@@ -1,5 +1,5 @@
 import { useState } from "react";
-import './index.css';
+import "./index.css";
 
 function LeaveRequest() {
   const [date, setDate] = useState("");
@@ -46,21 +46,29 @@ function LeaveRequest() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow-md p-6" style={{ backgroundColor: "#0A0043" }}>
-        
+      <div
+        className="w-full max-w-sm bg-white rounded-lg shadow-md p-6"
+        style={{ backgroundColor: "#0A0043" }}
+      >
         {/* Header */}
         <div className="flex items-center mb-4">
-          <button onClick={handleBack} className="text-[#FFFF00] text-xl mr-2 font-bold">
+          <button
+            onClick={handleBack}
+            className="text-[#FFFF00] text-xl mr-2 font-bold"
+          >
             &lt;
           </button>
-          <h2 className="text-xl font-bold text-center text-[#FFFF00] flex-1">LEAVE REQUEST</h2>
+          <h2 className="text-xl font-bold text-center text-[#FFFF00] flex-1">
+            LEAVE REQUEST
+          </h2>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4"> 
-          {/* Date */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Date:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              Date:
+            </label>
             <input
               type="text"
               placeholder="dd/mm/yy"
@@ -70,9 +78,10 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* From Date */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">From Date:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              From Date:
+            </label>
             <input
               type="text"
               placeholder="dd/mm/yy"
@@ -82,9 +91,10 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* To Date */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">To Date:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              To Date:
+            </label>
             <input
               type="text"
               placeholder="dd/mm/yy"
@@ -94,9 +104,10 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* From Time */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">From Time:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              From Time:
+            </label>
             <input
               type="text"
               placeholder="HH:MM"
@@ -106,9 +117,10 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* To Time */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">To Time:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              To Time:
+            </label>
             <input
               type="text"
               placeholder="HH:MM"
@@ -118,22 +130,25 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* Reason for Leave */}
           <div>
-            <p className="font-medium mb-1 text-[#FFFF00]">Reason for Leave:</p>
+            <p className="font-medium mb-1 text-[#FFFF00]">
+              Reason for Leave:
+            </p>
             <div className="space-y-1">
-              {["Vacation", "Military", "Sick-Self", "Sick-Family", "Other"].map((r) => (
-                <label key={r} className="flex items-center space-x-2 text-white">
-                  <input
-                    type="checkbox"
-                    name={r}
-                    checked={reason[r]}
-                    onChange={handleReasonChange}
-                    className="w-4 h-4"
-                  />
-                  <span>{r}</span>
-                </label>
-              ))}
+              {["Vacation", "Military", "Sick-Self", "Sick-Family", "Other"].map(
+                (r) => (
+                  <label key={r} className="flex items-center space-x-2 text-white">
+                    <input
+                      type="checkbox"
+                      name={r}
+                      checked={reason[r]}
+                      onChange={handleReasonChange}
+                      className="w-4 h-4"
+                    />
+                    <span>{r}</span>
+                  </label>
+                )
+              )}
             </div>
             {reason.Other && (
               <div className="mt-2">
@@ -151,9 +166,10 @@ function LeaveRequest() {
             )}
           </div>
 
-          {/* Link/Pic */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Link/Pic:</label>
+            <label className="block text-sm font-medium mb-1 text-white">
+              Link/Pic:
+            </label>
             <input
               type="text"
               placeholder="วางลิงก์หรือแนบรูป"
@@ -163,7 +179,6 @@ function LeaveRequest() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
