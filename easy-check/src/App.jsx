@@ -1,5 +1,5 @@
 
-import LeaveRequest from "./LeaveRequest";
+
 
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
     
     <div>
       
-      <LeaveRequest />
+
 
     </div>
   );
