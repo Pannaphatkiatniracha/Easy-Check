@@ -1,3 +1,4 @@
+import Login from "./user/page/login";
 
 
 
@@ -7,7 +8,7 @@ function App() {
     
     <div>
       
-
+      <Login></Login>
 
     </div>
   );
