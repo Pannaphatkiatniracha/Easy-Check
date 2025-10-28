@@ -8,6 +8,7 @@ import Event from "./user/page/Event";
 import Setting from "./user/page/Setting";
 import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
+import CheckIn from "./user/page/CheckIn";
 
 
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="event" element={<Event />} />
           <Route path="setting" element={<Setting />} />
           <Route path="leaverequest" element={<LeaveRequest />} />
+          <Route path="checkin" element={<CheckIn />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 
