@@ -23,7 +23,6 @@ function App() {
       <Routes>
 
         <Route path="/" element={<AppLayout />}>
-          <Route path="login" element={<Login />} />
           <Route path="profile" element={<Profile />} />
           <Route path="home" element={<Home />} />
           <Route path="event" element={<Event />} />
@@ -34,6 +33,7 @@ function App() {
         </Route>
 
         <Route path="/" element={<AppNobar />}>
+          <Route path="login" element={<Login />} />
 
         </Route>
 

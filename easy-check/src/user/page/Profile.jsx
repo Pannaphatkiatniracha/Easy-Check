@@ -71,7 +71,7 @@ const Profile = () => {
 
     return (
         <div className="app-container">
-                        {/* หัวข้อ */}
+            {/* หัวข้อ */}
             <div className="text-center text-warning mt-16">
                 <h2 className="fw-normal">My Profile</h2>
             </div>
@@ -122,7 +122,7 @@ const Profile = () => {
                 {/* ตำแหน่ง */}
                 <div className='mb-3 w-75'>
                     <label className="text-light fw-normal form-label" htmlFor="">Position -</label><br />
-                    <input className="rounded-1 form-control" type="text" 
+                    <input className="rounded-1 form-control fw-semibold" type="text" 
                     name='position' value={user.position} onChange={handleChange} readOnly  />
                 </div>
 
