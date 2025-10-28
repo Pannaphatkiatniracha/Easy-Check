@@ -110,7 +110,7 @@ const Event = () => {
                                 วันที่: {event.date} <br />
                                 สถานที่: {event.location}
                             </Card.Text>
-                            <Link to="" className='text-decoration-none'>                            
+                            <Link to="/register" className='text-decoration-none'>                            
                               <Button variant="warning">ลงทะเบียน</Button>
                             </Link>
                         </Card.Body>

@@ -9,6 +9,7 @@ import Setting from "./user/page/Setting";
 import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
 import CheckIn from "./user/page/CheckIn";
+import Register from "./user/page/Register";
 
 
 
@@ -34,7 +35,7 @@ function App() {
 
         <Route path="/" element={<AppNobar />}>
           <Route path="login" element={<Login />} />
-
+          <Route path="register" element={<Register />} />
         </Route>
 
       </Routes>
