@@ -1,5 +1,5 @@
 import './User.css'
-import { Button } from 'react-bootstrap';
+import { Button, FormSelect } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 
@@ -15,7 +15,7 @@ const Profile = () => {
             department: "",
             branch: "",
             gender: "Female",
-            avatar: "/easycheck/img/ton.jpg"
+            avatar: "/easycheck/img/an.jpg"
         }
     )
 
@@ -121,24 +121,41 @@ const Profile = () => {
 
                 {/* ตำแหน่ง */}
                 <div className='mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Position</label><br />
+                    <label className="text-light fw-normal form-label" htmlFor="">Position -</label><br />
                     <input className="rounded-1 form-control" type="text" 
-                    name='position' value={user.position} onChange={handleChange} />
+                    name='position' value={user.position} onChange={handleChange} readOnly  />
                 </div>
 
                 {/* แผนก */}
                 <div className='mb-3 w-75'>
                     <label className="text-warning fw-light form-label" htmlFor="">Department</label><br />
-                    <input className="rounded-1 form-control" type="text" 
-                    name='department' value={user.department} onChange={handleChange} />
+                    <Form.Select aria-label='Select dapartment'
+                    name='department' value={user.department} onChange={handleChange}>
+                        <option value="IT">IT</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Customer Service">Customer Service</option>
+                    </Form.Select>
+                    {/* <input className="rounded-1 form-control" type="text" 
+                     /> */}
                 </div>
 
                 {/* สาขา */}
                 <div className='w-75'>
                     <label className="text-warning fw-light form-label" htmlFor="">Branch</label><br />
-                    <input className="rounded-1 form-control" type="text" 
-                    name='branch' value={user.branch} onChange={handleChange} />
+                    <Form.Select aria-label='Select branch'
+                    name='branch' value={user.branch} onChange={handleChange}>
+                        <option value="Bangkok">กรุงเทพมหานคร</option>
+                        <option value="ChiangMai">เชียงใหม่</option>
+                        <option value="Phuket">ภูเก็ต</option>
+                        <option value="Chonburi">ชลบุรี</option>
+                        <option value="Khonkaen">ขอนแก่น</option>
+                    </Form.Select>
+                    {/* <input className="rounded-1 form-control" type="text" 
+                     /> */}
                 </div>
+
 
             </div>
 
@@ -153,7 +170,7 @@ const Profile = () => {
 
             <div className='px-5 mt-2'>
                 <label className="text-warning fw-light form-label">Gender</label>
-                <Form.Select aria-label="Default select example" 
+                <Form.Select aria-label="Select gender" 
                 name='gender' value={user.gender} onChange={handleChange}>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
