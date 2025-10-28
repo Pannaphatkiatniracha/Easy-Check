@@ -152,8 +152,6 @@ const Profile = () => {
                         <option value="Chonburi">ชลบุรี</option>
                         <option value="Khonkaen">ขอนแก่น</option>
                     </Form.Select>
-                    {/* <input className="rounded-1 form-control" type="text" 
-                     /> */}
                 </div>
 
 
