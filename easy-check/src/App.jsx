@@ -10,6 +10,9 @@ import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
 import CheckIn from "./user/page/CheckIn";
 import Register from "./user/page/Register";
+import CheckOut from "./user/page/CheckOut";
+import DelegateCheckin from "./user/page/DelegateCheckin";
+import Support from "./user/page/Support";
 
 
 
@@ -28,14 +31,17 @@ function App() {
           <Route path="home" element={<Home />} />
           <Route path="event" element={<Event />} />
           <Route path="setting" element={<Setting />} />
-          <Route path="leaverequest" element={<LeaveRequest />} />
-          <Route path="checkin" element={<CheckIn />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 
         <Route path="/" element={<AppNobar />}>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="leaverequest" element={<LeaveRequest />} />
+          <Route path="checkin" element={<CheckIn />} />
+          <Route path="checkout" element={<CheckOut />} />
+          <Route path="delegatecheckin" element={<DelegateCheckin />} />
+          <Route path="support" element={<Support />} />
         </Route>
 
       </Routes>
