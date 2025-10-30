@@ -107,14 +107,9 @@ const Profile = () => {
 
                 {/* ชื่อ */}
                 <div className='mt-4 mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Information</label><br />
-                    <InputGroup>
-                        <InputGroup.Text>
-                        Name
-                        </InputGroup.Text>
-                        <FormControl type='text' placeholder='Name'
-                        name='name' value={user.name} onChange={handleChange} />
-                    </InputGroup>
+                    <label className="text-warning fw-light form-label" htmlFor="">Information</label>
+                    <input className='fw-semibold form-control' type="text"
+                    name="name" value={user.name} onChange={handleChange} readOnly />
                 </div>
 
 
