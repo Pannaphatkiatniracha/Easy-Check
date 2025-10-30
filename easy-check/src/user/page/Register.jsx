@@ -146,7 +146,9 @@ const Register = () => {
 
             </div>
 
-            <hr className="w-75 mx-auto my-4 border-warning opacity-75" />
+
+            {/* opacity = ความโปร่งความทึบของเส้น */}
+            <hr className="w-100 my-4 border-warning opacity-75" />
 
 
             {/* ข้อมูลที่ให้เลือก */}

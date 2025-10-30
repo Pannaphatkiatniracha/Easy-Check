@@ -128,7 +128,7 @@ const ChangePassword = () => {
                 
                 {/* ปุ่ม */}
                 <div className='text-center mt-20'>
-                    <Button className='rounded-5 w-25' variant='warning' onClick={handleSave} >SAVE</Button>
+                    <Button className='rounded-5 w-25' variant='warning' onClick={handleSave} >Save</Button>
                 </div>
 
 
