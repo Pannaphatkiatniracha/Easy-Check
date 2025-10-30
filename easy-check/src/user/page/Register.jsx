@@ -85,20 +85,20 @@ const Register = () => {
 
 
             {/* form ต่าง ๆ */}
-            {/* พอใช้ d-flex แล้วก็กลายเป็น inline ต้องใช้ flex-column มา set ให้นางเป็นแนวตั้งอีกที */}
+            {/* ใช้ flex เป็นคอลัมน์ กับให้อยู่กลางแนวนอน */}
             <div className="d-flex flex-column align-items-center">
 
                 <div className="mt-4 mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
-                    <label className="text-warning fw-light form-label" htmlFor="">Name</label><br />
+                    <label className="text-warning fw-light form-label" htmlFor="">Name</label>
                     <input className="rounded-1 form-control" type="text" placeholder=''
                     // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
                     name='name' value={user.name} onChange={handleChange} />
                 </div>
 
                 <div className="mb-3 w-75">
-                    <label className="text-warning fw-light form-label" htmlFor="">Position</label><br />
+                    <label className="text-warning fw-light form-label" htmlFor="">Position</label>
                         <Form.Select aria-label="Select position" 
                         name='position' value={user.position} onChange={handleChange}>
                         <option value="Software Developer">Software Developer</option>
@@ -121,7 +121,7 @@ const Register = () => {
 
 
                 <div className='mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Department</label><br />
+                    <label className="text-warning fw-light form-label" htmlFor="">Department</label>
                         <Form.Select aria-label="Select department" 
                         name='department' value={user.department} onChange={handleChange}>
                         <option value="IT">IT</option>
@@ -133,7 +133,7 @@ const Register = () => {
                 </div>
 
                 <div className='mb-6 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Branch</label><br />
+                    <label className="text-warning fw-light form-label" htmlFor="">Branch</label>
                         <Form.Select aria-label="Select position" 
                         name='branch' value={user.branch} onChange={handleChange}>
                         <option value="Bangkok">กรุงเทพมหานคร</option>
