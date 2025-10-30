@@ -1,5 +1,5 @@
 import './User.css'
-import { Button, FormSelect } from 'react-bootstrap';
+import { Button, FormSelect, InputGroup, FormControl } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ const Profile = () => {
     const [user, setUser] = useState(
         {
             name: "", //ค่าตั้งต้น
+            username: "",
             email: "",
             phone: "",
             birth: "",
@@ -33,6 +34,7 @@ const Profile = () => {
             const data = await res.json()
             setUser({
                 name: data.name || "",
+                username: data.username || "",
                 email: data.email || "",
                 phone: data.phone || "",
                 birth: data.birth || "",
@@ -104,30 +106,57 @@ const Profile = () => {
 
 
                 {/* ชื่อ */}
-                <div className="mt-4 mb-3 w-75">
-                    {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
-                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
-                    <label className="text-warning fw-light form-label" htmlFor="">Name</label><br />
-                    <input className="rounded-1 form-control" type="text" 
-                    // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
-                    name='name' value={user.name} onChange={handleChange} />
+                <div className='mt-4 mb-3 w-75'>
+                    <label className="text-warning fw-light form-label" htmlFor="">Information</label><br />
+                    <InputGroup>
+                        <InputGroup.Text>
+                        Name
+                        </InputGroup.Text>
+                        <FormControl type='text' placeholder='Name'
+                        name='name' value={user.name} onChange={handleChange} />
+                    </InputGroup>
                 </div>
+
+
+                {/* username */}
+                <div className='mb-3 w-75'>
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                        <i className="bi bi-person-fill"></i>
+                        </InputGroup.Text>
+                        <FormControl type='text' placeholder='Username'
+                        name='username' value={user.username} onChange={handleChange} />                   
+                    </InputGroup>
+                </div>
+
 
                 {/* อีเมล */}
                 <div className="mb-3 w-75">
-                    <label className="text-warning fw-light form-label" htmlFor="">Email</label><br />
-                    <input className="rounded-1 form-control" type="text"
-                    name='email' value={user.email} onChange={handleChange} />
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                        <i class="bi bi-envelope-fill"></i>
+                        </InputGroup.Text>
+                        <FormControl type='text' placeholder='Email'
+                        name="email" value={user.email} onChange={handleChange} />
+                    </InputGroup>
                 </div>
 
+
                 {/* เบอร์โทร */}
-                <div className='mb-12 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Phone Number</label><br />
-                    <input className="rounded-1 form-control" type="text" 
-                    name='phone' value={user.phone} onChange={handleChange} />
+                <div className="mb-12 w-75">
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                        <i className="bi bi-telephone-fill"></i>
+                        {/* <i class="bi bi-telephone"></i> */}
+                        </InputGroup.Text>
+                        <FormControl type='text' placeholder='Phone Number'
+                        name="phone" value={user.phone} onChange={handleChange} />
+                    </InputGroup>
                 </div>
 
                 {/* ตำแหน่ง */}
+                    {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
+                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                 <div className='mb-3 w-75'>
                     <label className="text-light fw-normal form-label" htmlFor="">Position -</label><br />
                     <input className="rounded-1 form-control fw-semibold" type="text" 
