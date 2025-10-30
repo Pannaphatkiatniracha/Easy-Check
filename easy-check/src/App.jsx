@@ -14,6 +14,7 @@ import CheckOut from "./user/page/CheckOut";
 import DelegateCheckin from "./user/page/DelegateCheckin";
 import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
+import ChangePassword from "./user/page/ChangePassword";
 
 
 
@@ -44,6 +45,7 @@ function App() {
           <Route path="delegatecheckin" element={<DelegateCheckin />} />
           <Route path="support" element={<Support />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
+          <Route path="changepassword" element={<ChangePassword />} />
         </Route>
 
       </Routes>

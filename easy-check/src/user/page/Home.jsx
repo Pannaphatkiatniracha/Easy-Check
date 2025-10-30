@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
     return (
+
         <div className="p-4">
             
             <Link to="/" className='text-decoration-none'>            
@@ -13,7 +14,7 @@ const Home = () => {
                 </div>
             </Link>
 
-            <div className="text-white grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
 
                 {/* ลบเส้น border ออกเพราะใส่สีแล้วไม่สวย */}
                 <Link to="/checkin" className='text-decoration-none'>                

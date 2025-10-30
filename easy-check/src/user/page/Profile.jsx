@@ -2,6 +2,7 @@ import './User.css'
 import { Button, FormSelect } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
         // setUser ใช้ตอนเปลี่ยนค่า user
@@ -70,11 +71,16 @@ const Profile = () => {
   }
 
     return (
+
         <div className="app-container">
+
+
             {/* หัวข้อ */}
             <div className="text-center text-warning mt-16">
                 <h2 className="fw-normal">My Profile</h2>
             </div>
+
+
 
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
@@ -84,11 +90,13 @@ const Profile = () => {
 
                 {/* icon edit */}
                 <Button size='sm' variant='warning' className='position-absolute bottom-0 end-0 rounded-circle'
-                // 25 คือแกน x 10 คือแกน y
+                // เป๊ะไม่พอ 25 คือแกน x 10 คือแกน y
                 style={{ transform: "translate(25%, 10%)" }}>
                     <i className="bi bi-pencil-fill"></i>
                 </Button>
             </div>
+
+            
 
             {/* form ต่าง ๆ */}
             {/* พอใช้ d-flex แล้วก็กลายเป็น inline ต้องใช้ flex-column มา set ให้นางเป็นแนวตั้งอีกที */}
@@ -160,29 +168,37 @@ const Profile = () => {
             {/* ข้อมูลที่ให้เลือก */}
             <div className='px-5 mt-12'>
                 <label className='text-warning fw-light form-label' htmlFor="">Birth</label>
+
                 <input className='form-control' type="date" 
                 name='birth' value={user.birth} onChange={handleChange} />
             </div>
 
             
 
-            <div className='px-5 mt-2'>
+            <div className='px-5 mt-3'>
                 <label className="text-warning fw-light form-label">Gender</label>
+
                 <Form.Select aria-label="Select gender" 
                 name='gender' value={user.gender} onChange={handleChange}>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 </Form.Select>
+
             </div>
 
+
             {/* ปุ่ม */}
-            <div className='text-center mt-5'>
-                <Button className='rounded-5 w-50' variant='warning'>Chang Password &nbsp; <i className="bi bi-lock-fill"></i></Button>
-            </div>
+            <Link to="/changepassword" className='text-decoration-none'>        
+                <div className='text-center mt-5'>
+                    <Button className='rounded-5 w-50' variant='warning'>Chang Password &nbsp; <i className="bi bi-lock-fill"></i></Button>
+                </div>
+            </Link>
+
             <div className='text-center mt-3 mb-5'>
                 <Button className='rounded-5 w-25' variant='warning' 
                 onClick={handleSave}>Save</Button>
             </div>
+
         </div>
     )
 }

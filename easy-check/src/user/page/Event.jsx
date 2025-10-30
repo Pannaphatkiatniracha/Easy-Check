@@ -71,7 +71,10 @@ const Event = () => {
 
 
     return (
+
         <div className="app-container">
+
+            {/* สไลด์รูป event */}
             <Carousel>
                 <Carousel.Item>
                     <img src="/easycheck/img/blood.png" alt="" />
@@ -99,11 +102,17 @@ const Event = () => {
             </Carousel>
 
 
+            {/* หัวข้อ + กล่องงาน event */}
             <div className="text-white mt-3 p-3">
                 <h2 className="text-warning text-center fw-normal mb-8">Event</h2>
 
                 {events.map((event) => (
-                    <Card key={event.id} className="mb-3 bg-transparent border border-warning rounded-3 text-white hover:scale-105 transition-all duration-200 ease-in-out">
+                    <Card key={event.id} className="mb-3 bg-transparent border border-warning rounded-3 text-white
+                    hover:scale-105 transition-all duration-200 ease-in-out">
+                  {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
+                    duration-200 = ความเร็ว 0.2 s 
+                    ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
+                    
                         <Card.Body>
                             <Card.Title>{event.title}</Card.Title>
                             <Card.Text>
@@ -117,6 +126,8 @@ const Event = () => {
                     </Card>
                 ))}
             </div>
+
+            
         </div>
     )
 }

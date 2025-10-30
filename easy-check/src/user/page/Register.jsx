@@ -64,8 +64,11 @@ const Register = () => {
       }
 
     return (
+
         <div className='app-container'>
-                        {/* หัวข้อ */}
+
+            
+            {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-warning mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
