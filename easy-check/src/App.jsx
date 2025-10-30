@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./user/page/login";
-import AppLayout from "./user/layouts/AppLayou";
+import Login from "./user/page/Login";
+import AppLayout from "./user/layouts/AppLayout";
 import AppNobar from "./user/layouts/AppNobar";
 import NotFound from "./user/page/NotFound";
 import Profile from "./user/page/Profile";
@@ -13,6 +13,7 @@ import Register from "./user/page/Register";
 import CheckOut from "./user/page/CheckOut";
 import DelegateCheckin from "./user/page/DelegateCheckin";
 import Support from "./user/page/Support";
+import ForgotPassword from "./user/page/ForgotPassword";
 
 
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="checkout" element={<CheckOut />} />
           <Route path="delegatecheckin" element={<DelegateCheckin />} />
           <Route path="support" element={<Support />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
         </Route>
 
       </Routes>

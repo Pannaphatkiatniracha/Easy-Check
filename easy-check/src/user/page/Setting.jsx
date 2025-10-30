@@ -1,10 +1,9 @@
-import './User.css'
 import Form from 'react-bootstrap/Form';
 import { Link } from "react-router-dom";
 
 const Setting = () => {
     return (
-        <div className="app-container">
+        <div>
             {/* หัวข้อ */}
             <div className="text-center text-warning mt-16">
                 <h2 className="fw-normal">Setting</h2>

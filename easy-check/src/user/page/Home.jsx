@@ -1,10 +1,9 @@
-import './User.css'
 import { Button } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 
 const Home = () => {
     return (
-        <div className="app-container p-4">
+        <div className="p-4">
             
             <Link to="/" className='text-decoration-none'>            
                 <div className="mb-4 text-end rounded-circle">
