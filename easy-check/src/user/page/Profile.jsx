@@ -113,14 +113,14 @@ const Profile = () => {
                 </div>
 
 
-                {/* username */}
+                {/* รหัสพนักงาน */}
                 <div className='mb-3 w-75'>
                     <InputGroup>
                         <InputGroup.Text className='text-secondary'>
                         <i className="bi bi-person-fill"></i>
                         </InputGroup.Text>
-                        <FormControl type='text' placeholder='Username'
-                        name='username' value={user.username} onChange={handleChange} />                   
+                        <FormControl className='fw-semibold' type='text' placeholder='Employee ID'
+                        name='username' value={user.username} onChange={handleChange} readOnly />                   
                     </InputGroup>
                 </div>
 
@@ -153,7 +153,7 @@ const Profile = () => {
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                 <div className='mb-3 w-75'>
-                    <label className="text-light fw-normal form-label" htmlFor="">Position -</label><br />
+                    <label className="text-warning fw-light form-label" htmlFor="">Position</label><br />
                     <input className="rounded-1 form-control fw-semibold" type="text" 
                     name='position' value={user.position} onChange={handleChange} readOnly  />
                 </div>
