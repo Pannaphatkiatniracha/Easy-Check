@@ -10,7 +10,6 @@ import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
 import CheckIn from "./user/page/CheckIn";
 import Register from "./user/page/Register";
-import CheckOut from "./user/page/CheckOut";
 import DelegateCheckin from "./user/page/DelegateCheckin";
 import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
@@ -41,7 +40,6 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route path="leaverequest" element={<LeaveRequest />} />
           <Route path="checkin" element={<CheckIn />} />
-          <Route path="checkout" element={<CheckOut />} />
           <Route path="delegatecheckin" element={<DelegateCheckin />} />
           <Route path="support" element={<Support />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
