@@ -1,4 +1,3 @@
-import Carousel from 'react-bootstrap/Carousel';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
@@ -74,7 +73,7 @@ const InternalEvent = () => {
         <div className='app-container'>
 
 
-            {/* หัวข้อ */}
+            {/* หัวข้อ + icon */}
             <div className="d-flex justify-content-between text-warning mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
@@ -84,7 +83,7 @@ const InternalEvent = () => {
                     </Button>
                 </Link>
                 
-                <h3 className="text-[#F26623] text-center fw-normal">Corporate internal event</h3>
+                <h3 className="text-[#F26623] text-center fw-norma">Corporate internal event</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
