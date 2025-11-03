@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function CheckInOut() {
   const [name, setName] = useState("");
@@ -12,12 +13,11 @@ function CheckInOut() {
   const [photo, setPhoto] = useState(null);
   const [checkInData, setCheckInData] = useState(null);
   const [checkOutData, setCheckOutData] = useState(null);
-  const [mode, setMode] = useState("checkin"); // checkin | checkout | done
+  const [mode, setMode] = useState("checkin");
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // อัปเดตเวลาแบบ real-time
   useEffect(() => {
     const nowTime = () => {
       const now = new Date();
@@ -49,8 +49,10 @@ function CheckInOut() {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0);
     canvas.toBlob((blob) => {
-      const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
-      setPhoto(file);
+      if (blob) {
+        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+        setPhoto(file);
+      }
     });
   };
 
@@ -67,7 +69,7 @@ function CheckInOut() {
     );
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!name) return setError("กรุณากรอกชื่อ");
     if (!location) return setError("กรุณาขอตำแหน่งก่อน");
     if (!photo) return setError("กรุณาถ่ายรูปยืนยันตัวตน");
@@ -76,32 +78,26 @@ function CheckInOut() {
     const timestamp = now.getTime();
 
     if (mode === "checkin") {
-      // เช็คอิน
       const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
       setCheckInData(data);
       localStorage.setItem("checkInData", JSON.stringify(data));
-      setMessage(`✅ เช็คอินสำเร็จ\nเวลา: ${time}`);
+      setMessage(`เช็คอินสำเร็จ\nเวลา: ${time}`);
       setMode("checkout");
       setPhoto(null);
     } else if (mode === "checkout") {
-      // เช็คเอาท์
       const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
       setCheckOutData(data);
       localStorage.setItem("checkOutData", JSON.stringify(data));
-
-      // คำนวณเวลาทำงานรวม
       if (checkInData) {
         const durationMs = timestamp - checkInData.timestamp;
         const hours = Math.floor(durationMs / (1000 * 60 * 60));
         const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-        setMessage(`✅ เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`);
+        setMessage(`เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`);
       }
-
       setMode("done");
       setPhoto(null);
     }
 
-    // ปิดกล้อง
     const stream = videoRef.current?.srcObject;
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -123,98 +119,125 @@ function CheckInOut() {
   };
 
   return (
-    <div className="min-h-screen bg-indigo-950 text-white flex flex-col items-center p-5">
-      <h1 className="text-3xl font-bold text-yellow-300 mb-4">📍 Check-In / Check-Out</h1>
+    <div className="min-h-screen bg-gradient-to-b from-[#F26623] to-[#FFB97D] flex flex-col items-center py-10 px-4">
+      <div className="max-w-md w-full flex flex-col items-center space-y-6">
+        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg text-center flex items-center gap-2">
+          <i className="bi bi-geo-alt-fill"></i>
+          Check-In / Check-Out
+        </h1>
 
-      <video ref={videoRef} autoPlay className="w-64 rounded-lg border mb-4"></video>
-      <canvas ref={canvasRef} className="hidden"></canvas>
+        <video
+          ref={videoRef}
+          autoPlay
+          className="w-80 aspect-video rounded-xl shadow-xl border-4 border-white object-cover"
+        ></video>
+        <canvas ref={canvasRef} className="hidden"></canvas>
 
-      {mode !== "done" && (
-        <>
-          <button
-            onClick={startCamera}
-            className="w-60 bg-blue-500 py-2 rounded-md font-semibold mb-3"
-          >
-            เปิดกล้อง ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
-          </button>
+        {mode !== "done" && (
+          <div className="w-full flex flex-col gap-3">
+            <button
+              onClick={startCamera}
+              className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+            >
+              <i className="bi bi-camera-video-fill"></i> เปิดกล้อง ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
+            </button>
 
-          <button
-            onClick={capturePhoto}
-            className="w-60 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold mb-4"
-          >
-            ถ่ายรูป
-          </button>
-        </>
-      )}
+            <button
+              onClick={capturePhoto}
+              className="w-full py-3 rounded-xl bg-[#F26623] text-white font-bold shadow-lg hover:scale-105 transition transform"
+            >
+              <i className="bi bi-camera-fill"></i> ถ่ายรูป
+            </button>
+          </div>
+        )}
 
-      {photo && (
-        <img
-          src={URL.createObjectURL(photo)}
-          alt="preview"
-          className="w-48 rounded mb-4 border"
-        />
-      )}
+        {photo && (
+          <img
+            src={URL.createObjectURL(photo)}
+            alt="preview"
+            className="w-80 h-48 rounded-xl border-4 border-white shadow-xl object-cover"
+          />
+        )}
 
-      {mode === "checkin" && !checkInData && (
-        <input
-          type="text"
-          className="w-60 p-2 rounded-md text-black mb-3"
-          placeholder="ชื่อ"
-          onChange={(e) => setName(e.target.value)}
-        />
-      )}
+        {mode === "checkin" && !checkInData && (
+          <input
+            type="text"
+            className="w-full p-3 rounded-xl text-black placeholder-gray-500 shadow-inner"
+            placeholder="ชื่อ"
+            onChange={(e) => setName(e.target.value)}
+          />
+        )}
 
-      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-2">{time}</div>
-      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-4">{date}</div>
+        <div className="w-full grid grid-cols-2 gap-4">
+          <div className="bg-white text-[#F26623] py-2 rounded-xl text-center font-semibold shadow-inner">
+            {time}
+          </div>
+          <div className="bg-white text-[#F26623] py-2 rounded-xl text-center font-semibold shadow-inner">
+            {date}
+          </div>
+        </div>
 
-      <button
-        onClick={handleLocation}
-        className="w-60 bg-green-500 py-2 rounded-md font-semibold mb-3"
-      >
-        ขอใช้ตำแหน่ง
-      </button>
-
-      {mode !== "done" && (
         <button
-          onClick={handleConfirm}
-          className="w-32 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold mb-4"
+          onClick={handleLocation}
+          className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
         >
-          Done
+          <i className="bi bi-geo-alt"></i> ขอใช้ตำแหน่ง
         </button>
-      )}
 
-      {checkInData && (
-        <div className="border p-4 rounded-xl bg-white/10 w-60 mb-2 text-center">
-          <h3 className="font-bold text-yellow-300">📍 เช็คอิน</h3>
-          <p>เวลา: {checkInData.time}</p>
-          <img src={URL.createObjectURL(checkInData.photo)} alt="Check-In" className="mt-2 rounded-lg" />
-        </div>
-      )}
+        {mode !== "done" && (
+          <button
+            onClick={handleConfirm}
+            className="w-1/2 py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+          >
+            Done
+          </button>
+        )}
 
-      {checkOutData && (
-        <div className="border p-4 rounded-xl bg-white/10 w-60 mb-2 text-center">
-          <h3 className="font-bold text-yellow-300">🏁 เช็คเอาท์</h3>
-          <p>เวลา: {checkOutData.time}</p>
-          <img src={URL.createObjectURL(checkOutData.photo)} alt="Check-Out" className="mt-2 rounded-lg" />
-        </div>
-      )}
+        {checkInData && (
+          <div className="w-full p-4 rounded-xl bg-white/30 backdrop-blur-md shadow-lg border-2 border-white text-center">
+            <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
+              <i className="bi bi-geo-fill"></i> เช็คอิน
+            </h3>
+            <p className="text-white">เวลา: {checkInData.time}</p>
+            <img
+              src={URL.createObjectURL(checkInData.photo)}
+              alt="Check-In"
+              className="mt-2 w-full h-40 rounded-xl object-cover border-2 border-white shadow"
+            />
+          </div>
+        )}
 
-      {message && (
-        <div className="mt-4 p-3 bg-green-600 rounded-lg text-white w-60 text-center whitespace-pre-line">
-          {message}
-        </div>
-      )}
+        {checkOutData && (
+          <div className="w-full p-4 rounded-xl bg-white/30 backdrop-blur-md shadow-lg border-2 border-white text-center">
+            <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
+              <i className="bi bi-flag-fill"></i> เช็คเอาท์
+            </h3>
+            <p className="text-white">เวลา: {checkOutData.time}</p>
+            <img
+              src={URL.createObjectURL(checkOutData.photo)}
+              alt="Check-Out"
+              className="mt-2 w-full h-40 rounded-xl object-cover border-2 border-white shadow"
+            />
+          </div>
+        )}
 
-      {error && <p className="mt-3 text-red-400">{error}</p>}
+        {message && (
+          <div className="mt-4 p-3 bg-white/40 rounded-xl text-[#F26623] w-full text-center font-semibold shadow-md whitespace-pre-line">
+            {message}
+          </div>
+        )}
 
-      {mode === "done" && (
-        <button
-          onClick={handleReset}
-          className="w-60 py-2 rounded-md bg-red-500 text-white font-bold mt-4"
-        >
-         // เริ่มใหม่
-        </button>
-      )}
+        {error && <p className="mt-3 text-red-500 font-semibold">{error}</p>}
+
+        {mode === "done" && (
+          <button
+            onClick={handleReset}
+            className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+          >
+            เริ่มใหม่
+          </button>
+        )}
+      </div>
     </div>
   );
 }
