@@ -8,7 +8,7 @@ const Setting = () => {
 
             
             {/* หัวข้อ */}
-            <div className="text-center text-warning mt-16">
+            <div className="text-center text-[#F26623] mt-16">
                 <h2 className="fw-normal">Setting</h2>
             </div>
 
