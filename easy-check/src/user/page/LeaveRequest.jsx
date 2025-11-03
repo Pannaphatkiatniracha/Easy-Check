@@ -51,7 +51,7 @@ const LeaveRequest = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-8 space-y-8">
+    <div className="max-w-lg mx-auto p-8 space-y-8 app-container">
       {/* Header */}
       <h2 className="text-center text-2xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-white py-4 rounded-2xl shadow-lg">
         LEAVE REQUEST

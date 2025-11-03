@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-function CheckIn() {
+function CheckInOut() {
   const [name, setName] = useState("");
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
@@ -10,9 +10,14 @@ function CheckIn() {
   const [date, setDate] = useState("");
 
   const [photo, setPhoto] = useState(null);
+  const [checkInData, setCheckInData] = useState(null);
+  const [checkOutData, setCheckOutData] = useState(null);
+  const [mode, setMode] = useState("checkin"); // checkin | checkout | done
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
+  // อัปเดตเวลาแบบ real-time
   useEffect(() => {
     const nowTime = () => {
       const now = new Date();
@@ -27,7 +32,7 @@ function CheckIn() {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" }
+        video: { facingMode: "user" },
       });
       videoRef.current.srcObject = stream;
       setError("");
@@ -54,7 +59,7 @@ function CheckIn() {
       (pos) => {
         setLocation({
           lat: pos.coords.latitude,
-          lng: pos.coords.longitude
+          lng: pos.coords.longitude,
         });
         setError("");
       },
@@ -62,61 +67,85 @@ function CheckIn() {
     );
   };
 
-  const handleCheckIn = async () => {
+  const handleConfirm = async () => {
     if (!name) return setError("กรุณากรอกชื่อ");
     if (!location) return setError("กรุณาขอตำแหน่งก่อน");
     if (!photo) return setError("กรุณาถ่ายรูปยืนยันตัวตน");
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("date", date);
-    formData.append("time", time);
-    formData.append("lat", location.lat);
-    formData.append("lng", location.lng);
-    formData.append("photo", photo);
+    const now = new Date();
+    const timestamp = now.getTime();
 
-    try {
-      const res = await fetch("http://localhost:5000/api/checkin", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+    if (mode === "checkin") {
+      // เช็คอิน
+      const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
+      setCheckInData(data);
+      localStorage.setItem("checkInData", JSON.stringify(data));
+      setMessage(`✅ เช็คอินสำเร็จ\nเวลา: ${time}`);
+      setMode("checkout");
+      setPhoto(null);
+    } else if (mode === "checkout") {
+      // เช็คเอาท์
+      const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
+      setCheckOutData(data);
+      localStorage.setItem("checkOutData", JSON.stringify(data));
 
-      setMessage(` เช็คอินสำเร็จ\nวันที่: ${date}\nเวลา: ${time}`);
-      setError("");
-
-      // ปิดกล้องหลังเช็คอิน
-      const stream = videoRef.current.srcObject;
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
+      // คำนวณเวลาทำงานรวม
+      if (checkInData) {
+        const durationMs = timestamp - checkInData.timestamp;
+        const hours = Math.floor(durationMs / (1000 * 60 * 60));
+        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        setMessage(`✅ เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`);
       }
 
-    } catch (err) {
-      setError("เกิดข้อผิดพลาดในการเช็คอิน");
+      setMode("done");
+      setPhoto(null);
     }
+
+    // ปิดกล้อง
+    const stream = videoRef.current?.srcObject;
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+
+    setError("");
+  };
+
+  const handleReset = () => {
+    localStorage.removeItem("checkInData");
+    localStorage.removeItem("checkOutData");
+    setCheckInData(null);
+    setCheckOutData(null);
+    setPhoto(null);
+    setMode("checkin");
+    setMessage("");
+    setError("");
   };
 
   return (
     <div className="min-h-screen bg-indigo-950 text-white flex flex-col items-center p-5">
-      <h1 className="text-3xl font-bold text-yellow-300 mb-4">📍 Check In</h1>
+      <h1 className="text-3xl font-bold text-yellow-300 mb-4">📍 Check-In / Check-Out</h1>
 
       <video ref={videoRef} autoPlay className="w-64 rounded-lg border mb-4"></video>
       <canvas ref={canvasRef} className="hidden"></canvas>
 
-      <button
-        onClick={startCamera}
-        className="w-60 bg-blue-500 py-2 rounded-md font-semibold mb-3"
-      >
-        เปิดกล้อง
-      </button>
+      {mode !== "done" && (
+        <>
+          <button
+            onClick={startCamera}
+            className="w-60 bg-blue-500 py-2 rounded-md font-semibold mb-3"
+          >
+            เปิดกล้อง ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
+          </button>
 
-      <button
-        onClick={capturePhoto}
-        className="w-60 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold mb-4"
-      >
-        ถ่ายรูป
-      </button>
+          <button
+            onClick={capturePhoto}
+            className="w-60 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold mb-4"
+          >
+            ถ่ายรูป
+          </button>
+        </>
+      )}
 
       {photo && (
         <img
@@ -126,20 +155,17 @@ function CheckIn() {
         />
       )}
 
-      <input
-        type="text"
-        className="w-60 p-2 rounded-md text-black mb-3"
-        placeholder="ชื่อ"
-        onChange={(e) => setName(e.target.value)}
-      />
+      {mode === "checkin" && !checkInData && (
+        <input
+          type="text"
+          className="w-60 p-2 rounded-md text-black mb-3"
+          placeholder="ชื่อ"
+          onChange={(e) => setName(e.target.value)}
+        />
+      )}
 
-      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-2">
-         {time}
-      </div>
-
-      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-4">
-         {date}
-      </div>
+      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-2">{time}</div>
+      <div className="w-60 bg-gray-200 text-black text-center py-2 rounded mb-4">{date}</div>
 
       <button
         onClick={handleLocation}
@@ -148,28 +174,49 @@ function CheckIn() {
         ขอใช้ตำแหน่ง
       </button>
 
-      <button
-        onClick={handleCheckIn}
-        className="w-32 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold"
-      >
-        Done
-      </button>
+      {mode !== "done" && (
+        <button
+          onClick={handleConfirm}
+          className="w-32 bg-yellow-400 text-indigo-900 py-2 rounded-md font-semibold mb-4"
+        >
+          Done
+        </button>
+      )}
 
-      {location && (
-        <p className="text-green-300 mt-3 text-sm">
-          ตำแหน่ง: {location.lat.toFixed(5)}, {location.lng.toFixed(5)}
-        </p>
+      {checkInData && (
+        <div className="border p-4 rounded-xl bg-white/10 w-60 mb-2 text-center">
+          <h3 className="font-bold text-yellow-300">📍 เช็คอิน</h3>
+          <p>เวลา: {checkInData.time}</p>
+          <img src={URL.createObjectURL(checkInData.photo)} alt="Check-In" className="mt-2 rounded-lg" />
+        </div>
+      )}
+
+      {checkOutData && (
+        <div className="border p-4 rounded-xl bg-white/10 w-60 mb-2 text-center">
+          <h3 className="font-bold text-yellow-300">🏁 เช็คเอาท์</h3>
+          <p>เวลา: {checkOutData.time}</p>
+          <img src={URL.createObjectURL(checkOutData.photo)} alt="Check-Out" className="mt-2 rounded-lg" />
+        </div>
       )}
 
       {message && (
-        <div className="mt-4 p-3 bg-green-600 rounded-lg text-white w-64 text-center whitespace-pre-line">
+        <div className="mt-4 p-3 bg-green-600 rounded-lg text-white w-60 text-center whitespace-pre-line">
           {message}
         </div>
       )}
 
       {error && <p className="mt-3 text-red-400">{error}</p>}
+
+      {mode === "done" && (
+        <button
+          onClick={handleReset}
+          className="w-60 py-2 rounded-md bg-red-500 text-white font-bold mt-4"
+        >
+         // เริ่มใหม่
+        </button>
+      )}
     </div>
   );
 }
 
-export default CheckIn;
+export default CheckInOut;
