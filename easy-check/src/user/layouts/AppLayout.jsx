@@ -12,7 +12,7 @@ const AppLayout = () => {
                 <Outlet /> 
             </div>
 
-            <div className="bg-warning p-3">
+            <div className="bg-[#F26623] p-3">
                 <AppNavbar />
             </div>
         </div>
