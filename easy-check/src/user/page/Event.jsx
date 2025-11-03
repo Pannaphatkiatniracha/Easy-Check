@@ -13,7 +13,7 @@ const Event = () => {
 
 
           {/* กล่องแยก event */}
-            <Link to="/" className='text-decoration-none'>                
+            <Link to="/internalevent" className='text-decoration-none'>                
               <div className="mx-auto p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75">
                 <h5>Corporate <br /> internal event</h5>
               </div>

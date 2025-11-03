@@ -14,6 +14,7 @@ import DelegateCheckin from "./user/page/DelegateCheckin";
 import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
 import ChangePassword from "./user/page/ChangePassword";
+import InternalEvent from "./user/page/InternalEvent";
 
 
 
@@ -44,6 +45,7 @@ function App() {
           <Route path="support" element={<Support />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="changepassword" element={<ChangePassword />} />
+          <Route path="internalevent" element={<InternalEvent />} />
         </Route>
 
       </Routes>
