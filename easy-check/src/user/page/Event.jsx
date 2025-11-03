@@ -1,15 +1,40 @@
 import { Link } from "react-router-dom";
+import Carousel from 'react-bootstrap/Carousel';
 
 const Event = () => {
 
     return (
 
-        <div className="app-container">
+        <div>
 
-          {/* หัวข้อ */}
-          <div className="text-center text-[#F26623] mt-16">
-            <h2 className="fw-normal">Event</h2>
-          </div>
+
+          {/* สไลด์รูปภาพเลื่อนไปเลื่อนมา */}
+                      <Carousel>
+                <Carousel.Item>
+                    <img src="/easycheck/img/blood.png" alt="" />
+                    <Carousel.Caption>
+                    <h1 className='fw-bold'>EVENT</h1>
+                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
+                    </Carousel.Caption>
+                </Carousel.Item>
+
+                <Carousel.Item>
+                    <img src="/easycheck/img/mic.webp" alt="" />
+                    <Carousel.Caption>
+                    <h1 className='fw-bold'>EVENT</h1>
+                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
+                    </Carousel.Caption>
+                </Carousel.Item>
+                
+                <Carousel.Item>
+                    <img src="/easycheck/img/joy.png" alt="" />
+                    <Carousel.Caption>
+                    <h1 className='fw-bold'>EVENT</h1>
+                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
+                    </Carousel.Caption>
+                </Carousel.Item>
+            </Carousel>
+
 
 
           {/* กล่องแยก event */}

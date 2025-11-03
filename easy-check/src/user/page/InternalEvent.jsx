@@ -73,37 +73,25 @@ const InternalEvent = () => {
     return (
         <div className='app-container'>
 
-            {/* สไลด์รูป event */}
-            <Carousel>
-                <Carousel.Item>
-                    <img src="/easycheck/img/blood.png" alt="" />
-                    <Carousel.Caption>
-                    <h1 className='fw-bold'>EVENT</h1>
-                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
-                    </Carousel.Caption>
-                </Carousel.Item>
 
-                <Carousel.Item>
-                    <img src="/easycheck/img/mic.webp" alt="" />
-                    <Carousel.Caption>
-                    <h1 className='fw-bold'>EVENT</h1>
-                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
-                    </Carousel.Caption>
-                </Carousel.Item>
+            {/* หัวข้อ */}
+            <div className="d-flex justify-content-between text-warning mt-16">
                 
-                <Carousel.Item>
-                    <img src="/easycheck/img/joy.png" alt="" />
-                    <Carousel.Caption>
-                    <h1 className='fw-bold'>EVENT</h1>
-                    <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
-                    </Carousel.Caption>
-                </Carousel.Item>
-            </Carousel>
+                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
+                <Link to="/event" className='text-decoration-none'>                
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
+                    </Button>
+                </Link>
+                
+                <h3 className="text-[#F26623] text-center fw-normal">Corporate internal event</h3>
+                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
+                <div className="me-4"></div>
+            </div>
 
 
             {/* หัวข้อ + กล่องงาน event */}
             <div className="mt-3 p-3">
-                <h2 className="text-[#F26623] text-center fw-normal mb-12">Corporate internal event</h2>
 
                 {inevents.map((inevent) => (
                     <Card key={inevent.id} className="mb-3 rounded-3 text-black
