@@ -21,17 +21,10 @@ const Home = () => {
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
                     style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
-                        CHECK IN
+                        CHECK IN <br /> CHECK OUT
                     </div>
                 </Link>
 
-                <Link to="/checkout" className='text-decoration-none'>               
-                    <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff )'}}>
-                        <i className="bi bi-calendar-check-fill fs-2"></i> <br />
-                        CHECK OUT
-                    </div>
-                </Link>
 
                 <Link to="/delegatecheckin" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
@@ -41,13 +34,6 @@ const Home = () => {
                     </div>
                 </Link>
 
-                <Link to="/event" className='text-decoration-none'>              
-                    <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
-                        <i className="bi bi-calendar2-event-fill fs-2"></i> <br />
-                        EVENT
-                    </div>
-                </Link>
 
                 <Link to="/leaverequest" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
