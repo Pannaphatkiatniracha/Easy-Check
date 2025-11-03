@@ -102,12 +102,13 @@ const InternalEvent = () => {
 
 
             {/* หัวข้อ + กล่องงาน event */}
-            <div className="text-white mt-3 p-3">
-                <h2 className="text-warning text-center fw-normal mb-12">Corporate internal event</h2>
+            <div className="mt-3 p-3">
+                <h2 className="text-[#F26623] text-center fw-normal mb-12">Corporate internal event</h2>
 
                 {inevents.map((inevent) => (
-                    <Card key={inevent.id} className="mb-3 bg-transparent border border-warning rounded-3 text-white
-                    hover:scale-105 transition-all duration-200 ease-in-out">
+                    <Card key={inevent.id} className="mb-3 rounded-3 text-black
+                    hover:scale-105 transition-all duration-200 ease-in-out"
+                    style={{backgroundColor: '#D9D9D9'}}>
                   {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
                     duration-200 = ความเร็ว 0.2 s 
                     ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
@@ -119,7 +120,7 @@ const InternalEvent = () => {
                                 สถานที่: {inevent.location}
                             </Card.Text>
                             <Link to="/register" className='text-decoration-none'>                            
-                              <Button variant="warning">ลงทะเบียน</Button>
+                              <Button className='text-black' style={{backgroundColor: '#F26623', border: 'none'}}>ลงทะเบียน</Button>
                             </Link>
                         </Card.Body>
                     </Card>
