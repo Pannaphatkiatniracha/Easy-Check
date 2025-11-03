@@ -8,7 +8,8 @@ const Home = () => {
             
             <Link to="/" className='text-decoration-none'>            
                 <div className="mb-4 text-end rounded-circle">
-                    <Button size='sm' variant='warning' className='rounded-circle'>
+                    <Button size='sm' className='rounded-circle'
+                    style={{backgroundColor: '#F26623', border: 'none'}}>
                         <i className="bi bi-bell-fill"></i>
                     </Button>
                 </div>
@@ -19,7 +20,7 @@ const Home = () => {
                 {/* ลบเส้น border ออกเพราะใส่สีแล้วไม่สวย */}
                 <Link to="/checkin" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
+                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
                         CHECK IN <br /> CHECK OUT
                     </div>
@@ -28,7 +29,7 @@ const Home = () => {
 
                 <Link to="/delegatecheckin" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
+                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
                         DELEGATE CHECK-IN
                     </div>
@@ -37,7 +38,7 @@ const Home = () => {
 
                 <Link to="/leaverequest" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
+                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
                         <i className="bi bi-file-earmark-fill fs-2"></i> <br />
                         LEAVE REQUEST
                     </div>
@@ -46,7 +47,7 @@ const Home = () => {
                 {/* text-decoration-none เอาไว้ลบเส้นใต้ลิ้งจะได้สวยเริ่ด จึ้ง โบ้ะ */}
                 <Link to="/support" className='text-decoration-none'>
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark"
-                    style={{background: 'linear-gradient(to bottom, #FFFF00, #ffffffff)'}}>
+                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
                         <i className="bi bi-question-octagon-fill fs-2"></i> <br />
                         SUPPORT
                     </div>
