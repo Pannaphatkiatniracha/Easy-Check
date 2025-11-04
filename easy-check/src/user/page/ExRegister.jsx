@@ -155,16 +155,16 @@ const ExRegister = () => {
                 <label className="text-[#F26623] fw-light form-label">Event</label>
                     <Form.Select aria-label="Select event" 
                     name='events' value={user.events} onChange={handleChange}>
-                    <option value="1">อบรมความปลอดภัยในการทำงาน</option>
-                    <option value="2">บริจาคโลหิตประจำปี</option>
-                    <option value="3">Workshop การทำงานเป็นทีม</option>
-                    <option value="4">อบรมการใช้ซอฟต์แวร์ให</option>
-                    <option value="5">กิจกรรมสร้างความสัมพันธ์พนักงาน</option>
-                    <option value="6">งานเปิดตัวสินค้า</option>
-                    <option value="7">อบรมเทคนิคการสื่อสารภายในองค์กร</option>
-                    <option value="8">กิจกรรมกีฬาเพื่อสุขภาพ</option>
-                    <option value="9">Workshop การแก้ไขปัญหาเชิงสร้างสรรค์</option>
-                    <option value="10">งานเลี้ยงบริษัท</option>
+                    <option value="งานวิ่งการกุศลประจำปี">งานวิ่งการกุศลประจำปี</option>
+                    <option value="สัมมนาเทรนด์ธุรกิจปี 2025">สัมมนาเทรนด์ธุรกิจปี 2025</option>
+                    <option value="กิจกรรม CSR ร่วมกับชุมชน">กิจกรรม CSR ร่วมกับชุมชน</option>
+                    <option value="ประชุมผู้ถือหุ้นประจำปี">ประชุมผู้ถือหุ้นประจำปี</option>
+                    <option value="อบรมเทคนิคการตลาดดิจิทัล">อบรมเทคนิคการตลาดดิจิทัล</option>
+                    <option value="งานแสดงสินค้าและนวัตกรรม">งานแสดงสินค้าและนวัตกรรม</option>
+                    <option value="ทริป Team Building กลางแจ้ง">ทริป Team Building กลางแจ้ง</option>
+                    <option value="Workshop การพัฒนาทักษะผู้นำ">Workshop การพัฒนาทักษะผู้นำ</option>
+                    <option value="งานเทศกาลอาหารและวัฒนธรรม">งานเทศกาลอาหารและวัฒนธรรม</option>
+                    <option value="งานเลี้ยงสังสรรค์ปีใหม่บริษัท">งานเลี้ยงสังสรรค์ปีใหม่บริษัท</option>
                     </Form.Select>
             </div>
 

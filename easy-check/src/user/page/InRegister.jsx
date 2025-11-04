@@ -156,16 +156,16 @@ const InRegister = () => {
                 <label className="text-[#F26623] fw-light form-label">Event</label>
                     <Form.Select aria-label="Select event" 
                     name='events' value={user.events} onChange={handleChange}>
-                    <option value="1">อบรมความปลอดภัยในการทำงาน</option>
-                    <option value="2">บริจาคโลหิตประจำปี</option>
-                    <option value="3">Workshop การทำงานเป็นทีม</option>
-                    <option value="4">อบรมการใช้ซอฟต์แวร์ให</option>
-                    <option value="5">กิจกรรมสร้างความสัมพันธ์พนักงาน</option>
-                    <option value="6">งานเปิดตัวสินค้า</option>
-                    <option value="7">อบรมเทคนิคการสื่อสารภายในองค์กร</option>
-                    <option value="8">กิจกรรมกีฬาเพื่อสุขภาพ</option>
-                    <option value="9">Workshop การแก้ไขปัญหาเชิงสร้างสรรค์</option>
-                    <option value="10">งานเลี้ยงบริษัท</option>
+                    <option value="อบรมความปลอดภัยในการทำงาน">อบรมความปลอดภัยในการทำงาน</option>
+                    <option value="บริจาคโลหิตประจำปี">บริจาคโลหิตประจำปี</option>
+                    <option value="Workshop การทำงานเป็นทีม">Workshop การทำงานเป็นทีม</option>
+                    <option value="อบรมการใช้ซอฟต์แวร์ใหม่">อบรมการใช้ซอฟต์แวร์ใหม่</option>
+                    <option value="กิจกรรมสร้างความสัมพันธ์พนักงาน">กิจกรรมสร้างความสัมพันธ์พนักงาน</option>
+                    <option value="งานเปิดตัวสินค้า">งานเปิดตัวสินค้า</option>
+                    <option value="อบรมเทคนิคการสื่อสารภายในองค์กร">อบรมเทคนิคการสื่อสารภายในองค์กร</option>
+                    <option value="กิจกรรมกีฬาเพื่อสุขภาพ">กิจกรรมกีฬาเพื่อสุขภาพ</option>
+                    <option value="Workshop การแก้ไขปัญหาเชิงสร้างสรรค์">Workshop การแก้ไขปัญหาเชิงสร้างสรรค์</option>
+                    <option value="งานเลี้ยงบริษัท">งานเลี้ยงบริษัท</option>
                     </Form.Select>
             </div>
 
