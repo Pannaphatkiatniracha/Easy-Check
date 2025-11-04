@@ -39,16 +39,24 @@ const Event = () => {
 
           {/* กล่องแยก event */}
             <Link to="/internalevent" className='text-decoration-none'>                
-              <div className="mx-auto p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75">
+              <div className="mx-auto p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75
+
+            {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
+              duration-200 = ความเร็ว 0.2 s 
+              ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
+              
+              hover:scale-105 transition-all duration-200 ease-in-out">
                 <h5>Corporate <br /> internal event</h5>
               </div>
             </Link>
 
             <Link to="/externalevent" className='text-decoration-none'>                
-              <div className="mx-auto mt-6 p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75">
+              <div className="mx-auto mt-6 p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75
+              hover:scale-105 transition-all duration-200 ease-in-out">
                 <h5>Corporate <br /> external event</h5>
               </div>
             </Link>
+
 
 
         </div>
