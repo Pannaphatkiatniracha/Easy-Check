@@ -1,4 +1,3 @@
-import './User.css'
 import { Button } from "react-bootstrap"
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -12,12 +11,12 @@ const Support = () => {
 
 
             {/* หัวข้อ + icon back */}
-            <div className="d-flex justify-content-between text-warning mt-16">
+            <div className="d-flex justify-content-between text-[#F26623] mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก เพราะนางจะมี padding ติดมาอัตโนมัติ */}
                 <Link to="/home" className='text-decoration-none'>                
-                    <Button variant="link" className="text-warning p-0">
-                        <i className="bi bi-chevron-left ms-3"></i>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
                     </Button>
                 </Link>
                 
@@ -38,7 +37,7 @@ const Support = () => {
                 <InputGroup className="w-75">
                     <Form.Control aria-label="Search" placeholder="Search something..." />
 
-                    <Button variant="warning">
+                    <Button style={{backgroundColor: '#F26623', border: 'none'}}>
                         <i className="bi bi-search" ></i>
                     </Button>
 
