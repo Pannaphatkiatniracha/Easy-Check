@@ -44,7 +44,7 @@ const Event = () => {
               </div>
             </Link>
 
-            <Link to="/" className='text-decoration-none'>                
+            <Link to="/externalevent" className='text-decoration-none'>                
               <div className="mx-auto mt-6 p-5 text-center rounded-3 text-white mt-12 bg-[#F26623] w-75">
                 <h5>Corporate <br /> external event</h5>
               </div>

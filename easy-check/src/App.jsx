@@ -15,6 +15,7 @@ import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
 import ChangePassword from "./user/page/ChangePassword";
 import InternalEvent from "./user/page/InternalEvent";
+import ExternalEvent from "./user/page/ExternalEvent";
 
 
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="changepassword" element={<ChangePassword />} />
           <Route path="internalevent" element={<InternalEvent />} />
+          <Route path="externalevent" element={<ExternalEvent />} />
         </Route>
 
       </Routes>

@@ -2,10 +2,9 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 
-const InternalEvent = () => {
+const ExternalEvent = () => {
 
-
-    const inevents = [
+    const exevents = [
 {
       id: 1,
       title: "อบรมความปลอดภัยในการทำงาน",
@@ -72,7 +71,6 @@ const InternalEvent = () => {
     return (
         <div className='app-container'>
 
-
             {/* หัวข้อ + icon */}
             <div className="d-flex justify-content-between text-warning mt-16">
                 
@@ -92,8 +90,8 @@ const InternalEvent = () => {
             {/* หัวข้อ + กล่องงาน event */}
             <div className="mt-3 p-3">
 
-                {inevents.map((inevent) => (
-                    <Card key={inevent.id} className="mb-3 rounded-3 text-black
+                {exevents.map((exevent) => (
+                    <Card key={exevent.id} className="mb-3 rounded-3 text-black
                     hover:scale-105 transition-all duration-200 ease-in-out"
                     style={{backgroundColor: '#D9D9D9'}}>
                   {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
@@ -101,10 +99,10 @@ const InternalEvent = () => {
                     ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
                     
                         <Card.Body>
-                            <Card.Title>{inevent.title}</Card.Title>
+                            <Card.Title>{exevent.title}</Card.Title>
                             <Card.Text>
-                                วันที่: {inevent.date} <br />
-                                สถานที่: {inevent.location}
+                                วันที่: {exevent.date} <br />
+                                สถานที่: {exevent.location}
                             </Card.Text>
                             <Link to="/register" className='text-decoration-none'>                            
                               <Button className='text-black' style={{backgroundColor: '#F26623', border: 'none'}}>ลงทะเบียน</Button>
@@ -116,4 +114,5 @@ const InternalEvent = () => {
         </div>
     )
 }
-export default InternalEvent
+
+export default ExternalEvent
