@@ -1,10 +1,9 @@
-import './User.css'
 import { Button } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 
-const Register = () => {
+const ExRegister = () => {
 
         // setUser ใช้ตอนเปลี่ยนค่า user
         const [user, setUser] = useState(
@@ -26,7 +25,7 @@ const Register = () => {
         
         useEffect(() => {
             const loadData = async () => {
-                const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1")
+                const res = await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1")
                 const data = await res.json()
                 setUser({
                     name: data.name || "",
@@ -55,7 +54,7 @@ const Register = () => {
     
         // บันทึกข้อมูลที่แก้ไข
         const handleSave = async () => {
-        await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1", {
+        await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1", {
           method: "PUT", // อัปเดต
           headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
           body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
@@ -179,4 +178,4 @@ const Register = () => {
     )
 }
 
-export default Register
+export default ExRegister

@@ -106,7 +106,7 @@ const InternalEvent = () => {
                                 วันที่: {inevent.date} <br />
                                 สถานที่: {inevent.location}
                             </Card.Text>
-                            <Link to="/register" className='text-decoration-none'>                            
+                            <Link to="/inregister" className='text-decoration-none'>                            
                               <Button className='text-black' style={{backgroundColor: '#F26623', border: 'none'}}>ลงทะเบียน</Button>
                             </Link>
                         </Card.Body>

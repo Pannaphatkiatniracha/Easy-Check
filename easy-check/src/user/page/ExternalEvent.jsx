@@ -104,7 +104,7 @@ const ExternalEvent = () => {
                                 วันที่: {exevent.date} <br />
                                 สถานที่: {exevent.location}
                             </Card.Text>
-                            <Link to="/register" className='text-decoration-none'>                            
+                            <Link to="/exregister" className='text-decoration-none'>                            
                               <Button className='text-black' style={{backgroundColor: '#F26623', border: 'none'}}>ลงทะเบียน</Button>
                             </Link>
                         </Card.Body>
