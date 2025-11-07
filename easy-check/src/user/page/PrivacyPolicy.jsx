@@ -1,78 +1,82 @@
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
 function PrivacyPolicy() {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center px-4 py-6 text-black">
-      {/* Header */}
-      <div className="w-full max-w-md flex items-center text-white mb-4">
-        <button onClick={() => navigate(-1)} className="text-2xl font-bold mr-3">
-          ←
-        </button>
-        <h1 className="text-xl font-bold text-center flex-1">Privacy Policy</h1>
-      </div>
+    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center px-4 py-8 text-black font-[Inter]">
+      {/* หัวข้อหลัก */}
+      <h1 className="text-[32px] font-medium text-white mb-6 text-center">
+        Privacy Policy
+      </h1>
 
-      {/* Content Box */}
-      <div className="w-full max-w-md bg-white rounded-2xl p-5 shadow-lg text-sm leading-relaxed space-y-4 overflow-y-auto">
+      {/* กล่องเนื้อหา */}
+      <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg overflow-y-auto space-y-6 leading-relaxed">
+        
+        {/* บทนำ */}
         <section>
-          <h2 className="font-bold mb-1">บทนำ</h2>
-          <p>
-            เราให้ความสำคัญกับความเป็นส่วนตัวของคุณ
-            นโยบายนี้อธิบายถึงข้อมูลที่เรารวบรวม วิธีการใช้งาน
-            และเหตุผลที่เราต้องการข้อมูลสำหรับให้บริการระบบเช็กอิน–เช็กเอาท์
-            (Easy Check) ได้อย่างมีประสิทธิภาพ
+          <h2 className="text-[20px] font-semibold mb-2">บทนำ</h2>
+          <p className="text-[16px] font-normal text-gray-800">
+            เราให้ความสำคัญกับความเป็นส่วนตัวของคุณ นโยบายนี้อธิบายถึงข้อมูลที่เรารวบรวม 
+            วิธีการใช้งาน และเหตุผลที่เราต้องการข้อมูล เพื่อให้บริการระบบเช็กอิน–เช็กเอาท์ 
+            (Easy Check) ได้อย่างมีประสิทธิภาพและปลอดภัย
           </p>
         </section>
 
+        {/* ข้อมูลที่เรารวบรวม */}
         <section>
-          <h2 className="font-bold mb-1">ข้อมูลที่เรารวบรวม</h2>
-          <p>
-            เพื่อให้คุณสามารถใช้งานแอปพลิเคชันนี้ได้
-            เราเก็บข้อมูลบางประเภทดังต่อไปนี้:
+          <h2 className="text-[20px] font-semibold mb-2">ข้อมูลที่เรารวบรวม</h2>
+          <p className="text-[16px] font-normal text-gray-800 mb-2">
+            เพื่อให้คุณสามารถใช้งานแอปพลิเคชันนี้ได้ เราเก็บรวบรวมข้อมูลดังต่อไปนี้:
           </p>
-          <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
-            <li>ข้อมูลส่วนตัว เช่น ชื่อ-นามสกุล, รหัสพนักงาน</li>
+          <ul className="list-disc list-inside text-[16px] font-normal text-gray-800 space-y-1 ml-2">
+            <li>ข้อมูลส่วนตัว เช่น ชื่อ-นามสกุล และรหัสพนักงาน</li>
             <li>
               ข้อมูลตำแหน่ง (GPS) เพื่อบันทึกตำแหน่งขณะเช็กอินหรือเช็กเอาท์
             </li>
-            <li>ข้อมูลเวลาทำงาน เช่น เวลาทำงาน ประวัติการลา และข้อมูลการทำงานล่วงเวลา (OT)</li>
+            <li>
+              ข้อมูลเวลาทำงาน เช่น เวลาเข้า-ออกงาน ประวัติการลา 
+              และข้อมูลการทำงานล่วงเวลา (OT)
+            </li>
           </ul>
         </section>
 
+        {/* เราใช้ข้อมูลของคุณอย่างไร */}
         <section>
-          <h2 className="font-bold mb-1">เราใช้ข้อมูลของคุณอย่างไร</h2>
-          <p>ข้อมูลของคุณจะถูกใช้เพื่อวัตถุประสงค์ในการบริหารจัดการเวลาทำงานขององค์กร เช่น:</p>
-          <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+          <h2 className="text-[20px] font-semibold mb-2">เราใช้ข้อมูลของคุณอย่างไร</h2>
+          <p className="text-[16px] font-normal text-gray-800 mb-2">
+            ข้อมูลของคุณจะถูกนำไปใช้เพื่อวัตถุประสงค์ในการบริหารจัดการเวลาทำงานขององค์กร เช่น:
+          </p>
+          <ul className="list-disc list-inside text-[16px] font-normal text-gray-800 space-y-1 ml-2">
             <li>ยืนยันตัวตนและบันทึกเวลาทำงานของคุณ</li>
-            <li>ตรวจสอบเวลาการเข้า–ออกงาน</li>
-            <li>ใช้ในฝ่ายทรัพยากรบุคคล (HR)</li>
-            <li>เพื่อการวิเคราะห์และการทำสถิติด้านเวลา</li>
+            <li>ตรวจสอบเวลาการเข้า–ออกงานของพนักงาน</li>
+            <li>ใช้เพื่อการจัดการในฝ่ายทรัพยากรบุคคล (HR)</li>
+            <li>เพื่อการวิเคราะห์และการทำสถิติด้านเวลาทำงาน</li>
           </ul>
         </section>
 
+        {/* การเปิดเผยข้อมูล */}
         <section>
-          <h2 className="font-bold mb-1">การเปิดเผยข้อมูล</h2>
-          <p>
-            ข้อมูลของคุณจะถูกจัดเก็บภายในระบบ
-            และจะไม่ถูกเปิดเผยต่อบุคคลภายนอก
-            เว้นแต่จะได้รับความยินยอมจากคุณโดยชัดเจน
+          <h2 className="text-[20px] font-semibold mb-2">การเปิดเผยข้อมูล</h2>
+          <p className="text-[16px] font-normal text-gray-800">
+            ข้อมูลของคุณจะถูกจัดเก็บและใช้งานภายในระบบเท่านั้น 
+            และจะไม่ถูกเปิดเผยต่อบุคคลภายนอก เว้นแต่จะได้รับความยินยอมจากคุณโดยชัดเจน
           </p>
         </section>
 
+        {/* การรักษาความปลอดภัยของข้อมูล */}
         <section>
-          <h2 className="font-bold mb-1">การรักษาความปลอดภัยของข้อมูล</h2>
-          <p>
-            เรามีมาตรการรักษาความปลอดภัยทางเทคนิค
-            เพื่อป้องกันการเข้าถึงข้อมูลโดยไม่ได้รับอนุญาต
+          <h2 className="text-[20px] font-semibold mb-2">การรักษาความปลอดภัยของข้อมูล</h2>
+          <p className="text-[16px] font-normal text-gray-800">
+            เรามีมาตรการด้านความปลอดภัยทางเทคนิคและการจัดการ 
+            เพื่อป้องกันไม่ให้บุคคลภายนอกเข้าถึงหรือใช้ข้อมูลของคุณโดยไม่ได้รับอนุญาต
           </p>
         </section>
 
+        {/* ติดต่อเรา */}
         <section>
-          <h2 className="font-bold mb-1">ติดต่อเรา</h2>
-          <p>
-            หากคุณมีคำถามหรือข้อสงสัยเกี่ยวกับนโยบายความเป็นส่วนตัวนี้
-            กรุณาติดต่อฝ่ายบุคคลหรือผู้ดูแลระบบ
+          <h2 className="text-[20px] font-semibold mb-2">ติดต่อเรา</h2>
+          <p className="text-[16px] font-normal text-gray-800">
+            หากคุณมีคำถามหรือข้อสงสัยเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ 
+            กรุณาติดต่อฝ่ายบุคคลหรือผู้ดูแลระบบขององค์กร
           </p>
         </section>
       </div>
