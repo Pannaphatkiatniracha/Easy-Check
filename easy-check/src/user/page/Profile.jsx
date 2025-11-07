@@ -78,8 +78,8 @@ const Profile = () => {
 
 
             {/* หัวข้อ */}
-            <div className="text-center text-warning mt-16">
-                <h2 className="fw-normal">My Profile</h2>
+            <div className="text-center text-[#F26623] mt-16">
+                <h2 className="fw-normal">Edit Profile</h2>
             </div>
 
 
@@ -91,9 +91,9 @@ const Profile = () => {
 
 
                 {/* icon edit */}
-                <Button size='sm' variant='warning' className='position-absolute bottom-0 end-0 rounded-circle'
+                <Button size='sm' className='position-absolute bottom-0 end-0 rounded-circle'
                 // เป๊ะไม่พอ 25 คือแกน x 10 คือแกน y
-                style={{ transform: "translate(25%, 10%)" }}>
+                style={{ transform: "translate(25%, 10%)", backgroundColor: '#F26623', border: 'none' }}>
                     <i className="bi bi-pencil-fill"></i>
                 </Button>
             </div>
@@ -107,7 +107,7 @@ const Profile = () => {
 
                 {/* ชื่อ */}
                 <div className='mt-4 mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Information</label>
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Information</label>
                     <input className='fw-semibold form-control' type="text"
                     name="name" value={user.name} onChange={handleChange} readOnly />
                 </div>
@@ -153,14 +153,14 @@ const Profile = () => {
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                 <div className='mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Position</label><br />
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Position</label><br />
                     <input className="rounded-1 form-control fw-semibold" type="text" 
                     name='position' value={user.position} onChange={handleChange} readOnly  />
                 </div>
 
                 {/* แผนก */}
                 <div className='mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Department</label><br />
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Department</label><br />
                     <Form.Select aria-label='Select dapartment'
                     name='department' value={user.department} onChange={handleChange}>
                         <option value="IT">IT</option>
@@ -175,7 +175,7 @@ const Profile = () => {
 
                 {/* สาขา */}
                 <div className='w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Branch</label><br />
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Branch</label><br />
                     <Form.Select aria-label='Select branch'
                     name='branch' value={user.branch} onChange={handleChange}>
                         <option value="Bangkok">กรุงเทพมหานคร</option>
@@ -191,7 +191,7 @@ const Profile = () => {
 
             {/* ข้อมูลที่ให้เลือก */}
             <div className='px-5 mt-12'>
-                <label className='text-warning fw-light form-label' htmlFor="">Birth</label>
+                <label className='text-[#F26623] fw-light form-label' htmlFor="">Birth</label>
 
                 <input className='form-control' type="date" 
                 name='birth' value={user.birth} onChange={handleChange} />
@@ -200,7 +200,7 @@ const Profile = () => {
             
 
             <div className='px-5 mt-3'>
-                <label className="text-warning fw-light form-label">Gender</label>
+                <label className="text-[#F26623] fw-light form-label">Gender</label>
 
                 <Form.Select aria-label="Select gender" 
                 name='gender' value={user.gender} onChange={handleChange}>
@@ -214,12 +214,12 @@ const Profile = () => {
             {/* ปุ่ม */}
             <Link to="/changepassword" className='text-decoration-none'>        
                 <div className='text-center mt-5'>
-                    <Button className='rounded-5 w-50' variant='warning'>Chang Password &nbsp; <i className="bi bi-lock-fill"></i></Button>
+                    <Button className='rounded-5 w-50' style={{backgroundColor: '#F26623', border: 'none'}}>Chang Password &nbsp; <i className="bi bi-lock-fill"></i></Button>
                 </div>
             </Link>
 
             <div className='text-center mt-3 mb-5'>
-                <Button className='rounded-5 w-25' variant='warning' 
+                <Button className='rounded-5 w-25' style={{backgroundColor: '#F26623', border: 'none'}}
                 onClick={handleSave}>Save</Button>
             </div>
 

@@ -1,10 +1,9 @@
-import './User.css'
 import { Button } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 
-const Register = () => {
+const ExRegister = () => {
 
         // setUser ใช้ตอนเปลี่ยนค่า user
         const [user, setUser] = useState(
@@ -26,7 +25,7 @@ const Register = () => {
         
         useEffect(() => {
             const loadData = async () => {
-                const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1")
+                const res = await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1")
                 const data = await res.json()
                 setUser({
                     name: data.name || "",
@@ -55,7 +54,7 @@ const Register = () => {
     
         // บันทึกข้อมูลที่แก้ไข
         const handleSave = async () => {
-        await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1", {
+        await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1", {
           method: "PUT", // อัปเดต
           headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
           body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
@@ -69,12 +68,12 @@ const Register = () => {
 
             
             {/* หัวข้อ */}
-            <div className="d-flex justify-content-between text-warning mt-16">
+            <div className="d-flex justify-content-between text-[#F26623] mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
                 <Link to="/event" className='text-decoration-none'>                
-                    <Button variant="link" className="text-warning p-0">
-                        <i className="bi bi-chevron-left ms-3"></i>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
                     </Button>
                 </Link>
                 
@@ -91,14 +90,14 @@ const Register = () => {
                 <div className="mt-4 mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
-                    <label className="text-warning fw-light form-label" htmlFor="">Name</label>
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Name</label>
                     <input className="rounded-1 form-control" type="text" placeholder=''
                     // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
                     name='name' value={user.name} onChange={handleChange} />
                 </div>
 
                 <div className="mb-3 w-75">
-                    <label className="text-warning fw-light form-label" htmlFor="">Position</label>
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Position</label>
                         <Form.Select aria-label="Select position" 
                         name='position' value={user.position} onChange={handleChange}>
                         <option value="Software Developer">Software Developer</option>
@@ -121,7 +120,7 @@ const Register = () => {
 
 
                 <div className='mb-3 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Department</label>
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Department</label>
                         <Form.Select aria-label="Select department" 
                         name='department' value={user.department} onChange={handleChange}>
                         <option value="IT">IT</option>
@@ -133,7 +132,7 @@ const Register = () => {
                 </div>
 
                 <div className='mb-6 w-75'>
-                    <label className="text-warning fw-light form-label" htmlFor="">Branch</label>
+                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Branch</label>
                         <Form.Select aria-label="Select position" 
                         name='branch' value={user.branch} onChange={handleChange}>
                         <option value="Bangkok">กรุงเทพมหานคร</option>
@@ -148,35 +147,35 @@ const Register = () => {
 
 
             {/* opacity = ความโปร่งความทึบของเส้น */}
-            <hr className="w-100 my-4 border-warning opacity-75" />
+            <hr className="w-100 my-4 border-[#F26623] opacity-75" />
 
 
             {/* ข้อมูลที่ให้เลือก */}
             <div className='px-5 mt-2'>
-                <label className="text-warning fw-light form-label">Event</label>
+                <label className="text-[#F26623] fw-light form-label">Event</label>
                     <Form.Select aria-label="Select event" 
                     name='events' value={user.events} onChange={handleChange}>
-                    <option value="1">อบรมความปลอดภัยในการทำงาน</option>
-                    <option value="2">บริจาคโลหิตประจำปี</option>
-                    <option value="3">Workshop การทำงานเป็นทีม</option>
-                    <option value="4">อบรมการใช้ซอฟต์แวร์ให</option>
-                    <option value="5">กิจกรรมสร้างความสัมพันธ์พนักงาน</option>
-                    <option value="6">งานเปิดตัวสินค้า</option>
-                    <option value="7">อบรมเทคนิคการสื่อสารภายในองค์กร</option>
-                    <option value="8">กิจกรรมกีฬาเพื่อสุขภาพ</option>
-                    <option value="9">Workshop การแก้ไขปัญหาเชิงสร้างสรรค์</option>
-                    <option value="10">งานเลี้ยงบริษัท</option>
+                    <option value="งานวิ่งการกุศลประจำปี">งานวิ่งการกุศลประจำปี</option>
+                    <option value="สัมมนาเทรนด์ธุรกิจปี 2025">สัมมนาเทรนด์ธุรกิจปี 2025</option>
+                    <option value="กิจกรรม CSR ร่วมกับชุมชน">กิจกรรม CSR ร่วมกับชุมชน</option>
+                    <option value="ประชุมผู้ถือหุ้นประจำปี">ประชุมผู้ถือหุ้นประจำปี</option>
+                    <option value="อบรมเทคนิคการตลาดดิจิทัล">อบรมเทคนิคการตลาดดิจิทัล</option>
+                    <option value="งานแสดงสินค้าและนวัตกรรม">งานแสดงสินค้าและนวัตกรรม</option>
+                    <option value="ทริป Team Building กลางแจ้ง">ทริป Team Building กลางแจ้ง</option>
+                    <option value="Workshop การพัฒนาทักษะผู้นำ">Workshop การพัฒนาทักษะผู้นำ</option>
+                    <option value="งานเทศกาลอาหารและวัฒนธรรม">งานเทศกาลอาหารและวัฒนธรรม</option>
+                    <option value="งานเลี้ยงสังสรรค์ปีใหม่บริษัท">งานเลี้ยงสังสรรค์ปีใหม่บริษัท</option>
                     </Form.Select>
             </div>
 
 
             {/* ปุ่ม */}
             <div className='text-center mt-12'>
-                <Button className='rounded-5 w-50' variant='warning' 
+                <Button className='rounded-5 w-50' style={{backgroundColor: '#F26623', border: 'none'}}
                 onClick={handleSave}>Done</Button>
             </div>
         </div>
     )
 }
 
-export default Register
+export default ExRegister

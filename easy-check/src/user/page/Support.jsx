@@ -1,4 +1,3 @@
-import './User.css'
 import { Button } from "react-bootstrap"
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -12,12 +11,12 @@ const Support = () => {
 
 
             {/* หัวข้อ + icon back */}
-            <div className="d-flex justify-content-between text-warning mt-16">
+            <div className="d-flex justify-content-between text-[#F26623] mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก เพราะนางจะมี padding ติดมาอัตโนมัติ */}
                 <Link to="/home" className='text-decoration-none'>                
-                    <Button variant="link" className="text-warning p-0">
-                        <i className="bi bi-chevron-left ms-3"></i>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
                     </Button>
                 </Link>
                 
@@ -38,7 +37,7 @@ const Support = () => {
                 <InputGroup className="w-75">
                     <Form.Control aria-label="Search" placeholder="Search something..." />
 
-                    <Button variant="warning">
+                    <Button style={{backgroundColor: '#F26623', border: 'none'}}>
                         <i className="bi bi-search" ></i>
                     </Button>
 
@@ -60,7 +59,13 @@ const Support = () => {
                             ทำไมลงเวลาไม่ได้แก้อย่างไร
                         </Accordion.Header>
                         <Accordion.Body>
-                            -
+                            <b>หากไม่สามารถลงเวลาได้ ให้ตรวจสอบว่า:</b>
+                            <ul>
+                                <li>เปิด GPS/Location ของมือถือแล้ว</li>
+                                <li>อยู่ในพื้นที่กำหนดของบริษัท</li>
+                                <li>เชื่อมต่ออินเทอร์เน็ต</li>
+                            </ul>
+                            หากยังไม่สามารถลงเวลาได้ ให้ติดต่อฝ่าย HR หรือ IT Support
                         </Accordion.Body>
                     </Accordion.Item>
 
@@ -70,7 +75,11 @@ const Support = () => {
                             อยู่นอกพื้นที่กำหนดทำอย่างไร
                         </Accordion.Header>
                         <Accordion.Body>
-                            -
+                            <b>ระบบจะไม่สามารถลงเวลาได้หากอยู่นอกพื้นที่กำหนด หากเป็นกรณีจำเป็น:</b>
+                            <ul>
+                                <li>แจ้งผู้บังคับบัญชาผ่านแอปหรืออีเมล</li>
+                                <li>ลงเวลาแบบ Manual พร้อมแนบเหตุผล</li>
+                            </ul>
                         </Accordion.Body>
                     </Accordion.Item>
 
@@ -80,7 +89,7 @@ const Support = () => {
                             ลืมรหัสผ่านรีเซ็ตอย่างไร
                         </Accordion.Header>
                         <Accordion.Body>
-                            -
+                            กด “ลืมรหัสผ่าน” บนหน้าเข้าสู่ระบบ ระบบจะส่งอีเมลหรือ SMS สำหรับรีเซ็ตรหัสผ่านตามที่ลงทะเบียนไว้ หากไม่ได้รับอีเมล ให้ตรวจสอบโฟลเดอร์ Spam หรือแจ้งฝ่าย IT
                         </Accordion.Body>
                     </Accordion.Item>
 
@@ -90,7 +99,11 @@ const Support = () => {
                             วิธีขออนุมัติลา
                         </Accordion.Header>
                         <Accordion.Body>
-                            -
+                            1. เข้าเมนู “Leave Request” ในแอป  <br />
+                            2. เลือกประเภทการลา และกรอกวันที่ที่ต้องการลา  <br />
+                            3. แนบเอกสารประกอบ (ถ้ามี)  <br />
+                            4. กดส่งคำขอ รอผู้บังคับบัญชาอนุมัติ  <br />
+                            5. ระบบจะแจ้งผลอนุมัติผ่านแอป
                         </Accordion.Body>
                     </Accordion.Item>
                     
@@ -100,7 +113,12 @@ const Support = () => {
                             ลงเวลาผิดพลาดแก้ไขอย่างไร
                         </Accordion.Header>
                         <Accordion.Body>
-                            -
+                            <b>หากลงเวลาเข้า/ออกผิดพลาด:</b>
+                            <ul>
+                                <li>ไปที่เมนู “แก้ไขเวลา” หรือ “Time Correction”</li>
+                                <li>เลือกวันที่และเวลาที่ต้องการแก้ไข</li>
+                                <li>ระบุเหตุผล แล้วส่งให้ผู้บังคับบัญชาอนุมัติ</li>
+                            </ul>
                         </Accordion.Body>
                     </Accordion.Item>
 

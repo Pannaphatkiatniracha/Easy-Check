@@ -9,11 +9,14 @@ import Setting from "./user/page/Setting";
 import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
 import CheckIn from "./user/page/CheckIn";
-import Register from "./user/page/Register";
+import InRegister from "./user/page/InRegister";
 import DelegateCheckin from "./user/page/DelegateCheckin";
 import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
 import ChangePassword from "./user/page/ChangePassword";
+import InternalEvent from "./user/page/InternalEvent";
+import ExternalEvent from "./user/page/ExternalEvent";
+import ExRegister from "./user/page/ExRegister";
 
 
 
@@ -37,13 +40,16 @@ function App() {
 
         <Route path="/" element={<AppNobar />}>
           <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="inregister" element={<InRegister />} />
+          <Route path="exregister" element={<ExRegister />} />
           <Route path="leaverequest" element={<LeaveRequest />} />
           <Route path="checkin" element={<CheckIn />} />
           <Route path="delegatecheckin" element={<DelegateCheckin />} />
           <Route path="support" element={<Support />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="changepassword" element={<ChangePassword />} />
+          <Route path="internalevent" element={<InternalEvent />} />
+          <Route path="externalevent" element={<ExternalEvent />} />
         </Route>
 
       </Routes>
