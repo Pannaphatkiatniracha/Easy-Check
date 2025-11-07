@@ -17,6 +17,7 @@ import ChangePassword from "./user/page/ChangePassword";
 import InternalEvent from "./user/page/InternalEvent";
 import ExternalEvent from "./user/page/ExternalEvent";
 import ExRegister from "./user/page/ExRegister";
+import CheckInForFriend from "./user/page/CheckInForFriend";
 
 
 
@@ -50,6 +51,7 @@ function App() {
           <Route path="changepassword" element={<ChangePassword />} />
           <Route path="internalevent" element={<InternalEvent />} />
           <Route path="externalevent" element={<ExternalEvent />} />
+          <Route path="checkinforfriend" element={<CheckInForFriend />} />
         </Route>
 
       </Routes>
