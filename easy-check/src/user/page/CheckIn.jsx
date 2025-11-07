@@ -119,7 +119,7 @@ function CheckInOut() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F26623] to-[#FFB97D] flex flex-col items-center py-10 px-4">
+    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4 text-white">
       <div className="max-w-md w-full flex flex-col items-center space-y-6">
         <h1 className="text-4xl font-extrabold text-white drop-shadow-lg text-center flex items-center gap-2">
           <i className="bi bi-geo-alt-fill"></i>
@@ -137,14 +137,14 @@ function CheckInOut() {
           <div className="w-full flex flex-col gap-3">
             <button
               onClick={startCamera}
-              className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+              className="w-full py-3 rounded-xl bg-[#636CCB] text-white font-bold shadow-lg hover:scale-105 transition transform"
             >
               <i className="bi bi-camera-video-fill"></i> เปิดกล้อง ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
             </button>
 
             <button
               onClick={capturePhoto}
-              className="w-full py-3 rounded-xl bg-[#F26623] text-white font-bold shadow-lg hover:scale-105 transition transform"
+              className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg hover:scale-105 transition transform"
             >
               <i className="bi bi-camera-fill"></i> ถ่ายรูป
             </button>
@@ -169,17 +169,17 @@ function CheckInOut() {
         )}
 
         <div className="w-full grid grid-cols-2 gap-4">
-          <div className="bg-white text-[#F26623] py-2 rounded-xl text-center font-semibold shadow-inner">
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
             {time}
           </div>
-          <div className="bg-white text-[#F26623] py-2 rounded-xl text-center font-semibold shadow-inner">
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
             {date}
           </div>
         </div>
 
         <button
           onClick={handleLocation}
-          className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+          className="w-full py-3 rounded-xl bg-[#636CCB] text-white font-bold shadow-lg hover:scale-105 transition transform"
         >
           <i className="bi bi-geo-alt"></i> ขอใช้ตำแหน่ง
         </button>
@@ -187,7 +187,7 @@ function CheckInOut() {
         {mode !== "done" && (
           <button
             onClick={handleConfirm}
-            className="w-1/2 py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+            className="w-1/2 py-3 rounded-xl bg-[#636CCB] text-white font-bold shadow-lg hover:scale-105 transition transform"
           >
             Done
           </button>
@@ -222,17 +222,17 @@ function CheckInOut() {
         )}
 
         {message && (
-          <div className="mt-4 p-3 bg-white/40 rounded-xl text-[#F26623] w-full text-center font-semibold shadow-md whitespace-pre-line">
+          <div className="mt-4 p-3 bg-white/40 rounded-xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line">
             {message}
           </div>
         )}
 
-        {error && <p className="mt-3 text-red-500 font-semibold">{error}</p>}
+        {error && <p className="mt-3 text-red-300 font-semibold">{error}</p>}
 
         {mode === "done" && (
           <button
             onClick={handleReset}
-            className="w-full py-3 rounded-xl bg-white text-[#F26623] font-bold shadow-lg hover:scale-105 transition transform"
+            className="w-full py-3 rounded-xl bg-[#636CCB] text-white font-bold shadow-lg hover:scale-105 transition transform"
           >
             เริ่มใหม่
           </button>
