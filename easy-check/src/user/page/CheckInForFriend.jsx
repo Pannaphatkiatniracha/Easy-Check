@@ -8,7 +8,6 @@ const CheckInForFriend = () => {
   const handleCheckIn = (e) => {
     e.preventDefault();
 
-    // รหัส6หลัก
     if (!/^\d{6}$/.test(employeeId)) {
       setStatus("❌ กรุณากรอกรหัสพนักงาน 6 หลักให้ถูกต้อง");
       return;
@@ -17,7 +16,6 @@ const CheckInForFriend = () => {
     setIsLoading(true);
     setStatus("");
 
-    // จำลองการเช็กอินสำเร็จ
     setTimeout(() => {
       const now = new Date();
       const time = now.toLocaleTimeString("th-TH", {
@@ -33,43 +31,54 @@ const CheckInForFriend = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] px-4 py-12 flex flex-col items-center">
-      <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md border border-white/20">
-        <h1 className="text-3xl font-bold text-center text-white mb-6">
-          เช็กอินแทนเพื่อน
+    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center pt-10">
+      {/* ส่วนหัว */}
+      <header className="w-full max-w-sm flex items-center justify-center mb-4">
+        <h1 className="text-white text-lg font-medium tracking-wide">
+          CHECKIN FOR FRIEND
         </h1>
+      </header>
 
+      {/* กล่องหลัก */}
+      <div className="w-[90%] max-w-sm bg-white rounded-lg shadow-md p-6 border border-black">
         <form onSubmit={handleCheckIn} className="space-y-5">
           <div>
-            <label className="block text-gray-200 font-medium mb-2">
-              รหัสพนักงาน (6 หลัก)
+            <label className="block text-gray-800 text-sm font-semibold mb-2">
+              ID
             </label>
             <input
               type="text"
               value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value.replace(/\D/, ""))} // รับเฉพาะตัวเลข
+              onChange={(e) =>
+                setEmployeeId(e.target.value.replace(/\D/, ""))
+              }
               maxLength={6}
-              className="w-full px-4 py-2.5 rounded-lg bg-white/90 text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#636CCB] placeholder-gray-400"
+              placeholder="กรอกรหัสพนักงาน 6 หลัก"
+              className="w-full px-4 py-2 rounded-md bg-gray-200 text-gray-800 
+                         border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#636CCB]"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-2.5 rounded-lg text-white font-semibold transition ${
-              isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#636CCB] hover:bg-[#5059c0]"
-            }`}
-          >
-            {isLoading ? "กำลังเช็กอิน..." : "เช็กอิน"}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`px-5 py-2.5 rounded-md text-white font-medium text-sm 
+              transition-all duration-200 ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#636CCB] hover:bg-[#5059c0]"
+              }`}
+            >
+              {isLoading ? "กำลังเช็กอิน..." : "Done"}
+            </button>
+          </div>
         </form>
 
         {status && (
           <p
-            className={`mt-5 text-center font-medium ${
-              status.startsWith("✅") ? "text-green-300" : "text-red-300"
+            className={`mt-4 text-center text-sm font-medium ${
+              status.startsWith("✅") ? "text-green-600" : "text-red-500"
             }`}
           >
             {status}
