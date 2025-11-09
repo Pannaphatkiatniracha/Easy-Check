@@ -8,7 +8,7 @@ body {
 .app-container {
   width: 375px;       /* set จอไว้ให้เท่ากับหน้าจอแอพแบบโมบาย */
   min-height: 100vh;
-  background: #0A0043;
+  background: #3C467B;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
   border-radius: 12px;
   overflow: hidden;    /* ไม่ให้มีอะไรล้นจอ */

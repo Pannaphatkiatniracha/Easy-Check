@@ -68,16 +68,16 @@ const ExRegister = () => {
 
             
             {/* หัวข้อ */}
-            <div className="d-flex justify-content-between text-[#F26623] mt-16">
+            <div className="d-flex justify-content-between text-white mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
                 <Link to="/event" className='text-decoration-none'>                
                     <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
                 </Link>
                 
-                <h3 className="fw-normal">ลงทะเบียนงาน Event</h3>
+                <h3 className="fw-bold">Register</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -90,14 +90,14 @@ const ExRegister = () => {
                 <div className="mt-4 mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
-                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Name</label>
+                    <label className="text-white fw-light form-label" htmlFor="">Name</label>
                     <input className="rounded-1 form-control" type="text" placeholder=''
                     // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
                     name='name' value={user.name} onChange={handleChange} />
                 </div>
 
                 <div className="mb-3 w-75">
-                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Position</label>
+                    <label className="text-white fw-light form-label" htmlFor="">Position</label>
                         <Form.Select aria-label="Select position" 
                         name='position' value={user.position} onChange={handleChange}>
                         <option value="Software Developer">Software Developer</option>
@@ -120,7 +120,7 @@ const ExRegister = () => {
 
 
                 <div className='mb-3 w-75'>
-                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Department</label>
+                    <label className="text-white fw-light form-label" htmlFor="">Department</label>
                         <Form.Select aria-label="Select department" 
                         name='department' value={user.department} onChange={handleChange}>
                         <option value="IT">IT</option>
@@ -132,7 +132,7 @@ const ExRegister = () => {
                 </div>
 
                 <div className='mb-6 w-75'>
-                    <label className="text-[#F26623] fw-light form-label" htmlFor="">Branch</label>
+                    <label className="text-white fw-light form-label" htmlFor="">Branch</label>
                         <Form.Select aria-label="Select position" 
                         name='branch' value={user.branch} onChange={handleChange}>
                         <option value="Bangkok">กรุงเทพมหานคร</option>
@@ -147,12 +147,12 @@ const ExRegister = () => {
 
 
             {/* opacity = ความโปร่งความทึบของเส้น */}
-            <hr className="w-100 my-4 border-[#F26623] opacity-75" />
+            <hr className="w-100 my-4 border-white opacity-75" />
 
 
             {/* ข้อมูลที่ให้เลือก */}
             <div className='px-5 mt-2'>
-                <label className="text-[#F26623] fw-light form-label">Event</label>
+                <label className="text-white fw-light form-label">Event</label>
                     <Form.Select aria-label="Select event" 
                     name='events' value={user.events} onChange={handleChange}>
                     <option value="งานวิ่งการกุศลประจำปี">งานวิ่งการกุศลประจำปี</option>
@@ -171,8 +171,8 @@ const ExRegister = () => {
 
             {/* ปุ่ม */}
             <div className='text-center mt-12'>
-                <Button className='rounded-5 w-50' style={{backgroundColor: '#F26623', border: 'none'}}
-                onClick={handleSave}>Done</Button>
+                <Button className='rounded-5 w-50 fw-semibold' style={{backgroundColor: '#636CCB', border: 'none'}}
+                onClick={handleSave}>DONE</Button>
             </div>
         </div>
     )

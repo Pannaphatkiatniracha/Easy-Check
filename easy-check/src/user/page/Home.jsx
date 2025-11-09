@@ -9,8 +9,8 @@ const Home = () => {
             <Link to="/" className='text-decoration-none'>            
                 <div className="mb-4 text-end rounded-circle">
                     <Button size='sm' className='rounded-circle'
-                    style={{backgroundColor: '#F26623', border: 'none'}}>
-                        <i className="bi bi-bell-fill"></i>
+                    style={{backgroundColor: '#636CCB', border: 'none'}}>
+                        <i className="bi bi-bell-fill text-black"></i>
                     </Button>
                 </div>
             </Link>
@@ -26,7 +26,7 @@ const Home = () => {
 
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
-                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
                         CHECK IN <br /> CHECK OUT
                     </div>
@@ -37,7 +37,7 @@ const Home = () => {
                 <Link to="/delegatecheckin" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
-                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
                         DELEGATE CHECK-IN
                     </div>
@@ -47,7 +47,7 @@ const Home = () => {
                 <Link to="/leaverequest" className='text-decoration-none'>                
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
-                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
                         <i className="bi bi-file-earmark-fill fs-2"></i> <br />
                         LEAVE REQUEST
                     </div>
@@ -57,7 +57,7 @@ const Home = () => {
                 <Link to="/support" className='text-decoration-none'>
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
-                    style={{background: 'linear-gradient(to bottom, #F26623, #FFB592)'}}>
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
                         <i className="bi bi-question-octagon-fill fs-2"></i> <br />
                         SUPPORT
                     </div>

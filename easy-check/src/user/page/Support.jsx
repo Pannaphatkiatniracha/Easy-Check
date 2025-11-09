@@ -11,16 +11,16 @@ const Support = () => {
 
 
             {/* หัวข้อ + icon back */}
-            <div className="d-flex justify-content-between text-[#F26623] mt-16">
+            <div className="d-flex justify-content-between text-white mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก เพราะนางจะมี padding ติดมาอัตโนมัติ */}
                 <Link to="/home" className='text-decoration-none'>                
                     <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
                 </Link>
                 
-                <h2 className="fw-normal">Support</h2>
+                <h2 className="fw-bold">Support</h2>
 
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-5"></div>
@@ -37,7 +37,7 @@ const Support = () => {
                 <InputGroup className="w-75">
                     <Form.Control aria-label="Search" placeholder="Search something..." />
 
-                    <Button style={{backgroundColor: '#F26623', border: 'none'}}>
+                    <Button style={{backgroundColor: '#636CCB', border: 'none'}}>
                         <i className="bi bi-search" ></i>
                     </Button>
 

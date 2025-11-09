@@ -79,11 +79,11 @@ const InternalEvent = () => {
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
                 <Link to="/event" className='text-decoration-none'>                
                     <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
                 </Link>
                 
-                <h3 className="text-[#F26623] text-center fw-normal">Corporate internal event</h3>
+                <h3 className="text-white text-center fw-bold">Corporate <br /> internal event</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -101,13 +101,13 @@ const InternalEvent = () => {
                     ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
                     
                         <Card.Body>
-                            <Card.Title>{inevent.title}</Card.Title>
+                            <Card.Title><b>{inevent.title}</b></Card.Title>
                             <Card.Text>
                                 วันที่: {inevent.date} <br />
                                 สถานที่: {inevent.location}
                             </Card.Text>
                             <Link to="/inregister" className='text-decoration-none'>                            
-                              <Button className='text-black' style={{backgroundColor: '#F26623', border: 'none'}}>ลงทะเบียน</Button>
+                              <Button className='text-white fw-semibold' style={{backgroundColor: '#636CCB', border: 'none'}}>REGISTER</Button>
                             </Link>
                         </Card.Body>
                     </Card>

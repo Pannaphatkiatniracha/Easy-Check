@@ -39,7 +39,7 @@ const Login = () => {
                     </InputGroup>
 
                 <Link to="/forgotpassword" className='text-decoration-none'>                
-                    <p className='text-[#F26623] text-end fw-lighter mt-2'>Forget Password?</p>
+                    <p className='text-white text-end fw-lighter mt-2'>Forget Password?</p>
                 </Link>
 
                 </div>
@@ -50,7 +50,7 @@ const Login = () => {
             {/* ปุ่ม */}
             <Link to="/home" className='text-decoration-none'>            
                 <div className='text-center mt-14'>
-                    <Button className='rounded-3 w-25' style={{backgroundColor: '#F26623', border: 'none'}} type='submit'>LOGIN</Button>
+                    <Button className='rounded-3 w-25 fw-semibold' style={{backgroundColor: '#636CCB', border: 'none'}} type='submit'>LOGIN</Button>
                 </div>
             </Link>
 

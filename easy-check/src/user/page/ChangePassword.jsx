@@ -63,16 +63,16 @@ const ChangePassword = () => {
         <div className="app-container">
 
             {/* หัวข้อ */}
-            <div className="d-flex justify-content-between text-[#F26623] mt-16">
+            <div className="d-flex justify-content-between text-white mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
                 <Link to="/profile" className='text-decoration-none'>                
                     <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-[#F26623]"></i>
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
                 </Link>
                 
-                <h3 className="fw-normal">Change your password</h3>
+                <h3 className="fw-bold">Change your password</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -91,13 +91,13 @@ const ChangePassword = () => {
                     </InputGroup>
 
                 <Link to="/forgotpassword" className='text-decoration-none'>                
-                    <p className='text-[#F26623] text-end fw-lighter mt-2'>Forget Password?</p>
+                    <p className='text-white text-end fw-lighter mt-2'>Forget Password?</p>
                 </Link>
                 </div>
 
 
                 {/* เส้น */}
-                <hr className="w-75 mx-auto my-4 border-[#F26623] opacity-75" />
+                <hr className="w-75 mx-auto my-4 border-white opacity-75" />
 
 
                 {/* password ใหม่ */}
@@ -128,7 +128,7 @@ const ChangePassword = () => {
                 
                 {/* ปุ่ม */}
                 <div className='text-center mt-20'>
-                    <Button className='rounded-5 w-25' style={{backgroundColor: '#F26623', border: 'none'}} onClick={handleSave} >Save</Button>
+                    <Button className='rounded-5 w-25 fw-semibold' style={{backgroundColor: '#636CCB', border: 'none'}} onClick={handleSave} >SAVE</Button>
                 </div>
 
 
