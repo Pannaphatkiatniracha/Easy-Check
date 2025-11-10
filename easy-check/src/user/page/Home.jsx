@@ -7,7 +7,7 @@ const Home = () => {
         <div className="p-4">
             
             <Link to="/" className='text-decoration-none'>            
-                <div className="mb-4 text-end rounded-circle">
+                <div className="mt-2 mb-4 mr-2 text-end rounded-circle">
                     <Button size='sm' className='rounded-circle'
                     style={{backgroundColor: '#636CCB', border: 'none'}}>
                         <i className="bi bi-bell-fill text-black"></i>
@@ -15,7 +15,7 @@ const Home = () => {
                 </div>
             </Link>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-12">
 
                 {/* ลบเส้น border ออกเพราะใส่สีแล้วไม่สวย */}
                 <Link to="/checkin" className='text-decoration-none'>    
