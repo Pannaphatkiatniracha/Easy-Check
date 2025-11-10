@@ -60,6 +60,8 @@ const Home = () => {
                     style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
                         <i className="bi bi-question-octagon-fill fs-2"></i> <br />
                         SUPPORT
+                        <br />
+                        &nbsp;
                     </div>
                 </Link>
 
