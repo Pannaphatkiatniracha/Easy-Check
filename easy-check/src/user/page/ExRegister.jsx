@@ -71,7 +71,7 @@ const ExRegister = () => {
             <div className="d-flex justify-content-between text-white mt-16">
                 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
-                <Link to="/event" className='text-decoration-none'>                
+                <Link to="/externalevent" className='text-decoration-none'>                
                     <Button variant="link" className="p-0">
                         <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
