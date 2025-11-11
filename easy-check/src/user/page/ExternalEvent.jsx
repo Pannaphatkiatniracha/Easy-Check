@@ -64,7 +64,7 @@ const ExternalEvent = () => {
     title: "งานเลี้ยงสังสรรค์ปีใหม่บริษัท",
     date: "20 ธันวาคม 2025",
     location: "โรงแรม The St. Regis Bangkok",
-  }
+  },
 ]
 
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { verifyUser } from "../data/users";
 
 
-const Login = ({ setToken }) => {
+const Login = ({ setToken, setRole }) => {
 
 
     // state ที่เอาไว้เก็บค่าต่าง ๆ
@@ -27,6 +27,7 @@ const Login = ({ setToken }) => {
             // ถ้าใช่จะเอา token จาก verifyUser มายัดใส่ token ปัจจุบันด้วย setToken
             // แล้ว navigate ไปที่หน้า home เลยถ้าใช่ โดย replace: true ก็คือแทนที่ login ด้วยหน้า home เลยจ่ะ แบบ back กลับไม่ได้ด้วย
             setToken(result.token)
+            setRole(result.role)
             navigate('/home', { replace: true })
         } else {
             setError('Username หรือ Password ไม่ถูกต้อง')

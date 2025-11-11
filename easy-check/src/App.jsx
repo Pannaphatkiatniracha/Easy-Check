@@ -27,7 +27,8 @@ import { useState } from "react";
 
 function App() {
 
-  const [token, setToken] = useState("")
+  const [token, setToken] = useState("x")
+  const [role, setRole] = useState("")
 
 
   return (
@@ -37,7 +38,7 @@ function App() {
       <BrowserRouter basename="/easycheck/">
         <Routes>
 
-          <Route path="/login" element={<Login setToken={setToken} />} />
+          <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
 
           {/* ถ้ายังไม่ได้ login จะกระโดดไปให้ login ก่อน และ replace เพื่อไม่ให้มี history ใน history stack เวลากด back จะได้ไม่งง  */}
           {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
@@ -46,7 +47,8 @@ function App() {
           {token && (
             <>
               <Route element={<AppLayout />}>
-                <Route path="home" element={<Home />} />
+                <Route path="home" element={<Home
+                role={role} />} />
                 <Route path="event" element={<Event />} />
                 <Route path="setting" element={<Setting
                 setToken={setToken} />} />
