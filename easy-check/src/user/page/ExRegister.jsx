@@ -106,7 +106,7 @@ const ExRegister = () => {
 
                 <div className="mb-3 w-75">
                     <label className="text-white fw-light form-label" htmlFor="">Name</label>
-                    <input className="rounded-1 form-control" type="text" placeholder='' 
+                    <input className="rounded-1 form-control" type="text" placeholder=''
                         name='name' value={user.name} onChange={handleChange} />
                 </div>
 
@@ -115,21 +115,22 @@ const ExRegister = () => {
                     <label className="text-white fw-light form-label" htmlFor="">Position</label>
                     <Form.Select aria-label="Select position"
                         name='position' value={user.position} onChange={handleChange}>
-                        <option value="Software Developer">Software Developer</option>
-                        <option value="System Analyst">System Analyst</option>
-                        <option value="Network Engineer">Network Engineer</option>
-                        <option value="Database Administrator">Database Administrator</option>
-                        <option value="Marketing Officer">Marketing Officer</option>
-                        <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
+                        <option value="Animator">Animator</option>
+                        <option value="Content Creator">Content Creator</option>
+                        <option value="Copywriter">Copywriter</option>
                         <option value="Brand Manager">Brand Manager</option>
+                        <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
                         <option value="SEO Specialist">SEO Specialist</option>
                         <option value="Market Research Analyst">Market Research Analyst</option>
+                        <option value="Account Executive">Account Executive</option>
+                        <option value="Business Development Officer">Business Development Officer</option>
+                        <option value="Database Administrator">Database Administrator</option>
+                        <option value="Network Engineer">Network Engineer</option>
+                        <option value="Software Developer">Software Developer</option>
                         <option value="Finance Manager">Finance Manager</option>
                         <option value="Payroll Officer">Payroll Officer</option>
                         <option value="Customer Service Officer">Customer Service Officer</option>
                         <option value="Support Specialist">Support Specialist</option>
-                        <option value="Account Executive">Account Executive</option>
-                        <option value="Business Development Officer">Business Development Officer</option>
                     </Form.Select>
                 </div>
 
@@ -138,10 +139,11 @@ const ExRegister = () => {
                     <label className="text-white fw-light form-label" htmlFor="">Department</label>
                     <Form.Select aria-label="Select department"
                         name='department' value={user.department} onChange={handleChange}>
-                        <option value="IT">IT</option>
+                        <option value="Creative">Creative</option>
                         <option value="Marketing">Marketing</option>
-                        <option value="Finance">Finance</option>
                         <option value="Sales">Sales</option>
+                        <option value="IT">IT</option>
+                        <option value="Finance">Finance</option>
                         <option value="Customer Service">Customer Service</option>
                     </Form.Select>
                 </div>
@@ -192,13 +194,13 @@ const ExRegister = () => {
             </div>
 
             {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
-            <Modal  size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Body className="text-center py-5">
                     <h5 className="fw-bold mb-3">ลงทะเบียนสำเร็จ!</h5>
                     <p>ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว 🎉</p>
 
                     <Button variant="primary" className='fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
-                    onClick={() => setShowModal(false)}>
+                        onClick={() => setShowModal(false)}>
                         CLOSE
                     </Button>
 
