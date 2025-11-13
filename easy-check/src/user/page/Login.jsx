@@ -54,7 +54,7 @@ const Login = ({ setToken, setRole }) => {
                         <InputGroup.Text>
                             <i className="bi bi-person-fill"></i>
                         </InputGroup.Text>
-                        <FormControl type='text' placeholder='Username' 
+                        <FormControl type='text' placeholder='Employee ID' 
 
                         // setUsername(e.target.value)} = เอาค่าที่พิมพ์มา อัพเดตตัวแปร username
                         value={username} onChange={e => setUsername(e.target.value)} />
