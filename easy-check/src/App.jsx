@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { useState } from "react";
 import Login from "./user/page/Login";
 import AppLayout from "./user/layouts/AppLayout";
 import AppNobar from "./user/layouts/AppNobar";
@@ -17,9 +18,9 @@ import ChangePassword from "./user/page/ChangePassword";
 import InternalEvent from "./user/page/InternalEvent";
 import ExternalEvent from "./user/page/ExternalEvent";
 import ExRegister from "./user/page/ExRegister";
-
+import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
-import { useState } from "react";
+import WorkHoursTracker from "./user/page/WorkHoursTracker";
 
 
 
@@ -67,8 +68,9 @@ function App() {
                 <Route path="changepassword" element={<ChangePassword />} />
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
-               
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
+               <Route path="attendancesummary" element={<AttendanceSum />} />
+               <Route path="workhourstracker" element={<WorkHoursTracker />} />
               </Route>
             </>
           )}

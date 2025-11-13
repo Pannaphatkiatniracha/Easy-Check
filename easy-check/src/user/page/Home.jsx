@@ -17,9 +17,8 @@ const Home = () => {
 
             <div className="grid grid-cols-2 gap-4 mt-12">
 
-                {/* ลบเส้น border ออกเพราะใส่สีแล้วไม่สวย */}
-                <Link to="/checkin" className='text-decoration-none'>    
 
+                <Link to="/checkin" className='text-decoration-none'>    
                 {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
                   duration-200 = ความเร็ว 0.2 s 
                   ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}
@@ -30,7 +29,6 @@ const Home = () => {
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
                         CHECK IN <br /> CHECK OUT
                     </div>
-                    
                 </Link>
 
 
@@ -65,7 +63,30 @@ const Home = () => {
                     </div>
                 </Link>
 
+
+                <Link to="/attendancesummary" className='text-decoration-none'>
+                    <div className="p-4 text-center fw-semibold rounded-3 text-dark
+                    hover:scale-105 transition-all duration-200 ease-in-out"
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
+                        <i className="bi bi-calendar2-week-fill fs-2"></i> <br />
+                        ATTENDANCE SUMMARY
+                    </div>
+                </Link>
+
+
+
+                <Link to="/workhourstracker" className='text-decoration-none'>
+                    <div className="p-4 text-center fw-semibold rounded-3 text-dark
+                    hover:scale-105 transition-all duration-200 ease-in-out"
+                    style={{background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)'}}>
+                        <i className="bi bi-hourglass-bottom fs-2"></i> <br />
+                        WORKHOURS <br /> TRACKER
+                    </div>
+                </Link>
+
             </div>
+
+
         </div>
     )
 }
