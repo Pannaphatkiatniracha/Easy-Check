@@ -21,6 +21,7 @@ import ExRegister from "./user/page/ExRegister";
 import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
+import CheckApporve from "./user/page/CheckApprove";
 
 
 
@@ -71,6 +72,8 @@ function App() {
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
                <Route path="attendancesummary" element={<AttendanceSum />} />
                <Route path="workhourstracker" element={<WorkHoursTracker />} />
+               <Route path="checkapprove" element={<CheckApporve />} />
+               
               </Route>
             </>
           )}
