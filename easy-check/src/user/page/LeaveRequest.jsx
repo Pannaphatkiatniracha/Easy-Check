@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const LeaveRequest = () => {
   const [formData, setFormData] = useState({
@@ -57,6 +59,14 @@ const LeaveRequest = () => {
   return (
     <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4 font-inter">
       <div className="max-w-lg w-full flex flex-col space-y-8">
+
+        {/* ปุ่มย้อนกลับ */}
+        <div className="w-full flex justify-start mb-4">
+          <Link to="/home" className="text-white text-2xl">
+            <i className="bi bi-chevron-left"></i>
+          </Link>
+        </div>
+
         {/* Header */}
         <h2 className="text-center text-3xl font-bold text-[#FFFFFF] drop-shadow-lg py-4 rounded-xl bg-white/10 backdrop-blur-md shadow-lg font-inter">
           LEAVE REQUEST

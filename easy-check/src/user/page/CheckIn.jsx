@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function CheckInOut() {
@@ -6,10 +7,8 @@ function CheckInOut() {
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
-
   const [photo, setPhoto] = useState(null);
   const [checkInData, setCheckInData] = useState(null);
   const [checkOutData, setCheckOutData] = useState(null);
@@ -31,9 +30,7 @@ function CheckInOut() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
       videoRef.current.srcObject = stream;
       setError("");
     } catch (err) {
@@ -59,10 +56,7 @@ function CheckInOut() {
   const handleLocation = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setError("");
       },
       () => setError("ไม่สามารถเข้าถึงตำแหน่ง ควรเปิด GPS")
@@ -121,6 +115,14 @@ function CheckInOut() {
   return (
     <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4 text-white">
       <div className="max-w-md w-full flex flex-col items-center space-y-6">
+
+        {/* ปุ่มกลับไปหน้า Home แบบเรียบง่าย */}
+        <div className="w-full flex justify-start mb-4">
+          <Link to="/home" className="text-white text-2xl">
+            <i className="bi bi-chevron-left"></i>
+          </Link>
+        </div>
+
         <h1 className="text-4xl font-extrabold text-white drop-shadow-lg text-center flex items-center gap-2">
           <i className="bi bi-geo-alt-fill"></i>
           Check-In / Check-Out
@@ -169,12 +171,8 @@ function CheckInOut() {
         )}
 
         <div className="w-full grid grid-cols-2 gap-4">
-          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
-            {time}
-          </div>
-          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
-            {date}
-          </div>
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{time}</div>
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{date}</div>
         </div>
 
         <button

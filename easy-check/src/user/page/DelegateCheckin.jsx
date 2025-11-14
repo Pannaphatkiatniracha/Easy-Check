@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const DelegateCheckin = () => {
   const [employeeId, setEmployeeId] = useState("");
@@ -31,7 +33,14 @@ const DelegateCheckin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center pt-10">
+    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center pt-10 px-4">
+      {/* ปุ่มย้อนกลับ */}
+      <div className="w-full max-w-sm flex justify-start mb-4">
+        <Link to="/home" className="text-white text-2xl">
+          <i className="bi bi-chevron-left"></i>
+        </Link>
+      </div>
+
       {/* ส่วนหัว */}
       <header className="w-full max-w-sm flex items-center justify-center mb-4">
         <h1 className="text-white text-lg font-medium tracking-wide">
