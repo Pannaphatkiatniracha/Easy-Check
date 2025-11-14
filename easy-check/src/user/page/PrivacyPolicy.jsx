@@ -1,8 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom"; // ใช้สำหรับลิงก์ย้อนกลับ
+import 'bootstrap-icons/font/bootstrap-icons.css'; // ใส่ถ้ายังไม่ได้ใส่
 
 function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-[#3C467B] flex flex-col items-center px-4 py-8 text-black font-[Inter]">
+
+      {/* ปุ่มย้อนกลับ */}
+      <div className="w-full max-w-md flex justify-start mb-4">
+        <Link to="/setting" className="text-white text-2xl">
+          <i className="bi bi-chevron-left"></i>
+        </Link>
+      </div>
+
       {/* หัวข้อหลัก */}
       <h1 className="text-[32px] font-medium text-white mb-6 text-center">
         Privacy Policy
@@ -29,13 +39,8 @@ function PrivacyPolicy() {
           </p>
           <ul className="list-disc list-inside text-[16px] font-normal text-gray-800 space-y-1 ml-2">
             <li>ข้อมูลส่วนตัว เช่น ชื่อ-นามสกุล และรหัสพนักงาน</li>
-            <li>
-              ข้อมูลตำแหน่ง (GPS) เพื่อบันทึกตำแหน่งขณะเช็กอินหรือเช็กเอาท์
-            </li>
-            <li>
-              ข้อมูลเวลาทำงาน เช่น เวลาเข้า-ออกงาน ประวัติการลา 
-              และข้อมูลการทำงานล่วงเวลา (OT)
-            </li>
+            <li>ข้อมูลตำแหน่ง (GPS) เพื่อบันทึกตำแหน่งขณะเช็กอินหรือเช็กเอาท์</li>
+            <li>ข้อมูลเวลาทำงาน เช่น เวลาเข้า-ออกงาน ประวัติการลา และข้อมูลการทำงานล่วงเวลา (OT)</li>
           </ul>
         </section>
 
@@ -79,6 +84,7 @@ function PrivacyPolicy() {
             กรุณาติดต่อฝ่ายบุคคลหรือผู้ดูแลระบบขององค์กร
           </p>
         </section>
+
       </div>
     </div>
   );
