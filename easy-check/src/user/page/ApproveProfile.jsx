@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 
-const Profile = () => {
+const ApproveProfile = () => {
 
     const [showModal, setShowModal] = useState(false)
 
@@ -36,7 +36,7 @@ const Profile = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users/1")
+            const res = await fetch("https://6918ce1c21a9635948713999.mockapi.io/users/1")
             const data = await res.json()
             setUser({
                 name: data.name || "",
@@ -71,17 +71,17 @@ const Profile = () => {
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://68fbd77794ec960660275293.mockapi.io/users/1", {
+        await fetch("https://6918ce1c21a9635948713999.mockapi.io/users/1", {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
             body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
         })
         setShowModal(true)
     }
-
+    
+    
     return (
-
-        <div className="app-container">
+                <div className="app-container">
 
 
             {/* <div className="text-center text-white mt-16">
@@ -266,4 +266,4 @@ const Profile = () => {
     )
 }
 
-export default Profile
+export default ApproveProfile

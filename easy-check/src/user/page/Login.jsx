@@ -21,13 +21,24 @@ const Login = ({ setToken, setRole }) => {
     // result มันคือสิ่งที่ verifyUser จะ return ค่ากลับมาเว้ย
     const handleLogin = () => {
 
+        // result คือคำตอบจากการตรวจสอบ verifyUser
         const result = verifyUser(username, password)
+
         // ถ้าเช็คแล้ว username กับ password เป็นจริง จะเข้าสู่ {} แรก
         if (result) {
+
             // ถ้าใช่จะเอา token จาก verifyUser มายัดใส่ token ปัจจุบันด้วย setToken
             // แล้ว navigate ไปที่หน้า home เลยถ้าใช่ โดย replace: true ก็คือแทนที่ login ด้วยหน้า home เลยจ่ะ แบบ back กลับไม่ได้ด้วย
+            
+            // บันทึกลง localStorage
+            // .setItem(key, value)
+            localStorage.setItem('token', result.token)
+            localStorage.setItem('role', result.role)
+
+            // อัปเดต state ของ App.jsx ด้วย
             setToken(result.token)
             setRole(result.role)
+
             navigate('/home', { replace: true })
         } else {
             setError('Username หรือ Password ไม่ถูกต้อง')
