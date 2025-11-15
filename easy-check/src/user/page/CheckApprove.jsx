@@ -5,7 +5,7 @@ const initialUsers = [
   { 
     id: 1, 
     name: "ปัณณพรรธน์ เกียรตินิรชา", 
-    employeeId: "esc100",
+    employeeId: "010889",
     checkInTime: "09:00",
     profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
     checkInPhoto: "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg"
@@ -13,7 +13,7 @@ const initialUsers = [
   { 
     id: 2, 
     name: "ฐิติฉัตร ศิริบุตร", 
-    employeeId: "esc101",
+    employeeId: "010101",
     checkInTime: "08:30",
     profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
     checkInPhoto: "https://i.redd.it/dte258y55e1c1.jpg"
@@ -21,7 +21,7 @@ const initialUsers = [
   { 
     id: 3, 
     name: "ภทรพร แซ่ลี้", 
-    employeeId: "esc102",
+    employeeId: "110400",
     checkInTime: "10:00",
     profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
     checkInPhoto: "https://i.pinimg.com/736x/f8/d3/15/f8d315c29812464824e8aaf91970be46.jpg"
@@ -55,7 +55,7 @@ function CheckApprove() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
+    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter app-container">
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
         <button className="text-white text-2xl">
