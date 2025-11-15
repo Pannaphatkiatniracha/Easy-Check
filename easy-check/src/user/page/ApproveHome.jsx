@@ -18,7 +18,7 @@ const ApproveHome = () => {
             <div className="grid grid-cols-2 gap-4 mt-12">
 
 
-                <Link to="/" className='text-decoration-none'>    
+                <Link to="/checkapprove" className='text-decoration-none'>    
                 {/* hover:scale-105 = hover แล้วขยายฉ่ำๆ 105%
                   duration-200 = ความเร็ว 0.2 s 
                   ease-in-out ก็ให้ตอนเปลี่ยนมันสมูท*/}

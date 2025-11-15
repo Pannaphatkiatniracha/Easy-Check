@@ -1,5 +1,6 @@
 // CheckApprove.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const initialUsers = [
   { 
@@ -58,9 +59,13 @@ function CheckApprove() {
     <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter app-container">
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <button className="text-white text-2xl">
-          <i className="bi bi-chevron-left"></i>
-        </button>
+
+        <Link to="/approvehome" className='text-decoration-none'>
+          <button className="text-white text-2xl">
+            <i className="bi bi-chevron-left"></i>
+          </button>
+        </Link>
+
         <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
           CHECK APPROVE
         </h1>
