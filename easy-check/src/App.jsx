@@ -22,7 +22,6 @@ import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
 import CheckApporve from "./user/page/CheckApprove";
-import ApproveHome from "./user/page/ApproveHome";
 
 
 
@@ -54,8 +53,7 @@ function App() {
                 role={role} />} />
                 <Route path="event" element={<Event />} />
                 <Route path="setting" element={<Setting
-                setToken={setToken} />} />
-                <Route path="approvehome" element={<ApproveHome />} />
+                setToken={setToken} role={role} />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 

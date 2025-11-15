@@ -60,7 +60,7 @@ function CheckApprove() {
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
 
-        <Link to="/approvehome" className='text-decoration-none'>
+        <Link to="/home" className='text-decoration-none'>
           <button className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </button>
