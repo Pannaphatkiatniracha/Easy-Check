@@ -193,16 +193,18 @@ const ExRegister = () => {
                     onClick={handleSave}>DONE</Button>
             </div>
 
-            {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
-            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Body className="text-center py-5">
-                    <h5 className="fw-bold mb-3">ลงทะเบียนสำเร็จ!</h5>
-                    <p>ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว 🎉</p>
 
-                    <Button variant="primary" className='fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
-                        onClick={() => setShowModal(false)}>
-                        CLOSE
-                    </Button>
+            {/* 
+                centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ
+                backdrop = ให้คลิกด้านนอก modal ก็ปิดตัว modal ได้
+                keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
+             */}
+
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
+                    <h5 className="fw-bold mt-2">You're registered!</h5>
+                    {/* <p>Your event registration is complete.</p> */}
 
                 </Modal.Body>
             </Modal>

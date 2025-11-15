@@ -251,17 +251,18 @@ const Profile = () => {
                     onClick={handleSave}>SAVE</Button>
             </div>
 
-            {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
-            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
+
+            {/* 
+                centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ
+                backdrop = ให้คลิกด้านนอก modal ก็ปิดตัว modal ได้
+                keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
+             */}
+
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
-                    <h5 className="fw-bold mb-3">บันทึกข้อมูลสำเร็จ</h5>
-                    <p>ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</p>
-
-                    <Button variant="primary" className='fw-semibold' style={{ backgroundColor: '#BE2623', border: 'none' }}
-                        onClick={() => setShowModal(false)}>
-                        CLOSE
-                    </Button>
+                    <h5 className="fw-bold mt-2">Update complete</h5>
+                    {/* <p>Your information has been <br /> updated successfully.</p> */}
 
                 </Modal.Body>
             </Modal>
