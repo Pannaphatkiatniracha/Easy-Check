@@ -34,13 +34,15 @@ const AttendanceSum = () => {
         "2025-10-30"
     ]
 
+
+    // ระเบิด array ตรงนี้เหมือนเอาทุก array มารวมกันอะ
     const allRecords = [...onTimes, ...lates, ...leaves]
 
 
     const scrollToSection = (id) => {
-        document.getElementById(id)?.scrollIntoView({
-            behavior: "smooth"
-        })
+        // เหมือนบอกนางว่าพี่สาวช่วยหากล่องที่ตรงกับ id นี้หน่อยจ่ะ 👁️👄👁️ ?. ก็คือถ้าหา id นี้ไม่เจอก็ไม่เป็น ไม่ error จ่ะ จะอยู่อย่างสงบเสงี่ยม
+        document.getElementById(id)?.
+        scrollIntoView({behavior: "smooth"})
     }
 
     return (
@@ -63,7 +65,7 @@ const AttendanceSum = () => {
             </div>
 
 
-
+            {/* กล่องรวม */}
             <div className='d-flex justify-content-center mt-10'>
 
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
@@ -71,7 +73,7 @@ const AttendanceSum = () => {
 
                     <h4 className="mt-3 fw-bold">October 2025 Summary</h4>
 
-
+                    {/* เนื้อหาข้างใน */}
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
 
                         <Button className='w-100 p-1 text-white fw-semibold
@@ -126,7 +128,11 @@ const AttendanceSum = () => {
                     <h3 id="ontime" className='fw-bold'>
                         On Time Details
                     </h3>
-                    <ul>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {/* 
+                            มันเป็นค่า default ของ .map() ว่าตัวแรกคือค่าหรือข้อมูลของตัวนั้น ตัวสองคือลำดับหรือ index ไรงี้
+                            d = ค่าของวันนั้นๆ / i = เลขลำดับของวันนั้นใน array
+                         */}
                         {onTimes.map((d, i) => <li key={i}>{d}</li>)}
                     </ul>
 
@@ -135,7 +141,7 @@ const AttendanceSum = () => {
                     <h3 id="late" className="mt-6 fw-bold">
                         Late Details
                     </h3>
-                    <ul>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
                         {lates.map((d, i) => <li key={i}>{d}</li>)}
                     </ul>
 
@@ -144,7 +150,7 @@ const AttendanceSum = () => {
                     <h3 id="leave" className="mt-6 fw-bold">
                         Leave Details
                     </h3>
-                    <ul>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
                         {leaves.map((d, i) => <li key={i}>{d}</li>)}
                     </ul>
 
@@ -153,7 +159,7 @@ const AttendanceSum = () => {
                     <h3 id="all" className="mt-6 fw-bold">
                         All Records
                     </h3>
-                    <ul>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
                         {allRecords.map((d, i) => <li key={i}>{d}</li>)}
                     </ul>
 
