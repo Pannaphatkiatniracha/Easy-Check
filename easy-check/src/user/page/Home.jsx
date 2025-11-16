@@ -46,7 +46,7 @@ const Home = () => {
                     </Link>
 
 
-                    <Link to="/" className='text-decoration-none'>
+                    <Link to="/leaveRequestApprove" className='text-decoration-none'>
                         <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
                             style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>

@@ -2,10 +2,13 @@ import { InputGroup, FormControl, Button } from 'react-bootstrap';
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from 'react';
 import { verifyUser } from "../data/users";
+import { Modal } from 'react-bootstrap';
 
 
 const Login = ({ setToken, setRole }) => {
 
+
+    const [showModal, setShowModal] = useState(false)
 
     // state ที่เอาไว้เก็บค่าต่าง ๆ
     // ซึ่ง set ค่าเริ่มต้นตัวแรกทุกตัวเป็นค่าว่างจ่ะ เจอ set... เมื่อไหร่ก็คือกำลังอัปเดตค่าให้นางอยู่
@@ -29,7 +32,7 @@ const Login = ({ setToken, setRole }) => {
 
             // ถ้าใช่จะเอา token จาก verifyUser มายัดใส่ token ปัจจุบันด้วย setToken
             // แล้ว navigate ไปที่หน้า home เลยถ้าใช่ โดย replace: true ก็คือแทนที่ login ด้วยหน้า home เลยจ่ะ แบบ back กลับไม่ได้ด้วย
-            
+
             // บันทึกลง localStorage
             // .setItem(key, value)
             localStorage.setItem('token', result.token)
@@ -41,7 +44,8 @@ const Login = ({ setToken, setRole }) => {
 
             navigate('/home', { replace: true })
         } else {
-            setError('Username หรือ Password ไม่ถูกต้อง')
+            setError('Username or Password is incorrect')
+            setShowModal(true)
         }
     }
 
@@ -65,10 +69,10 @@ const Login = ({ setToken, setRole }) => {
                         <InputGroup.Text>
                             <i className="bi bi-person-fill"></i>
                         </InputGroup.Text>
-                        <FormControl type='text' placeholder='Employee ID' 
+                        <FormControl type='text' placeholder='Employee ID'
 
-                        // setUsername(e.target.value)} = เอาค่าที่พิมพ์มา อัพเดตตัวแปร username
-                        value={username} onChange={e => setUsername(e.target.value)} />
+                            // setUsername(e.target.value)} = เอาค่าที่พิมพ์มา อัพเดตตัวแปร username
+                            value={username} onChange={e => setUsername(e.target.value)} />
                     </InputGroup>
                 </div>
 
@@ -79,8 +83,8 @@ const Login = ({ setToken, setRole }) => {
                         <InputGroup.Text>
                             <i className="bi bi-lock-fill"></i>
                         </InputGroup.Text>
-                        <FormControl type='password' placeholder='Password' 
-                        value={password} onChange={e => setPassword(e.target.value)} />
+                        <FormControl type='password' placeholder='Password'
+                            value={password} onChange={e => setPassword(e.target.value)} />
                     </InputGroup>
 
 
@@ -99,7 +103,7 @@ const Login = ({ setToken, setRole }) => {
                     */}
 
                     {error && <p className="text-danger text-center fw-semibold mt-4">{error}</p>}
-                
+
                 </div>
 
 
@@ -108,10 +112,21 @@ const Login = ({ setToken, setRole }) => {
 
             {/* ปุ่ม login */}
             <div className='text-center mt-14'>
-                <Button className='rounded-3 w-25 fw-semibold' 
-                style={{ backgroundColor: '#636CCB', border: 'none' }} 
-                onClick={handleLogin}>LOGIN</Button>
+                <Button className='rounded-3 w-25 fw-semibold'
+                    style={{ backgroundColor: '#636CCB', border: 'none' }}
+                    onClick={handleLogin}>LOGIN</Button>
             </div>
+
+
+            {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi-x-circle-fill fs-1 text-danger"></i>
+                    <h5 className="fw-bold mt-2">Login Failed</h5>
+                    <p>{error}</p>
+
+                </Modal.Body>
+            </Modal>
 
 
         </div>
