@@ -72,42 +72,42 @@ const AttendanceSum = () => {
                     <h4 className="mt-3 fw-bold">October 2025 Summary</h4>
 
 
-                    <div className='grid grid-cols-4 gap-1 p-3 mt-3'>
+                    <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
 
-                        <Button className='rounded w-100 p-1 text-white fw-semibold
+                        <Button className='w-100 p-1 text-white fw-semibold
                         hover:scale-105 transition-all duration-200 ease-in-out'
-                            style={{ backgroundColor: '#1CA983', border: 'none' }}
+                            style={{ backgroundColor: '#1CA983', border: 'none', borderRadius: '12px' }}
                             onClick={() => scrollToSection("ontime")}>
-                            On time
+                            On time: {onTimes.length} times
                         </Button>
-                        <span>{onTimes.length} times</span>
+                        {/* <span>{onTimes.length} times</span> */}
 
 
-                        <Button className='rounded w-100 p-1 text-white fw-semibold
+                        <Button className='w-100 p-1 text-white fw-semibold
                         hover:scale-105 transition-all duration-200 ease-in-out'
-                            style={{ backgroundColor: '#D06356', border: 'none' }}
+                            style={{ backgroundColor: '#D06356', border: 'none', borderRadius: '12px' }}
                             onClick={() => scrollToSection("late")}>
-                            Late
+                            Late: {lates.length} times
                         </Button>
-                        <span>{lates.length} times</span>
+                        {/* <span>{lates.length} times</span> */}
 
 
-                        <Button className='rounded w-100 p-1 text-white fw-semibold
+                        <Button className='w-100 p-1 text-white fw-semibold mt-3
                         hover:scale-105 transition-all duration-200 ease-in-out'
-                            style={{ backgroundColor: '#C7C76E', border: 'none' }}
+                            style={{ backgroundColor: '#C7C76E', border: 'none', borderRadius: '12px' }}
                             onClick={() => scrollToSection("leave")}>
-                            Leave
+                            Leave: {leaves.length} times
                         </Button>
-                        <span>{leaves.length} times</span>
+                        {/* <span className='mt-3'>{leaves.length} times</span> */}
 
 
-                        <Button className='rounded w-100 p-1 text-white fw-semibold
+                        <Button className='w-100 p-1 text-white fw-semibold mt-3
                         hover:scale-105 transition-all duration-200 ease-in-out'
                             onClick={() => scrollToSection("all")}
-                            style={{ backgroundColor: '#252A46', border: 'none' }}>
-                            All
+                            style={{ backgroundColor: '#252A46', border: 'none', borderRadius: '12px' }}>
+                            All: {allRecords.length} times
                         </Button>
-                        <span>{allRecords.length} records</span>
+                        {/* <span className='mt-3'>{allRecords.length} times</span> */}
 
                     </div>
 
@@ -116,45 +116,52 @@ const AttendanceSum = () => {
             </div>
 
 
+            <div className='d-flex justify-content-center mt-8 mb-12'>
+                <div className='rounded-3 text-dark w-80'
+                style={{ background: 'linear-gradient(to bottom right, #D9D9D9, #636CCB)' }}>
 
-            <div className="mt-1 p-4 text-white">
+                <div className="mt-1 p-4">
 
-                {/* On Time */}
-                <h3 id="ontime" className="mt-4">
-                    On Time Details
-                </h3>
-                <ul>
-                    {onTimes.map((d, i) => <li key={i}>{d}</li>)}
-                </ul>
-
-
-                {/* Late */}
-                <h3 id="late" className="mt-6">
-                    Late Details
-                </h3>
-                <ul>
-                    {lates.map((d, i) => <li key={i}>{d}</li>)}
-                </ul>
+                    {/* On Time */}
+                    <h3 id="ontime" className='fw-bold'>
+                        On Time Details
+                    </h3>
+                    <ul>
+                        {onTimes.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
 
 
-                {/* Leave */}
-                <h3 id="leave" className="mt-6">
-                    Leave Details
-                </h3>
-                <ul>
-                    {leaves.map((d, i) => <li key={i}>{d}</li>)}
-                </ul>
+                    {/* Late */}
+                    <h3 id="late" className="mt-6 fw-bold">
+                        Late Details
+                    </h3>
+                    <ul>
+                        {lates.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
 
 
-                {/* All */}
-                <h3 id="all" className="mt-6">
-                    All Records
-                </h3>
-                <ul>
-                    {allRecords.map((d, i) => <li key={i}>{d}</li>)}
-                </ul>
+                    {/* Leave */}
+                    <h3 id="leave" className="mt-6 fw-bold">
+                        Leave Details
+                    </h3>
+                    <ul>
+                        {leaves.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+
+                    {/* All */}
+                    <h3 id="all" className="mt-6 fw-bold">
+                        All Records
+                    </h3>
+                    <ul>
+                        {allRecords.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+                </div>
+                </div>
 
             </div>
+
 
 
 
