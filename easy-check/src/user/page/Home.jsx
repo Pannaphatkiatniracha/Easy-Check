@@ -10,14 +10,14 @@ const Home = () => {
 
             <div className="p-4">
 
-                <Link to="/" className='text-decoration-none'>
+                {/* <Link to="/" className='text-decoration-none'> */}
                     <div className="mt-2 mb-4 mr-2 text-end rounded-circle">
                         <Button size='sm' className='rounded-circle'
                             style={{ backgroundColor: '#636CCB', border: 'none' }}>
                             <i className="bi bi-bell-fill text-black"></i>
                         </Button>
                     </div>
-                </Link>
+                {/* </Link> */}
 
                 <div className="grid grid-cols-2 gap-4 mt-12">
 
@@ -56,14 +56,23 @@ const Home = () => {
                     </Link>
 
                     {/* text-decoration-none เอาไว้ลบเส้นใต้ลิ้งจะได้สวยเริ่ด จึ้ง โบ้ะ */}
-                    <Link to="/" className='text-decoration-none'>
+                    <Link to="/datacheck" className='text-decoration-none'>
                         <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
                             style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                            <i className="bi bi-calendar-range-fill fs-2"></i> <br />
-                            STATUS
-                            <br />
-                            &nbsp;
+                            <i className="bi bi-calendar2-week-fill fs-2"></i> <br />
+                            ATTENDANCE SUMMARY
+                        </div>
+                    </Link>
+
+
+
+                    <Link to="/datacheck" className='text-decoration-none'>
+                        <div className="p-4 text-center fw-semibold rounded-3 text-dark
+                    hover:scale-105 transition-all duration-200 ease-in-out"
+                            style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+                            <i className="bi bi-hourglass-bottom fs-2"></i> <br />
+                            WORKHOURS <br /> TRACKER
                         </div>
                     </Link>
 
@@ -79,14 +88,14 @@ const Home = () => {
 
         <div className="p-4">
 
-            <Link to="/" className='text-decoration-none'>
+            {/* <Link to="/" className='text-decoration-none'> */}
                 <div className="mt-2 mb-4 mr-2 text-end rounded-circle">
                     <Button size='sm' className='rounded-circle'
                         style={{ backgroundColor: '#636CCB', border: 'none' }}>
                         <i className="bi bi-bell-fill text-black"></i>
                     </Button>
                 </div>
-            </Link>
+            {/* </Link> */}
 
             <div className="grid grid-cols-2 gap-4 mt-12">
 

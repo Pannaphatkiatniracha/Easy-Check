@@ -24,6 +24,7 @@ import WorkHoursTracker from "./user/page/WorkHoursTracker";
 import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
+import DataCheck from "./user/page/DataCheck";
 
 
 
@@ -77,6 +78,7 @@ function App() {
                <Route path="workhourstracker" element={<WorkHoursTracker />} />
                <Route path="checkapprove" element={<CheckApporve />} />
                <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+               <Route path="datacheck" element={<DataCheck />} />
               </Route>
             </>
           )}
