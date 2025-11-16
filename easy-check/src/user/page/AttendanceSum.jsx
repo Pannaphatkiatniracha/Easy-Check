@@ -4,34 +4,34 @@ import Button from 'react-bootstrap/Button';
 const AttendanceSum = () => {
 
     const onTimes = [
-        "2025-01-02",
-        "2025-01-03",
-        "2025-01-06",
-        "2025-01-07",
-        "2025-01-08",
-        "2025-01-09",
-        "2025-01-10",
-        "2025-01-13",
-        "2025-01-14",
-        "2025-01-15",
-        "2025-01-17",
-        "2025-01-20",
-        "2025-01-21",
-        "2025-01-22",
-        "2025-01-24",
-        "2025-01-27",
-        "2025-01-29",
-        "2025-01-30",
+        "2025-10-01",
+        "2025-10-02",
+        "2025-10-03",
+        "2025-10-06",
+        "2025-10-07",
+        "2025-10-08",
+        "2025-10-10",
+        "2025-10-13",
+        "2025-10-15",
+        "2025-10-16",
+        "2025-10-17",
+        "2025-10-20",
+        "2025-10-21",
+        "2025-10-22",
+        "2025-10-24",
+        "2025-10-27",
+        "2025-10-29"
     ]
 
     const lates = [
-        "2025-01-16",
-        "2025-01-23",
-        "2025-01-31",
+        "2025-10-09",
+        "2025-10-14",
+        "2025-10-23",
+        "2025-10-28",
     ]
 
     const leaves = [
-        "2025-01-28", 
+        "2025-10-30"
     ]
 
     const allRecords = [...onTimes, ...lates, ...leaves]
@@ -69,8 +69,10 @@ const AttendanceSum = () => {
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 
+                    <h4 className="mt-3 fw-bold">October 2025 Summary</h4>
 
-                    <div className='grid grid-cols-4 gap-1 p-3 mt-6'>
+
+                    <div className='grid grid-cols-4 gap-1 p-3 mt-3'>
 
                         <Button className='rounded w-100 p-1 text-white fw-semibold
                         hover:scale-105 transition-all duration-200 ease-in-out'
@@ -101,7 +103,7 @@ const AttendanceSum = () => {
 
                         <Button className='rounded w-100 p-1 text-white fw-semibold
                         hover:scale-105 transition-all duration-200 ease-in-out'
-                        onClick={() => scrollToSection("all")}
+                            onClick={() => scrollToSection("all")}
                             style={{ backgroundColor: '#252A46', border: 'none' }}>
                             All
                         </Button>
