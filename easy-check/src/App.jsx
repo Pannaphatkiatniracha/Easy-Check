@@ -23,6 +23,7 @@ import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
 import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
+import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 
 
 
@@ -75,6 +76,7 @@ function App() {
                <Route path="attendancesummary" element={<AttendanceSum />} />
                <Route path="workhourstracker" element={<WorkHoursTracker />} />
                <Route path="checkapprove" element={<CheckApporve />} />
+               <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
               </Route>
             </>
           )}

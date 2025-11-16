@@ -1,12 +1,11 @@
 // CheckApprove.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
 const initialUsers = [
   { 
     id: 1, 
     name: "ปัณณพรรธน์ เกียรตินิรชา", 
-    employeeId: "010889",
+    employeeId: "esc100",
     checkInTime: "09:00",
     profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
     checkInPhoto: "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg"
@@ -14,7 +13,7 @@ const initialUsers = [
   { 
     id: 2, 
     name: "ฐิติฉัตร ศิริบุตร", 
-    employeeId: "010101",
+    employeeId: "esc101",
     checkInTime: "08:30",
     profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
     checkInPhoto: "https://i.redd.it/dte258y55e1c1.jpg"
@@ -22,7 +21,7 @@ const initialUsers = [
   { 
     id: 3, 
     name: "ภทรพร แซ่ลี้", 
-    employeeId: "110400",
+    employeeId: "esc102",
     checkInTime: "10:00",
     profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
     checkInPhoto: "https://i.pinimg.com/736x/f8/d3/15/f8d315c29812464824e8aaf91970be46.jpg"
@@ -56,16 +55,13 @@ function CheckApprove() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter app-container">
+    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
+
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
-
-        <Link to="/home" className='text-decoration-none'>
-          <button className="text-white text-2xl">
-            <i className="bi bi-chevron-left"></i>
-          </button>
-        </Link>
-
+        <button className="text-white text-2xl">
+          <i className="bi bi-chevron-left"></i>
+        </button>
         <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
           CHECK APPROVE
         </h1>
@@ -77,32 +73,35 @@ function CheckApprove() {
         {users.map((user) => (
           <div
             key={user.id}
-            className="bg-white rounded-xl p-4 shadow-md flex items-center justify-between"
+            className="bg-white rounded-2xl p-3 shadow-md flex items-center gap-3"
           >
-            {/* Profile */}
-            <div className="flex-shrink-0">
-              <img
-                src={user.profile}
-                className="w-12 h-12 object-cover rounded-full border"
-              />
-            </div>
+            {/* Profile Image */}
+            <img
+              src={user.profile}
+              className="w-12 h-12 object-cover rounded-full border"
+            />
 
-            {/* Info + buttons */}
-            <div className="flex-1 ml-4">
-              <div className="text-sm font-bold text-gray-800">{user.name}</div>
-              <div className="text-xs text-gray-500 mb-2">{`เข้างาน: ${user.checkInTime} - สถานะ: ${getStatus(user.checkInTime)}`}</div>
+            {/* Text Info */}
+            <div className="flex-1">
+              <div className="text-gray-800 font-bold">{user.name}</div>
+              <div className="text-xs text-gray-500 mb-1">
+                ID: {user.employeeId}
+              </div>
+              <div className="text-xs text-gray-600">
+                เข้างาน: {user.checkInTime} - สถานะ: {getStatus(user.checkInTime)}
+              </div>
 
-              {/* ปุ่มอนุมัติ / ไม่อนุมัติ */}
-              <div className="flex gap-2">
+              {/* Buttons - อยู่บรรทัดเดียวกัน */}
+              <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handleApprove(user)}
-                  className="px-3 py-1 rounded-[20px] text-white font-bold bg-[#59EA78] shadow-md flex-1 whitespace-nowrap text-center"
+                  className="px-3 py-1 rounded-full bg-[#59EA78] text-white text-xs font-semibold shadow flex-1"
                 >
                   อนุมัติ
                 </button>
                 <button
                   onClick={() => handleReject(user)}
-                  className="px-3 py-1 rounded-[20px] text-white font-bold bg-[#DF4E4E] shadow-md flex-1 whitespace-nowrap text-center"
+                  className="px-3 py-1 rounded-full bg-[#DF4E4E] text-white text-xs font-semibold shadow flex-1"
                 >
                   ไม่อนุมัติ
                 </button>
@@ -152,10 +151,10 @@ function CheckApprove() {
       )}
 
       {/* Approved / Rejected summary */}
-      <div className="max-w-md w-full mt-6 space-y-2">
+      <div className="max-w-md w-full mt-6 space-y-3">
         {approvedUsers.length > 0 && (
           <div className="bg-green-50 p-3 rounded-md">
-            <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว:</div>
+            <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว</div>
             {approvedUsers.map((u) => (
               <div key={u.id} className="text-sm text-green-800">
                 {u.name} - เข้างาน: {u.checkInTime} - สถานะ: {getStatus(u.checkInTime)}
@@ -165,7 +164,7 @@ function CheckApprove() {
         )}
         {rejectedUsers.length > 0 && (
           <div className="bg-red-50 p-3 rounded-md">
-            <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ:</div>
+            <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ</div>
             {rejectedUsers.map((u) => (
               <div key={u.id} className="text-sm text-red-800">
                 {u.name} - เข้างาน: {u.checkInTime} - สถานะ: {getStatus(u.checkInTime)}

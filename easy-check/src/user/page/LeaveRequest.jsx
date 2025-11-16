@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const LeaveRequest = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +8,8 @@ const LeaveRequest = () => {
     leaveEnd: "",
     leaveReasons: [],
     otherReasonText: "",
+    evidenceFile: null,
+    evidencePreview: null,
   });
 
   const leaveOptions = [
@@ -27,13 +29,38 @@ const LeaveRequest = () => {
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
+
       if (reason === "Other")
-        setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
-      else setFormData({ ...formData, leaveReasons: updated });
+        setFormData({
+          ...formData,
+          leaveReasons: updated,
+          otherReasonText: "",
+        });
+      else
+        setFormData({
+          ...formData,
+          leaveReasons: updated,
+        });
     } else {
       updated.push(reason);
       setFormData({ ...formData, leaveReasons: updated });
     }
+  };
+
+  const handleEvidenceUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file.");
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      evidenceFile: file,
+      evidencePreview: URL.createObjectURL(file),
+    });
   };
 
   const handleFileLeave = () => {
@@ -41,10 +68,12 @@ const LeaveRequest = () => {
       alert("Please select start and end dates.");
       return;
     }
+
     if (formData.leaveReasons.length === 0) {
       alert("Please select at least one leave reason.");
       return;
     }
+
     if (
       formData.leaveReasons.includes("Other") &&
       !formData.otherReasonText.trim()
@@ -52,6 +81,15 @@ const LeaveRequest = () => {
       alert("Please provide reason for 'Other'.");
       return;
     }
+
+    if (
+      formData.leaveReasons.includes("Sick-self") &&
+      !formData.evidenceFile
+    ) {
+      alert("กรุณาแนบรูปใบรับรองแพทย์");
+      return;
+    }
+
     alert("Leave filed successfully!");
     console.log(formData);
   };
@@ -59,8 +97,7 @@ const LeaveRequest = () => {
   return (
     <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4 font-inter">
       <div className="max-w-lg w-full flex flex-col space-y-8">
-
-        {/* ปุ่มย้อนกลับ */}
+        {/* Back Button */}
         <div className="w-full flex justify-start mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
@@ -83,9 +120,10 @@ const LeaveRequest = () => {
               name="leaveStart"
               value={formData.leaveStart}
               onChange={handleDateChange}
-              className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white placeholder-white"
+              className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white"
             />
           </div>
+
           <div>
             <label className="block font-semibold text-[#FFFFFF] mb-1">
               Leave End <span className="text-red-400">*</span>
@@ -95,7 +133,7 @@ const LeaveRequest = () => {
               name="leaveEnd"
               value={formData.leaveEnd}
               onChange={handleDateChange}
-              className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white placeholder-white"
+              className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white"
             />
           </div>
         </div>
@@ -105,6 +143,7 @@ const LeaveRequest = () => {
           <label className="block font-semibold mb-3 text-[#FFFFFF]">
             Leave Reason <span className="text-red-400">*</span>
           </label>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {leaveOptions.map((reason) => (
               <label
@@ -126,6 +165,7 @@ const LeaveRequest = () => {
             ))}
           </div>
 
+          {/* Other reason input */}
           {formData.leaveReasons.includes("Other") && (
             <div className="mt-4">
               <label className="block font-semibold mb-2 text-[#FFFFFF]">
@@ -137,17 +177,46 @@ const LeaveRequest = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, otherReasonText: e.target.value })
                 }
-                className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:ring-2 focus:ring-[#636CCB] bg-white/10 text-white placeholder-white"
+                className="w-full border-2 border-white rounded-xl p-3 shadow-inner bg-white/10 text-white"
                 placeholder="Enter your reason"
               />
             </div>
           )}
         </div>
 
-        {/* Submit Button */}
+        {/* ⭐ Compact Evidence Upload */}
+        <div>
+          <label className="block font-semibold mb-2 text-white">
+            Attach Evidence (ถ้ามี)
+          </label>
+
+          <div className="relative border-2 border-dashed border-white/50 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:border-[#636CCB] transition-all max-w-sm">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleEvidenceUpload}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <i className="bi bi-cloud-arrow-up text-2xl text-white"></i>
+            <p className="text-white/80 text-sm">Click to upload evidence</p>
+          </div>
+
+          {/* Preview */}
+          {formData.evidencePreview && (
+            <div className="mt-3 flex justify-start gap-2">
+              <img
+                src={formData.evidencePreview}
+                alt="evidence preview"
+                className="w-20 h-20 object-cover rounded-xl border border-white shadow"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Submit */}
         <button
           onClick={handleFileLeave}
-          className="w-full py-3 rounded-xl bg-[#636CCB] text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all hover:bg-[#4b54b5]"
+          className="w-full py-3 rounded-xl bg-[#636CCB] text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
         >
           File Leave
         </button>
