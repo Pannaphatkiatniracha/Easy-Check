@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 
-const Profile = () => {
+const Profile = ( {role} ) => {
 
     const [showModal, setShowModal] = useState(false)
 
@@ -36,7 +36,7 @@ const Profile = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users/1")
+            const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users/6")
             const data = await res.json()
             setUser({
                 name: data.name || "",
@@ -71,7 +71,7 @@ const Profile = () => {
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://68fbd77794ec960660275293.mockapi.io/users/1", {
+        await fetch("https://68fbd77794ec960660275293.mockapi.io/users/6", {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
             body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
@@ -108,8 +108,12 @@ const Profile = () => {
 
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
-            <div className="w-25 mx-auto mt-6 position-relative">
-                <img src={user.avatar} className="rounded-circle w-100 h-100" />
+            <div className="mx-auto mt-6 position-relative"
+              style={{width: "100px",height: "100px",}}>
+
+                {/* objectFit: "cover" = ไม่ให้รูปโดนบีบ */}
+                <img src={user.avatar} className="rounded-circle w-100 h-100" 
+                style={{width: "100%",height: "100%",objectFit: "cover"}}/>
 
 
                 {/* icon edit */}
