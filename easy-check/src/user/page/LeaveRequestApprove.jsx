@@ -4,18 +4,21 @@ import { Link } from "react-router-dom";
 const initialLeaveRequests = [
   {
     id: 1,
-    profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
+    profile:
+      "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
     name: "ปัณณพรรธน์ เกียรตินิรชา",
     employeeId: "010889",
     reasons: ["Sick-self"],
     leaveStart: "2025-11-20",
     leaveEnd: "2025-11-22",
     otherReason: "",
-    evidencePreview: "https://consumerthai.s3.ap-southeast-1.amazonaws.com/news-img/news-216-1.jpg", 
+    evidencePreview:
+      "https://consumerthai.s3.ap-southeast-1.amazonaws.com/news-img/news-216-1.jpg",
   },
   {
     id: 2,
-    profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
+    profile:
+      "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
     name: "ฐิติฉัตร ศิริบุตร",
     employeeId: "010101",
     reasons: ["Vacation"],
@@ -26,7 +29,8 @@ const initialLeaveRequests = [
   },
   {
     id: 3,
-    profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
+    profile:
+      "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
     name: "ภทรพร แซ่ลี้",
     employeeId: "110400",
     reasons: ["Other"],
@@ -41,7 +45,7 @@ function LeaveRequestApprove() {
   const [requests, setRequests] = useState(initialLeaveRequests);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
-  const [selectedEvidence, setSelectedEvidence] = useState(null); // <-- สำหรับ modal รูป
+  const [selectedEvidence, setSelectedEvidence] = useState(null);
 
   const handleApprove = (req) => {
     setApproved([...approved, req]);
@@ -54,8 +58,10 @@ function LeaveRequestApprove() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
-
+    <div
+      className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center"
+      style={{ fontFamily: "Inter, sans-serif" }}
+    >
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
         <Link to="/home" className="text-white text-2xl">
@@ -85,17 +91,19 @@ function LeaveRequestApprove() {
 
             {/* Text Info */}
             <div className="flex-1">
-              <div className="text-gray-800 font-bold">{req.name}</div>
+              <div className="text-gray-800 font-semibold">{req.name}</div>
               <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
               <div className="text-xs text-gray-600">
-                {req.reasons.includes("Other") ? req.otherReason : req.reasons.join(", ")}
+                {req.reasons.includes("Other")
+                  ? req.otherReason
+                  : req.reasons.join(", ")}
               </div>
 
               {/* View Evidence */}
               {req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
-                  className="mt-2 text-blue-500 underline text-xs"
+                  className="mt-2 text-blue-500 underline text-xs font-medium"
                 >
                   ดูรูปแนบ
                 </button>
@@ -103,16 +111,17 @@ function LeaveRequestApprove() {
             </div>
 
             {/* Approve / Reject Buttons */}
+            {/* Approve / Reject Buttons */}
             <div className="flex flex-row gap-2 items-center">
               <button
                 onClick={() => handleApprove(req)}
-                className="px-3 py-1 rounded-full bg-[#59EA78] text-black text-xs font-semibold shadow"
+                className="px-3 py-1 rounded-full bg-[#59EA78] text-white text-xs font-semibold shadow"
               >
                 อนุมัติ
               </button>
               <button
                 onClick={() => handleReject(req)}
-                className="px-3 py-1 rounded-full bg-[#DF4E4E] text-black text-xs font-semibold shadow"
+                className="px-3 py-1 rounded-full bg-[#DF4E4E] text-white text-xs font-semibold shadow"
               >
                 ไม่อนุมัติ
               </button>
@@ -148,27 +157,47 @@ function LeaveRequestApprove() {
         </div>
       )}
 
-      {/* Summary */}
-      <div className="max-w-md w-full mt-6 space-y-3">
+      {/* Summary: แยกกล่องแต่ละคน + Header มีกล่อง */}
+      <div className="max-w-md w-full mt-6 space-y-4">
+        {/* Approved */}
         {approved.length > 0 && (
-          <div className="bg-green-50 p-3 rounded-md">
-            <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว</div>
-            {approved.map((r) => (
-              <div key={r.id} className="text-sm text-green-800">
-                {r.name} ({r.leaveStart} → {r.leaveEnd})
-              </div>
-            ))}
+          <div>
+            <div className="inline-block bg-green-100 text-green-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+              อนุมัติแล้ว
+            </div>
+            <div className="space-y-2">
+              {approved.map((r) => (
+                <div
+                  key={r.id}
+                  className="bg-green-50 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                >
+                  <span className="text-green-800 font-medium">
+                    {r.name} ({r.leaveStart} → {r.leaveEnd})
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
+        {/* Rejected */}
         {rejected.length > 0 && (
-          <div className="bg-red-50 p-3 rounded-md">
-            <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ</div>
-            {rejected.map((r) => (
-              <div key={r.id} className="text-sm text-red-800">
-                {r.name} ({r.leaveStart} → {r.leaveEnd})
-              </div>
-            ))}
+          <div>
+            <div className="inline-block bg-red-100 text-red-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+              ไม่อนุมัติ
+            </div>
+            <div className="space-y-2">
+              {rejected.map((r) => (
+                <div
+                  key={r.id}
+                  className="bg-red-50 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                >
+                  <span className="text-red-800 font-medium">
+                    {r.name} ({r.leaveStart} → {r.leaveEnd})
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
