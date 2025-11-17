@@ -34,7 +34,7 @@ const ForgotPassword = () => {
 
 
             {/* ปุ่ม */}
-            <Link to="/changepassword" className="text-decoration-none">          
+            <Link to="/forgottochange" className="text-decoration-none">          
                 <div className="text-center mt-20">
                     <Button className="w-25 rounded-5 fw-semibold" style={{backgroundColor: '#636CCB', border: 'none'}}>SEND</Button>
                 </div>

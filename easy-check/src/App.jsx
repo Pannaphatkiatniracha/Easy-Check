@@ -25,6 +25,7 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
+import ForgotToChange from "./user/page/ForgotToChange";
 
 
 
@@ -71,6 +72,7 @@ function App() {
                 <Route path="support" element={<Support />} />
                 <Route path="forgotpassword" element={<ForgotPassword />} />
                 <Route path="changepassword" element={<ChangePassword />} />
+                <Route path="forgottochange" element={<ForgotToChange />} />
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />

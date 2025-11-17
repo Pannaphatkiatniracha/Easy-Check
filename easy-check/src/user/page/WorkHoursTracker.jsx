@@ -125,7 +125,7 @@ const WorkHoursTracker = () => {
 
 
                     {weeklyData.map((item, index) => (
-                        <div key={index} className='mb-3 ml-1 mr-1 text-start'>
+                        <div key={index} className='mb-3 ml-1 mr-1'>
 
                             {/* ชื่อกับเปอร์เซนต์ที่แสดง */}
                             <div className='d-flex justify-content-between mb-1'>

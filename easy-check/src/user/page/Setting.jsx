@@ -171,7 +171,7 @@ const Setting = ({ role }) => {
                 </div>
             </div>
         </div>
-    );
+    )
 
     //  ถ้า user ที่ login เข้ามาเป็น role approver ให้แสดงหน้า ApprovePage ถ้าไม่ใช่ค่อยให้แสดงหน้า Userpage
     return role === "approver" ? ApprovePage : Userpage
