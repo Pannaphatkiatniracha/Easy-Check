@@ -70,10 +70,34 @@ const Login = ({ setToken, setRole }) => {
                             <i className="bi bi-person-fill"></i>
                         </InputGroup.Text>
                         <FormControl type='text' placeholder='Employee ID'
+                            value={username}
 
-                            // setUsername(e.target.value)} = เอาค่าที่พิมพ์มา อัพเดตตัวแปร username
-                            value={username} onChange={e => setUsername(e.target.value)} />
+                            // ทุกครั้งที่พิมพ์จะมาอัปเดต username
+                            onChange={(e) => {
+
+                                // let enter = e.target.value = ดึงค่าที่พิมพ์มา
+                                let enter = e.target.value.replace(/\D/g, "") // ตัดทุกอย่างที่ไม่ใช่ตัวเลขออก
+                                enter = enter.slice(0, 6)
+                                setUsername(enter)
+                            }} />
+
+
+                            {/* 
+                                >>>>> text.replace(สิ่งที่อยากหา, สิ่งที่อยากแทนที่)
+                                \D = ไม่ใช่ตัวเลข
+                                /…/g = / สิ่งที่อยากหา / ตัวเลือก
+                                g = ช่วยลบตัวที่ไม่ใช่ตัวเลขทุกตัวที่กรอกมาเลย ไม่งั้นมันจะลบแค่ตัวแรกที่มันเจอ
+                                ส่วนที่ลบก็แทนที่ด้วยค่าว่าง "" นั่นเองง ✨ 
+                            */}
+
+                            {/* 
+                                "123456789".slice(3,6)
+                                = 456 
+                                เพราะ(ตัวแรก,ตัวสอง) ตัวแรกคือตัวแรกที่เริ่มนับ ตัวสองคือตัวสุดท้ายที่มันจะเอา
+                            */}
+
                     </InputGroup>
+
                 </div>
 
 

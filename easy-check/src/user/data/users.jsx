@@ -1,13 +1,13 @@
 const users = [
     {
-        user: 'user',
-        pass: 'userpass',
+        user: '000000',
+        pass: 'pass',
         role: 'user',
         token: 'usertoken',
     },
     {
-        user: 'approver',
-        pass: 'approverpass',
+        user: '111111',
+        pass: 'pass',
         role: 'approver',
         token: 'approvertoken',
     },
