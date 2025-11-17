@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
-const WorkHoursTracker = () => {
+const WorkHoursTracker = ({ role }) => {
 
     const weekTemplate = [
         {
@@ -35,11 +35,11 @@ const WorkHoursTracker = () => {
         Thursday: 50,
         Friday: 90,
     }
-    
-    
+
+
     // กำหนดชื่อวันโดยเรียงตาม date 0-6
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    
+
     // new Date() บอกว่าวันนี้วันที่ 17 ซึ่งตรงกับวันจันทร์ getDay() ก็จะส่งเลข 1
     // และ dayNames ที่เรากำหนดไว้ก็คือเรียงให้มันตรงกับค่าของมัน
 
@@ -73,8 +73,98 @@ const WorkHoursTracker = () => {
     // ซึ่ง todayName = วันของปัจจุบัน
     // d => d.day === todayName อันนี้คือเฉพาะวันแบบ Monday Tuesday Wednesday / weeklyData ถึงจะเป็นวันที่แบบตัวเลข
 
+    
 
-    return (
+    // component ของ Approver
+    const ApprovePage = (
+
+        <div className="app-container">
+
+            {/* หัวข้อ */}
+            <div className="d-flex justify-content-between text-white mt-16">
+
+                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
+                <Link to="/datacheck" className='text-decoration-none'>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    </Button>
+                </Link>
+
+                <h3 className="fw-bold">Work Hours Tracker</h3>
+                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
+                <div className="me-4"></div>
+            </div>
+
+
+            {/* ขแงวันนี้ */}
+            <div className='d-flex justify-content-center mt-10'>
+                <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
+                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+
+                    <h4 className="mt-3 mb-3 fw-bold">Today</h4>
+                    <div className='p-1'>
+
+                        <ProgressBar className='mb-3'
+                            style={{ height: '20px', backgroundColor: '#ccc' }}>
+
+                            <ProgressBar className='text-black' now={today.percent} key={1} label={`${today.percent}%`}
+                                style={{ backgroundColor: today.color }} />
+
+                        </ProgressBar>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            {/* รายสัปดาห์ */}
+            <div className='d-flex justify-content-center mt-8'>
+                <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
+                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+
+                    <h4 className="mt-3 mb-6 fw-bold">Weekly</h4>
+
+
+                    {weeklyData.map((item, index) => (
+                        <div key={index} className='mb-3 ml-1 mr-1 text-start'>
+
+                            {/* ชื่อกับเปอร์เซนต์ที่แสดง */}
+                            <div className='d-flex justify-content-between mb-1'>
+                                <span>{item.day}</span>
+                                <span>{item.percent}%</span>
+                            </div>
+
+                            {/* ตรง now ไว้กำหนดความยาวของแถบสี แต่มันเลือกสีตามที่เราต้องการไม่ได้เลยต้องกำหนดใน div ข้างในอีกที */}
+                            <ProgressBar now={item.percent} className="mb-2"
+                                style={{ backgroundColor: '#ccc', height: '20px' }}>
+                                <div style={{
+                                    width: `${item.percent}%`,
+                                    backgroundColor: item.color,
+                                }} />
+                            </ProgressBar>
+
+                        </div>
+                    ))}
+
+                </div>
+            </div>
+
+
+            {/* กล่องรวม */}
+            
+
+
+
+        </div>
+    )
+
+
+
+    // component ของ User ทั่วไป
+    const Userpage = (
+
         <div className="app-container">
 
             {/* หัวข้อ */}
@@ -101,12 +191,12 @@ const WorkHoursTracker = () => {
                     <h4 className="mt-3 mb-3 fw-bold">Today</h4>
                     <div className='p-1'>
 
-                        <ProgressBar className='mb-3' 
-                        style={{ height: '20px', backgroundColor: '#ccc'}}>
+                        <ProgressBar className='mb-3'
+                            style={{ height: '20px', backgroundColor: '#ccc' }}>
 
                             <ProgressBar className='text-black' now={today.percent} key={1} label={`${today.percent}%`}
-                            style={{ backgroundColor: today.color }}/>
-                            
+                                style={{ backgroundColor: today.color }} />
+
                         </ProgressBar>
 
                     </div>
@@ -125,7 +215,7 @@ const WorkHoursTracker = () => {
 
 
                     {weeklyData.map((item, index) => (
-                        <div key={index} className='mb-3 ml-1 mr-1'>
+                        <div key={index} className='mb-3 ml-1 mr-1 text-start'>
 
                             {/* ชื่อกับเปอร์เซนต์ที่แสดง */}
                             <div className='d-flex justify-content-between mb-1'>
@@ -139,7 +229,7 @@ const WorkHoursTracker = () => {
                                 <div style={{
                                     width: `${item.percent}%`,
                                     backgroundColor: item.color,
-                                    }}/>
+                                }} />
                             </ProgressBar>
 
                         </div>
@@ -155,6 +245,12 @@ const WorkHoursTracker = () => {
 
         </div>
     )
+
+    //  ถ้า user ที่ login เข้ามาเป็น role approver ให้แสดงหน้า ApprovePage ถ้าไม่ใช่ค่อยให้แสดงหน้า Userpage
+    return role === "approver" ? ApprovePage : Userpage
+
+
+
 }
 
 export default WorkHoursTracker

@@ -25,7 +25,6 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
-import ForgotToChange from "./user/page/ForgotToChange";
 
 
 
@@ -72,12 +71,13 @@ function App() {
                 <Route path="support" element={<Support />} />
                 <Route path="forgotpassword" element={<ForgotPassword />} />
                 <Route path="changepassword" element={<ChangePassword />} />
-                <Route path="forgottochange" element={<ForgotToChange />} />
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
-               <Route path="attendancesummary" element={<AttendanceSum />} />
-               <Route path="workhourstracker" element={<WorkHoursTracker />} />
+               <Route path="attendancesummary" element={<AttendanceSum
+               role={role} />} />
+               <Route path="workhourstracker" element={<WorkHoursTracker
+               role={role} setToken={setToken} />} />
                <Route path="checkapprove" element={<CheckApporve />} />
                <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                <Route path="datacheck" element={<DataCheck />} />

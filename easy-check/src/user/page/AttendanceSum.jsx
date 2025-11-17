@@ -45,6 +45,8 @@ const AttendanceSum = () => {
         scrollIntoView({behavior: "smooth"})
     }
 
+    
+
     return (
 
         <div className="app-container">
