@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
 
-const Setting = ({ role }) => {
+const Setting = ({ role, setToken, setRole }) => {
 
 
     const navigate = useNavigate()
@@ -10,7 +10,10 @@ const Setting = ({ role }) => {
     // ฟังก์ชัน logout
     const handleLogout = () => {
         localStorage.removeItem('token') // ล้าง token
-        navigate('/login')            // redirect ไปหน้า login
+        localStorage.removeItem('role')
+        setToken("")
+        setRole("")
+        navigate('/login')
     }
 
 
