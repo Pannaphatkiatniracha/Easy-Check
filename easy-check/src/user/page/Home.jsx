@@ -1,9 +1,8 @@
 import { Button } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 
-const Home = () => {
+const Home = ({ role }) => {
 
-    const role = localStorage.getItem('role')
 
     if (role === "approver") {
         return (
