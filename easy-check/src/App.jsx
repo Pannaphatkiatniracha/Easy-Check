@@ -30,6 +30,7 @@ import DataCheck from "./user/page/DataCheck";
 
 
 
+
 function App() {
 
   // () => ... คือเป็นการบอกว่าให้ useState เรียกใช้ฟังก์ชันนี้ตอนเริ่มต้นเท่านั้น
@@ -47,6 +48,7 @@ function App() {
         <Routes>
 
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
 
           {/* ถ้ายังไม่ได้ login จะกระโดดไปให้ login ก่อน และ replace เพื่อไม่ให้มี history ใน history stack เวลากด back จะได้ไม่งง  */}
           {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
@@ -72,7 +74,6 @@ function App() {
                 <Route path="checkin" element={<CheckIn />} />
                 <Route path="delegateCheckin" element={<DelegateCheckin />} />
                 <Route path="support" element={<Support />} />
-                <Route path="forgotpassword" element={<ForgotPassword />} />
                 <Route path="changepassword" element={<ChangePassword />} />
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />

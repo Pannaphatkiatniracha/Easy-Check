@@ -150,7 +150,7 @@ const WorkHoursTracker = ({ role }) => {
 
 
                     {weeklyData.map((item, index) => (
-                        <div key={index} className='mb-3 ml-1 mr-1 text-start'>
+                        <div key={index} className='mb-3 ml-1 mr-1'>
 
                             {/* ชื่อกับเปอร์เซนต์ที่แสดง */}
                             <div className='d-flex justify-content-between mb-1'>
@@ -192,6 +192,8 @@ const WorkHoursTracker = ({ role }) => {
 
 
                     <div>
+                        {/* <mark className="p-1 rounded-3 mr-2">Total Hours: </mark>
+                        <span className='fw-bold'>{workedHours.toFixed(1)} hours By {maxPossibleHours} hours</span> */}
                         <span className='fw-bold'>Total Hours: </span>
                         <mark className="p-1 rounded-3">{workedHours.toFixed(1)} hours By {maxPossibleHours} hours</mark>
                     </div>
