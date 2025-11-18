@@ -43,9 +43,8 @@ const WorkHoursTracker = ({ role }) => {
     // new Date() บอกว่าวันนี้วันที่ 17 ซึ่งตรงกับวันจันทร์ getDay() ก็จะส่งเลข 1
     // และ dayNames ที่เรากำหนดไว้ก็คือเรียงให้มันตรงกับค่าของมัน
 
-    // ผลลัพธ์คือ todayIndex = 1 todayName = "Monday"
-    const todayIndex = new Date().getDay() // วันปัจจุบันจริง ๆ
-    const todayName = dayNames[todayIndex]
+    const todayIndex = new Date().getDay() // วันปัจจุบันจริง ๆ แต่เป็นเลข 0-6
+    const todayName = dayNames[todayIndex] // วันปัจจุบันที่เป็นชื่อวัน เช่น todayIndex คือ 1 / todayName คือ Monday
 
 
 
@@ -73,25 +72,30 @@ const WorkHoursTracker = ({ role }) => {
     // ซึ่ง todayName = วันของปัจจุบัน
     // d => d.day === todayName อันนี้คือเฉพาะวันแบบ Monday Tuesday Wednesday / weeklyData ถึงจะเป็นวันที่แบบตัวเลข
 
-    const MAX_HOURS_PER_DAY = 9;
 
-    // ชั่วโมงที่ทำจริงจนถึงวันนี้
-    const workedHours = weekTemplate.reduce((sum, d) => {
-        const index = dayNames.indexOf(d.day);
-        if (index <= todayIndex) {
-            return sum + (hoursData[d.day] ?? 0);
-        }
-        return sum;
-    }, 0);
 
-    // ชั่วโมงสูงสุดที่ทำได้ตามวันปัจจุบัน
-    const maxPossibleHours = Math.min(todayIndex, 5) * MAX_HOURS_PER_DAY;
+    const MAX_HOURS_PER_DAY = 9
+    
+    // sum = ผลรวม   day = ของใน array  -------------------- เวลาทำงานจริงจ้า --------------------
+    // .reduce คือการเอาของใน array มาค่อยๆ ทำอะไรสักอย่างกัน โดยส่งผลลัพธ์ไปเรื่อยๆ ในทีนี้คือ บวก
+    const workedHours = weeklyData.reduce((sum, day) => {
+        // แปลง % เป็นชั่วโมง (9 ชม. = 100%)
+        const hours = (day.percent / 100) * MAX_HOURS_PER_DAY
+        return sum + hours
+    }, 0) // 0 ตรงนี้คือให้ sum มีค่าเริ่มต้นเป็น 0
 
+
+    // เอาไว้บอกว่าตอนนี้เราทำงานไปกี่วันแล้ว
+    const daysWorked = Math.min(todayIndex, 5) // Math.min(.., ..) คือมันเลือกตัวที่น้อยที่สุดระหว่างสองตัวนี้ ดังนั้นค่าของ daysWorked คือจำนวนวันที่ทำงานไปแล้วในวีคนี้
+    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY // จำนวนชั่วโมงสูงสุดที่เข้าทำงาน *นับแค่วันที่ทำงานแล้ว*
+
+    
     // สรุปเปอร์เซ็นต์รวม
-    const weeklySummaryPercent =
-        maxPossibleHours > 0
-            ? Math.round((workedHours / maxPossibleHours) * 100)
-            : 0;
+    const weeklySummaryPercent = maxPossibleHours > 0 
+        // Math.round คือปัดเศษตามค่าความเป็นจริง
+        ? Math.round((workedHours / maxPossibleHours) * 100) : 0 // ถ้าหล่อนไม่เคยทำงานเลยก็ 0 จ่ะ
+
+
 
     // component ของ Approver
     const ApprovePage = (
@@ -155,23 +159,13 @@ const WorkHoursTracker = ({ role }) => {
                             </div>
 
                             {/* container ของ progress bar */}
-                            <div
-                                style={{
-                                    height: '20px',
-                                    backgroundColor: '#ccc',  // สี track ด้านหลัง
-                                    borderRadius: '4px',
-                                    overflow: 'hidden',
-                                }}
-                            >
+                            <div style={{ height: '20px', backgroundColor: '#ccc', borderRadius: '4px', overflow: 'hidden', }}>
+
                                 {/* bar สี */}
-                                <div
-                                    style={{
-                                        width: `${item.percent}%`,
-                                        height: '100%',
-                                        backgroundColor: item.color, // สี progress bar ของเรา
-                                    }}
-                                />
+                                <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: item.color }} />
+
                             </div>
+
 
                         </div>
                     ))}
@@ -181,24 +175,27 @@ const WorkHoursTracker = ({ role }) => {
 
 
             {/* กล่องรวม */}
-            <div className='d-flex justify-content-center mt-10'>
+            <div className='d-flex justify-content-center mt-10 mb-3'>
                 <div className="p-3 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 
+
                     <h4 className="mt-2 mb-4 fw-bold">Weekly Summary</h4>
 
-                    <ProgressBar className='mb-3'
+                    <ProgressBar className='mb-6'
                         style={{ height: '20px', backgroundColor: '#ccc' }}>
-                        <ProgressBar
-                            now={weeklySummaryPercent}
-                            label={`${weeklySummaryPercent}%`}
-                            style={{ backgroundColor: '#4CAF50' }}
-                        />
+
+                        <ProgressBar className='text-black' now={weeklySummaryPercent} label={`${weeklySummaryPercent}%`}
+                            style={{ backgroundColor: '#6D29F6' }}/>
+
                     </ProgressBar>
 
-                    <p className='mt-2'>
-                        Total Hours: <span className='fw-bold'>{workedHours}</span> hours
-                    </p>
+
+                    <div>
+                        <span className='fw-bold'>Total Hours: </span>
+                        <mark className="p-1 rounded-3">{workedHours.toFixed(1)} hours By {maxPossibleHours} hours</mark>
+                    </div>
+
 
                 </div>
             </div>
@@ -271,34 +268,20 @@ const WorkHoursTracker = ({ role }) => {
                                 <span>{item.percent}%</span>
                             </div>
 
-
                             {/* container ของ progress bar */}
-                            <div
-                                style={{
-                                    height: '20px',
-                                    backgroundColor: '#ccc',  // สี track ด้านหลัง
-                                    borderRadius: '4px',
-                                    overflow: 'hidden',
-                                }}
-                            >
+                            <div style={{ height: '20px', backgroundColor: '#ccc', borderRadius: '4px', overflow: 'hidden', }}>
+
                                 {/* bar สี */}
-                                <div
-                                    style={{
-                                        width: `${item.percent}%`,
-                                        height: '100%',
-                                        backgroundColor: item.color, // สี progress bar ของเรา
-                                    }}
-                                />
+                                <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: item.color }} />
+
                             </div>
+
 
                         </div>
                     ))}
 
                 </div>
             </div>
-
-
-
 
 
 
