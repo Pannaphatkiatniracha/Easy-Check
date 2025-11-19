@@ -20,12 +20,12 @@ const LeaveRequest = () => {
     "Other",
   ];
 
-  const handleDateChange = (e) => {
+  const handleDateChange = (e) => { //อัปเดตวันที่เริ่มต้นและสิ้นสุดการลา
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleReasonChange = (reason) => {
+  const handleReasonChange = (reason) => { // เลือกหรือยกเลิกเหตุผลการลา ถ้าเลือกother จะต้องบอกเหตุผล
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
@@ -47,7 +47,7 @@ const LeaveRequest = () => {
     }
   };
 
-  const handleEvidenceUpload = (e) => {
+  const handleEvidenceUpload = (e) => { // อัปโหลดและแสดงภาพตัวอย่าง ใบรับรอง
     const file = e.target.files[0];
     if (!file) return;
 
@@ -63,7 +63,7 @@ const LeaveRequest = () => {
     });
   };
 
-  const handleFileLeave = () => {
+  const handleFileLeave = () => { // ตรวจสอบข้อมูลว่าครบถ้วนไหมก่อนยืนยันคำลา
     if (!formData.leaveStart || !formData.leaveEnd) {
       alert("Please select start and end dates.");
       return;

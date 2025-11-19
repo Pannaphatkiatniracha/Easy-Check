@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-function CheckInOut() {
-  const [name, setName] = useState("");
+function CheckInOut() { //ใช้ ีusestate เก็บค่า name , location , message , error, time, date, photo,
+  const [name, setName] = useState(""); 
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +28,7 @@ function CheckInOut() {
     return () => clearInterval(timer);
   }, []);
 
-  const startCamera = async () => {
+  const startCamera = async () => { //เปิดกล้องเพื่อถ่ายรูป
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
       videoRef.current.srcObject = stream;
@@ -38,7 +38,7 @@ function CheckInOut() {
     }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = () => { //ถ่ายรูปจากกล้องและเก็บเป็นไฟล์
     const video = videoRef.current;
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
@@ -53,7 +53,7 @@ function CheckInOut() {
     });
   };
 
-  const handleLocation = () => {
+  const handleLocation = () => { //ขอสิทธิ์เข้าถึงตำแหน่ง gps ของผู้ใช้
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
@@ -63,7 +63,7 @@ function CheckInOut() {
     );
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = () => { //บันทึกข้อมูลการเช็กอิน เช็กเอ้า และคำนวณเวลาทำงาน
     if (!name) return setError("กรุณากรอกชื่อ");
     if (!location) return setError("กรุณาขอตำแหน่งก่อน");
     if (!photo) return setError("กรุณาถ่ายรูปยืนยันตัวตน");
@@ -101,7 +101,7 @@ function CheckInOut() {
     setError("");
   };
 
-  const handleReset = () => {
+  const handleReset = () => { //รีเซตข้อมูลทั้งหมด 
     localStorage.removeItem("checkInData");
     localStorage.removeItem("checkOutData");
     setCheckInData(null);
@@ -184,7 +184,7 @@ function CheckInOut() {
 
         {mode !== "done" && (
           <button
-            onClick={handleConfirm}
+            onClick={handleConfirm} 
             className="w-1/2 py-3 rounded-xl bg-[#636CCB] text-white font-bold shadow-lg hover:scale-105 transition transform"
           >
             Done

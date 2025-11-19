@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const initialLeaveRequests = [
+const initialLeaveRequests = [  // ข้อมูลคำลา ชื่อพนักงาน รหัสไอดี เหตุผลการลา วันที่เริ่มต้นลา-วันสิ้นสุดการลา รูปภาพแนบ เหตุผล
   {
     id: 1,
     profile:
@@ -41,18 +41,18 @@ const initialLeaveRequests = [
   },
 ];
 
-function LeaveRequestApprove() {
-  const [requests, setRequests] = useState(initialLeaveRequests);
-  const [approved, setApproved] = useState([]);
-  const [rejected, setRejected] = useState([]);
+function LeaveRequestApprove() { 
+  const [requests, setRequests] = useState(initialLeaveRequests); //เก็บคำลางานที่ยังไม่ได้กดรับ การอนุมัติ ไม่อนุมัติ
+  const [approved, setApproved] = useState([]); //ได้รับการอนุมัติ
+  const [rejected, setRejected] = useState([]); //ไม่ได้รับการอนุมัติ
   const [selectedEvidence, setSelectedEvidence] = useState(null);
 
-  const handleApprove = (req) => {
+  const handleApprove = (req) => {  //อนุมัติ
     setApproved([...approved, req]);
     setRequests(requests.filter((r) => r.id !== req.id));
   };
 
-  const handleReject = (req) => {
+  const handleReject = (req) => { //ไม่อนุมัติ
     setRejected([...rejected, req]);
     setRequests(requests.filter((r) => r.id !== req.id));
   };
