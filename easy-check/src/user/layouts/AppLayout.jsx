@@ -7,8 +7,9 @@ const AppLayout = () => {
         
 
         <div className="app-container">
+            
+            {/* flex-grow-1 ทำให้ชิดขอบ / overflow-auto เผื่อข้อมูลมันล้นจะได้ scroll ได้  */}
             <div className="flex-grow-1 overflow-auto">
-                {/* ใน route จะมาแสดงใน Outlet */}
                 <Outlet /> 
             </div>
 

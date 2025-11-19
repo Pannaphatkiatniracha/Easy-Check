@@ -122,8 +122,8 @@ const Support = () => {
                         // e.target = คือเหตุการณ์ที่เกิดขึ้นกับมัน แต่ e.target.value คือค่าที่อยู่ในกล่อง
                         // พอเอา setSearch ครอบเข้าไป ก็คืออัปเดตให้มันเป็น search หรือก็คือข้อมูลปัจจุบันนั่นแหละ
 
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                        onChange={(e) => setSearch(e.target.value)}/>
+                        
                     <Button style={{ backgroundColor: "#636CCB", border: "none" }}>
                         <i className="bi bi-search"></i>
                     </Button>
