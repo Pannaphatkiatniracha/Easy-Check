@@ -7,7 +7,7 @@ const DelegateCheckin = () => {
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCheckIn = (e) => {
+  const handleCheckIn = (e) => {   //ตรวจสอบรหัสพนักงาน 
     e.preventDefault();
 
     if (!/^\d{6}$/.test(employeeId)) {
@@ -18,7 +18,7 @@ const DelegateCheckin = () => {
     setIsLoading(true);
     setStatus("");
 
-    setTimeout(() => {
+    setTimeout(() => {  //จำลองการเช็กอินที่ใช้เวลาหนึ่งวินาที แล้วอัปเดตสถานะ
       const now = new Date();
       const time = now.toLocaleTimeString("th-TH", {
         hour: "2-digit",

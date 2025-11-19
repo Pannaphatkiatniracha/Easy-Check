@@ -29,7 +29,7 @@ const initialUsers = [
   },
 ];
 
-const getStatus = (checkIn) => {
+const getStatus = (checkIn) => { //ใช้เพื่อประเมินสถานะการเข้าทำงานของพนักงาน ว่า สาย หรือ ตรงเวลา กำหนดเวลาเริ่มงาน 09.00
   const checkInDate = new Date(`1970-01-01T${checkIn}:00`);
   const officialStart = new Date(`1970-01-01T09:00:00`);
   return checkInDate > officialStart ? "สาย" : "ตรงเวลา";
@@ -41,7 +41,7 @@ function CheckApprove() {
   const [rejectedUsers, setRejectedUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const openCameraFor = (user) => setSelectedUser(user);
+  const openCameraFor = (user) => setSelectedUser(user); // เมื่อคลิกไอคอนกล้อง  จะแสดงภาพ
 
   const handleApprove = (user) => {
     setApprovedUsers((prev) => [...prev, user]);
