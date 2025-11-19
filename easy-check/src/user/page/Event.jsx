@@ -9,7 +9,7 @@ const Event = () => {
 
 
           {/* สไลด์รูปภาพเลื่อนไปเลื่อนมา */}
-                      <Carousel>
+                <Carousel>
                 <Carousel.Item>
                     <img src="/easycheck/img/blood.png" alt="" />
                     <Carousel.Caption>
