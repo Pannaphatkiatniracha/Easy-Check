@@ -18,31 +18,34 @@ const AppNavbar = () => {
             */}
 
             <Link  to="/home"
-                className={`transition-all duration-200 
-                    ${location.pathname === "/home" ? "text-white scale-125" // ใหญ่ขึ้น 25%
-                        : "text-[#636CCB] hover:text-white hover:scale-110" // ใหญ่ขึ้น 10 %
+                className={`transition-all duration-200 flex flex-col items-center text-decoration-none
+                    ${location.pathname === "/home" ? "text-white scale-110" // ใหญ่ขึ้น 10%
+                        : "text-[#636CCB] hover:text-white hover:scale-105" // ใหญ่ขึ้น 10 %
                     }`}>
                 <i className="bi bi-house-fill text-2xl"></i>
+                <span className="text-sm mt-1">Home</span>
             </Link>
 
 
 
             <Link to="/event"
-                className={`transition-all duration-200 
-                    ${location.pathname === "/event" ? "text-white scale-125"
-                        : "text-[#636CCB] hover:text-white hover:scale-110"
+                className={`transition-all duration-200 flex flex-col items-center text-decoration-none
+                    ${location.pathname === "/event" ? "text-white scale-110"
+                        : "text-[#636CCB] hover:text-white hover:scale-105"
                     }`}>
                 <i className="bi bi-calendar-event-fill text-2xl"></i>
+                <span className="text-sm mt-1">Event</span>
             </Link>
 
 
 
             <Link to="/setting"
-                className={`transition-all duration-200 
-                    ${location.pathname === "/setting" ? "text-white scale-125"
-                        : "text-[#636CCB] hover:text-white hover:scale-110"
+                className={`transition-all duration-200 flex flex-col items-center text-decoration-none
+                    ${location.pathname === "/setting" ? "text-white scale-110"
+                        : "text-[#636CCB] hover:text-white hover:scale-105"
                     }`}>
                 <i className="bi bi-gear-fill text-2xl"></i>
+                <span className="text-sm mt-1">Setting</span>
             </Link>
 
 

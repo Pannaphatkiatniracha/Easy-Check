@@ -51,6 +51,7 @@ const Event = () => {
               </div>
             </Link>
 
+
             <Link to="/externalevent" className='text-decoration-none'>                
               <div className="mx-auto mt-6 p-5 text-center rounded-3 text-[#252A46] mt-12 w-75
               hover:scale-105 transition-all duration-200 ease-in-out"

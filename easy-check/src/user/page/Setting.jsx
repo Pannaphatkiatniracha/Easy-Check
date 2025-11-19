@@ -128,6 +128,7 @@ const Setting = ({ role, setToken, setRole }) => {
 
 
             {/* Edit Profile */}
+            {/* d-block ทำให้สามารถกดได้ท้างกล่อง */}
             <Link to="/userprofile" className='text-decoration-none d-block'>
                 <div className="d-flex justify-content-center mt-3">
 
@@ -173,6 +174,7 @@ const Setting = ({ role, setToken, setRole }) => {
                     </div>
                 </div>
             </div>
+            
         </div>
     )
 
