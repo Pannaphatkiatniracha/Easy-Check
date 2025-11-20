@@ -39,8 +39,7 @@ const Event = () => {
       <div className="mt-24">
 
         {/* internal */}
-        <Link to="/internalevent" className="text-decoration-none">
-          <div className="position-relative overflow-hidden"
+        <div className="position-relative overflow-hidden"
             style={{background: 'linear-gradient(135deg, rgba(217, 217, 217, 0.7), rgba(99, 108, 203, 0.5))',
               minHeight: '120px'}}>
 
@@ -73,7 +72,7 @@ const Event = () => {
                     <div className="d-inline-block 
                     hover:rotate-90 transition-transform duration-300 ease-out">
 
-                      <i className="bi bi-arrow-right-circle-fill fs-1 text-dark"></i>
+                      <i className="bi bi-arrow-right-circle-fill fs-2 text-dark"></i>
                     
                     </div>
                   </div>
@@ -85,7 +84,6 @@ const Event = () => {
             </div>
 
           </div>
-        </Link>
 
 
 
@@ -126,9 +124,9 @@ const Event = () => {
                     <div className="d-inline-block 
                     hover:rotate-90 transition-transform duration-300 ease-out">
                       
-                      <i className="bi bi-arrow-right-circle-fill fs-1 text-dark"></i>
+                      <i className="bi bi-arrow-right-circle-fill fs-2 text-dark"></i>
                     </div>
-                    
+
                   </div>
 
                 </Link>
