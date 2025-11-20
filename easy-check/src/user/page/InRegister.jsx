@@ -3,8 +3,13 @@ import { Modal } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const InRegister = () => {
+
+
+    const location = useLocation()  // รับข้อมูลจาก state
+    const selectedEvent = location.state?.event  //  ข้อมูล event ที่เลือก
 
 
     const [showModal, setShowModal] = useState(false)
@@ -17,7 +22,7 @@ const InRegister = () => {
             position: "",
             department: "",
             branch: "",
-            events: ""
+            events: selectedEvent?.title || ""  // เซ็ตค่าเริ่มต้นจาก event ที่เลือกกดเข้ามา
         }
     )
 
@@ -167,22 +172,15 @@ const InRegister = () => {
             <hr className="w-100 my-4 border-white opacity-75" />
 
 
-            {/* ข้อมูลที่ให้เลือก */}
+            {/* event ที่เราเลือกลงทะเบียน */}
             <div className='px-5 mt-2'>
                 <label className="text-white fw-light form-label">Event</label>
-                <Form.Select aria-label="Select event"
-                    name='events' value={user.events} onChange={handleChange}>
-                    <option value="อบรมความปลอดภัยในการทำงาน">อบรมความปลอดภัยในการทำงาน</option>
-                    <option value="บริจาคโลหิตประจำปี">บริจาคโลหิตประจำปี</option>
-                    <option value="Workshop การทำงานเป็นทีม">Workshop การทำงานเป็นทีม</option>
-                    <option value="อบรมการใช้ซอฟต์แวร์ใหม่">อบรมการใช้ซอฟต์แวร์ใหม่</option>
-                    <option value="กิจกรรมสร้างความสัมพันธ์พนักงาน">กิจกรรมสร้างความสัมพันธ์พนักงาน</option>
-                    <option value="งานเปิดตัวสินค้า">งานเปิดตัวสินค้า</option>
-                    <option value="อบรมเทคนิคการสื่อสารภายในองค์กร">อบรมเทคนิคการสื่อสารภายในองค์กร</option>
-                    <option value="กิจกรรมกีฬาเพื่อสุขภาพ">กิจกรรมกีฬาเพื่อสุขภาพ</option>
-                    <option value="Workshop การแก้ไขปัญหาเชิงสร้างสรรค์">Workshop การแก้ไขปัญหาเชิงสร้างสรรค์</option>
-                    <option value="งานเลี้ยงบริษัท">งานเลี้ยงบริษัท</option>
-                </Form.Select>
+                <div className="bg-light rounded-2 p-3 text-dark">
+                    <b>{selectedEvent?.title || "ไม่ได้เลือก event"}</b>
+                </div>
+
+                <input type="hidden" onChange={handleChange}
+                name='events' value={selectedEvent?.title || ""}/>
             </div>
 
 
