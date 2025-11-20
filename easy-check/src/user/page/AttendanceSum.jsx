@@ -18,32 +18,48 @@ const AttendanceSum = ({ role }) => {
         "2025-10-30"
     ]
 
+
+
+    // ระเบิด array ตรงนี้คือการเอาข้อมูลใน array พวกนี้มารวมกัน
     const allRecords = [...onTimes, ...lates, ...leaves]
 
+
+
     const scrollToSection = (id) => {
-        document.getElementById(id)?.scrollIntoView({behavior: "smooth"})
+        document.getElementById(id)?.
+        scrollIntoView({behavior: "smooth"})
     }
 
-    // Component สำหรับแสดงวันที่ในรูปแบบ Grid - แถวละ 2 วัน
+
+
+    // ตัวแสดงวันที่
     const DateGrid = ({ dates, title, color }) => (
         <div className="mb-6">
             <h4 className="fw-bold mb-3 text-black">
                 {title} <span className="badge bg-dark ms-2">{dates.length} วัน</span>
             </h4>
+
             <div className="row g-2">
                 {dates.map((date, index) => (
-                    <div key={index} className="col-6">  {/* ← แก้จาก col-6 col-md-4 col-lg-3 เป็น col-6 */}
+                    <div key={index} className="col-6">
+
                         <div className="bg-white bg-opacity-90 rounded-2 p-2 text-center shadow-sm">
                             <small className="fw-semibold" style={{ color: color }}>{date}</small>
                         </div>
+
                     </div>
                 ))}
             </div>
+
         </div>
     )
 
+
+    // ส่วนสรุปผล
     const SummaryCard = (
         <div className="app-container">
+
+
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
                 <Link to={role === "approver" ? "/datacheck" : "/home"} className='text-decoration-none'>
@@ -55,7 +71,7 @@ const AttendanceSum = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
-            {/* กล่องรวมสถิติ */}
+            {/* กล่องใหญ่ */}
             <div className='d-flex justify-content-center mt-10'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
@@ -94,7 +110,7 @@ const AttendanceSum = ({ role }) => {
                 </div>
             </div>
 
-            {/* รายละเอียดแบบ Grid */}
+            {/* ดีเทลสถานะ */}
             <div className='d-flex justify-content-center mt-8 mb-12'>
                 <div className='rounded-3 w-80 p-4'
                     style={{ background: 'linear-gradient(to bottom right, #D9D9D9, #636CCB)' }}>
