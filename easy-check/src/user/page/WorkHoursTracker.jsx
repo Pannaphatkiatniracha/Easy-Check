@@ -73,7 +73,25 @@ const WorkHoursTracker = ({ role }) => {
     // ซึ่ง todayName = วันของปัจจุบัน
     // d => d.day === todayName อันนี้คือเฉพาะวันแบบ Monday Tuesday Wednesday / weeklyData ถึงจะเป็นวันที่แบบตัวเลข
 
-    
+    const MAX_HOURS_PER_DAY = 9;
+
+    // ชั่วโมงที่ทำจริงจนถึงวันนี้
+    const workedHours = weekTemplate.reduce((sum, d) => {
+        const index = dayNames.indexOf(d.day);
+        if (index <= todayIndex) {
+            return sum + (hoursData[d.day] ?? 0);
+        }
+        return sum;
+    }, 0);
+
+    // ชั่วโมงสูงสุดที่ทำได้ตามวันปัจจุบัน
+    const maxPossibleHours = Math.min(todayIndex, 5) * MAX_HOURS_PER_DAY;
+
+    // สรุปเปอร์เซ็นต์รวม
+    const weeklySummaryPercent =
+        maxPossibleHours > 0
+            ? Math.round((workedHours / maxPossibleHours) * 100)
+            : 0;
 
     // component ของ Approver
     const ApprovePage = (
@@ -84,7 +102,7 @@ const WorkHoursTracker = ({ role }) => {
             <div className="d-flex justify-content-between text-white mt-16">
 
                 {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
-                <Link to="/datacheck" className='text-decoration-none'>
+                <Link to="/" className='text-decoration-none'>
                     <Button variant="link" className="p-0">
                         <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
@@ -136,14 +154,24 @@ const WorkHoursTracker = ({ role }) => {
                                 <span>{item.percent}%</span>
                             </div>
 
-                            {/* ตรง now ไว้กำหนดความยาวของแถบสี แต่มันเลือกสีตามที่เราต้องการไม่ได้เลยต้องกำหนดใน div ข้างในอีกที */}
-                            <ProgressBar now={item.percent} className="mb-2"
-                                style={{ backgroundColor: '#ccc', height: '20px' }}>
-                                <div style={{
-                                    width: `${item.percent}%`,
-                                    backgroundColor: item.color,
-                                }} />
-                            </ProgressBar>
+                            {/* container ของ progress bar */}
+                            <div
+                                style={{
+                                    height: '20px',
+                                    backgroundColor: '#ccc',  // สี track ด้านหลัง
+                                    borderRadius: '4px',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                {/* bar สี */}
+                                <div
+                                    style={{
+                                        width: `${item.percent}%`,
+                                        height: '100%',
+                                        backgroundColor: item.color, // สี progress bar ของเรา
+                                    }}
+                                />
+                            </div>
 
                         </div>
                     ))}
@@ -153,7 +181,27 @@ const WorkHoursTracker = ({ role }) => {
 
 
             {/* กล่องรวม */}
-            
+            <div className='d-flex justify-content-center mt-10'>
+                <div className="p-3 text-center fw-semibold rounded-3 text-dark w-80"
+                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+
+                    <h4 className="mt-2 mb-4 fw-bold">Weekly Summary</h4>
+
+                    <ProgressBar className='mb-3'
+                        style={{ height: '20px', backgroundColor: '#ccc' }}>
+                        <ProgressBar
+                            now={weeklySummaryPercent}
+                            label={`${weeklySummaryPercent}%`}
+                            style={{ backgroundColor: '#4CAF50' }}
+                        />
+                    </ProgressBar>
+
+                    <p className='mt-2'>
+                        Total Hours: <span className='fw-bold'>{workedHours}</span> hours
+                    </p>
+
+                </div>
+            </div>
 
 
 
@@ -223,14 +271,25 @@ const WorkHoursTracker = ({ role }) => {
                                 <span>{item.percent}%</span>
                             </div>
 
-                            {/* ตรง now ไว้กำหนดความยาวของแถบสี แต่มันเลือกสีตามที่เราต้องการไม่ได้เลยต้องกำหนดใน div ข้างในอีกที */}
-                            <ProgressBar now={item.percent} className="mb-2"
-                                style={{ backgroundColor: '#ccc', height: '20px' }}>
-                                <div style={{
-                                    width: `${item.percent}%`,
-                                    backgroundColor: item.color,
-                                }} />
-                            </ProgressBar>
+
+                            {/* container ของ progress bar */}
+                            <div
+                                style={{
+                                    height: '20px',
+                                    backgroundColor: '#ccc',  // สี track ด้านหลัง
+                                    borderRadius: '4px',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                {/* bar สี */}
+                                <div
+                                    style={{
+                                        width: `${item.percent}%`,
+                                        height: '100%',
+                                        backgroundColor: item.color, // สี progress bar ของเรา
+                                    }}
+                                />
+                            </div>
 
                         </div>
                     ))}
