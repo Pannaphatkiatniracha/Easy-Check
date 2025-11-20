@@ -48,7 +48,7 @@ const CreateEvent = () => {
                 <i
                     className="bi bi-chevron-left position-absolute"
                     style={{
-                         color: '#FFFF',
+                        color: '#FFFF',
                         fontSize: '30px',
                         left: '20px',
                         top: '50%',
@@ -97,13 +97,13 @@ const CreateEvent = () => {
 
                                     {/* Calendar Grid */}
                                     {['first', 'second', 'third', 'fourth', 'fifth'].map((week, i) => (
-                                        <Row key={i} className="text-center mb-3">
+                                        <Row key={i} className="text-center mb-3 " title="Select the date and time" style={{ cursor: "pointer"}}>
                                             {getDaysForWeek(week).map((day, idx) => (
                                                 <Col
                                                     key={idx}
                                                     className={`py-3 rounded ${day.className?.includes('last-month')
-                                                            ? 'text-muted'
-                                                            : 'cursor-pointer'
+                                                        ? 'text-muted'
+                                                        : 'cursor-pointer'
                                                         } ${day.day === todayDate &&
                                                             !day.className?.includes('last-month')
                                                             ? 'text-white fw-normal'
@@ -180,6 +180,19 @@ const CreateEvent = () => {
                     </Col>
                 </Row>
             </Container>
+
+            <br />
+
+            <div className='text-center text-white mt-5'>
+
+                <h2 className='mb-4'> How to Add an Event </h2>
+                <p> Select the date and time </p>
+                <p> Write the event details </p>
+                <p> Click Save to store the event or Dismiss to cancel </p>
+
+            </div>
+
+
         </div>
     )
 }
