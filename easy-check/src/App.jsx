@@ -32,8 +32,11 @@ import DataCheck from "./user/page/DataCheck";
 
 function App() {
 
-  const [token, setToken] = useState("x")
-  const [role, setRole] = useState("")
+  // () => ... คือเป็นการบอกว่าให้ useState เรียกใช้ฟังก์ชันนี้ตอนเริ่มต้นเท่านั้น
+  // เพื่อป้องกันไม่ให้ localStorage.getItem("token") ถูกเรียกใช้ทุกครั้งที่มีการ re-render แบบฟีลฟังก์ชันขี้เกียจเรียกรอบแรกรอบเดียวพอ แล้วก็จะไม่หาย
+
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "")      // ตอนโหลดเว็บครั้งแรก react จะเรียก () => localStorage.getItem("token") || ""  ถ้าเจอ token ก็ค่อยเก็บค่า token ใน state ถ้าไม่เจอ token → เก็บค่าว่าง "" ใน state เพื่อไม่ให้เป็น undefind
+  const [role, setRole] = useState(() => localStorage.getItem("role") || "")
 
 
   return (
