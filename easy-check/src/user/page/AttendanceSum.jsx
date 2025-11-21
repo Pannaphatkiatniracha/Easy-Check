@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
-const AttendanceSum = () => {
+const AttendanceSum = ({ role }) => {
 
     const onTimes = [
         "2025-10-01",
@@ -45,9 +45,138 @@ const AttendanceSum = () => {
         scrollIntoView({behavior: "smooth"})
     }
 
-    
+    const ApprovePage = (
+        
+        <div className="app-container">
 
-    return (
+            {/* หัวข้อ */}
+            <div className="d-flex justify-content-between text-white mt-16">
+
+                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
+                <Link to="/datacheck" className='text-decoration-none'>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    </Button>
+                </Link>
+
+                <h3 className="fw-bold">Attendance Summary</h3>
+                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
+                <div className="me-4"></div>
+            </div>
+
+
+            {/* กล่องรวม */}
+            <div className='d-flex justify-content-center mt-10'>
+
+                <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
+                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+
+                    <h4 className="mt-3 fw-bold">October 2025 Summary</h4>
+
+                    {/* เนื้อหาข้างใน */}
+                    <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
+
+                        <Button className='w-100 p-1 text-white fw-semibold
+                        hover:scale-105 transition-all duration-200 ease-in-out'
+                            style={{ backgroundColor: '#1CA983', border: 'none', borderRadius: '12px' }}
+                            onClick={() => scrollToSection("ontime")}>
+                            On time: {onTimes.length} times
+                        </Button>
+                        {/* <span>{onTimes.length} times</span> */}
+
+
+                        <Button className='w-100 p-1 text-white fw-semibold
+                        hover:scale-105 transition-all duration-200 ease-in-out'
+                            style={{ backgroundColor: '#D06356', border: 'none', borderRadius: '12px' }}
+                            onClick={() => scrollToSection("late")}>
+                            Late: {lates.length} times
+                        </Button>
+                        {/* <span>{lates.length} times</span> */}
+
+
+                        <Button className='w-100 p-1 text-white fw-semibold mt-3
+                        hover:scale-105 transition-all duration-200 ease-in-out'
+                            style={{ backgroundColor: '#C7C76E', border: 'none', borderRadius: '12px' }}
+                            onClick={() => scrollToSection("leave")}>
+                            Leave: {leaves.length} times
+                        </Button>
+                        {/* <span className='mt-3'>{leaves.length} times</span> */}
+
+
+                        <Button className='w-100 p-1 text-white fw-semibold mt-3
+                        hover:scale-105 transition-all duration-200 ease-in-out'
+                            onClick={() => scrollToSection("all")}
+                            style={{ backgroundColor: '#252A46', border: 'none', borderRadius: '12px' }}>
+                            All: {allRecords.length} times
+                        </Button>
+                        {/* <span className='mt-3'>{allRecords.length} times</span> */}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div className='d-flex justify-content-center mt-8 mb-12'>
+                <div className='rounded-3 text-dark w-80'
+                style={{ background: 'linear-gradient(to bottom right, #D9D9D9, #636CCB)' }}>
+
+                <div className="mt-1 p-4">
+
+                    {/* On Time */}
+                    <h3 id="ontime" className='fw-bold'>
+                        On Time Details
+                    </h3>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {/* 
+                            มันเป็นค่า default ของ .map() ว่าตัวแรกคือค่าหรือข้อมูลของตัวนั้น ตัวสองคือลำดับหรือ index ไรงี้
+                            d = ค่าของวันนั้นๆ / i = เลขลำดับของวันนั้นใน array
+                         */}
+                        {onTimes.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+
+                    {/* Late */}
+                    <h3 id="late" className="mt-6 fw-bold">
+                        Late Details
+                    </h3>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {lates.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+
+                    {/* Leave */}
+                    <h3 id="leave" className="mt-6 fw-bold">
+                        Leave Details
+                    </h3>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {leaves.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+
+                    {/* All */}
+                    <h3 id="all" className="mt-6 fw-bold">
+                        All Records
+                    </h3>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {allRecords.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+
+                </div>
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+
+    )
+
+
+    const UserPage = (
 
         <div className="app-container">
 
@@ -174,7 +303,13 @@ const AttendanceSum = () => {
 
 
         </div>
+
     )
+
+    
+    //  ถ้า user ที่ login เข้ามาเป็น role approver ให้แสดงหน้า ApprovePage ถ้าไม่ใช่ค่อยให้แสดงหน้า Userpage
+    return role === "approver" ? ApprovePage : UserPage
+
 }
 
 export default AttendanceSum
