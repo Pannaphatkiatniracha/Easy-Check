@@ -64,13 +64,22 @@ const Home = ({ role }) => {
                 </Link>
 
 
-
                 <Link to="/datatocheck" className='text-decoration-none'>
                     <div className="p-4 text-center fw-semibold rounded-3 text-dark
                     hover:scale-105 transition-all duration-200 ease-in-out"
                         style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
                         <i className="bi bi-hourglass-bottom fs-2"></i> <br />
                         WORKHOURS <br /> TRACKER
+                    </div>
+                </Link>
+
+
+                <Link to="/paymentrequest" className='text-decoration-none'>
+                    <div className="p-4 text-center fw-semibold rounded-3 text-dark
+                    hover:scale-105 transition-all duration-200 ease-in-out"
+                        style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+                        <i className="bi bi-file-earmark-text-fill fs-2"></i> <br />
+                        PAYMENT REQUEST
                     </div>
                 </Link>
 

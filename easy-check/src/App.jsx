@@ -26,6 +26,7 @@ import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
+import PaymentRequest from "./user/page/PaymentRequest";
 
 
 
@@ -86,13 +87,13 @@ function App() {
                 role={role} />} />
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
-                
+                <Route path="paymentrequest" element={<PaymentRequest />} />
                 <Route path="datacheck" element={
                   role === "approver" 
                   ? <DataCheck role={role} /> 
                   : <Navigate to="/home" replace />
                 } />
-                
+
                 <Route path="datatocheck" element={
                   role === "approver" 
                   ? <DataToCheck role={role} /> 
