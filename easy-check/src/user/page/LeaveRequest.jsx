@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // เพิ่ม useNavigate
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const LeaveRequest = () => {
+  const navigate = useNavigate(); // สร้าง navigate
+
   const [formData, setFormData] = useState({
     leaveStart: "",
     leaveEnd: "",
@@ -20,34 +22,25 @@ const LeaveRequest = () => {
     "Other",
   ];
 
-  const handleDateChange = (e) => { //อัปเดตวันที่เริ่มต้นและสิ้นสุดการลา
+  const handleDateChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleReasonChange = (reason) => { // เลือกหรือยกเลิกเหตุผลการลา ถ้าเลือกother จะต้องบอกเหตุผล
+  const handleReasonChange = (reason) => {
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
-
       if (reason === "Other")
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-          otherReasonText: "",
-        });
-      else
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-        });
+        setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
+      else setFormData({ ...formData, leaveReasons: updated });
     } else {
       updated.push(reason);
       setFormData({ ...formData, leaveReasons: updated });
     }
   };
 
-  const handleEvidenceUpload = (e) => { // อัปโหลดและแสดงภาพตัวอย่าง ใบรับรอง
+  const handleEvidenceUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -63,7 +56,7 @@ const LeaveRequest = () => {
     });
   };
 
-  const handleFileLeave = () => { // ตรวจสอบข้อมูลว่าครบถ้วนไหมก่อนยืนยันคำลา
+  const handleFileLeave = () => {
     if (!formData.leaveStart || !formData.leaveEnd) {
       alert("Please select start and end dates.");
       return;
@@ -74,24 +67,21 @@ const LeaveRequest = () => {
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Other") &&
-      !formData.otherReasonText.trim()
-    ) {
+    if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
       alert("Please provide reason for 'Other'.");
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Sick-self") &&
-      !formData.evidenceFile
-    ) {
+    if (formData.leaveReasons.includes("Sick-self") && !formData.evidenceFile) {
       alert("กรุณาแนบรูปใบรับรองแพทย์");
       return;
     }
 
     alert("Leave filed successfully!");
     console.log(formData);
+
+    // เด้งกลับไปหน้า Home เหมือนกดปุ่ม Back
+    navigate(-1);
   };
 
   return (
