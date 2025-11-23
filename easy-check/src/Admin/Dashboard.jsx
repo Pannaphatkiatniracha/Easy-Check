@@ -4,7 +4,7 @@ import './Dashboard.css'
 
 const departments = ['ฝ่ายผลิต', 'ฝ่ายขาย', 'ฝ่าย IT', 'ฝ่ายบัญชี', 'ฝ่ายทั่วไป'];
 const branches = ['สำนักงานใหญ่', 'สาขา 1', 'สาขา 2', 'สาขา 3'];
-const leaveTypes = ['ลาป่วย', 'ลากิจ', 'ลาพักร้อน'];
+const leaveTypes = ['ลาป่วย', 'ลากิจ', 'ลาพักร้อน', 'ลาคลอด'];
 const positions = [
   'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 
   'DevOps Engineer', 'QA Engineer', 'UI/UX Designer', 
@@ -17,42 +17,8 @@ const generateEmployees = (count) => {
   const firstNames = ['สมชาย', 'สมหญิง', 'วิชัย', 'สุดา', 'นภา', 'ชัยวัฒน์', 'อรุณ', 'มานี', 'สมศักดิ์', 'ปิยะ', 'วันดี', 'ธนา', 'พิมพ์', 'กันต์', 'รัตน์'];
   const lastNames = ['ใจดี', 'รักสงบ', 'มั่นคง', 'สุขสันต์', 'เจริญ', 'วิไล', 'ศรีสุข', 'แสงดาว', 'ทองดี', 'สว่าง', 'มีชัย', 'พัฒนา', 'เรืองศักดิ์', 'บุญมา', 'สมบูรณ์'];
   
-  for (let i = 0; i < 42; i++) {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const checkInTime = new Date();
-    checkInTime.setHours(Math.floor(Math.random() * 3) + 7, Math.floor(Math.random() * 60));
-    const isLate = i < 5;
-    if (isLate) {
-      checkInTime.setHours(8, 31 + Math.floor(Math.random() * 30));
-    }
-    const hasCheckedOut = Math.random() > 0.3;
-    
-    let checkOutTime = null;
-    let workHours = 0;
-    if (hasCheckedOut) {
-      checkOutTime = new Date();
-      checkOutTime.setHours(Math.floor(Math.random() * 3) + 17, Math.floor(Math.random() * 60));
-      workHours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
-    }
-    
-    employees.push({
-      id: i + 1,
-      firstName: firstName,
-      lastName: lastName,
-      name: `${firstName} ${lastName}`,
-      position: positions[Math.floor(Math.random() * positions.length)],
-      department: departments[Math.floor(Math.random() * departments.length)],
-      branch: branches[Math.floor(Math.random() * branches.length)],
-      checkInTime: checkInTime.toTimeString().slice(0, 5),
-      checkOutTime: hasCheckedOut ? checkOutTime.toTimeString().slice(0, 5) : null,
-      status: isLate ? 'สาย' : 'ปกติ',
-      location: `13.7${Math.floor(Math.random() * 99)}, 100.5${Math.floor(Math.random() * 99)}`,
-      workHours: hasCheckedOut ? workHours.toFixed(1) : null
-    });
-  }
-  
-  for (let i = 42; i < 47; i++) {
+  // สร้างพนักงาน 50 คนก่อน
+  for (let i = 0; i < count; i++) {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     employees.push({
@@ -65,32 +31,62 @@ const generateEmployees = (count) => {
       branch: branches[Math.floor(Math.random() * branches.length)],
       checkInTime: null,
       checkOutTime: null,
-      status: 'ขาด',
+      status: 'ปกติ', // สถานะเริ่มต้น
       location: '-',
-      workHours: null
+      workHours: null,
+      leaveType: null
     });
   }
-  
-  for (let i = 47; i < 50; i++) {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    employees.push({
-      id: i + 1,
-      firstName: firstName,
-      lastName: lastName,
-      name: `${firstName} ${lastName}`,
-      position: positions[Math.floor(Math.random() * positions.length)],
-      department: departments[Math.floor(Math.random() * departments.length)],
-      branch: branches[Math.floor(Math.random() * branches.length)],
-      checkInTime: null,
-      checkOutTime: null,
-      status: 'ลา',
-      leaveType: leaveTypes[Math.floor(Math.random() * leaveTypes.length)],
-      location: '-',
-      workHours: null
-    });
+
+  // สุ่มสถานะต่างๆ ให้กับพนักงาน
+  const shuffledIndices = [...Array(count).keys()].sort(() => 0.5 - Math.random());
+  let currentIndex = 0;
+
+  // 2 คน ลาคลอด (เลือกชื่อผู้หญิง)
+  const femaleNames = ['สมหญิง', 'สุดา', 'นภา', 'มานี', 'วันดี', 'พิมพ์'];
+  let maternityCount = 0;
+  for (let i = 0; i < count && maternityCount < 2; i++) {
+      const empIndex = shuffledIndices[i];
+      if (femaleNames.includes(employees[empIndex].firstName)) {
+          employees[empIndex].status = 'ลา';
+          employees[empIndex].leaveType = 'ลาคลอด';
+          maternityCount++;
+          currentIndex++;
+      }
   }
-  
+
+  // 5 คน ขาดงาน
+  for (let i = 0; i < 5; i++) employees[shuffledIndices[currentIndex++]].status = 'ขาด';
+
+  // 3 คน ลาประเภทอื่น
+  for (let i = 0; i < 3; i++) {
+      const otherLeaveTypes = leaveTypes.filter(t => t !== 'ลาคลอด');
+      employees[shuffledIndices[currentIndex]].status = 'ลา';
+      employees[shuffledIndices[currentIndex]].leaveType = otherLeaveTypes[Math.floor(Math.random() * otherLeaveTypes.length)];
+      currentIndex++;
+  }
+
+  // 5 คน มาสาย
+  for (let i = 0; i < 5; i++) employees[shuffledIndices[currentIndex++]].status = 'สาย';
+
+  // ที่เหลือเข้างานปกติ หรือสาย
+  employees.forEach(emp => {
+      if (emp.status === 'ปกติ' || emp.status === 'สาย') {
+          const checkInTime = new Date();
+          const isLate = emp.status === 'สาย';
+          checkInTime.setHours(isLate ? 8 : 7, isLate ? 31 + Math.floor(Math.random() * 30) : Math.floor(Math.random() * 60));
+          emp.checkInTime = checkInTime.toTimeString().slice(0, 5);
+          emp.location = `13.7${Math.floor(Math.random() * 99)}, 100.5${Math.floor(Math.random() * 99)}`;
+
+          if (Math.random() > 0.3) { // 70% checkout
+              const checkOutTime = new Date();
+              checkOutTime.setHours(Math.floor(Math.random() * 3) + 17, Math.floor(Math.random() * 60));
+              emp.checkOutTime = checkOutTime.toTimeString().slice(0, 5);
+              emp.workHours = ((checkOutTime - checkInTime) / (1000 * 60 * 60)).toFixed(1);
+          }
+      }
+  });
+
   return employees;
 };
 
@@ -223,6 +219,20 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    // คำนวณข้อมูลสำหรับกราฟสัดส่วนการลา
+    const leaveData = leaveTypes.map(type => {
+      const countFromEmployees = employees.filter(e => e.status === 'ลา' && e.leaveType === type).length;
+      const countFromRequests = leaveRequests.filter(req => req.type === type).reduce((sum, req) => sum + req.days, 0);
+      return countFromEmployees + countFromRequests;
+    });
+
+    const doughnutChart = document.getElementById('doughnutChart')?.chart;
+    if (doughnutChart) {
+      doughnutChart.data.labels = leaveTypes;
+      doughnutChart.data.datasets[0].data = leaveData;
+      doughnutChart.update();
+    }
+
     const initCharts = () => {
       if (typeof Chart === 'undefined') return;
 
@@ -287,9 +297,9 @@ const Dashboard = () => {
         doughnutCtx.chart = new Chart(doughnutCtx, {
           type: 'doughnut',
           data: {
-            labels: ['ลาป่วย', 'ลากิจ', 'ลาพักร้อน'],
+            labels: leaveTypes,
             datasets: [{
-              data: [40, 30, 30],
+              data: leaveData,
               backgroundColor: ['#3C467B', '#50589C', '#636CCB'],
               borderWidth: 0,
               hoverOffset: 10
@@ -328,7 +338,7 @@ const Dashboard = () => {
     if (!isLoading) {
       setTimeout(initCharts, 100);
     }
-  }, [isLoading]);
+  }, [isLoading, employees, leaveRequests]);
 
   if (isLoading) {
     return (
