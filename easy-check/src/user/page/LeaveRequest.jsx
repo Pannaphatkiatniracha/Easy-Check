@@ -15,11 +15,12 @@ const LeaveRequest = () => {
   });
 
   const leaveOptions = [
-    "Vacation",
-    "Military",
-    "Sick-self",
-    "Sick-family",
-    "Other",
+    "Sick Leave",
+    "Personal Leave",
+    "Vaction Leave",
+    "Maternity Leave",
+    "Widding Leave",
+    "Religious Leave",
   ];
 
   const handleDateChange = (e) => {

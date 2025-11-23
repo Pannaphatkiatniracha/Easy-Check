@@ -83,8 +83,7 @@ function LeaveRequestApprove() {
         {requests.map((req) => (
           <div
             key={req.id}
-            className="relative bg-[#4a518f]/80 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-[#7f5cff]/30
-              transform hover:-translate-y-2 hover:shadow-[0_0_25px_#7f5cff] transition duration-300 flex items-center gap-3"
+            className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-200 transform hover:-translate-y-2 hover:shadow-lg transition duration-300 flex items-center gap-3"
           >
             {/* Profile */}
             <img
@@ -95,14 +94,14 @@ function LeaveRequestApprove() {
 
             {/* Info */}
             <div className="flex-1">
-              <div className="font-semibold text-white text-lg">{req.name}</div>
-              <div className="text-xs text-gray-300">ID: {req.employeeId}</div>
-              <div className="text-xs text-gray-200 mt-1">
+              <div className="font-semibold text-gray-900 text-lg">{req.name}</div>
+              <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
+              <div className="text-xs text-gray-700 mt-1">
                 {req.reasons.includes("Other")
                   ? req.otherReason
                   : req.reasons.join(", ")}
               </div>
-              <div className="text-xs text-gray-200">
+              <div className="text-xs text-gray-700">
                 วันที่ลา: {req.leaveStart} → {req.leaveEnd}
               </div>
 
@@ -110,7 +109,7 @@ function LeaveRequestApprove() {
               {req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
-                  className="mt-2 text-blue-300 underline text-xs font-medium hover:text-blue-500"
+                  className="mt-2 text-blue-500 underline text-xs font-medium hover:text-blue-700"
                 >
                   ดูรูปแนบ
                 </button>
@@ -167,16 +166,16 @@ function LeaveRequestApprove() {
       <div className="max-w-md w-full mt-8 space-y-4">
         {approved.length > 0 && (
           <div>
-            <div className="inline-block bg-green-400/20 text-green-100 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+            <div className="inline-block bg-green-400/20 text-green-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
               อนุมัติแล้ว
             </div>
             <div className="space-y-2">
               {approved.map((r) => (
                 <div
                   key={r.id}
-                  className="bg-green-500/10 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                  className="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center"
                 >
-                  <span className="text-green-100 font-medium">
+                  <span className="text-gray-900 font-medium">
                     {r.name} ({r.leaveStart} → {r.leaveEnd})
                   </span>
                 </div>
@@ -187,16 +186,16 @@ function LeaveRequestApprove() {
 
         {rejected.length > 0 && (
           <div>
-            <div className="inline-block bg-red-400/20 text-red-100 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+            <div className="inline-block bg-red-400/20 text-red-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
               ไม่อนุมัติ
             </div>
             <div className="space-y-2">
               {rejected.map((r) => (
                 <div
                   key={r.id}
-                  className="bg-red-500/10 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                  className="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center"
                 >
-                  <span className="text-red-100 font-medium">
+                  <span className="text-gray-900 font-medium">
                     {r.name} ({r.leaveStart} → {r.leaveEnd})
                   </span>
                 </div>
