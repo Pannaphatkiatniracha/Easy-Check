@@ -15,7 +15,7 @@ const users = [
 
 export function verifyUser(user, pass) {
 
-    // เอาไว้เก็บข้อมูล ถ้าตรงทั้ง user และ pass ถึงจะเก็บข้อมูล
+    // .find เพื่อหาข้อมูลที่กรอกมาแล้วตรงทั้ง user และ pass ถึงจะเก็บข้อมูล
     const userFound = users.find((u) => {
         return u.user === user && u.pass === pass
     })

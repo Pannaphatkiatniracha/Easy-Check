@@ -25,7 +25,8 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
-import ForgotToChange from "./user/page/ForgotToChange";
+
+
 
 
 
@@ -33,8 +34,11 @@ import ForgotToChange from "./user/page/ForgotToChange";
 
 function App() {
 
-  const [token, setToken] = useState("x")
-  const [role, setRole] = useState("")
+  // () => ... คือเป็นการบอกว่าให้ useState เรียกใช้ฟังก์ชันนี้ตอนเริ่มต้นเท่านั้น
+  // เพื่อป้องกันไม่ให้ localStorage.getItem("token") ถูกเรียกใช้ทุกครั้งที่มีการ re-render แบบฟีลฟังก์ชันขี้เกียจเรียกรอบแรกรอบเดียวพอ แล้วก็จะไม่หาย
+
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "")      // ตอนโหลดเว็บครั้งแรก react จะเรียก () => localStorage.getItem("token") || ""  ถ้าเจอ token ก็ค่อยเก็บค่า token ใน state ถ้าไม่เจอ token → เก็บค่าว่าง "" ใน state เพื่อไม่ให้เป็น undefind
+  const [role, setRole] = useState(() => localStorage.getItem("role") || "")
 
 
   return (
@@ -45,6 +49,7 @@ function App() {
         <Routes>
 
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
 
           {/* ถ้ายังไม่ได้ login จะกระโดดไปให้ login ก่อน และ replace เพื่อไม่ให้มี history ใน history stack เวลากด back จะได้ไม่งง  */}
           {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
@@ -57,7 +62,7 @@ function App() {
                 role={role} />} />
                 <Route path="event" element={<Event />} />
                 <Route path="setting" element={<Setting
-                role={role} setToken={setToken} />} />
+                role={role} setToken={setToken} setRole={setRole} />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 
@@ -70,52 +75,30 @@ function App() {
                 <Route path="checkin" element={<CheckIn />} />
                 <Route path="delegateCheckin" element={<DelegateCheckin />} />
                 <Route path="support" element={<Support />} />
-                <Route path="forgotpassword" element={<ForgotPassword />} />
                 <Route path="changepassword" element={<ChangePassword />} />
-                <Route path="forgottochange" element={<ForgotToChange />} />
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
-               <Route path="attendancesummary" element={<AttendanceSum />} />
-               <Route path="workhourstracker" element={<WorkHoursTracker />} />
-               <Route path="checkapprove" element={<CheckApporve />} />
-               <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
-               <Route path="datacheck" element={<DataCheck />} />
+
+              
+                <Route path="attendancesummary" element={<AttendanceSum
+                role={role} />} />
+                <Route path="workhourstracker" element={<WorkHoursTracker
+                role={role} />} />
+                <Route path="checkapprove" element={<CheckApporve />} />
+                <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+                
+                <Route path="datacheck" element={
+                    role === "approver" 
+                      ? <DataCheck role={role} /> 
+                      : <Navigate to="/home" replace />
+                } />
+
               </Route>
             </>
           )}
         </Routes>
       </BrowserRouter>
-
-      {/* <BrowserRouter basename="/easycheck/">
-      <Routes >
-
-        <Route element={<AppLayout />}>
-          <Route path="profile" element={<Profile />} />
-          <Route path="home" element={<Home />} />
-          <Route path="event" element={<Event />} />
-          <Route path="setting" element={<Setting />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-
-        <Route element={<AppNobar />}>
-          <Route path="login" element={<Login />} />
-          <Route path="inregister" element={<InRegister />} />
-          <Route path="exregister" element={<ExRegister />} />
-          <Route path="leaverequest" element={<LeaveRequest />} />
-          <Route path="checkin" element={<CheckIn />} />
-          <Route path="delegatecheckin" element={<DelegateCheckin />} />
-          <Route path="support" element={<Support />} />
-          <Route path="forgotpassword" element={<ForgotPassword />} />
-          <Route path="changepassword" element={<ChangePassword />} />
-          <Route path="internalevent" element={<InternalEvent />} />
-          <Route path="externalevent" element={<ExternalEvent />} />
-          <Route path="checkinforfriend" element={<CheckInForFriend />} />
-          <Route path="privacypolicy" element={<PrivacyPolicy />} />
-        </Route>
-
-      </Routes>
-      </BrowserRouter> */}
 
     </>
   );

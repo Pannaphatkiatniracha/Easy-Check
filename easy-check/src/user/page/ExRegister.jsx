@@ -3,8 +3,13 @@ import { Modal } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const ExRegister = () => {
+
+
+    const location = useLocation() // รับข้อมูลจาก state
+    const selectedEvent = location.state?.selectedEvent || "" // ข้อมูล event ที่เลือก
 
 
     const [showModal, setShowModal] = useState(false)
@@ -18,7 +23,7 @@ const ExRegister = () => {
             position: "",
             department: "",
             branch: "",
-            events: ""
+            events: selectedEvent || ""  // เซ็ตค่าเริ่มต้นจาก event ที่เลือกกดเข้ามา
         }
     )
 
@@ -168,22 +173,15 @@ const ExRegister = () => {
             <hr className="w-100 my-4 border-white opacity-75" />
 
 
-            {/* ข้อมูลที่ให้เลือก */}
+            {/* event ที่เราเลือกลงทะเบียน */}
             <div className='px-5 mt-2'>
                 <label className="text-white fw-light form-label">Event</label>
-                <Form.Select aria-label="Select event"
-                    name='events' value={user.events} onChange={handleChange}>
-                    <option value="งานวิ่งการกุศลประจำปี">งานวิ่งการกุศลประจำปี</option>
-                    <option value="สัมมนาเทรนด์ธุรกิจปี 2025">สัมมนาเทรนด์ธุรกิจปี 2025</option>
-                    <option value="กิจกรรม CSR ร่วมกับชุมชน">กิจกรรม CSR ร่วมกับชุมชน</option>
-                    <option value="ประชุมผู้ถือหุ้นประจำปี">ประชุมผู้ถือหุ้นประจำปี</option>
-                    <option value="อบรมเทคนิคการตลาดดิจิทัล">อบรมเทคนิคการตลาดดิจิทัล</option>
-                    <option value="งานแสดงสินค้าและนวัตกรรม">งานแสดงสินค้าและนวัตกรรม</option>
-                    <option value="ทริป Team Building กลางแจ้ง">ทริป Team Building กลางแจ้ง</option>
-                    <option value="Workshop การพัฒนาทักษะผู้นำ">Workshop การพัฒนาทักษะผู้นำ</option>
-                    <option value="งานเทศกาลอาหารและวัฒนธรรม">งานเทศกาลอาหารและวัฒนธรรม</option>
-                    <option value="งานเลี้ยงสังสรรค์ปีใหม่บริษัท">งานเลี้ยงสังสรรค์ปีใหม่บริษัท</option>
-                </Form.Select>
+                <div className="bg-light rounded-2 p-3 text-dark">
+                    <b>{selectedEvent || "ไม่ได้เลือก event"}</b>
+                </div>
+
+                <input type="hidden" onChange={handleChange}
+                name='events' value={selectedEvent || ""}/>
             </div>
 
 

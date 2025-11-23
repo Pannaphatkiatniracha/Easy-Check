@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
 
-const Setting = ({ role }) => {
+const Setting = ({ role, setToken, setRole }) => {
 
 
     const navigate = useNavigate()
@@ -10,7 +10,10 @@ const Setting = ({ role }) => {
     // ฟังก์ชัน logout
     const handleLogout = () => {
         localStorage.removeItem('token') // ล้าง token
-        navigate('/login')            // redirect ไปหน้า login
+        localStorage.removeItem('role')
+        setToken("")
+        setRole("")
+        navigate('/login')
     }
 
 
@@ -31,7 +34,7 @@ const Setting = ({ role }) => {
                 hover:scale-105 transition-all duration-200 ease-in-out"
                 style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 
-                    <i className="bi bi-bell-fill fs-4 "></i> &nbsp; Notification
+                    <i className="bi bi-bell-fill"></i> &nbsp; Notification
                     <Form.Check className="ms-auto"
                         type="switch"
                         id="custom-switch"
@@ -115,7 +118,7 @@ const Setting = ({ role }) => {
                 hover:scale-105 transition-all duration-200 ease-in-out"
                 style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 
-                    <i className="bi bi-bell-fill fs-4 "></i> &nbsp; Notification
+                    <i className="bi bi-bell-fill"></i> &nbsp; Notification
                     <Form.Check className="ms-auto"
                         type="switch"
                         id="custom-switch"
@@ -125,6 +128,7 @@ const Setting = ({ role }) => {
 
 
             {/* Edit Profile */}
+            {/* d-block ทำให้สามารถกดได้ท้างกล่อง */}
             <Link to="/userprofile" className='text-decoration-none d-block'>
                 <div className="d-flex justify-content-center mt-3">
 
@@ -170,6 +174,7 @@ const Setting = ({ role }) => {
                     </div>
                 </div>
             </div>
+            
         </div>
     )
 

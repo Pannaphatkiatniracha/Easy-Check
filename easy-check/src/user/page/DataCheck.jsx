@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 
 const DataCheck = () => {
+    
 
     const data = [
         {
@@ -50,34 +51,50 @@ const DataCheck = () => {
                 <div className='w-80 space-y-4'>
 
                     {data.map((person) => (
-                        <div
-                            key={person.id}
-                            className='bg-white rounded-2xl p-3 shadow-md flex items-center gap-3'
-                        >
-                            <img
-                                src={person.profile}
-                                className="w-12 h-12 rounded-full object-cover"
-                                alt="profile"
-                            />
+
+                        // กล่องขาว
+                        <div key={person.id}
+                        className='bg-white rounded-2xl p-3 shadow-md flex items-center gap-3'>
+
+                            <img src={person.profile} alt="profile"
+                            className="w-12 h-12 rounded-full object-cover"/>
+
 
                             <div className="flex-1">
                                 <div className="text-gray-800 font-semibold">{person.name}</div>
                                 <div className="text-xs text-black">ID: {person.employeeId}</div>
                             </div>
 
+
                             <div className="flex flex-col gap-2 items-center">
 
-                                <Link to="/attendancesummary">
-                                    <button className="px-3 py-1 rounded-full bg-[#59EA78] text-white text-xs">
+                                <Link to="/attendancesummary" 
+                                      state={{ 
+                                        employeeData: {
+                                            name: person.name,
+                                            employeeId: person.employeeId,
+                                            profile: person.profile
+                                        }
+                                      }}>
+                                    <button className="px-3 py-1 rounded-full bg-[#6D29F6] text-white text-xs fw-semibold">
                                         Attendance
                                     </button>
                                 </Link>
-                                <Link to="/workhourstracker">                               
-                                    <button className="px-3 py-1 rounded-full bg-[#DF4E4E] text-white text-xs">
+                                <Link to="/workhourstracker"
+                                      state={{ 
+                                        employeeData: {
+                                            name: person.name,
+                                            employeeId: person.employeeId,
+                                            profile: person.profile
+                                        }
+                                      }}>                               
+                                    <button className="px-3 py-1 rounded-full bg-[#6D29F6] text-white text-xs fw-semibold">
                                         Work Hours
                                     </button>
                                 </Link>
                             </div>
+
+
                         </div>
                     ))}
 

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // เพิ่ม useNavigate
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const LeaveRequest = () => {
+  const navigate = useNavigate(); // สร้าง navigate
+
   const [formData, setFormData] = useState({
     leaveStart: "",
     leaveEnd: "",
@@ -29,18 +31,9 @@ const LeaveRequest = () => {
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
-
       if (reason === "Other")
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-          otherReasonText: "",
-        });
-      else
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-        });
+        setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
+      else setFormData({ ...formData, leaveReasons: updated });
     } else {
       updated.push(reason);
       setFormData({ ...formData, leaveReasons: updated });
@@ -74,24 +67,21 @@ const LeaveRequest = () => {
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Other") &&
-      !formData.otherReasonText.trim()
-    ) {
+    if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
       alert("Please provide reason for 'Other'.");
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Sick-self") &&
-      !formData.evidenceFile
-    ) {
+    if (formData.leaveReasons.includes("Sick-self") && !formData.evidenceFile) {
       alert("กรุณาแนบรูปใบรับรองแพทย์");
       return;
     }
 
     alert("Leave filed successfully!");
     console.log(formData);
+
+    // เด้งกลับไปหน้า Home เหมือนกดปุ่ม Back
+    navigate(-1);
   };
 
   return (

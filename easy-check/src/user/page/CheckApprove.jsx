@@ -3,30 +3,14 @@ import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 
 const initialUsers = [
-  { 
-    id: 1, 
-    name: "ปัณณพรรธน์ เกียรตินิรชา", 
-    employeeId: "010889",
-    checkInTime: "09:00",
-    profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
-    checkInPhoto: "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg"
-  },
-  { 
-    id: 2, 
-    name: "ฐิติฉัตร ศิริบุตร", 
-    employeeId: "010101",
-    checkInTime: "08:30",
-    profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
-    checkInPhoto: "https://i.redd.it/dte258y55e1c1.jpg"
-  },
-  { 
-    id: 3, 
-    name: "ภทรพร แซ่ลี้", 
-    employeeId: "110400",
-    checkInTime: "10:00",
-    profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
-    checkInPhoto: "https://i.pinimg.com/736x/f8/d3/15/f8d315c29812464824e8aaf91970be46.jpg"
-  },
+  { id: 1, name: "ปัณณพรรธน์ เกียรตินิรชา", employeeId: "010889", checkInTime: "09:00", profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg", checkInPhoto: "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg" },
+  { id: 2, name: "ฐิติฉัตร ศิริบุตร", employeeId: "010101", checkInTime: "08:30", profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg", checkInPhoto: "https://i.redd.it/dte258y55e1c1.jpg" },
+  { id: 3, name: "ภทรพร แซ่ลี้", employeeId: "110400", checkInTime: "10:00", profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg", checkInPhoto: "https://i.pinimg.com/736x/f8/d3/15/f8d315c29812464824e8aaf91970be46.jpg" },
+];
+
+const initialDelegateCheckins = [
+  { id: 1, name: "สราศินีย์ บุญมา", employeeId: "110500" },
+  { id: 2, name: "ฐนิก ทรัพย์โนนหวาย", employeeId: "110600" },
 ];
 
 const getStatus = (checkIn) => {
@@ -37,142 +21,112 @@ const getStatus = (checkIn) => {
 
 function CheckApprove() {
   const [users, setUsers] = useState(initialUsers);
+  const [delegateUsers, setDelegateUsers] = useState(initialDelegateCheckins);
   const [approvedUsers, setApprovedUsers] = useState([]);
   const [rejectedUsers, setRejectedUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [viewDelegate, setViewDelegate] = useState(false);
 
-  const openCameraFor = (user) => setSelectedUser(user);
-
-  const handleApprove = (user) => {
-    setApprovedUsers((prev) => [...prev, user]);
-    setUsers((prev) => prev.filter((u) => u.id !== user.id));
-    setSelectedUser(null);
+  const handleApprove = (user, isDelegate=false) => {
+    setApprovedUsers(prev => [...prev, {...user, isDelegate}]);
+    if(isDelegate) setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
+    else setUsers(prev => prev.filter(u => u.id !== user.id));
   };
 
-  const handleReject = (user) => {
-    setRejectedUsers((prev) => [...prev, user]);
-    setUsers((prev) => prev.filter((u) => u.id !== user.id));
-    setSelectedUser(null);
+  const handleReject = (user, isDelegate=false) => {
+    setRejectedUsers(prev => [...prev, {...user, isDelegate}]);
+    if(isDelegate) setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
+    else setUsers(prev => prev.filter(u => u.id !== user.id));
+  };
+
+  const renderCard = (user, isDelegate=false) => {
+    if(isDelegate) {
+      // เช็กอินแทนเพื่อน: แค่ชื่อกับID, ปุ่มอนุมัติเขียว / ไม่อนุมัติแดง
+      return (
+        <div key={user.id} className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center justify-between">
+          <div>
+            <div className="font-bold text-gray-800 text-lg">{user.name} </div>
+            <div className="text-xs text-gray-500">ID: {user.employeeId}</div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={()=>handleApprove(user,true)} className="py-2 px-4 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
+            <button onClick={()=>handleReject(user,true)} className="py-2 px-4 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ผู้ใช้ปกติ: มีโปรไฟล์ กล้อง เวลาเช็กอิน
+    return (
+      <div key={user.id} className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center gap-4">
+        <img src={user.profile} alt={user.name} className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover" />
+        <div className="flex-1">
+          <div className="font-bold text-gray-800 text-lg">{user.name}</div>
+          <div className="text-xs text-gray-500">ID: {user.employeeId}</div>
+          <div className="text-xs text-gray-600 mt-1">
+            เวลาเช็กอิน: {user.checkInTime} - <span className={getStatus(user.checkInTime)==="สาย"?"text-red-500":"text-green-500"}>{getStatus(user.checkInTime)}</span>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <button onClick={()=>handleApprove(user)} className="flex-1 py-2 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
+            <button onClick={()=>handleReject(user)} className="flex-1 py-2 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
+          </div>
+        </div>
+        <button onClick={()=>setSelectedUser(user)} className="text-gray-700 text-2xl hover:scale-110 transition"><i className="bi bi-camera"></i></button>
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
 
       {/* Header */}
-      <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <Link to="/home">
-          <button className="text-white text-2xl">
-            <i className="bi bi-chevron-left"></i>
-          </button>
-        </Link>
-        <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
-          CHECK APPROVE
-        </h1>
+      <div className="w-full max-w-md flex items-center justify-between mb-4">
+        <Link to="/home"><button className="text-white text-2xl hover:scale-110 transition"><i className="bi bi-chevron-left"></i></button></Link>
+        <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">CHECK APPROVE</h1>
         <div className="w-8" />
       </div>
 
-      {/* User List */}
-      <div className="max-w-md w-full space-y-4">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className="bg-white rounded-2xl p-3 shadow-md flex items-center gap-3"
-          >
-            {/* Profile Image */}
-            <img
-              src={user.profile}
-              className="w-12 h-12 object-cover rounded-full border"
-            />
-
-            {/* Text Info */}
-            <div className="flex-1">
-              <div className="text-gray-800 font-bold">{user.name}</div>
-              <div className="text-xs text-gray-500 mb-1">
-                ID: {user.employeeId}
-              </div>
-              <div className="text-xs text-gray-600">
-                เข้างาน: {user.checkInTime} - สถานะ: {getStatus(user.checkInTime)}
-              </div>
-
-              {/* Buttons - อยู่บรรทัดเดียวกัน */}
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handleApprove(user)}
-                  className="px-3 py-1 rounded-full bg-[#59EA78] text-white text-xs font-semibold shadow flex-1"
-                >
-                  อนุมัติ
-                </button>
-                <button
-                  onClick={() => handleReject(user)}
-                  className="px-3 py-1 rounded-full bg-[#DF4E4E] text-white text-xs font-semibold shadow flex-1"
-                >
-                  ไม่อนุมัติ
-                </button>
-              </div>
-            </div>
-
-            {/* Camera icon */}
-            <button
-              onClick={() => openCameraFor(user)}
-              className="ml-2 text-gray-700 text-xl flex-shrink-0"
-            >
-              <i className="bi bi-camera"></i>
-            </button>
-          </div>
-        ))}
+      {/* Toggle Buttons */}
+      <div className="flex gap-2 mb-4 w-full max-w-md justify-center">
+        <button onClick={()=>setViewDelegate(false)} className={`w-[48%] py-2 rounded-full ${!viewDelegate?"bg-blue-600 text-white":"bg-gray-300 text-gray-700"} font-semibold transition`}>เช็กอินปกติ</button>
+        <button onClick={()=>setViewDelegate(true)} className={`w-[48%] py-2 rounded-full ${viewDelegate?"bg-blue-600 text-white":"bg-gray-300 text-gray-700"} font-semibold transition`}>เช็กอินแทนเพื่อน</button>
       </div>
 
-      {/* Modal preview */}
-      {selectedUser && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedUser(null)}
-        >
-          <div
-            className="bg-white rounded-lg max-w-lg w-full overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-bold">{selectedUser.name}</h2>
-              <button onClick={() => setSelectedUser(null)} className="p-2 text-lg">
-                ✕
-              </button>
+      {/* User / Delegate List */}
+      <div className="max-w-md w-full space-y-5">
+        {viewDelegate ? delegateUsers.map(u=>renderCard(u,true)) : users.map(u=>renderCard(u))}
+      </div>
+
+      {/* Modal */}
+      {selectedUser && !selectedUser.isDelegate && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={()=>setSelectedUser(null)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-lg" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-gray-300">
+              <h2 className="text-lg font-bold text-gray-800">{selectedUser.name}</h2>
+              <button onClick={()=>setSelectedUser(null)} className="p-2 text-lg text-gray-600">✕</button>
             </div>
-            <div className="p-4 space-y-2">
+            <div className="p-4 space-y-2 text-gray-700">
               <div><strong>รหัสพนักงาน:</strong> {selectedUser.employeeId}</div>
-              <div><strong>เวลาเข้า:</strong> {selectedUser.checkInTime}</div>
-              <div><strong>สถานะวันนี้:</strong> {getStatus(selectedUser.checkInTime)}</div>
-              {selectedUser.checkInPhoto && (
-                <img
-                  src={selectedUser.checkInPhoto}
-                  className="w-full h-auto object-cover rounded-md mt-2"
-                />
-              )}
+              <div><strong>เวลาเช็กอิน:</strong> {selectedUser.checkInTime}</div>
+              <div><strong>สถานะ:</strong> <span className={getStatus(selectedUser.checkInTime)==="สาย"?"text-red-500":"text-green-500"}>{getStatus(selectedUser.checkInTime)}</span></div>
+              {selectedUser.checkInPhoto && <img src={selectedUser.checkInPhoto} alt="checkin" className="w-full h-auto object-cover rounded-lg mt-2 border border-gray-300"/>}
             </div>
           </div>
         </div>
       )}
 
-      {/* Approved / Rejected summary */}
-      <div className="max-w-md w-full mt-6 space-y-3">
-        {approvedUsers.length > 0 && (
-          <div className="bg-green-50 p-3 rounded-md">
+      {/* Summary */}
+      <div className="max-w-md w-full mt-6 space-y-4">
+        {approvedUsers.length>0 && (
+          <div className="bg-green-100/50 p-3 rounded-xl">
             <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว</div>
-            {approvedUsers.map((u) => (
-              <div key={u.id} className="text-sm text-green-800">
-                {u.name} - เข้างาน: {u.checkInTime} - สถานะ: {getStatus(u.checkInTime)}
-              </div>
-            ))}
+            {approvedUsers.map(u=><div key={u.id} className="text-green-800 text-sm">{u.name} {u.isDelegate && "(แทนเพื่อน)"}{!u.isDelegate && ` - ${u.checkInTime} - ${getStatus(u.checkInTime)}`}</div>)}
           </div>
         )}
-        {rejectedUsers.length > 0 && (
-          <div className="bg-red-50 p-3 rounded-md">
+        {rejectedUsers.length>0 && (
+          <div className="bg-red-100/50 p-3 rounded-xl">
             <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ</div>
-            {rejectedUsers.map((u) => (
-              <div key={u.id} className="text-sm text-red-800">
-                {u.name} - เข้างาน: {u.checkInTime} - สถานะ: {getStatus(u.checkInTime)}
-              </div>
-            ))}
+            {rejectedUsers.map(u=><div key={u.id} className="text-red-800 text-sm">{u.name} {u.isDelegate && "(แทนเพื่อน)"}{!u.isDelegate && ` - ${u.checkInTime} - ${getStatus(u.checkInTime)}`}</div>)}
           </div>
         )}
       </div>
