@@ -119,19 +119,19 @@ const WorkHoursTracker = ({ role }) => {
     // โปรไฟล์ของพนักงานคนนั้น ๆ
     const EmployeeProfile = employeeData ? (
         <div className='d-flex justify-content-center mt-6'>
-            <div className="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center w-80">
+            <div className="flex flex-col items-center w-80">
 
                 <img
                     src={employeeData.profile}
                     alt="profile"
-                    className="w-24 h-24 rounded-full object-cover mb-3"
+                    className="w-28 h-28 rounded-full object-cover mb-3"
                 />
 
-                <div className="text-gray-800 font-semibold fs-5 text-center">
+                <div className="text-white font-semibold fs-5 text-center">
                     {employeeData.name}
                 </div>
 
-                <div className="text-sm text-black text-center">
+                <div className="text-sm text-white text-center">
                     ID: {employeeData.employeeId}
                 </div>
 

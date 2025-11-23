@@ -90,7 +90,7 @@ const InternalEvent = () => {
                     </Button>
                 </Link>
                 
-                <h3 className="text-white text-center fw-bold">Corporate <br /> internal event</h3>
+                <h3 className="text-white text-center fw-bold">Corporate <br /> Internal event</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>

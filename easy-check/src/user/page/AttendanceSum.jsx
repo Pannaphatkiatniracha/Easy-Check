@@ -119,6 +119,14 @@ const AttendanceSum = ({ role }) => {
         setShowModal(true)
     }
 
+    // ฟังก์ชันเลื่อนไปยังส่วนต่างๆ (สำหรับ approver)
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId)
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+    }
+
 
 
     // ตัวแสดงวันที่ใน Modal
@@ -144,19 +152,18 @@ const AttendanceSum = ({ role }) => {
     // ส่วนแสดงโปรไฟล์พนักงาน
     const EmployeeProfile = employeeData ? (
         <div className='d-flex justify-content-center mt-6'>
-            <div className="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center w-80">
+            <div className="flex flex-col items-center w-80">
 
                 <img
                     src={employeeData.profile}
                     alt="profile"
-                    className="w-20 h-20 rounded-full object-cover mb-3"
-                />
+                    className="w-28 h-28 rounded-full object-cover mb-3"/>
 
-                <div className="text-gray-800 font-semibold fs-5 text-center">
+                <div className="text-white font-semibold fs-5 text-center">
                     {employeeData.name}
                 </div>
 
-                <div className="text-sm text-black text-center">
+                <div className="text-sm text-white text-center">
                     ID: {employeeData.employeeId}
                 </div>
 
@@ -196,28 +203,28 @@ const AttendanceSum = ({ role }) => {
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105 transition-all duration-200 ease-in-out'
                             style={{ backgroundColor: '#1CA983', border: 'none', borderRadius: '12px' }}
-                            onClick={() => openModal("ontime")}>
+                            onClick={() => scrollToSection("ontime")}>
                             <i className="bi bi-check-circle me-2"></i>
                             On time: {onTimes.length}
                         </Button>
 
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105 transition-all duration-200 ease-in-out'
                             style={{ backgroundColor: '#D06356', border: 'none', borderRadius: '12px' }}
-                            onClick={() => openModal("late")}>
+                            onClick={() => scrollToSection("late")}>
                             <i className="bi bi-clock me-2"></i>
                             Late: {lates.length}
                         </Button>
 
                         <Button className='w-100 p-2 text-white fw-semibold mt-3 hover:scale-105 transition-all duration-200 ease-in-out'
                             style={{ backgroundColor: '#C7C76E', border: 'none', borderRadius: '12px' }}
-                            onClick={() => openModal("leave")}>
+                            onClick={() => scrollToSection("leave")}>
                             <i className="bi bi-person-x me-2"></i>
                             Leave: {leaves.length}
                         </Button>
 
                         <Button className='w-100 p-2 text-white fw-semibold mt-3 hover:scale-105 transition-all duration-200 ease-in-out'
-                            onClick={() => openModal("all")}
-                            style={{ backgroundColor: '#252A46', border: 'none', borderRadius: '12px' }}>
+                            style={{ backgroundColor: '#252A46', border: 'none', borderRadius: '12px' }}
+                            onClick={() => scrollToSection("all")}>
                             <i className="bi bi-list-ul me-2"></i>
                             All: {allRecords.length}
                         </Button>

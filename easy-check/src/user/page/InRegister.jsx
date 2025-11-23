@@ -90,7 +90,7 @@ const InRegister = () => {
 
                 <div className="d-flex flex-column align-items-center">
                     <h3 className="fw-bold">Register to</h3>
-                    <p className="text-white mb-0">{selectedEvent?.title}</p>
+                    <h5 className="text-white mb-0">{selectedEvent?.title}</h5>
                 </div>
 
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
