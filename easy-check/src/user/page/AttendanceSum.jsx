@@ -93,7 +93,7 @@ const AttendanceSum = ({ role }) => {
     // ฟังก์ชันเปิด Modal
     const openModal = (type) => {
         let data = {}
-        switch(type) {
+        switch (type) {
             case "ontime":
                 data = { title: "On Time Details", dates: onTimes, color: "#1CA983" }
                 break
@@ -124,7 +124,7 @@ const AttendanceSum = ({ role }) => {
                 {dates.map((date, index) => (
                     <div key={index} className="col-6">
                         <div className="rounded-2 p-2 text-center shadow-sm"
-                             style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}>
+                            style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}>
                             <small className="fw-semibold" style={{ color: color }}>{date}</small>
                         </div>
                     </div>
@@ -136,13 +136,22 @@ const AttendanceSum = ({ role }) => {
     // ส่วนแสดงโปรไฟล์พนักงาน
     const EmployeeProfile = employeeData ? (
         <div className='d-flex justify-content-center mt-6'>
-            <div className="bg-white rounded-2xl p-4 shadow-md flex items-center gap-4 w-80">
-                <img src={employeeData.profile} alt="profile"
-                    className="w-16 h-16 rounded-full object-cover"/>
-                <div className="flex-1">
-                    <div className="text-gray-800 font-semibold fs-5">{employeeData.name}</div>
-                    <div className="text-sm text-black">ID: {employeeData.employeeId}</div>
+            <div className="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center w-80">
+
+                <img
+                    src={employeeData.profile}
+                    alt="profile"
+                    className="w-20 h-20 rounded-full object-cover mb-3"
+                />
+
+                <div className="text-gray-800 font-semibold fs-5 text-center">
+                    {employeeData.name}
                 </div>
+
+                <div className="text-sm text-black text-center">
+                    ID: {employeeData.employeeId}
+                </div>
+
             </div>
         </div>
     ) : null
@@ -169,7 +178,7 @@ const AttendanceSum = ({ role }) => {
             <div className='d-flex justify-content-center mt-6'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    
+
                     <h4 className="mt-3 fw-bold text-black">October 2025 Summary</h4>
 
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
@@ -211,36 +220,36 @@ const AttendanceSum = ({ role }) => {
 
                     {/* On Time - สีเขียว */}
                     <div id="ontime" className="mb-6">
-                        <DateGridModal 
-                            dates={onTimes} 
-                            title="On Time Details" 
+                        <DateGridModal
+                            dates={onTimes}
+                            title="On Time Details"
                             color="#1CA983"
                         />
                     </div>
 
                     {/* Late - สีแดง */}
                     <div id="late" className="mb-6">
-                        <DateGridModal 
-                            dates={lates} 
-                            title="Late Details" 
+                        <DateGridModal
+                            dates={lates}
+                            title="Late Details"
                             color="#D06356"
                         />
                     </div>
 
                     {/* Leave - สีเหลือง */}
                     <div id="leave" className="mb-6">
-                        <DateGridModal 
-                            dates={leaves} 
-                            title="Leave Details" 
+                        <DateGridModal
+                            dates={leaves}
+                            title="Leave Details"
                             color="#C7C76E"
                         />
                     </div>
 
                     {/* All Records - สีดำ */}
                     <div id="all">
-                        <DateGridModal 
-                            dates={allRecords} 
-                            title="All Records" 
+                        <DateGridModal
+                            dates={allRecords}
+                            title="All Records"
                             color="#252A46"
                         />
                     </div>
@@ -249,7 +258,7 @@ const AttendanceSum = ({ role }) => {
             </div>
         </div>
     )
-    
+
     // ส่วนสรุปผลสำหรับ User ทั่วไป
     const Userpage = (
         <div className="app-container">
@@ -269,7 +278,7 @@ const AttendanceSum = ({ role }) => {
             <div className='d-flex justify-content-center mt-10'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    
+
                     <h4 className="mt-3 fw-bold text-black">October 2025 Summary</h4>
 
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
@@ -316,14 +325,14 @@ const AttendanceSum = ({ role }) => {
                     <Modal.Title className="fw-bold">{modalData.title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">
-                    <DateGridModal 
-                        dates={modalData.dates} 
-                        title={modalData.title} 
+                    <DateGridModal
+                        dates={modalData.dates}
+                        title={modalData.title}
                         color={modalData.color}
                     />
                 </Modal.Body>
                 <Modal.Footer className="border-0">
-                    <Button 
+                    <Button
                         style={{ backgroundColor: '#636CCB', border: 'none' }}
                         onClick={() => setShowModal(false)}>
                         Close
