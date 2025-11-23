@@ -134,7 +134,7 @@ const WorkHoursTracker = ({ role }) => {
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
 
-                <Link to="/datacheck" className='text-decoration-none'>
+                <Link to="/datatocheck" className='text-decoration-none'>
                     <Button variant="link" className="p-0">
                         <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
