@@ -32,7 +32,7 @@ const WorkHoursTracker = ({ role }) => {
     ]
 
 
-    // mock จำนวนชั่วโมงไว้ก่อน
+    // mock จำนวนชั่วโมงไว้ก่อน - เพิ่มข้อมูลให้ครบทุก employeeId
     const hoursMap = {
         "010889": {
             Monday: 7.2,
@@ -54,13 +54,41 @@ const WorkHoursTracker = ({ role }) => {
             Wednesday: 5.9,
             Thursday: 8.3,
             Friday: 7.1,
+        },
+        "130901": {
+            Monday: 8.0,
+            Tuesday: 7.5,
+            Wednesday: 8.2,
+            Thursday: 7.8,
+            Friday: 8.5,
+        },
+        "030996": {
+            Monday: 6.5,
+            Tuesday: 7.8,
+            Wednesday: 8.0,
+            Thursday: 7.2,
+            Friday: 8.3,
+        },
+        "270502": {
+            Monday: 8.2,
+            Tuesday: 8.5,
+            Wednesday: 7.9,
+            Thursday: 8.1,
+            Friday: 8.4,
+        },
+        "1110495": {
+            Monday: 7.8,
+            Tuesday: 8.0,
+            Wednesday: 7.5,
+            Thursday: 8.2,
+            Friday: 7.9,
         }
     }
 
 
     // ให้มันโชว์ข้อมูลตาม ID แต่ถ้าผิดพลาดอะไรก็จะให้แสดงของ 010889 ไปก่อน
     const hoursData = employeeData
-        ? hoursMap[employeeData.employeeId]
+        ? hoursMap[employeeData.employeeId] || hoursMap["010889"]
         : hoursMap["010889"]
 
 
@@ -106,7 +134,10 @@ const WorkHoursTracker = ({ role }) => {
 
 
     // เอาไว้บอกว่าตอนนี้เราทำงานไปกี่วันแล้ว
-    const daysWorked = Math.min(todayIndex, 5)  // Math.min(.., ..) คือมันเลือกตัวที่น้อยที่สุดระหว่างสองตัวนี้ ดังนั้นค่าของ daysWorked คือจำนวนวันที่ทำงานไปแล้วในวีคนี้
+    const workDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    const daysWorked = workDays.filter(day => 
+        dayNames.indexOf(day) <= todayIndex
+    ).length
     const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY  // จำนวนชั่วโมงสูงสุดที่เข้าทำงาน *นับแค่วันที่ทำงานแล้ว*
 
 
