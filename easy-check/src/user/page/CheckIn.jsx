@@ -111,7 +111,7 @@ function CheckInOut() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4">
       <div className="max-w-md w-full space-y-6 relative">
 
         {/* Header */}
@@ -125,12 +125,12 @@ function CheckInOut() {
           <i className="bi bi-geo-alt-fill"></i> Check-In / Check-Out
         </h1>
 
-        {/* Camera Card */}
-        <div className="bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/30 flex flex-col items-center space-y-4">
+        {/* Camera Card แนวตั้ง 3D floating */}
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4 transform hover:scale-105 transition-transform duration-300 hover:shadow-3xl perspective-1000">
           <video
             ref={videoRef}
             autoPlay
-            className="w-full rounded-2xl shadow-2xl border-4 border-white object-cover max-h-[650px]"
+            className="w-full rounded-2xl shadow-2xl border-4 border-white object-cover max-h-[450px] aspect-[3/4] transform-gpu"
           ></video>
           <canvas ref={canvasRef} className="hidden"></canvas>
 
@@ -156,7 +156,7 @@ function CheckInOut() {
           <img
             src={URL.createObjectURL(photo)}
             alt="preview"
-            className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover"
+            className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover transform hover:scale-105 transition duration-300"
           />
         )}
 
@@ -185,7 +185,7 @@ function CheckInOut() {
 
         {/* Check-In & Check-Out Data */}
         {checkInData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30 text-center">
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
               <i className="bi bi-geo-fill"></i> เช็คอิน
             </h3>
@@ -199,7 +199,7 @@ function CheckInOut() {
         )}
 
         {checkOutData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30 text-center">
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
               <i className="bi bi-flag-fill"></i> เช็คเอาท์
             </h3>
@@ -214,7 +214,7 @@ function CheckInOut() {
 
         {/* Message & Error */}
         {message && (
-          <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line">
+          <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line transform hover:scale-105 transition duration-300">
             {message}
           </div>
         )}
