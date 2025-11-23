@@ -22,41 +22,51 @@ const getStatus = (checkIn) => {
 function CheckApprove() {
   const [users, setUsers] = useState(initialUsers);
   const [delegateUsers, setDelegateUsers] = useState(initialDelegateCheckins);
-  const [approvedUsers, setApprovedUsers] = useState([]);
-  const [rejectedUsers, setRejectedUsers] = useState([]);
+
+  // แยก state ของแต่ละหน้า
+  const [approvedNormal, setApprovedNormal] = useState([]);
+  const [rejectedNormal, setRejectedNormal] = useState([]);
+  const [approvedDelegate, setApprovedDelegate] = useState([]);
+  const [rejectedDelegate, setRejectedDelegate] = useState([]);
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewDelegate, setViewDelegate] = useState(false);
 
-  const handleApprove = (user, isDelegate=false) => {
-    setApprovedUsers(prev => [...prev, {...user, isDelegate}]);
-    if(isDelegate) setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
-    else setUsers(prev => prev.filter(u => u.id !== user.id));
+  // --- ฟังก์ชันอนุมัติ/ไม่อนุมัติ ---
+  const handleApproveNormal = (user) => {
+    setApprovedNormal(prev => [...prev, user]);
+    setUsers(prev => prev.filter(u => u.id !== user.id));
+  };
+  const handleRejectNormal = (user) => {
+    setRejectedNormal(prev => [...prev, user]);
+    setUsers(prev => prev.filter(u => u.id !== user.id));
+  };
+  const handleApproveDelegate = (user) => {
+    setApprovedDelegate(prev => [...prev, user]);
+    setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
+  };
+  const handleRejectDelegate = (user) => {
+    setRejectedDelegate(prev => [...prev, user]);
+    setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
   };
 
-  const handleReject = (user, isDelegate=false) => {
-    setRejectedUsers(prev => [...prev, {...user, isDelegate}]);
-    if(isDelegate) setDelegateUsers(prev => prev.filter(u => u.id !== user.id));
-    else setUsers(prev => prev.filter(u => u.id !== user.id));
-  };
-
+  // --- Card ผู้ใช้ ---
   const renderCard = (user, isDelegate=false) => {
     if(isDelegate) {
-      // เช็กอินแทนเพื่อน: แค่ชื่อกับID, ปุ่มอนุมัติเขียว / ไม่อนุมัติแดง
       return (
         <div key={user.id} className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center justify-between">
           <div>
-            <div className="font-bold text-gray-800 text-lg">{user.name} </div>
+            <div className="font-bold text-gray-800 text-lg">{user.name}</div>
             <div className="text-xs text-gray-500">ID: {user.employeeId}</div>
           </div>
           <div className="flex gap-2">
-            <button onClick={()=>handleApprove(user,true)} className="py-2 px-4 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
-            <button onClick={()=>handleReject(user,true)} className="py-2 px-4 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
+            <button onClick={()=>handleApproveDelegate(user)} className="py-2 px-4 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
+            <button onClick={()=>handleRejectDelegate(user)} className="py-2 px-4 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
           </div>
         </div>
       );
     }
 
-    // ผู้ใช้ปกติ: มีโปรไฟล์ กล้อง เวลาเช็กอิน
     return (
       <div key={user.id} className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center gap-4">
         <img src={user.profile} alt={user.name} className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover" />
@@ -67,8 +77,8 @@ function CheckApprove() {
             เวลาเช็กอิน: {user.checkInTime} - <span className={getStatus(user.checkInTime)==="สาย"?"text-red-500":"text-green-500"}>{getStatus(user.checkInTime)}</span>
           </div>
           <div className="flex gap-2 mt-2">
-            <button onClick={()=>handleApprove(user)} className="flex-1 py-2 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
-            <button onClick={()=>handleReject(user)} className="flex-1 py-2 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
+            <button onClick={()=>handleApproveNormal(user)} className="flex-1 py-2 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition">อนุมัติ</button>
+            <button onClick={()=>handleRejectNormal(user)} className="flex-1 py-2 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition">ไม่อนุมัติ</button>
           </div>
         </div>
         <button onClick={()=>setSelectedUser(user)} className="text-gray-700 text-2xl hover:scale-110 transition"><i className="bi bi-camera"></i></button>
@@ -117,18 +127,40 @@ function CheckApprove() {
 
       {/* Summary */}
       <div className="max-w-md w-full mt-6 space-y-4">
-        {approvedUsers.length>0 && (
-          <div className="bg-green-100/50 p-3 rounded-xl">
-            <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว</div>
-            {approvedUsers.map(u=><div key={u.id} className="text-green-800 text-sm">{u.name} {u.isDelegate && "(แทนเพื่อน)"}{!u.isDelegate && ` - ${u.checkInTime} - ${getStatus(u.checkInTime)}`}</div>)}
-          </div>
+
+        {/* Summary แยกหน้าชัดเจน */}
+        {viewDelegate ? (
+          <>
+            {approvedDelegate.length>0 && (
+              <div className="bg-green-100/50 p-3 rounded-xl">
+                <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว (แทนเพื่อน)</div>
+                {approvedDelegate.map(u=><div key={u.id} className="text-green-800 text-sm">{u.name} (แทนเพื่อน)</div>)}
+              </div>
+            )}
+            {rejectedDelegate.length>0 && (
+              <div className="bg-red-100/50 p-3 rounded-xl">
+                <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (แทนเพื่อน)</div>
+                {rejectedDelegate.map(u=><div key={u.id} className="text-red-800 text-sm">{u.name} (แทนเพื่อน)</div>)}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {approvedNormal.length>0 && (
+              <div className="bg-green-100/50 p-3 rounded-xl">
+                <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว (ปกติ)</div>
+                {approvedNormal.map(u=><div key={u.id} className="text-green-800 text-sm">{u.name} - {u.checkInTime} - {getStatus(u.checkInTime)}</div>)}
+              </div>
+            )}
+            {rejectedNormal.length>0 && (
+              <div className="bg-red-100/50 p-3 rounded-xl">
+                <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (ปกติ)</div>
+                {rejectedNormal.map(u=><div key={u.id} className="text-red-800 text-sm">{u.name} - {u.checkInTime} - {getStatus(u.checkInTime)}</div>)}
+              </div>
+            )}
+          </>
         )}
-        {rejectedUsers.length>0 && (
-          <div className="bg-red-100/50 p-3 rounded-xl">
-            <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ</div>
-            {rejectedUsers.map(u=><div key={u.id} className="text-red-800 text-sm">{u.name} {u.isDelegate && "(แทนเพื่อน)"}{!u.isDelegate && ` - ${u.checkInTime} - ${getStatus(u.checkInTime)}`}</div>)}
-          </div>
-        )}
+
       </div>
     </div>
   );
