@@ -26,50 +26,32 @@ import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
-<<<<<<< HEAD
-import ApprovePage from "./user/page/ApprovePage";
 
-=======
-import PaymentRequest from "./user/page/PaymentRequest";
->>>>>>> d92bad341a86f889f89bae08cd3c8b8ff9bbaefa
-
-
-
-
-
-
+import ApprovePage from "./user/page/ApprovePage";      // KEEP BOTH
+import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 
 function App() {
-
-  // () => ... คือเป็นการบอกว่าให้ useState เรียกใช้ฟังก์ชันนี้ตอนเริ่มต้นเท่านั้น
-  // เพื่อป้องกันไม่ให้ localStorage.getItem("token") ถูกเรียกใช้ทุกครั้งที่มีการ re-render แบบฟีลฟังก์ชันขี้เกียจเรียกรอบแรกรอบเดียวพอ แล้วก็จะไม่หาย
-
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "")      // ตอนโหลดเว็บครั้งแรก react จะเรียก () => localStorage.getItem("token") || ""  ถ้าเจอ token ก็ค่อยเก็บค่า token ใน state ถ้าไม่เจอ token → เก็บค่าว่าง "" ใน state เพื่อไม่ให้เป็น undefind
-  const [role, setRole] = useState(() => localStorage.getItem("role") || "")
-
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [role, setRole] = useState(() => localStorage.getItem("role") || "");
 
   return (
-
     <>
-
       <BrowserRouter basename="/easycheck/">
         <Routes>
-
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
 
-          {/* ถ้ายังไม่ได้ login จะกระโดดไปให้ login ก่อน และ replace เพื่อไม่ให้มี history ใน history stack เวลากด back จะได้ไม่งง  */}
           {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
 
-          {/* อันนี้คือกรณีมีการ login แล้วเลยเข้าได้ปกติ */}
           {token && (
             <>
               <Route element={<AppLayout />}>
-                <Route path="home" element={<Home
-                role={role} />} />
+                <Route path="home" element={<Home role={role} />} />
                 <Route path="event" element={<Event />} />
-                <Route path="setting" element={<Setting
-                role={role} setToken={setToken} setRole={setRole} />} />
+                <Route
+                  path="setting"
+                  element={<Setting role={role} setToken={setToken} setRole={setRole} />}
+                />
                 <Route path="*" element={<NotFound />} />
               </Route>
 
@@ -86,36 +68,42 @@ function App() {
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
-                <Route path="attendancesummary" element={<AttendanceSum
-                role={role} />} />
-                <Route path="workhourstracker" element={<WorkHoursTracker
-                role={role} />} />
+                <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
+                <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
+
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
-<<<<<<< HEAD
-                <Route path="approvepage" element={<ApprovePage />} /> 
-                
-=======
+
+                {/* *** NEW PAGES *** */}
+                <Route path="approvepage" element={<ApprovePage />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
->>>>>>> d92bad341a86f889f89bae08cd3c8b8ff9bbaefa
-                <Route path="datacheck" element={
-                  role === "approver" 
-                  ? <DataCheck role={role} /> 
-                  : <Navigate to="/home" replace />
-                } />
 
-                <Route path="datatocheck" element={
-                  role === "approver" 
-                  ? <DataToCheck role={role} /> 
-                  : <Navigate to="/home" replace />
-                  } />
+                <Route
+                  path="datacheck"
+                  element={
+                    role === "approver" ? (
+                      <DataCheck role={role} />
+                    ) : (
+                      <Navigate to="/home" replace />
+                    )
+                  }
+                />
 
+                <Route
+                  path="datatocheck"
+                  element={
+                    role === "approver" ? (
+                      <DataToCheck role={role} />
+                    ) : (
+                      <Navigate to="/home" replace />
+                    )
+                  }
+                />
               </Route>
             </>
           )}
         </Routes>
       </BrowserRouter>
-
     </>
   );
 }
