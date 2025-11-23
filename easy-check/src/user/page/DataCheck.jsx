@@ -7,19 +7,19 @@ const DataCheck = () => {
     const data = [
         {
             id: 1,
-            name: "ปิลันทิตา เหมือนวงศ์",
+            name: "ปัณณพรรธน์ เกียรตินิรชา",
             employeeId: "010889",
             profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
         },
         {
             id: 2,
-            name: "อภิชญา มณีวงศ์",
+            name: "ฐิติฉัตร ศิริบุตร",
             employeeId: "010101",
             profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
         },
         {
             id: 3,
-            name: "ยิหวา ศรีสุข",
+            name: "ภทรพร แซ่ลี้",
             employeeId: "110400",
             profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
         },
