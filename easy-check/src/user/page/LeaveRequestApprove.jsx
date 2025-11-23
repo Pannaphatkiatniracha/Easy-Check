@@ -64,7 +64,10 @@ function LeaveRequestApprove() {
     >
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <Link to="/home" className="text-white text-2xl hover:scale-110 transition">
+        <Link
+          to="/home"
+          className="text-white text-2xl hover:scale-110 transition"
+        >
           <i className="bi bi-chevron-left"></i>
         </Link>
 
@@ -95,7 +98,9 @@ function LeaveRequestApprove() {
               <div className="font-semibold text-white text-lg">{req.name}</div>
               <div className="text-xs text-gray-300">ID: {req.employeeId}</div>
               <div className="text-xs text-gray-200 mt-1">
-                {req.reasons.includes("Other") ? req.otherReason : req.reasons.join(", ")}
+                {req.reasons.includes("Other")
+                  ? req.otherReason
+                  : req.reasons.join(", ")}
               </div>
               <div className="text-xs text-gray-200">
                 วันที่ลา: {req.leaveStart} → {req.leaveEnd}
