@@ -1,0 +1,206 @@
+/* --- Global Styles --- */
+:root {
+  --bg-color: #7190f450;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --input-bg: #f8f8f8;
+  --input-border: #cccccc;
+  --accent-color: #3C467B;
+  }
+
+body {
+  font-family: 'Inter', 'Sarabun', sans-serif;
+  margin: 0;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.admin-profile-container {
+  max-width: 900px; /* ลดความกว้างลงเล็กน้อยเพื่อให้กระชับขึ้น */
+  margin: 40px auto;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* --- Gradient Header --- */
+.gradient-header-bg {
+  height: 100px; /* เพิ่มความสูงเล็กน้อย */
+  background:#7190F4; /* เปลี่ยนสี Gradient ให้ดูทันสมัยขึ้น */
+}
+
+/* --- Profile Info Section --- */
+.profile-main-info {
+  display: flex;
+  align-items: flex-end; /* จัดให้ Avatar อยู่ด้านล่างของ Header */
+  padding: 0 40px;
+  margin-top: 10px; /* ดึง Avatar ขึ้นไปซ้อนทับ Header */
+  margin-bottom: 30px;
+}
+
+.profile-avatar-wrapper {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 5px solid var(--card-bg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  position: relative;
+  margin-right: 30px;
+  background-color: #fff; /* ป้องกันพื้นหลังโปร่งใส */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-upload-label {
+  position: absolute;
+  bottom: 5px;
+  right: -5px;
+  background: var(--accent-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid var(--card-bg);
+  color: white;
+  transition: all 0.2s;
+}
+
+.avatar-upload-label:hover {
+  transform: scale(1.1);
+  background-color: var(--button-hover-bg);
+}
+
+.avatar-upload-label svg {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-text-info {
+  padding-bottom: 15px; /* ขยับข้อความขึ้นเล็กน้อย */
+}
+
+.profile-text-info h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.profile-text-info p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+/* --- Form Layout --- */
+.profile-form-section {
+  padding: 0 40px 40px;
+}
+
+.form-section-title {
+  font-size: 1.2rem;
+  color: var(--accent-color);
+  margin: 35px 0 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--bg-color);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Grid 3 คอลัมน์ สำหรับหน้าจอใหญ่ */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+/* Grid 2 คอลัมน์ */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  padding: 12px 15px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background-color: var(--input-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* --- Save Button --- */
+
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .profile-main-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -70px;
+  }
+
+  .profile-avatar-wrapper {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .profile-text-info {
+    padding-bottom: 0;
+  }
+
+  .form-grid-3,
+  .form-grid-2 {
+    grid-template-columns: 1fr; /* เปลี่ยนเป็นคอลัมน์เดียวบนมือถือ */
+    gap: 20px;
+  }
+
+  .save-btn-container {
+    justify-content: center;
+  }
+
+  .save-profile-btn {
+    width: 100%;
+  }
+}
