@@ -25,6 +25,7 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
+import DelegateCheckinApprove from "./user/page/DelegateCheckinApprove";
 
 
 
@@ -79,6 +80,7 @@ function App() {
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
+
               
                 <Route path="attendancesummary" element={<AttendanceSum
                 role={role} />} />
@@ -86,6 +88,7 @@ function App() {
                 role={role} />} />
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+                <Route path="delegatecheckinapprove" element={<DelegateCheckinApprove/>} />
                 <Route path="datacheck" element={
                     role === "approver" 
                       ? <DataCheck role={role} /> 
