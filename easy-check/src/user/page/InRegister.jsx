@@ -88,7 +88,11 @@ const InRegister = () => {
                     </Button>
                 </Link>
 
-                <h3 className="fw-bold">Register</h3>
+                <div className="d-flex flex-column align-items-center">
+                    <h3 className="fw-bold">Register to</h3>
+                    <p className="text-white mb-0">{selectedEvent?.title}</p>
+                </div>
+
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -98,7 +102,7 @@ const InRegister = () => {
             {/* ใช้ flex เป็นคอลัมน์ กับให้อยู่กลางแนวนอน */}
             <div className="d-flex flex-column align-items-center">
 
-                <div className="mt-4 mb-3 w-75">
+                <div className="mt-10 mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
@@ -169,11 +173,11 @@ const InRegister = () => {
 
 
             {/* opacity = ความโปร่งความทึบของเส้น */}
-            <hr className="w-100 my-4 border-white opacity-75" />
+            {/* <hr className="w-100 my-4 border-white opacity-75" /> */}
 
 
             {/* event ที่เราเลือกลงทะเบียน */}
-            <div className='px-5 mt-2'>
+            {/* <div className='px-5 mt-2'>
                 <label className="text-white fw-light form-label">Event</label>
                 <div className="bg-light rounded-2 p-3 text-dark">
                     <b>{selectedEvent?.title || "ไม่ได้เลือก event"}</b>
@@ -181,7 +185,7 @@ const InRegister = () => {
 
                 <input type="hidden" onChange={handleChange}
                 name='events' value={selectedEvent?.title || ""}/>
-            </div>
+            </div> */}
 
 
             {/* ปุ่ม */}
