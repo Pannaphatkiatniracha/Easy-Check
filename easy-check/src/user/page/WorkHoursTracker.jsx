@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import { useLocation } from 'react-router-dom';
 
 const WorkHoursTracker = ({ role }) => {
+
+    const location = useLocation()
+    const employeeData = location.state?.employeeData
 
     const weekTemplate = [
         {
@@ -96,6 +100,20 @@ const WorkHoursTracker = ({ role }) => {
         ? Math.round((workedHours / maxPossibleHours) * 100) : 0 // ถ้าหล่อนไม่เคยทำงานเลยก็ 0 จ่ะ
 
 
+    // ส่วนแสดงโปรไฟล์พนักงาน (สำหรับ Approver เท่านั้น)
+    const EmployeeProfile = employeeData ? (
+        <div className='d-flex justify-content-center mt-6'>
+            <div className="bg-white rounded-2xl p-4 shadow-md flex items-center gap-4 w-80">
+                <img src={employeeData.profile} alt="profile"
+                    className="w-16 h-16 rounded-full object-cover"/>
+                <div className="flex-1">
+                    <div className="text-gray-800 font-semibold fs-5">{employeeData.name}</div>
+                    <div className="text-sm text-black">ID: {employeeData.employeeId}</div>
+                </div>
+            </div>
+        </div>
+    ) : null
+
 
     // component ของ Approver
     const ApprovePage = (
@@ -117,9 +135,11 @@ const WorkHoursTracker = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
+            {/* แสดงโปรไฟล์พนักงาน (สำหรับ Approver) */}
+            {EmployeeProfile}
 
             {/* ขแงวันนี้ */}
-            <div className='d-flex justify-content-center mt-10'>
+            <div className='d-flex justify-content-center mt-6'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 

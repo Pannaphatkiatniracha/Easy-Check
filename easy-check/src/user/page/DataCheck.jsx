@@ -7,19 +7,19 @@ const DataCheck = () => {
     const data = [
         {
             id: 1,
-            name: "ปัณณพรรธน์ เกียรตินิรชา",
+            name: "ปิลันทิตา เหมือนวงศ์",
             employeeId: "010889",
             profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
         },
         {
             id: 2,
-            name: "ฐิติฉัตร ศิริบุตร",
+            name: "อภิชญา มณีวงศ์",
             employeeId: "010101",
             profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
         },
         {
             id: 3,
-            name: "ภทรพร แซ่ลี้",
+            name: "ยิหวา ศรีสุข",
             employeeId: "110400",
             profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
         },
@@ -68,12 +68,26 @@ const DataCheck = () => {
 
                             <div className="flex flex-col gap-2 items-center">
 
-                                <Link to="/attendancesummary">
+                                <Link to="/attendancesummary" 
+                                      state={{ 
+                                        employeeData: {
+                                            name: person.name,
+                                            employeeId: person.employeeId,
+                                            profile: person.profile
+                                        }
+                                      }}>
                                     <button className="px-3 py-1 rounded-full bg-[#6D29F6] text-white text-xs fw-semibold">
                                         Attendance
                                     </button>
                                 </Link>
-                                <Link to="/workhourstracker">                               
+                                <Link to="/workhourstracker"
+                                      state={{ 
+                                        employeeData: {
+                                            name: person.name,
+                                            employeeId: person.employeeId,
+                                            profile: person.profile
+                                        }
+                                      }}>                               
                                     <button className="px-3 py-1 rounded-full bg-[#6D29F6] text-white text-xs fw-semibold">
                                         Work Hours
                                     </button>
