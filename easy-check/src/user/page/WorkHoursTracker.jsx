@@ -31,6 +31,7 @@ const WorkHoursTracker = ({ role }) => {
         },
     ]
 
+
     // mock จำนวนชั่วโมงไว้ก่อน
     const hoursMap = {
         "010889": {
@@ -66,14 +67,17 @@ const WorkHoursTracker = ({ role }) => {
     // กำหนดชื่อวันโดยเรียงตาม date 0-6
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-    const todayIndex = new Date().getDay()
-    const todayName = dayNames[todayIndex]
+
+    const todayIndex = new Date().getDay()  // วันปัจจุบันจริง ๆ แต่เป็นเลข 0-6
+    const todayName = dayNames[todayIndex]  // วันปัจจุบันที่เป็นชื่อวัน เช่น todayIndex คือ 1 / todayName คือ Monday
+
 
     const MAX_HOURS_PER_DAY = 9
 
     const weeklyData = weekTemplate.map(item => {
 
-        const itemIndex = dayNames.indexOf(item.day)
+        // dayNames.indexOf(item.day) จะได้ ตำแหน่งของวันนั้นในสัปดาห์ เช่นแบบ dayNames.indexOf("Wednesday") คืนค่า 3 
+        const itemIndex = dayNames.indexOf(item.day)  // itemIndex = เลขลำดับวันนั้นๆ
 
         const reached = itemIndex <= todayIndex
         const hoursWorked = reached ? (hoursData[item.day] ?? 0) : 0
@@ -87,18 +91,29 @@ const WorkHoursTracker = ({ role }) => {
         }
     })
 
+
+    // .find() มันคือของอย่างที่แรกที่ระบบเจอและตรงตามเงื่อนไข
+    // today อันนี้คือพอเช็คแล้วว่า d => d.day === todayName ถูกไหม ถ้าถูกมันจะได้ชุดผลลัพธ์ทั้งหมดเลย เช่น วันจันทร์ สีเหลือง 80%
     const today = weeklyData.find(d => d.day === todayName) ?? { hours: 0, percent: 0, color: "#ccc" }
 
+
+    // sum = ผลรวม   day = ของใน array  -------------------- เวลาทำงานจริงจ้า --------------------
+    // .reduce คือการเอาของใน array มาค่อยๆ ทำอะไรสักอย่างกัน โดยส่งผลลัพธ์ไปเรื่อยๆ ในทีนี้คือ บวก
     const workedHours = weeklyData.reduce((sum, day) => {
         return sum + day.hours
-    }, 0)
 
-    const daysWorked = Math.min(todayIndex, 5)
-    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY
+    }, 0)  // 0 ตรงนี้คือให้ sum มีค่าเริ่มต้นเป็น 0
 
+
+    // เอาไว้บอกว่าตอนนี้เราทำงานไปกี่วันแล้ว
+    const daysWorked = Math.min(todayIndex, 5)  // Math.min(.., ..) คือมันเลือกตัวที่น้อยที่สุดระหว่างสองตัวนี้ ดังนั้นค่าของ daysWorked คือจำนวนวันที่ทำงานไปแล้วในวีคนี้
+    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY  // จำนวนชั่วโมงสูงสุดที่เข้าทำงาน *นับแค่วันที่ทำงานแล้ว*
+
+
+    // สรุปเปอร์เซ็นต์รวม
     const weeklySummaryPercent = maxPossibleHours > 0
-        ? Math.round((workedHours / maxPossibleHours) * 100)
-        : 0
+        // Math.round คือปัดเศษตามค่าความเป็นจริง
+        ? Math.round((workedHours / maxPossibleHours) * 100) : 0 // ถ้าหล่อนไม่เคยทำงานเลยก็ 0 จ่ะ
 
 
     // โปรไฟล์ของพนักงานคนนั้น ๆ

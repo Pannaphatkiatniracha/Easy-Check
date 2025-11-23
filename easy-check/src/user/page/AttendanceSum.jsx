@@ -5,14 +5,18 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const AttendanceSum = ({ role }) => {
-
+    
     const location = useLocation()
     const employeeData = location.state?.employeeData
+    
+    
+    const [showModal, setShowModal] = useState(false)
+    const [modalData, setModalData] = useState({ title: "", dates: [], color: "" })
 
     // ฟังก์ชันดึงข้อมูลตาม employeeId
     const getAttendanceData = (employeeId) => {
         const attendanceMap = {
-            "010889": { // ปิลันทิตา - ลา 3 ครั้ง สาย 2 ครั้ง
+            "010889": {
                 onTimes: [
                     "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-06", "2025-10-07",
                     "2025-10-08", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14",
@@ -22,13 +26,13 @@ const AttendanceSum = ({ role }) => {
                     "2025-10-18"
                 ],
                 lates: [
-                    "2025-10-05", "2025-10-12" // สาย 2 ครั้ง
+                    "2025-10-05", "2025-10-12"
                 ],
                 leaves: [
-                    "2025-10-19", "2025-10-25", "2025-10-26" // ลา 3 ครั้ง
+                    "2025-10-19", "2025-10-25", "2025-10-26"
                 ]
             },
-            "010101": { // อภิชญา - ลา 1 ครั้ง
+            "010101": {
                 onTimes: [
                     "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-04", "2025-10-05",
                     "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-10-10",
@@ -41,10 +45,10 @@ const AttendanceSum = ({ role }) => {
                     // ไม่มีมาสาย
                 ],
                 leaves: [
-                    "2025-10-31" // ลา 1 ครั้ง
+                    "2025-10-31"
                 ]
             },
-            "110400": { // ยิหวา - ลา 5 ครั้ง สาย 3 ครั้ง
+            "110400": {
                 onTimes: [
                     "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-06", "2025-10-07",
                     "2025-10-08", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14",
@@ -52,15 +56,17 @@ const AttendanceSum = ({ role }) => {
                     "2025-10-22", "2025-10-23", "2025-10-27", "2025-10-28", "2025-10-29"
                 ],
                 lates: [
-                    "2025-10-04", "2025-10-11", "2025-10-24" // สาย 3 ครั้ง
+                    "2025-10-04", "2025-10-11", "2025-10-24" 
                 ],
                 leaves: [
-                    "2025-10-05", "2025-10-12", "2025-10-18", "2025-10-25", "2025-10-30", "2025-10-31" // ลา 6 ครั้ง
+                    "2025-10-05", "2025-10-12", "2025-10-18", "2025-10-25", "2025-10-30", "2025-10-31"
                 ]
             }
         }
         return attendanceMap[employeeId] || attendanceMap["010889"]
     }
+
+
 
     // ดึงข้อมูลตามพนักงาน
     const attendanceData = employeeData ? getAttendanceData(employeeData.employeeId) : {
@@ -80,15 +86,15 @@ const AttendanceSum = ({ role }) => {
         ]
     }
 
+
     const onTimes = attendanceData.onTimes
     const lates = attendanceData.lates
     const leaves = attendanceData.leaves
 
+
     // ระเบิด array ตรงนี้คือการเอาข้อมูลใน array พวกนี้มารวมกัน
     const allRecords = [...onTimes, ...lates, ...leaves]
 
-    const [showModal, setShowModal] = useState(false)
-    const [modalData, setModalData] = useState({ title: "", dates: [], color: "" })
 
     // ฟังก์ชันเปิด Modal
     const openModal = (type) => {
@@ -112,6 +118,8 @@ const AttendanceSum = ({ role }) => {
         setModalData(data)
         setShowModal(true)
     }
+
+
 
     // ตัวแสดงวันที่ใน Modal
     const DateGridModal = ({ dates, title, color }) => (
@@ -156,7 +164,10 @@ const AttendanceSum = ({ role }) => {
         </div>
     ) : null
 
-    // ส่วนสรุปผลสำหรับ Approver
+
+
+
+
     const ApprovePage = (
         <div className="app-container">
 
@@ -171,8 +182,9 @@ const AttendanceSum = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
-            {/* แสดงโปรไฟล์พนักงาน (สำหรับ Approver) */}
+            {/* profile พนักงาน */}
             {EmployeeProfile}
+
 
             {/* กล่องใหญ่ */}
             <div className='d-flex justify-content-center mt-6'>
@@ -213,45 +225,42 @@ const AttendanceSum = ({ role }) => {
                 </div>
             </div>
 
-            {/* ดีเทลสถานะ */}
+
+            {/* ดีเทล */}
             <div className='d-flex justify-content-center mt-8 mb-12'>
                 <div className='rounded-3 w-80 p-4'
                     style={{ background: 'linear-gradient(to bottom right, #D9D9D9, #636CCB)' }}>
 
-                    {/* On Time - สีเขียว */}
+                    {/* On Time */}
                     <div id="ontime" className="mb-6">
                         <DateGridModal
                             dates={onTimes}
                             title="On Time Details"
-                            color="#1CA983"
-                        />
+                            color="#1CA983"/>
                     </div>
 
-                    {/* Late - สีแดง */}
+                    {/* Late */}
                     <div id="late" className="mb-6">
                         <DateGridModal
                             dates={lates}
                             title="Late Details"
-                            color="#D06356"
-                        />
+                            color="#D06356"/>
                     </div>
 
-                    {/* Leave - สีเหลือง */}
+                    {/* Leave */}
                     <div id="leave" className="mb-6">
                         <DateGridModal
                             dates={leaves}
                             title="Leave Details"
-                            color="#C7C76E"
-                        />
+                            color="#C7C76E"/>
                     </div>
 
-                    {/* All Records - สีดำ */}
+                    {/* All Records */}
                     <div id="all">
                         <DateGridModal
                             dates={allRecords}
                             title="All Records"
-                            color="#252A46"
-                        />
+                            color="#252A46"/>
                     </div>
 
                 </div>
@@ -259,7 +268,10 @@ const AttendanceSum = ({ role }) => {
         </div>
     )
 
-    // ส่วนสรุปผลสำหรับ User ทั่วไป
+
+    
+
+
     const Userpage = (
         <div className="app-container">
 
@@ -273,6 +285,8 @@ const AttendanceSum = ({ role }) => {
                 <h3 className="fw-bold">Attendance Summary</h3>
                 <div className="me-4"></div>
             </div>
+
+
 
             {/* กล่องใหญ่ */}
             <div className='d-flex justify-content-center mt-10'>
@@ -318,7 +332,10 @@ const AttendanceSum = ({ role }) => {
 
     return (
         <>
+
+
             {role === "approver" ? ApprovePage : Userpage}
+
 
             <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
                 <Modal.Header closeButton className="border-0">
@@ -339,6 +356,8 @@ const AttendanceSum = ({ role }) => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            
         </>
     )
 }
