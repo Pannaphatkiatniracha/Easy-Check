@@ -9,8 +9,10 @@ const InRegister = ({ role }) => {
     const location = useLocation()  // รับข้อมูลจาก state
     const selectedEvent = location.state?.event  //  ข้อมูล event ที่เลือก
 
+
     const [showModal, setShowModal] = useState(false)
     const [notes, setNotes] = useState("") // State สำหรับเก็บหมายเหตุเพิ่มเติม
+
 
     // กำหนด API URL ตาม role
     const getApiUrls = () => {
@@ -27,7 +29,10 @@ const InRegister = ({ role }) => {
         }
     }
 
+
     const apiUrls = getApiUrls()
+
+
 
     // setUser ใช้ตอนเปลี่ยนค่า user
     const [user, setUser] = useState(
@@ -47,6 +52,7 @@ const InRegister = ({ role }) => {
     // const res = await fetch ("") ก็คือให้ res นางเป็นตัวรับค่าข้อมูลในลิ้งมา ซึ่งพอมี await ก็คือบอกให้รอโหลดให้เสร็จก่อนนะ
     // const data = await res.json() ก็คือเอาให้ res แปลงสภาพตัวเองเป็น json แต่อยู่ในนาม data เพราะ res คือตัวแปรข้อมูลดิบ และให้ รอนางแปลงสภาพเสร็จก่อน
 
+
     useEffect(() => {
         const loadData = async () => {
             const res = await fetch(apiUrls.profile)
@@ -63,13 +69,15 @@ const InRegister = ({ role }) => {
         loadData()
     }, [selectedEvent])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
+
+
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
         const registrationData = {
             ...user,
             notes: notes // เพิ่มหมายเหตุในการลงทะเบียน
         }
-        
+
         await fetch(apiUrls.register, {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
@@ -77,6 +85,9 @@ const InRegister = ({ role }) => {
         })
         setShowModal(true)
     }
+
+
+
 
     const UserPage = (
         <div className='app-container'>
@@ -100,6 +111,8 @@ const InRegister = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
+
+
             {/* ข้อมูลอีเว้น */}
             <div className="mt-6">
                 <div className="mb-3 rounded-3 text-black mx-3"
@@ -116,6 +129,7 @@ const InRegister = ({ role }) => {
 
                             </div>
 
+
                             {/* เนื้อหา */}
                             <div className="flex-grow-1">
 
@@ -125,6 +139,7 @@ const InRegister = ({ role }) => {
 
                                 <div className="small mb-2">
                                     <i className="bi bi-calendar3 me-1"></i> วันที่: {selectedEvent?.date} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {selectedEvent?.time} <br />
                                     <i className="bi bi-geo-alt me-1"></i> สถานที่: {selectedEvent?.location}
                                 </div>
 
@@ -178,8 +193,8 @@ const InRegister = ({ role }) => {
                 {/* กล่องหมายเหตุ */}
                 <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
-                    <textarea 
-                        className="rounded-1 form-control fw-semibold" 
+                    <textarea
+                        className="rounded-1 form-control fw-semibold"
                         rows="3"
                         placeholder="เช่น แจ้งอาหารที่แพ้, ข้อจำกัดพิเศษ, หรือคำขอเพิ่มเติม..."
                         value={notes}
@@ -221,6 +236,10 @@ const InRegister = ({ role }) => {
 
         </div>
     )
+
+
+
+
 
     const ApprovePage = (
         <div className='app-container'>
@@ -270,6 +289,7 @@ const InRegister = ({ role }) => {
 
                                 <div className="small mb-2">
                                     <i className="bi bi-calendar3 me-1"></i> วันที่: {selectedEvent?.date} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {selectedEvent?.time} <br />
                                     <i className="bi bi-geo-alt me-1"></i> สถานที่: {selectedEvent?.location}
                                 </div>
 
@@ -324,8 +344,8 @@ const InRegister = ({ role }) => {
                 {/* กล่องหมายเหตุ */}
                 <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
-                    <textarea 
-                        className="rounded-1 form-control fw-semibold" 
+                    <textarea
+                        className="rounded-1 form-control fw-semibold"
                         rows="3"
                         placeholder="เช่น แจ้งอาหารที่แพ้, ข้อจำกัดพิเศษ, หรือคำขอเพิ่มเติม..."
                         value={notes}
