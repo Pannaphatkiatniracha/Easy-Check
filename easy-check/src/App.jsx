@@ -59,8 +59,8 @@ function App() {
               <Route element={<AppNobar />}>
                 <Route path="userprofile" element={<Profile />} />
                 <Route path="approveprofile" element={<ApproveProfile />} />
-                <Route path="inregister" element={<InRegister />} />
-                <Route path="exregister" element={<ExRegister />} />
+                <Route path="inregister" element={<InRegister role={role} />} />
+                <Route path="exregister" element={<ExRegister role={role} />} />
                 <Route path="leaverequest" element={<LeaveRequest />} />
                 <Route path="checkin" element={<CheckIn />} />
                 <Route path="delegateCheckin" element={<DelegateCheckin />} />
@@ -71,14 +71,14 @@ function App() {
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
                 <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
+<<<<<<< HEAD
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
                 <Route path="notification" element={<Notification role={role} />} />
 
+=======
+>>>>>>> c5d4d185e2d495bf3e7ebc855fb1971a2c8e853a
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
-
-                {/* *** NEW PAGES *** */}
-          
                 <Route path="paymentrequest" element={<PaymentRequest />} />
 
                 <Route
