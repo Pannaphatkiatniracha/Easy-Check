@@ -139,14 +139,14 @@ function CheckInOut() {
               onClick={startCamera}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg hover:scale-105 transition transform"
             >
-              <i className="bi bi-camera-video-fill"></i> เปิดกล้อง ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
+              <i className="bi bi-camera-video-fill"></i> Open Camera ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
             </button>
 
             <button
               onClick={capturePhoto}
               className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg hover:scale-105 transition transform"
             >
-              <i className="bi bi-camera-fill"></i> ถ่ายรูป
+              <i className="bi bi-camera-fill"></i> Take a photo
             </button>
           </div>
         </div>
@@ -171,7 +171,7 @@ function CheckInOut() {
           onClick={handleLocation}
           className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg hover:scale-105 transition transform"
         >
-          <i className="bi bi-geo-alt"></i> ขอใช้ตำแหน่ง
+          <i className="bi bi-geo-alt"></i> Request position access
         </button>
 
         {mode !== "done" && (
@@ -187,7 +187,7 @@ function CheckInOut() {
         {checkInData && (
           <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
-              <i className="bi bi-geo-fill"></i> เช็คอิน
+              <i className="bi bi-geo-fill"></i> CheckIn
             </h3>
             <p className="text-white">เวลา: {checkInData.time}</p>
             <img
@@ -201,9 +201,9 @@ function CheckInOut() {
         {checkOutData && (
           <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
-              <i className="bi bi-flag-fill"></i> เช็คเอาท์
+              <i className="bi bi-flag-fill"></i> CheckOut
             </h3>
-            <p className="text-white">เวลา: {checkOutData.time}</p>
+            <p className="text-white">Time: {checkOutData.time}</p>
             <img
               src={URL.createObjectURL(checkOutData.photo)}
               alt="Check-Out"
@@ -226,7 +226,7 @@ function CheckInOut() {
             onClick={handleReset}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg hover:scale-105 transition transform"
           >
-            เริ่มใหม่
+            Reset
           </button>
         )}
 
