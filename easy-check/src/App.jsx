@@ -36,7 +36,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter basename="/easycheck/">
+      <BrowserRouter basename="/easy-check/">
         <Routes>
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
