@@ -1,11 +1,10 @@
 import { Button } from 'react-bootstrap';
 import { Modal } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const InRegister = () => {
+const InRegister = ({ role }) => {
 
 
     const location = useLocation()  // รับข้อมูลจาก state
@@ -13,6 +12,25 @@ const InRegister = () => {
 
 
     const [showModal, setShowModal] = useState(false)
+
+
+    // กำหนด API URL ตาม role
+    const getApiUrls = () => {
+        if (role === "approver") {
+            return {
+                profile: "https://6918ce1c21a9635948713999.mockapi.io/users/1",
+                register: "https://69037e5cd0f10a340b249323.mockapi.io/register/1"
+            }
+        } else {
+            return {
+                profile: "https://68fbd77794ec960660275293.mockapi.io/users/6",
+                register: "https://68fbd77794ec960660275293.mockapi.io/register/1"
+            }
+        }
+    }
+
+    const apiUrls = getApiUrls()
+
 
     // setUser ใช้ตอนเปลี่ยนค่า user
     const [user, setUser] = useState(
@@ -35,7 +53,7 @@ const InRegister = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1")
+            const res = await fetch(apiUrls.profile)
             const data = await res.json()
             setUser({
                 name: data.name || "",
@@ -43,29 +61,17 @@ const InRegister = () => {
                 position: data.position || "",
                 department: data.department || "",
                 branch: data.branch || "",
-                events: data.events || ""
+                events: selectedEvent?.title || ""
             })
         }
         loadData()
-    }, [])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
-
-
-
-    // แก้ข้อมูลใน input
-
-    // เวลามีเปลี่ยนแปลงที่ input จะส่งค่ามาที่ e
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        // ...oldUser  คือเหมือนก็อปสำเนาเก็บไว้ เพราะเราจะเปลี่ยนค่า user โดยใช้ setUser เพื่อเปลี่ยนข้อความในกล่อง input
-        // แต่เพราะว่าอาจจะไม่ใช่ input ทุกตัวที่โดนเปลี่ยนเลยต้องสำเนาตัวเดิมไว้ แล้วแก้เฉพาะ [name]: value นั้น ส่วนตัวอื่นจะยังเหมือนเดิม
-        setUser((oldUSer) => ({ ...oldUSer, [name]: value }))
-    }
+    }, [selectedEvent])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
 
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://68fbd77794ec960660275293.mockapi.io/register/1", {
+        await fetch(apiUrls.register, {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
             body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
@@ -73,8 +79,10 @@ const InRegister = () => {
         setShowModal(true)
     }
 
-    return (
 
+
+
+    const UserPage = (
         <div className='app-container'>
 
 
@@ -98,94 +106,46 @@ const InRegister = () => {
             </div>
 
 
-            {/* form ต่าง ๆ */}
-            {/* ใช้ flex เป็นคอลัมน์ กับให้อยู่กลางแนวนอน */}
+            {/* ลิ้งข้อมูลจาก profile */}
             <div className="d-flex flex-column align-items-center">
 
                 <div className="mt-10 mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
-                    <input className="rounded-1 form-control" type="text" placeholder=''
-                        // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
-                        name='userid' value={user.userid} onChange={handleChange} />
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='userid' value={user.userid} readOnly />
                 </div>
 
 
                 <div className="mb-3 w-75">
                     <label className="text-white fw-light form-label" htmlFor="">Name</label>
-                    <input className="rounded-1 form-control" type="text" placeholder=''
-                        name='name' value={user.name} onChange={handleChange} />
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='name' value={user.name} readOnly />
                 </div>
 
 
                 <div className="mb-3 w-75">
                     <label className="text-white fw-light form-label" htmlFor="">Position</label>
-                    <Form.Select aria-label="Select position"
-                        name='position' value={user.position} onChange={handleChange}>
-                        <option value="Animator">Animator</option>
-                        <option value="Content Creator">Content Creator</option>
-                        <option value="Copywriter">Copywriter</option>
-                        <option value="Brand Manager">Brand Manager</option>
-                        <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
-                        <option value="SEO Specialist">SEO Specialist</option>
-                        <option value="Market Research Analyst">Market Research Analyst</option>
-                        <option value="Account Executive">Account Executive</option>
-                        <option value="Business Development Officer">Business Development Officer</option>
-                        <option value="Database Administrator">Database Administrator</option>
-                        <option value="Network Engineer">Network Engineer</option>
-                        <option value="Software Developer">Software Developer</option>
-                        <option value="Finance Manager">Finance Manager</option>
-                        <option value="Payroll Officer">Payroll Officer</option>
-                        <option value="Customer Service Officer">Customer Service Officer</option>
-                        <option value="Support Specialist">Support Specialist</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='position' value={user.position} readOnly />
                 </div>
 
 
                 <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Department</label>
-                    <Form.Select aria-label="Select department"
-                        name='department' value={user.department} onChange={handleChange}>
-                        <option value="Creative">Creative</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="IT">IT</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Customer Service">Customer Service</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='department' value={user.department} readOnly />
                 </div>
 
 
                 <div className='mb-6 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Branch</label>
-                    <Form.Select aria-label="Select position"
-                        name='branch' value={user.branch} onChange={handleChange}>
-                        <option value="Bangkok">กรุงเทพมหานคร</option>
-                        <option value="ChiangMai">เชียงใหม่</option>
-                        <option value="Phuket">ภูเก็ต</option>
-                        <option value="Chonburi">ชลบุรี</option>
-                        <option value="Khonkaen">ขอนแก่น</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='branch' value={user.branch} readOnly />
                 </div>
 
             </div>
-
-
-            {/* opacity = ความโปร่งความทึบของเส้น */}
-            {/* <hr className="w-100 my-4 border-white opacity-75" /> */}
-
-
-            {/* event ที่เราเลือกลงทะเบียน */}
-            {/* <div className='px-5 mt-2'>
-                <label className="text-white fw-light form-label">Event</label>
-                <div className="bg-light rounded-2 p-3 text-dark">
-                    <b>{selectedEvent?.title || "ไม่ได้เลือก event"}</b>
-                </div>
-
-                <input type="hidden" onChange={handleChange}
-                name='events' value={selectedEvent?.title || ""}/>
-            </div> */}
 
 
             {/* ปุ่ม */}
@@ -205,14 +165,112 @@ const InRegister = () => {
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
-                    {/* <p>Your event registration is complete.</p> */}
-
+                    <p><i>{user.name}</i>registered successfully</p>
                 </Modal.Body>
             </Modal>
 
 
         </div>
     )
+
+
+
+
+    const ApprovePage = (
+        <div className='app-container'>
+
+
+            {/* หัวข้อ */}
+            <div className="d-flex justify-content-between text-white mt-16">
+
+                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
+                <Link to="/internalevent" className='text-decoration-none'>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    </Button>
+                </Link>
+
+                <div className="d-flex flex-column align-items-center">
+                    <h3 className="fw-bold">Register to</h3>
+                    <h5 className="text-white">{selectedEvent?.title}</h5>
+                    <small className="text-warning">👑 Approver</small>
+                </div>
+
+                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
+                <div className="me-4"></div>
+            </div>
+
+
+            {/* ข้อมูลจาก Profile - แสดงอย่างเดียว */}
+            <div className="d-flex flex-column align-items-center">
+
+                <div className="mt-10 mb-3 w-75">
+                    {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
+                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
+                    <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='userid' value={user.userid} readOnly />
+                </div>
+
+
+                <div className="mb-3 w-75">
+                    <label className="text-white fw-light form-label" htmlFor="">Name</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='name' value={user.name} readOnly />
+                </div>
+
+
+                <div className="mb-3 w-75">
+                    <label className="text-white fw-light form-label" htmlFor="">Position</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='position' value={user.position} readOnly />
+                </div>
+
+
+                <div className='mb-3 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Department</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='department' value={user.department} readOnly />
+                </div>
+
+
+                <div className='mb-6 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Branch</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='branch' value={user.branch} readOnly />
+                </div>
+
+            </div>
+
+
+            {/* ปุ่ม */}
+            <div className='text-center mt-12'>
+                <Button className='rounded-5 w-50 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
+                    onClick={handleSave}>DONE</Button>
+            </div>
+
+
+            {/* 
+                centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ
+                backdrop = ให้คลิกด้านนอก modal ก็ปิดตัว modal ได้
+                keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
+             */}
+
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
+                    <h5 className="fw-bold mt-2">You're registered!</h5>
+                    <p className='mt-3'><i>{user.name}</i> registered successfully</p>
+                </Modal.Body>
+            </Modal>
+
+
+        </div>
+    )
+
+
+    return role === "approver" ? ApprovePage : UserPage
+
 }
 
 export default InRegister
