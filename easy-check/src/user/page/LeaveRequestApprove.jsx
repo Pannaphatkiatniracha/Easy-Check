@@ -18,7 +18,7 @@ const initialLeaveRequests = [
   {
     id: 2,
     profile:
-      "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
+      "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
     name: "ฐิติฉัตร ศิริบุตร",
     employeeId: "010101",
     reasons: ["Vacation"],
@@ -30,7 +30,7 @@ const initialLeaveRequests = [
   {
     id: 3,
     profile:
-      "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
+      "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
     name: "ภทรพร แซ่ลี้",
     employeeId: "110400",
     reasons: ["Other"],

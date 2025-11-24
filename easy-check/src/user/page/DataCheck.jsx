@@ -15,13 +15,37 @@ const DataCheck = () => {
             id: 2,
             name: "ฐิติฉัตร ศิริบุตร",
             employeeId: "010101",
-            profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
+            profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
         },
         {
             id: 3,
             name: "ภทรพร แซ่ลี้",
             employeeId: "110400",
-            profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
+            profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
+        },
+        {
+            id: 4,
+            name: "ฐนิก ทรัพย์โนนหวาย",
+            employeeId: "130901",
+            profile: "https://cnc-magazine.oramiland.com/parenting/images/Sungchan_2.width-800.format-webp.webp",
+        },
+        {
+            id: 5,
+            name: "สราสินีย์ บุญมา",
+            employeeId: "030996",
+            profile: "https://pm1.aminoapps.com/7490/987663ecbeba45008c74d8dfc5c7332094bf4780r1-540-515v2_hq.jpg",
+        },
+        {
+            id: 6,
+            name: "กรณ์นภัส เศรษฐรัตนพงศ์",
+            employeeId: "270502",
+            profile: "https://www.workpointtoday.com/_next/image?url=https%3A%2F%2Fimages.workpointtoday.com%2Fworkpointnews%2F2025%2F08%2F22145353%2F1755849232_726522-workpointtoday.webp&w=2048&q=75",
+        },
+        {
+            id: 7,
+            name: "ศิริลักษณ์ คอง",
+            employeeId: "1110495",
+            profile: "https://www.siamzone.com/ig/media/6927166/3418396622193635427-1.jpg",
         },
     ]
 

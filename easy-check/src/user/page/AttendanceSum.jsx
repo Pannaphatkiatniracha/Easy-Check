@@ -334,6 +334,9 @@ const AttendanceSum = ({ role }) => {
                 </div>
             </div>
 
+
+            
+
         </div>
     )
 
@@ -344,7 +347,7 @@ const AttendanceSum = ({ role }) => {
             {role === "approver" ? ApprovePage : Userpage}
 
 
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="sm" centered backdrop={true} keyboard={true}>
                 <Modal.Header closeButton className="border-0">
                     <Modal.Title className="fw-bold">{modalData.title}</Modal.Title>
                 </Modal.Header>
@@ -355,13 +358,13 @@ const AttendanceSum = ({ role }) => {
                         color={modalData.color}
                     />
                 </Modal.Body>
-                <Modal.Footer className="border-0">
+                {/* <Modal.Footer className="border-0">
                     <Button
                         style={{ backgroundColor: '#636CCB', border: 'none' }}
                         onClick={() => setShowModal(false)}>
                         Close
                     </Button>
-                </Modal.Footer>
+                </Modal.Footer> */}
             </Modal>
 
             
