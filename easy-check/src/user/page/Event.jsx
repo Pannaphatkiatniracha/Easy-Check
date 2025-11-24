@@ -8,7 +8,7 @@ const Event = () => {
       {/* สไลด์รูปภาพเลื่อนไปเลื่อนมา */}
       <Carousel>
         <Carousel.Item>
-          <img src="/easycheck/img/blood.png" alt="" />
+          <img src="/easy-check/img/blood.png" alt="" />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
@@ -16,7 +16,7 @@ const Event = () => {
         </Carousel.Item>
 
         <Carousel.Item>
-          <img src="/easycheck/img/mic.webp" alt="" />
+          <img src="/easy-check/img/mic.webp" alt="" />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
@@ -24,7 +24,7 @@ const Event = () => {
         </Carousel.Item>
 
         <Carousel.Item>
-          <img src="/easycheck/img/joy.png" alt="" />
+          <img src="/easy-check/img/joy.png" alt="" />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
