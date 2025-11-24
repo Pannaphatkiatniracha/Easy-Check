@@ -27,7 +27,7 @@ import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
 
-import ApprovePage from "./user/page/ApprovePage";      // KEEP BOTH
+
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 
 function App() {
@@ -75,7 +75,7 @@ function App() {
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
 
                 {/* *** NEW PAGES *** */}
-                <Route path="approvepage" element={<ApprovePage />} />
+          
                 <Route path="paymentrequest" element={<PaymentRequest />} />
 
                 <Route
