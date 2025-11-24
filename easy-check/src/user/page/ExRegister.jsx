@@ -8,9 +8,12 @@ const ExRegister = ({ role }) => {
 
     const location = useLocation() // รับข้อมูลจาก state
     const selectedEvent = location.state?.selectedEvent || "" // ข้อมูล event ที่เลือก
+    const eventData = location.state?.event // ข้อมูลเต็มของ event
+
 
     const [showModal, setShowModal] = useState(false)
     const [notes, setNotes] = useState("") // State สำหรับเก็บหมายเหตุเพิ่มเติม
+
 
     // กำหนด API URL ตาม role
     const getApiUrls = () => {
@@ -27,7 +30,9 @@ const ExRegister = ({ role }) => {
         }
     }
 
+
     const apiUrls = getApiUrls()
+
 
     // setUser ใช้ตอนเปลี่ยนค่า user
     const [user, setUser] = useState(
@@ -47,6 +52,7 @@ const ExRegister = ({ role }) => {
     // const res = await fetch ("") ก็คือให้ res นางเป็นตัวรับค่าข้อมูลในลิ้งมา ซึ่งพอมี await ก็คือบอกให้รอโหลดให้เสร็จก่อนนะ
     // const data = await res.json() ก็คือเอาให้ res แปลงสภาพตัวเองเป็น json แต่อยู่ในนาม data เพราะ res คือตัวแปรข้อมูลดิบ และให้ รอนางแปลงสภาพเสร็จก่อน
 
+
     useEffect(() => {
         const loadData = async () => {
             const res = await fetch(apiUrls.profile)
@@ -62,6 +68,8 @@ const ExRegister = ({ role }) => {
         }
         loadData()
     }, [selectedEvent])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
+
+
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
@@ -127,8 +135,9 @@ const ExRegister = ({ role }) => {
                                 </div>
 
                                 <div className="small mb-2">
-                                    <i className="bi bi-calendar3 me-1"></i> วันที่: ข้อมูลวันที่ <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: ข้อมูลสถานที่
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
                                 </div>
 
                                 <div className="small text-success">
@@ -229,6 +238,7 @@ const ExRegister = ({ role }) => {
 
 
 
+
     const ApprovePage = (
         <div className='app-container'>
 
@@ -276,8 +286,9 @@ const ExRegister = ({ role }) => {
                                 </div>
 
                                 <div className="small mb-2">
-                                    <i className="bi bi-calendar3 me-1"></i> วันที่: ข้อมูลวันที่ <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: ข้อมูลสถานที่
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
                                 </div>
 
                                 <div className="small text-success">
