@@ -26,9 +26,9 @@ import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
-
-
+import ApproverManagement from "./user/page/ApproverManagement";
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
+import Notification from "./user/page/Notification";
 
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token") || "");
@@ -70,6 +70,11 @@ function App() {
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
                 <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
+                
+                {/* Added missing pages */}
+                <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
+                <Route path="notification" element={<Notification role={role} />} />
+
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
