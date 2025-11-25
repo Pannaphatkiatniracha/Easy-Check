@@ -77,7 +77,7 @@ const ExRegister = ({ role }) => {
             ...user,
             notes: notes // เพิ่มหมายเหตุในการลงทะเบียน
         }
-        
+
         await fetch(apiUrls.register, {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
@@ -88,7 +88,7 @@ const ExRegister = ({ role }) => {
 
 
 
-    
+
     const UserPage = (
         <div className='app-container'>
 
@@ -158,7 +158,7 @@ const ExRegister = ({ role }) => {
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
-                    <input className="rounded-1 form-control fw-semibold" type="text" 
+                    <input className="rounded-1 form-control fw-semibold" type="text"
                         name='userid' value={user.userid} readOnly />
                 </div>
 
@@ -186,11 +186,17 @@ const ExRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
+                {/* วันที่ที่ลงอีเว้น */}
+                <div className='mb-3 w-75'>
+                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
+                    <input className='rounded-1 form-control fw-semibold' type="date" />
+                </div>
+
                 {/* กล่องหมายเหตุ */}
                 <div className='mb-6 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
-                    <textarea 
-                        className="rounded-1 form-control fw-semibold" 
+                    <textarea
+                        className="rounded-1 form-control fw-semibold"
                         rows="3"
                         placeholder="เช่น วัตถุประสงค์การเข้าร่วม, รายละเอียดเพิ่มเติม, หรือคำขอพิเศษ..."
                         value={notes}
@@ -309,7 +315,7 @@ const ExRegister = ({ role }) => {
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
-                    <input className="rounded-1 form-control fw-semibold" type="text" 
+                    <input className="rounded-1 form-control fw-semibold" type="text"
                         name='userid' value={user.userid} readOnly />
                 </div>
 
@@ -337,11 +343,16 @@ const ExRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
+                <div className='mb-3 w-75'>
+                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
+                    <input className='rounded-1 form-control fw-semibold' type="date" />
+                </div>
+
                 {/* กล่องหมายเหตุ */}
                 <div className='mb-6 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
-                    <textarea 
-                        className="rounded-1 form-control fw-semibold" 
+                    <textarea
+                        className="rounded-1 form-control fw-semibold"
                         rows="3"
                         placeholder="เช่น วัตถุประสงค์การเข้าร่วม, รายละเอียดเพิ่มเติม, หรือคำขอพิเศษ..."
                         value={notes}

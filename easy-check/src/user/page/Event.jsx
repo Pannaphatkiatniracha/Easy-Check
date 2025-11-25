@@ -9,7 +9,7 @@ const Event = () => {
       <Carousel>
         <Carousel.Item>
           <img
-            src="/easy-check/img/blood.png"
+            src="/easycheck/img/blood.png"
             alt="Blood"
             className="d-block w-100"
           />
@@ -21,7 +21,7 @@ const Event = () => {
 
         <Carousel.Item>
           <img
-            src="/easy-check/img/mic.webp"
+            src="/easycheck/img/mic.webp"
             alt="Mic"
             className="d-block w-100"
           />
@@ -33,7 +33,7 @@ const Event = () => {
 
         <Carousel.Item>
           <img
-            src="/easy-check/img/joy.png"
+            src="/easycheck/img/joy.png"
             alt="Joy"
             className="d-block w-100"
           />

@@ -56,7 +56,7 @@ const Login = ({ setToken, setRole }) => {
 
             {/* profile เปล่า แต่น่าจะเปลี่ยนเป็น logo */}
             <div className="w-25 mx-auto mt-28">
-                <img src="/easy-check/img/who.webp" className="rounded-circle w-100 h-100" />
+                <img src="/easycheck/img/who.webp" className="rounded-circle w-100 h-100" />
             </div>
 
 

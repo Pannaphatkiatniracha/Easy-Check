@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://Pannaphatkiatniracha.github.io/easy-check/",
+  "homepage": "https://Pannaphatkiatniracha.github.io/easycheck/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d ./dist",
