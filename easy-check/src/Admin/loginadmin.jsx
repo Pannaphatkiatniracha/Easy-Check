@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authenticateUser } from '../../data/mockUsers';
-import './loginadmin.css';
+import './Loginadmin.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
