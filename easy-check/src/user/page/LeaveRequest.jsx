@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const LeaveRequest = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     leaveStart: "",
     leaveEnd: "",
@@ -13,41 +15,34 @@ const LeaveRequest = () => {
   });
 
   const leaveOptions = [
-    "Vacation",
-    "Military",
-    "Sick-self",
-    "Sick-family",
+    "Sick Leave",
+    "Personal Leave",
+    "Vacation Leave",
+    "Maternity Leave",
+    "Wedding Leave",
+    "Religious Leave",
     "Other",
   ];
 
-  const handleDateChange = (e) => { //อัปเดตวันที่เริ่มต้นและสิ้นสุดการลา
+  const handleDateChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleReasonChange = (reason) => { // เลือกหรือยกเลิกเหตุผลการลา ถ้าเลือกother จะต้องบอกเหตุผล
+  const handleReasonChange = (reason) => {
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
-
       if (reason === "Other")
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-          otherReasonText: "",
-        });
-      else
-        setFormData({
-          ...formData,
-          leaveReasons: updated,
-        });
+        setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
+      else setFormData({ ...formData, leaveReasons: updated });
     } else {
       updated.push(reason);
       setFormData({ ...formData, leaveReasons: updated });
     }
   };
 
-  const handleEvidenceUpload = (e) => { // อัปโหลดและแสดงภาพตัวอย่าง ใบรับรอง
+  const handleEvidenceUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -63,7 +58,7 @@ const LeaveRequest = () => {
     });
   };
 
-  const handleFileLeave = () => { // ตรวจสอบข้อมูลว่าครบถ้วนไหมก่อนยืนยันคำลา
+  const handleFileLeave = () => {
     if (!formData.leaveStart || !formData.leaveEnd) {
       alert("Please select start and end dates.");
       return;
@@ -74,24 +69,21 @@ const LeaveRequest = () => {
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Other") &&
-      !formData.otherReasonText.trim()
-    ) {
-      alert("Please provide reason for 'Other'.");
+    if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
+      alert("Please provide a reason for 'Other'.");
       return;
     }
 
-    if (
-      formData.leaveReasons.includes("Sick-self") &&
-      !formData.evidenceFile
-    ) {
-      alert("กรุณาแนบรูปใบรับรองแพทย์");
+    if (formData.leaveReasons.includes("Sick Leave") && !formData.evidenceFile) {
+      alert("Please attach a medical certificate.");
       return;
     }
 
     alert("Leave filed successfully!");
     console.log(formData);
+
+    // Navigate back to previous page
+    navigate(-1);
   };
 
   return (
@@ -105,7 +97,7 @@ const LeaveRequest = () => {
         </div>
 
         {/* Header */}
-        <h2 className="text-center text-3xl font-bold text-[#FFFFFF] drop-shadow-lg py-4 rounded-xl bg-white/10 backdrop-blur-md shadow-lg font-inter">
+        <h2 className="text-center text-3xl font-bold text-[#FFFFFF] drop-shadow-lg py-4 rounded-xl bg-white/10 backdrop-blur-md shadow-lg">
           LEAVE REQUEST
         </h2>
 
@@ -184,10 +176,10 @@ const LeaveRequest = () => {
           )}
         </div>
 
-        {/* ⭐ Compact Evidence Upload */}
+        {/* Evidence Upload */}
         <div>
           <label className="block font-semibold mb-2 text-white">
-            Attach Evidence (ถ้ามี)
+            Attach Evidence (if any)
           </label>
 
           <div className="relative border-2 border-dashed border-white/50 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:border-[#636CCB] transition-all max-w-sm">

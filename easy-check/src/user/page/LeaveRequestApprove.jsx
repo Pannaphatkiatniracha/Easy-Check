@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
-const initialLeaveRequests = [  // ข้อมูลคำลา ชื่อพนักงาน รหัสไอดี เหตุผลการลา วันที่เริ่มต้นลา-วันสิ้นสุดการลา รูปภาพแนบ เหตุผล
+const initialLeaveRequests = [
   {
     id: 1,
     profile:
@@ -17,8 +16,7 @@ const initialLeaveRequests = [  // ข้อมูลคำลา ชื่อ�
   },
   {
     id: 2,
-    profile:
-      "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg",
+    profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
     name: "ฐิติฉัตร ศิริบุตร",
     employeeId: "010101",
     reasons: ["Vacation"],
@@ -27,12 +25,22 @@ const initialLeaveRequests = [  // ข้อมูลคำลา ชื่อ�
     otherReason: "",
     evidencePreview: null,
   },
-  {
+   {
     id: 3,
-    profile:
-      "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg",
+    profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
     name: "ภทรพร แซ่ลี้",
     employeeId: "110400",
+    reasons: ["Vacation"],
+    leaveStart: "2025-11-25",
+    leaveEnd: "2025-11-27",
+    otherReason: "",
+    evidencePreview: null,
+  },
+  {
+    id: 4,
+    profile: "https://i.pinimg.com/736x/da/73/d2/da73d286b8d797a0f085220cb2a83280.jpg",
+    name: "สราศินีย์ บุญมา",
+    employeeId: "010101",
     reasons: ["Other"],
     leaveStart: "2025-11-15",
     leaveEnd: "2025-11-16",
@@ -40,169 +48,188 @@ const initialLeaveRequests = [  // ข้อมูลคำลา ชื่อ�
     evidencePreview: null,
   },
 ];
-
-function LeaveRequestApprove() { 
-  const [requests, setRequests] = useState(initialLeaveRequests); //เก็บคำลางานที่ยังไม่ได้กดรับ การอนุมัติ ไม่อนุมัติ
-  const [approved, setApproved] = useState([]); //ได้รับการอนุมัติ
-  const [rejected, setRejected] = useState([]); //ไม่ได้รับการอนุมัติ
+function LeaveRequestApprove() {
+  const [requests, setRequests] = useState(initialLeaveRequests);
+  const [approved, setApproved] = useState([]);
+  const [rejected, setRejected] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
-
-  const handleApprove = (req) => {  //อนุมัติ
+  const handleApprove = (req) => {
     setApproved([...approved, req]);
     setRequests(requests.filter((r) => r.id !== req.id));
   };
-
-  const handleReject = (req) => { //ไม่อนุมัติ
+  const handleReject = (req) => {
     setRejected([...rejected, req]);
     setRequests(requests.filter((r) => r.id !== req.id));
   };
-
   return (
     <div
-      className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center"
+      className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center relative overflow-hidden"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      {/* Header */}
+      {" "}
+      {/* Header */}{" "}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <Link to="/home" className="text-white text-2xl">
-          <i className="bi bi-chevron-left"></i>
-        </Link>
-
+        {" "}
+        <Link
+          to="/home"
+          className="text-white text-2xl hover:scale-110 transition"
+        >
+          {" "}
+          <i className="bi bi-chevron-left"></i>{" "}
+        </Link>{" "}
         <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
-          LEAVE APPROVE
-        </h1>
-
-        <div className="w-8" />
-      </div>
-
-      {/* Leave Request Cards */}
-      <div className="max-w-md w-full space-y-4">
+          {" "}
+          LEAVE APPROVE{" "}
+        </h1>{" "}
+        <div className="w-8" />{" "}
+      </div>{" "}
+      {/* Leave Request Cards */}{" "}
+      <div className="max-w-md w-full space-y-5">
+        {" "}
         {requests.map((req) => (
           <div
             key={req.id}
-            className="bg-white rounded-2xl p-3 shadow-md flex items-center gap-3"
+            className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-200 transform hover:-translate-y-2 hover:shadow-lg transition duration-300 flex items-center gap-3"
           >
-            {/* Profile Image */}
+            {" "}
+            {/* Profile */}{" "}
             <img
               src={req.profile}
-              alt="profile"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-
-            {/* Text Info */}
+              alt={req.name}
+              className="w-14 h-14 rounded-full border-2 border-[#ff00c8] object-cover"
+            />{" "}
+            {/* Info */}{" "}
             <div className="flex-1">
-              <div className="text-gray-800 font-semibold">{req.name}</div>
-              <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
-              <div className="text-xs text-gray-600">
+              {" "}
+              <div className="font-semibold text-gray-900 text-lg">
+                {req.name}
+              </div>{" "}
+              <div className="text-xs text-gray-500">ID: {req.employeeId}</div>{" "}
+              <div className="text-xs text-gray-700 mt-1">
+                {" "}
                 {req.reasons.includes("Other")
                   ? req.otherReason
-                  : req.reasons.join(", ")}
-              </div>
-
-              {/* View Evidence */}
+                  : req.reasons.join(", ")}{" "}
+              </div>{" "}
+              <div className="text-xs text-gray-700">
+                {" "}
+                วันที่ลา: {req.leaveStart} → {req.leaveEnd}{" "}
+              </div>{" "}
+              {/* Evidence */}{" "}
               {req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
-                  className="mt-2 text-blue-500 underline text-xs font-medium"
+                  className="mt-2 text-blue-500 underline text-xs font-medium hover:text-blue-700"
                 >
-                  ดูรูปแนบ
+                  {" "}
+                  ดูรูปแนบ{" "}
                 </button>
-              )}
-            </div>
-
-            {/* Approve / Reject Buttons */}
-            {/* Approve / Reject Buttons */}
-            <div className="flex flex-row gap-2 items-center">
+              )}{" "}
+            </div>{" "}
+            {/* Buttons */}{" "}
+            <div className="flex flex-col gap-2">
+              {" "}
               <button
                 onClick={() => handleApprove(req)}
-                className="px-3 py-1 rounded-full bg-[#59EA78] text-white text-xs font-semibold shadow"
+                className="px-3 py-1 rounded-full bg-gradient-to-r from-[#34ffb9] to-[#12c27e] text-black font-semibold text-xs shadow hover:shadow-[0_0_18px_#34ffb9] transition"
               >
-                อนุมัติ
-              </button>
+                {" "}
+                อนุมัติ{" "}
+              </button>{" "}
               <button
                 onClick={() => handleReject(req)}
-                className="px-3 py-1 rounded-full bg-[#DF4E4E] text-white text-xs font-semibold shadow"
+                className="px-3 py-1 rounded-full bg-gradient-to-r from-[#ff5b5b] to-[#c71616] text-white font-semibold text-xs shadow hover:shadow-[0_0_18px_#ff5b5b] transition"
               >
-                ไม่อนุมัติ
-              </button>
-            </div>
+                {" "}
+                ไม่อนุมัติ{" "}
+              </button>{" "}
+            </div>{" "}
           </div>
-        ))}
-      </div>
-
-      {/* Evidence Modal */}
+        ))}{" "}
+      </div>{" "}
+      {/* Evidence Modal */}{" "}
       {selectedEvidence && (
         <div
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedEvidence(null)}
         >
+          {" "}
           <div
             className="bg-white rounded-lg max-w-lg w-full overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-end p-2 border-b">
+            {" "}
+            <div className="flex justify-end p-2 border-b border-gray-300">
+              {" "}
               <button
                 onClick={() => setSelectedEvidence(null)}
                 className="text-lg font-bold"
               >
-                ✕
-              </button>
-            </div>
+                {" "}
+                ✕{" "}
+              </button>{" "}
+            </div>{" "}
             <img
               src={selectedEvidence}
               alt="evidence"
               className="w-full h-auto object-cover rounded-b-lg"
-            />
-          </div>
+            />{" "}
+          </div>{" "}
         </div>
-      )}
-
-      {/* Summary: แยกกล่องแต่ละคน + Header มีกล่อง */}
-      <div className="max-w-md w-full mt-6 space-y-4">
-        {/* Approved */}
+      )}{" "}
+      {/* Approved / Rejected Summary */}{" "}
+      <div className="max-w-md w-full mt-8 space-y-4">
+        {" "}
         {approved.length > 0 && (
           <div>
-            <div className="inline-block bg-green-100 text-green-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
-              อนุมัติแล้ว
-            </div>
+            {" "}
+            <div className="inline-block bg-green-400/20 text-green-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+              {" "}
+              อนุมัติแล้ว{" "}
+            </div>{" "}
             <div className="space-y-2">
+              {" "}
               {approved.map((r) => (
                 <div
                   key={r.id}
-                  className="bg-green-50 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                  className="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center"
                 >
-                  <span className="text-green-800 font-medium">
-                    {r.name} ({r.leaveStart} → {r.leaveEnd})
-                  </span>
+                  {" "}
+                  <span className="text-gray-900 font-medium">
+                    {" "}
+                    {r.name} ({r.leaveStart} → {r.leaveEnd}){" "}
+                  </span>{" "}
                 </div>
-              ))}
-            </div>
+              ))}{" "}
+            </div>{" "}
           </div>
-        )}
-
-        {/* Rejected */}
+        )}{" "}
         {rejected.length > 0 && (
           <div>
-            <div className="inline-block bg-red-100 text-red-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
-              ไม่อนุมัติ
-            </div>
+            {" "}
+            <div className="inline-block bg-red-400/20 text-red-800 font-semibold text-lg px-3 py-1 rounded-md mb-2">
+              {" "}
+              ไม่อนุมัติ{" "}
+            </div>{" "}
             <div className="space-y-2">
+              {" "}
               {rejected.map((r) => (
                 <div
                   key={r.id}
-                  className="bg-red-50 p-3 rounded-xl shadow-sm flex justify-between items-center"
+                  className="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center"
                 >
-                  <span className="text-red-800 font-medium">
-                    {r.name} ({r.leaveStart} → {r.leaveEnd})
-                  </span>
+                  {" "}
+                  <span className="text-gray-900 font-medium">
+                    {" "}
+                    {r.name} ({r.leaveStart} → {r.leaveEnd}){" "}
+                  </span>{" "}
                 </div>
-              ))}
-            </div>
+              ))}{" "}
+            </div>{" "}
           </div>
-        )}
-      </div>
+        )}{" "}
+      </div>{" "}
     </div>
   );
 }
-
 export default LeaveRequestApprove;

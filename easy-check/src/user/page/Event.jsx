@@ -5,10 +5,14 @@ const Event = () => {
   return (
     <div>
 
-      {/* สไลด์รูปภาพเลื่อนไปเลื่อนมา */}
+      {/* สไลด์รูปภาพ */}
       <Carousel>
         <Carousel.Item>
-          <img src="/easycheck/img/blood.png" alt="" />
+          <img
+            src="/easy-check/img/blood.png"
+            alt="Blood"
+            className="d-block w-100"
+          />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
@@ -16,7 +20,11 @@ const Event = () => {
         </Carousel.Item>
 
         <Carousel.Item>
-          <img src="/easycheck/img/mic.webp" alt="" />
+          <img
+            src="/easy-check/img/mic.webp"
+            alt="Mic"
+            className="d-block w-100"
+          />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
@@ -24,7 +32,11 @@ const Event = () => {
         </Carousel.Item>
 
         <Carousel.Item>
-          <img src="/easycheck/img/joy.png" alt="" />
+          <img
+            src="/easy-check/img/joy.png"
+            alt="Joy"
+            className="d-block w-100"
+          />
           <Carousel.Caption>
             <h1 className='fw-bold'>EVENT</h1>
             <p>กำลังจะเปิดให้ลงทะเบียนเร็ว ๆ นี้</p>
@@ -35,112 +47,43 @@ const Event = () => {
 
 
 
-
-      <div className="mt-24">
-
-        {/* internal */}
-        <div className="position-relative overflow-hidden"
-            style={{background: 'linear-gradient(135deg, rgba(217, 217, 217, 0.7), rgba(99, 108, 203, 0.5))',
-              minHeight: '120px'}}>
-
-            <div className="container-fluid">
-              <div className="row align-items-center h-100 py-4">
-
-                {/* icon + กล่อง */}
-                <div className="col-10">
-                  <div className="d-flex align-items-center">
-
-                    <div className="me-4">
-                      <i className="bi bi-building-fill fs-1 text-dark"></i>
-                    </div>
-
-                    <div>
-                      <h4 className="fw-bold text-dark mb-1">Internal Event</h4>
-                      <p className="text-dark opacity-75 mb-0">กิจกรรมภายในองค์กร</p>
-                    </div>
-
-                  </div>
-
-                </div>
-
-
-                {/* icon */}
-              <div className="col-1">
-                <Link to="/internalevent" className="text-decoration-none">
-
-                  <div className="d-flex justify-content-end align-items-center ps-4">
-                    <div className="d-inline-block 
-                    hover:rotate-90 transition-transform duration-300 ease-out">
-
-                      <i className="bi bi-arrow-right-circle-fill fs-2 text-dark"></i>
-                    
-                    </div>
-                  </div>
-
-                </Link>
-              </div>
-
-              </div>
+      {/* Internal Event */}
+      <div className="w-80 mx-auto mb-6 mt-24">
+        <Link to="/internalevent" className="text-decoration-none group">
+          <div className="relative backdrop-blur-xl rounded-3 shadow-2xl 
+          p-4 flex items-center gap-4 transform transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_25px_#7f5cff] w-full h-24"
+          style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+            
+            <i className="bi bi-building-fill text-3xl text-black flex-shrink-0"></i>
+            <div className="flex-1">
+              <h4 className="font-bold text-black text-lg">Internal Event</h4>
+              {/* <p className="text-gray-600 text-sm">กิจกรรมภายในองค์กร</p> */}
             </div>
-
+            <i className="bi bi-arrow-right-circle-fill text-2xl text-black ml-auto transition-transform duration-300 group-hover:rotate-90 flex-shrink-0"></i>
           </div>
+        </Link>
+      </div>
 
 
-
-
-        {/* external */}
-        <div className="position-relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(to bottom, rgba(217, 217, 217, 0.7), rgba(99, 108, 203, 0.5))',
-            minHeight: '120px'
-          }}>
-
-          <div className="container-fluid">
-            <div className="row align-items-center h-100 py-4">
-
-              {/* icon + กล่อง */}
-              <div className="col-10">
-                <div className="d-flex align-items-center">
-
-                  <div className="me-4">
-                    <i className="bi bi-globe2 fs-1 text-dark"></i>
-                  </div>
-
-                  <div>
-                    <h4 className="fw-bold text-dark mb-1">External Event</h4>
-                    <p className="text-dark opacity-75 mb-0">กิจกรรมภายนอกองค์กร</p>
-                  </div>
-
-                </div>
-
-              </div>
-
-
-              {/* icon */}
-              <div className="col-1">
-                <Link to="/externalevent" className="text-decoration-none">
-
-                  <div className="d-flex justify-content-end align-items-center ps-4">
-                    <div className="d-inline-block 
-                    hover:rotate-90 transition-transform duration-300 ease-out">
-                      
-                      <i className="bi bi-arrow-right-circle-fill fs-2 text-dark"></i>
-                    </div>
-
-                  </div>
-
-                </Link>
-              </div>
-
+      {/* External Event */}
+      <div className="w-80 mx-auto">
+        <Link to="/externalevent" className="text-decoration-none group">
+          <div className="relative backdrop-blur-xl rounded-3 shadow-2xl
+          p-4 flex items-center gap-4 transform transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_25px_#7f5cff] w-full h-24"
+          style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+            
+            <i className="bi bi-globe2 text-3xl text-black flex-shrink-0"></i>
+            <div className="flex-1">
+              <h4 className="font-bold text-gray-800 text-lg">External Event</h4>
+              {/* <p className="text-gray-600 text-sm">กิจกรรมภายนอกองค์กร</p> */}
             </div>
+            <i className="bi bi-arrow-right-circle-fill text-2xl text-black ml-auto transition-transform duration-300 group-hover:rotate-90 flex-shrink-0"></i>
           </div>
-
-        </div>
-
+        </Link>
       </div>
 
     </div>
-  )
+  );
 }
 
-export default Event
+export default Event;
