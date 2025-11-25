@@ -190,6 +190,11 @@ const InRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
+                <div className='mb-3 w-75'>
+                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
+                    <input className='rounded-1 form-control fw-semibold' type="date" />
+                </div>
+
                 {/* กล่องหมายเหตุ */}
                 <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
@@ -337,6 +342,12 @@ const InRegister = ({ role }) => {
                     <label className="text-white fw-light form-label" htmlFor="">Branch</label>
                     <input className="rounded-1 form-control fw-semibold" type="text"
                         name='branch' value={user.branch} readOnly />
+                </div>
+
+
+                <div className='mb-3 w-75'>
+                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
+                    <input className='rounded-1 form-control fw-semibold' type="date" />
                 </div>
 
 
