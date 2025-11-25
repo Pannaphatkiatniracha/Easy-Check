@@ -25,6 +25,7 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
+import DataToCheck from "./user/page/DataToCheck";
 
 
 
@@ -79,7 +80,6 @@ function App() {
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
-              
                 <Route path="attendancesummary" element={<AttendanceSum
                 role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker
@@ -91,8 +91,13 @@ function App() {
                       ? <DataCheck role={role} /> 
                       : <Navigate to="/home" replace />
                 } />
-
+                <Route path="datatocheck" element={
+                    role === "approver" 
+                      ? <DataToCheck role={role} /> 
+                      : <Navigate to="/home" replace />
+                } />
               </Route>
+
             </>
           )}
         </Routes>
