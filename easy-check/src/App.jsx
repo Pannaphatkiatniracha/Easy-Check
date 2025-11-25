@@ -25,7 +25,15 @@ import CheckApporve from "./user/page/CheckApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
+<<<<<<< HEAD
 import DataToCheck from "./user/page/DataToCheck";
+=======
+import Settings from "./Admin/Settings";
+import CreateEvent from "./Admin/CreateEvent";
+import AdminPrivacyPolicy from "./Admin/AdminPrivacyPolicy";
+import AccessControl from "./Admin/AccessControl";
+import ShiftSchedule from "./Admin/ShiftSchedule";
+>>>>>>> d46f83624e1f5b5c79dd5e52eb6e8e7cbaf9a63a
 
 
 
@@ -60,10 +68,10 @@ function App() {
             <>
               <Route element={<AppLayout />}>
                 <Route path="home" element={<Home
-                role={role} />} />
+                  role={role} />} />
                 <Route path="event" element={<Event />} />
                 <Route path="setting" element={<Setting
-                role={role} setToken={setToken} setRole={setRole} />} />
+                  role={role} setToken={setToken} setRole={setRole} />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 
@@ -80,16 +88,30 @@ function App() {
                 <Route path="internalevent" element={<InternalEvent />} />
                 <Route path="externalevent" element={<ExternalEvent />} />
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
+<<<<<<< HEAD
+=======
+
+
+                <Route path='settings' element={<Settings />} />
+                <Route path='createevent' element={<CreateEvent />} />
+                <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy />} />
+                <Route path='accesscontrol' element={<AccessControl />} />
+                <Route path='shiftschedule' element={<ShiftSchedule />} />
+
+
+
+>>>>>>> d46f83624e1f5b5c79dd5e52eb6e8e7cbaf9a63a
                 <Route path="attendancesummary" element={<AttendanceSum
-                role={role} />} />
+                  role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker
-                role={role} />} />
+                  role={role} />} />
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+
                 <Route path="datacheck" element={
-                    role === "approver" 
-                      ? <DataCheck role={role} /> 
-                      : <Navigate to="/home" replace />
+                  role === "approver"
+                    ? <DataCheck role={role} />
+                    : <Navigate to="/home" replace />
                 } />
                 <Route path="datatocheck" element={
                     role === "approver" 

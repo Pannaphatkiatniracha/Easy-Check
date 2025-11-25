@@ -1,0 +1,29 @@
+
+.table {
+  color: #ffffff !important;        /* เปลี่ยนสีตัวอักษรทั้งตาราง */
+  background-color: transparent !important;
+  font-weight: 400 !important;  /* พื้นหลังโปร่งใส */
+}
+
+.table th,
+.table td {
+  color: #ffffff !important;        /* บังคับสีตัวอักษรใน cell */
+  background-color: transparent !important; 
+}
+
+.table,
+.table th,
+.table td,
+.table tr {
+  border: none !important;
+} 
+/* ลบเส้นในขอบตาราง */
+
+
+.dropdown-toggle {
+  width: 100% !important; /* กำหนดความกว้างให้เต็ม */
+  display: flex !important;
+  justify-content: space-between; /* title ชิดซ้าย, caret ชิดขวา */
+  align-items: center;
+  text-align: left; /* ให้ข้อความชิดซ้าย */
+}
