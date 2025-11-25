@@ -81,7 +81,7 @@ const ApproveProfile = () => {
     
     
     return (
-                <div className="app-container">
+        <div className="app-container">
 
 
             {/* <div className="text-center text-white mt-16">
@@ -108,8 +108,13 @@ const ApproveProfile = () => {
 
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
-            <div className="w-25 mx-auto mt-6 position-relative">
-                <img src={user.avatar} className="rounded-circle w-100 h-100" />
+            {/* เปลี่ยนจาก w-25 เป็นการกำหนด width และ height แบบ fixed */}
+            <div className="mx-auto mt-6 position-relative"
+                style={{width: "100px", height: "100px"}}>
+
+                {/* objectFit: "cover" = ไม่ให้รูปโดนบีบ */}
+                <img src={user.avatar} className="rounded-circle w-100 h-100" 
+                style={{width: "100%", height: "100%", objectFit: "cover"}}/>
 
 
                 {/* icon edit */}
