@@ -186,6 +186,7 @@ const ExRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
+                {/* วันที่ที่ลงอีเว้น */}
                 <div className='mb-3 w-75'>
                     <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
                     <input className='rounded-1 form-control fw-semibold' type="date" />
