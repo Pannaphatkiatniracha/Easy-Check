@@ -64,7 +64,7 @@ const DataCheck = () => {
                     </Button>
                 </Link>
 
-                <h3 className="fw-bold">Status Check</h3>
+                <h3 className="fw-bold">Attendance Check</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
