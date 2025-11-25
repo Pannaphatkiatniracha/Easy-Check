@@ -1,18 +1,37 @@
 import { Button } from 'react-bootstrap';
 import { Modal } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const ExRegister = () => {
-
+const ExRegister = ({ role }) => {
 
     const location = useLocation() // รับข้อมูลจาก state
     const selectedEvent = location.state?.selectedEvent || "" // ข้อมูล event ที่เลือก
+    const eventData = location.state?.event // ข้อมูลเต็มของ event
 
 
     const [showModal, setShowModal] = useState(false)
+    const [notes, setNotes] = useState("") // State สำหรับเก็บหมายเหตุเพิ่มเติม
+
+
+    // กำหนด API URL ตาม role
+    const getApiUrls = () => {
+        if (role === "approver") {
+            return {
+                profile: "https://6918ce1c21a9635948713999.mockapi.io/users/1",
+                register: "https://69037e5cd0f10a340b249323.mockapi.io/register/1"
+            }
+        } else {
+            return {
+                profile: "https://68fbd77794ec960660275293.mockapi.io/users/6",
+                register: "https://69037e5cd0f10a340b249323.mockapi.io/register/1"
+            }
+        }
+    }
+
+
+    const apiUrls = getApiUrls()
 
 
     // setUser ใช้ตอนเปลี่ยนค่า user
@@ -36,7 +55,7 @@ const ExRegister = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const res = await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1")
+            const res = await fetch(apiUrls.profile)
             const data = await res.json()
             setUser({
                 name: data.name || "",
@@ -44,40 +63,34 @@ const ExRegister = () => {
                 position: data.position || "",
                 department: data.department || "",
                 branch: data.branch || "",
-                events: data.events || ""
+                events: selectedEvent || ""
             })
         }
         loadData()
-    }, [])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
-
-
-
-    // แก้ข้อมูลใน input
-
-    // เวลามีเปลี่ยนแปลงที่ input จะส่งค่ามาที่ e
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        // ...oldUser  คือเหมือนก็อปสำเนาเก็บไว้ เพราะเราจะเปลี่ยนค่า user โดยใช้ setUser เพื่อเปลี่ยนข้อความในกล่อง input
-        // แต่เพราะว่าอาจจะไม่ใช่ input ทุกตัวที่โดนเปลี่ยนเลยต้องสำเนาตัวเดิมไว้ แล้วแก้เฉพาะ [name]: value นั้น ส่วนตัวอื่นจะยังเหมือนเดิม
-        setUser((oldUser) => ({ ...oldUser, [name]: value }))
-    }
+    }, [selectedEvent])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
 
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://69037e5cd0f10a340b249323.mockapi.io/register/1", {
+        const registrationData = {
+            ...user,
+            notes: notes // เพิ่มหมายเหตุในการลงทะเบียน
+        }
+        
+        await fetch(apiUrls.register, {
             method: "PUT", // อัปเดต
             headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
-            body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
+            body: JSON.stringify(registrationData),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
         })
         setShowModal(true)
     }
 
-    return (
 
+
+    
+    const UserPage = (
         <div className='app-container'>
-
 
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
@@ -89,108 +102,113 @@ const ExRegister = () => {
                     </Button>
                 </Link>
 
-                <h3 className="fw-bold">Register</h3>
+                <div className="d-flex flex-column align-items-center">
+                    <h3 className="fw-bold">Register to</h3>
+                    <h5 className="text-white mb-0">{selectedEvent}</h5>
+                </div>
+
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
 
+            {/* ข้อมูลอีเว้น*/}
+            <div className="mt-6">
+                <div className="mb-3 rounded-3 text-black mx-3"
+                    style={{ backgroundColor: '#D9D9D9' }}>
 
-            {/* form ต่าง ๆ */}
-            {/* ใช้ flex เป็นคอลัมน์ กับให้อยู่กลางแนวนอน */}
-            <div className="d-flex flex-column align-items-center">
+                    <div className="p-3">
+                        <div className="d-flex align-items-start">
 
-                <div className="mt-4 mb-3 w-75">
+                            {/* icon  */}
+                            <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
+                                style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
+
+                                <i className="bi bi-calendar-event fs-5 text-[#6D29F6]"></i>
+
+                            </div>
+
+                            {/* เนื้อหา */}
+                            <div className="flex-grow-1">
+
+                                <div className="h6 mb-2">
+                                    <b>{selectedEvent}</b>
+                                </div>
+
+                                <div className="small mb-2">
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
+                                </div>
+
+                                <div className="small text-success">
+                                    <i className="bi bi-globe me-1"></i> External Event
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ข้อมูลที่ลิ้งมาจาก profile */}
+            <div className="d-flex flex-column align-items-center mt-6">
+
+                <div className="mb-3 w-75">
                     {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
                     ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
-                    <input className="rounded-1 form-control" type="text" placeholder=''
-                        // onChange คือเวลาเปลี่ยนค่าอะไรให้ใช้ function handleChange 
-                        name='userid' value={user.userid} onChange={handleChange} />
+                    <input className="rounded-1 form-control fw-semibold" type="text" 
+                        name='userid' value={user.userid} readOnly />
                 </div>
-
 
                 <div className="mb-3 w-75">
                     <label className="text-white fw-light form-label" htmlFor="">Name</label>
-                    <input className="rounded-1 form-control" type="text" placeholder=''
-                        name='name' value={user.name} onChange={handleChange} />
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='name' value={user.name} readOnly />
                 </div>
-
 
                 <div className="mb-3 w-75">
                     <label className="text-white fw-light form-label" htmlFor="">Position</label>
-                    <Form.Select aria-label="Select position"
-                        name='position' value={user.position} onChange={handleChange}>
-                        <option value="Animator">Animator</option>
-                        <option value="Content Creator">Content Creator</option>
-                        <option value="Copywriter">Copywriter</option>
-                        <option value="Brand Manager">Brand Manager</option>
-                        <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
-                        <option value="SEO Specialist">SEO Specialist</option>
-                        <option value="Market Research Analyst">Market Research Analyst</option>
-                        <option value="Account Executive">Account Executive</option>
-                        <option value="Business Development Officer">Business Development Officer</option>
-                        <option value="Database Administrator">Database Administrator</option>
-                        <option value="Network Engineer">Network Engineer</option>
-                        <option value="Software Developer">Software Developer</option>
-                        <option value="Finance Manager">Finance Manager</option>
-                        <option value="Payroll Officer">Payroll Officer</option>
-                        <option value="Customer Service Officer">Customer Service Officer</option>
-                        <option value="Support Specialist">Support Specialist</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='position' value={user.position} readOnly />
                 </div>
-
 
                 <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Department</label>
-                    <Form.Select aria-label="Select department"
-                        name='department' value={user.department} onChange={handleChange}>
-                        <option value="Creative">Creative</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="IT">IT</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Customer Service">Customer Service</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='department' value={user.department} readOnly />
                 </div>
 
-
-                <div className='mb-6 w-75'>
+                <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Branch</label>
-                    <Form.Select aria-label="Select position"
-                        name='branch' value={user.branch} onChange={handleChange}>
-                        <option value="Bangkok">กรุงเทพมหานคร</option>
-                        <option value="ChiangMai">เชียงใหม่</option>
-                        <option value="Phuket">ภูเก็ต</option>
-                        <option value="Chonburi">ชลบุรี</option>
-                        <option value="Khonkaen">ขอนแก่น</option>
-                    </Form.Select>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='branch' value={user.branch} readOnly />
                 </div>
 
-            </div>
-
-
-            {/* opacity = ความโปร่งความทึบของเส้น */}
-            <hr className="w-100 my-4 border-white opacity-75" />
-
-
-            {/* event ที่เราเลือกลงทะเบียน */}
-            <div className='px-5 mt-2'>
-                <label className="text-white fw-light form-label">Event</label>
-                <div className="bg-light rounded-2 p-3 text-dark">
-                    <b>{selectedEvent || "ไม่ได้เลือก event"}</b>
+                {/* กล่องหมายเหตุ */}
+                <div className='mb-6 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
+                    <textarea 
+                        className="rounded-1 form-control fw-semibold" 
+                        rows="3"
+                        placeholder="เช่น วัตถุประสงค์การเข้าร่วม, รายละเอียดเพิ่มเติม, หรือคำขอพิเศษ..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                    />
+                    <div className="form-text text-white-50">
+                        ระบุหมายเหตุเพิ่มเติมเกี่ยวกับการเข้าร่วมงาน (ถ้ามี)
+                    </div>
                 </div>
 
-                <input type="hidden" onChange={handleChange}
-                name='events' value={selectedEvent || ""}/>
             </div>
 
 
             {/* ปุ่ม */}
-            <div className='text-center mt-12'>
+            <div className='text-center mt-12 mb-12'>
                 <Button className='rounded-5 w-50 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
                     onClick={handleSave}>DONE</Button>
             </div>
-
 
             {/* 
                 centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ
@@ -202,13 +220,172 @@ const ExRegister = () => {
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
-                    {/* <p>Your event registration is complete.</p> */}
-
+                    <p><i>{user.name}</i> registered for<br />{selectedEvent}</p>
+                    {notes && (
+                        <div className="mt-3 p-2 bg-light rounded">
+                            <small className="text-muted">
+                                <strong>หมายเหตุ:</strong> {notes}
+                            </small>
+                        </div>
+                    )}
                 </Modal.Body>
             </Modal>
 
         </div>
     )
+
+
+
+
+
+
+    const ApprovePage = (
+        <div className='app-container'>
+
+            {/* หัวข้อ */}
+            <div className="d-flex justify-content-between text-white mt-16">
+
+                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
+                <Link to="/externalevent" className='text-decoration-none'>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    </Button>
+                </Link>
+
+                <div className="d-flex flex-column align-items-center">
+                    <h3 className="fw-bold">Register to</h3>
+                    <h5 className="text-white">{selectedEvent}</h5>
+                    <small className="text-warning">👑 Approver</small>
+                </div>
+
+                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
+                <div className="me-4"></div>
+            </div>
+
+            {/* ข้อมูลอีเว้น*/}
+            <div className="mt-6">
+                <div className="mb-3 rounded-3 text-black mx-3"
+                    style={{ backgroundColor: '#D9D9D9' }}>
+
+                    <div className="p-3">
+                        <div className="d-flex align-items-start">
+
+                            {/* icon  */}
+                            <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
+                                style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
+
+                                <i className="bi bi-calendar-event fs-5 text-[#6D29F6]"></i>
+
+                            </div>
+
+                            {/* เนื้อหา */}
+                            <div className="flex-grow-1">
+
+                                <div className="h6 mb-2">
+                                    <b>{selectedEvent}</b>
+                                </div>
+
+                                <div className="small mb-2">
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
+                                </div>
+
+                                <div className="small text-success">
+                                    <i className="bi bi-globe me-1"></i> External Event
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ข้อมูลที่แสดงลิ้งมาจากหน้า profile */}
+            <div className="d-flex flex-column align-items-center mt-6">
+
+                <div className="mb-3 w-75">
+                    {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
+                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
+                    <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text" 
+                        name='userid' value={user.userid} readOnly />
+                </div>
+
+                <div className="mb-3 w-75">
+                    <label className="text-white fw-light form-label" htmlFor="">Name</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='name' value={user.name} readOnly />
+                </div>
+
+                <div className="mb-3 w-75">
+                    <label className="text-white fw-light form-label" htmlFor="">Position</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='position' value={user.position} readOnly />
+                </div>
+
+                <div className='mb-3 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Department</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='department' value={user.department} readOnly />
+                </div>
+
+                <div className='mb-3 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Branch</label>
+                    <input className="rounded-1 form-control fw-semibold" type="text"
+                        name='branch' value={user.branch} readOnly />
+                </div>
+
+                {/* กล่องหมายเหตุ */}
+                <div className='mb-6 w-75'>
+                    <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
+                    <textarea 
+                        className="rounded-1 form-control fw-semibold" 
+                        rows="3"
+                        placeholder="เช่น วัตถุประสงค์การเข้าร่วม, รายละเอียดเพิ่มเติม, หรือคำขอพิเศษ..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                    />
+                    <div className="form-text text-white-50">
+                        ระบุหมายเหตุเพิ่มเติมเกี่ยวกับการเข้าร่วมงาน (ถ้ามี)
+                    </div>
+                </div>
+
+            </div>
+
+            {/* ปุ่ม */}
+            <div className='text-center mt-12 mb-12'>
+                <Button className='rounded-5 w-50 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
+                    onClick={handleSave}>DONE</Button>
+            </div>
+
+            {/* 
+                centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ
+                backdrop = ให้คลิกด้านนอก modal ก็ปิดตัว modal ได้
+                keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
+             */}
+
+            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
+                    <h5 className="fw-bold mt-2">You're registered!</h5>
+                    <p><i>{user.name}</i> (Approver) registered for<br />{selectedEvent}</p>
+                    {notes && (
+                        <div className="mt-3 p-2 bg-light rounded">
+                            <small className="text-muted">
+                                <strong>หมายเหตุ:</strong> {notes}
+                            </small>
+                        </div>
+                    )}
+                </Modal.Body>
+            </Modal>
+
+        </div>
+    )
+
+    return role === "approver" ? ApprovePage : UserPage
+
 }
 
 export default ExRegister

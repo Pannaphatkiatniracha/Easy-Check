@@ -9,6 +9,7 @@ const InternalEvent = () => {
             id: 1,
             title: "อบรมความปลอดภัยในการทำงาน",
             date: "25 ตุลาคม 2025",
+            time: "09:00 - 12:00",
             location: "ห้องประชุมใหญ่ อาคาร A",
             icon: "bi-shield-check"
         },
@@ -16,6 +17,7 @@ const InternalEvent = () => {
             id: 2,
             title: "บริจาคโลหิตประจำปี", 
             date: "1 พฤศจิกายน 2025",
+            time: "08:30 - 16:00",
             location: "ห้องประชุมกลาง ชั้น 3",
             icon: "bi-droplet"
         },
@@ -23,13 +25,15 @@ const InternalEvent = () => {
             id: 3,
             title: "Workshop การทำงานเป็นทีม",
             date: "5 พฤศจิกายน 2025",
+            time: "13:00 - 17:00",
             location: "ห้องอบรม อาคาร B",
             icon: "bi-people"
         },
         {
             id: 4,
             title: "อบรมการใช้ซอฟต์แวร์ใหม่",
-            date: "10 พฤศจิกายน 2025", 
+            date: "10 พฤศจิกายน 2025",
+            time: "10:00 - 15:00",
             location: "ห้องคอมพิวเตอร์ ชั้น 2",
             icon: "bi-laptop"
         },
@@ -37,6 +41,7 @@ const InternalEvent = () => {
             id: 5,
             title: "กิจกรรมสร้างความสัมพันธ์พนักงาน",
             date: "15 พฤศจิกายน 2025",
+            time: "16:00 - 19:00",
             location: "สวนหย่อม อาคาร A",
             icon: "bi-heart"
         },
@@ -44,6 +49,7 @@ const InternalEvent = () => {
             id: 6,
             title: "งานเปิดตัวสินค้า",
             date: "20 พฤศจิกายน 2025",
+            time: "14:00 - 17:30",
             location: "ห้องประชุม C", 
             icon: "bi-megaphone"
         },
@@ -51,6 +57,7 @@ const InternalEvent = () => {
             id: 7,
             title: "อบรมเทคนิคการสื่อสารภายในองค์กร",
             date: "25 พฤศจิกายน 2025",
+            time: "09:30 - 16:30",
             location: "ห้องประชุมใหญ่ อาคาร A",
             icon: "bi-chat-dots"
         },
@@ -58,6 +65,7 @@ const InternalEvent = () => {
             id: 8,
             title: "กิจกรรมกีฬาเพื่อสุขภาพ", 
             date: "30 พฤศจิกายน 2025",
+            time: "08:00 - 11:00",
             location: "สนามกีฬาในบริษัท",
             icon: "bi-activity"
         },
@@ -65,6 +73,7 @@ const InternalEvent = () => {
             id: 9,
             title: "Workshop การแก้ไขปัญหาเชิงสร้างสรรค์",
             date: "5 ธันวาคม 2025",
+            time: "13:30 - 16:30",
             location: "ห้องอบรม อาคาร B",
             icon: "bi-lightbulb"
         },
@@ -72,10 +81,13 @@ const InternalEvent = () => {
             id: 10,
             title: "งานเลี้ยงบริษัท",
             date: "10 ธันวาคม 2025",
+            time: "18:00 - 21:00",
             location: "ห้องประชุมใหญ่ อาคาร A",
             icon: "bi-cup-straw"
         },
     ]
+
+
 
     return (
         <div className='app-container'>
@@ -90,7 +102,7 @@ const InternalEvent = () => {
                     </Button>
                 </Link>
                 
-                <h3 className="text-white text-center fw-bold">Corporate <br /> internal event</h3>
+                <h3 className="text-white text-center fw-bold">Corporate <br /> Internal event</h3>
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -124,12 +136,16 @@ const InternalEvent = () => {
                                 <div className="flex-grow-1">
 
 
+                                    {/* ชื่ออีเว้น */}
                                     <Card.Title className="h6 mb-2">
                                         <b>{inevent.title}</b>
                                     </Card.Title>
 
+
+                                    {/* รายละเอียดอีเว้น */}
                                     <Card.Text className="small mb-2">
                                         <i className="bi bi-calendar3 me-1"></i> วันที่: {inevent.date} <br />
+                                        <i className="bi bi-clock me-1"></i> เวลา: {inevent.time} <br />
                                         <i className="bi bi-geo-alt me-1"></i> สถานที่: {inevent.location}
                                     </Card.Text>
 

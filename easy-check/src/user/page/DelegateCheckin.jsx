@@ -19,12 +19,12 @@ const DelegateCheckin = () => {
     e.preventDefault();
 
     if (!/^\d{6}$/.test(employeeId)) {
-      setStatus("❌ กรุณากรอกรหัสพนักงาน 6 หลักให้ถูกต้อง");
+      setStatus("❌ Please enter your 6-digit employee ID correctly");
       return;
     }
 
     if (!employees[employeeId]) {
-      setStatus("❌ ไม่พบรหัสพนักงานในระบบ");
+      setStatus("❌ The employee ID was not found in the system");
       return;
     }
 
@@ -68,14 +68,14 @@ const DelegateCheckin = () => {
         <form onSubmit={handleCheckIn} className="space-y-5">
           <div>
             <label className="block text-white text-sm font-semibold mb-2">
-              รหัสพนักงาน 6 หลัก
+              EMPLOYEE ID
             </label>
             <input
               type="text"
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value.replace(/\D/, ""))}
               maxLength={6}
-              placeholder="กรอกรหัสเพื่อน"
+              placeholder="FRIEND'S EMPLOYEE ID 6 DIGITS"
               className="w-full px-4 py-2 rounded-lg bg-white/80 text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#636CCB]"
             />
           </div>
@@ -99,10 +99,10 @@ const DelegateCheckin = () => {
         {/* Checked-in Employee Info */}
         {checkedInEmployee && (
           <div className="mt-4 bg-white/30 p-4 rounded-lg text-center text-white shadow-md">
-            <p className="font-medium">เช็กอินสำเร็จ!</p>
+            <p className="font-medium">Successfully checked in</p>
             <p>ID: {checkedInEmployee.id}</p>
-            <p>ชื่อ: {checkedInEmployee.name}</p>
-            <p>เวลา: {checkedInEmployee.time}</p>
+            <p>Name: {checkedInEmployee.name}</p>
+            <p>Time: {checkedInEmployee.time}</p>
           </div>
         )}
 

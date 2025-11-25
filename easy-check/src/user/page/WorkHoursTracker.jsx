@@ -2,11 +2,45 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const WorkHoursTracker = ({ role }) => {
 
     const location = useLocation()
     const employeeData = location.state?.employeeData
+
+
+    // State สำหรับเก็บข้อมูลผู้ใช้จาก API
+    const [userProfile, setUserProfile] = useState({
+        name: "",
+        userid: "",
+        avatar: ""
+    })
+
+
+    // ดึงข้อมูลผู้ใช้จาก API (สำหรับฝั่ง User)
+    useEffect(() => {
+        const loadUserProfile = async () => {
+            try {
+                const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users/6")
+                const data = await res.json()
+                setUserProfile({
+                    name: data.name || "",
+                    userid: data.userid || "",
+                    avatar: data.avatar || "/easycheck/img/an.jpg"
+                })
+            } catch (error) {
+                console.error("Error loading user profile:", error)
+            }
+        }
+
+        // ถ้าไม่ใช่ approver ให้ไปเอาข้อมูลจาก profile มาแสดง ซึ่งก็คือ user นั่นแหละ
+        if (role !== "approver" && !employeeData) {
+            loadUserProfile()
+        }
+    }, [role, employeeData])
+
+
 
     const weekTemplate = [
         {
@@ -31,7 +65,8 @@ const WorkHoursTracker = ({ role }) => {
         },
     ]
 
-    // mock จำนวนชั่วโมงไว้ก่อน
+
+    // mock จำนวนชั่วโมงไว้ก่อน - เพิ่มข้อมูลให้ครบทุก employeeId
     const hoursMap = {
         "010889": {
             Monday: 7.2,
@@ -53,27 +88,63 @@ const WorkHoursTracker = ({ role }) => {
             Wednesday: 5.9,
             Thursday: 8.3,
             Friday: 7.1,
+        },
+        "130901": {
+            Monday: 8.0,
+            Tuesday: 7.5,
+            Wednesday: 8.2,
+            Thursday: 7.8,
+            Friday: 8.5,
+        },
+        "030996": {
+            Monday: 6.5,
+            Tuesday: 7.8,
+            Wednesday: 8.0,
+            Thursday: 7.2,
+            Friday: 8.3,
+        },
+        "270502": {
+            Monday: 8.2,
+            Tuesday: 8.5,
+            Wednesday: 7.9,
+            Thursday: 8.1,
+            Friday: 8.4,
+        },
+        "1110495": {
+            Monday: 7.8,
+            Tuesday: 8.0,
+            Wednesday: 7.5,
+            Thursday: 8.2,
+            Friday: 7.9,
         }
     }
 
 
     // ให้มันโชว์ข้อมูลตาม ID แต่ถ้าผิดพลาดอะไรก็จะให้แสดงของ 010889 ไปก่อน
-    const hoursData = employeeData
-        ? hoursMap[employeeData.employeeId]
-        : hoursMap["010889"]
+    // ส่วน user ก็ใชที่ลิ้งเอาจาก profile นั่นแหละ
+    const employeeId = employeeData
+        ? employeeData.employeeId
+        : (userProfile.userid || "010889")
+
+
+
+    const hoursData = hoursMap[employeeId] || hoursMap["010889"]
 
 
     // กำหนดชื่อวันโดยเรียงตาม date 0-6
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-    const todayIndex = new Date().getDay()
-    const todayName = dayNames[todayIndex]
+
+    const todayIndex = new Date().getDay()  // วันปัจจุบันจริง ๆ แต่เป็นเลข 0-6
+    const todayName = dayNames[todayIndex]  // วันปัจจุบันที่เป็นชื่อวัน เช่น todayIndex คือ 1 / todayName คือ Monday
+
 
     const MAX_HOURS_PER_DAY = 9
 
     const weeklyData = weekTemplate.map(item => {
 
-        const itemIndex = dayNames.indexOf(item.day)
+        // dayNames.indexOf(item.day) จะได้ ตำแหน่งของวันนั้นในสัปดาห์ เช่นแบบ dayNames.indexOf("Wednesday") คืนค่า 3 
+        const itemIndex = dayNames.indexOf(item.day)  // itemIndex = เลขลำดับวันนั้นๆ
 
         const reached = itemIndex <= todayIndex
         const hoursWorked = reached ? (hoursData[item.day] ?? 0) : 0
@@ -87,45 +158,76 @@ const WorkHoursTracker = ({ role }) => {
         }
     })
 
+
+    // .find() มันคือของอย่างที่แรกที่ระบบเจอและตรงตามเงื่อนไข
+    // today อันนี้คือพอเช็คแล้วว่า d => d.day === todayName ถูกไหม ถ้าถูกมันจะได้ชุดผลลัพธ์ทั้งหมดเลย เช่น วันจันทร์ สีเหลือง 80%
     const today = weeklyData.find(d => d.day === todayName) ?? { hours: 0, percent: 0, color: "#ccc" }
 
+
+    // sum = ผลรวม   day = ของใน array  -------------------- เวลาทำงานจริงจ้า --------------------
+    // .reduce คือการเอาของใน array มาค่อยๆ ทำอะไรสักอย่างกัน โดยส่งผลลัพธ์ไปเรื่อยๆ ในทีนี้คือ บวก
     const workedHours = weeklyData.reduce((sum, day) => {
         return sum + day.hours
-    }, 0)
 
-    const daysWorked = Math.min(todayIndex, 5)
-    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY
+    }, 0)  // 0 ตรงนี้คือให้ sum มีค่าเริ่มต้นเป็น 0
 
+
+    // เอาไว้บอกว่าตอนนี้เราทำงานไปกี่วันแล้ว
+    const workDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    const daysWorked = workDays.filter(day =>
+        dayNames.indexOf(day) <= todayIndex
+    ).length
+    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY  // จำนวนชั่วโมงสูงสุดที่เข้าทำงาน *นับแค่วันที่ทำงานแล้ว*
+
+
+    // สรุปเปอร์เซ็นต์รวม
     const weeklySummaryPercent = maxPossibleHours > 0
-        ? Math.round((workedHours / maxPossibleHours) * 100)
-        : 0
+        // Math.round คือปัดเศษตามค่าความเป็นจริง
+        ? Math.round((workedHours / maxPossibleHours) * 100) : 0 // ถ้าหล่อนไม่เคยทำงานเลยก็ 0 จ่ะ
 
 
-    // โปรไฟล์ของพนักงานคนนั้น ๆ
+    // ส่วนแสดงโปรไฟล์พนักงาน (ใช้ทั้งสองฝั่ง)
     const EmployeeProfile = employeeData ? (
-        <div className='d-flex justify-content-center mt-6'>
-            <div className="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center w-80">
 
+
+        // ฝั่ง approver
+        <div className='d-flex justify-content-center mt-6'>
+            <div className="flex flex-col items-center w-80">
                 <img
                     src={employeeData.profile}
                     alt="profile"
-                    className="w-24 h-24 rounded-full object-cover mb-3"
+                    className="w-28 h-28 rounded-full object-cover mb-3"
                 />
-
-                <div className="text-gray-800 font-semibold fs-5 text-center">
+                <div className="text-white font-semibold fs-5 text-center">
                     {employeeData.name}
                 </div>
-
-                <div className="text-sm text-black text-center">
+                <div className="text-sm text-white text-center">
                     ID: {employeeData.employeeId}
                 </div>
+            </div>
+        </div>
+    ) : userProfile.name ? (
 
+
+        // ฝั่ง user
+        <div className='d-flex justify-content-center mt-6'>
+            <div className="flex flex-col items-center w-80">
+                <img
+                    src={userProfile.avatar}
+                    alt="profile"
+                    className="w-28 h-28 rounded-full object-cover mb-3"
+                />
+                <div className="text-white font-semibold fs-5 text-center">
+                    {userProfile.name}
+                </div>
+                <div className="text-sm text-white text-center">
+                    ID: {userProfile.userid}
+                </div>
             </div>
         </div>
     ) : null
 
 
-    
 
     const ApprovePage = (
 
@@ -145,7 +247,7 @@ const WorkHoursTracker = ({ role }) => {
             </div>
 
 
-            {/* profile พนักงาน */}
+
             {EmployeeProfile}
 
 
@@ -204,6 +306,7 @@ const WorkHoursTracker = ({ role }) => {
                 </div>
             </div>
 
+
             {/* กล่องรวม */}
             <div className='d-flex justify-content-center mt-10 mb-3'>
                 <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80"
@@ -235,7 +338,7 @@ const WorkHoursTracker = ({ role }) => {
     )
 
 
-    
+
 
 
     const Userpage = (
@@ -255,8 +358,11 @@ const WorkHoursTracker = ({ role }) => {
             </div>
 
 
+            {EmployeeProfile}
+
+
             {/* ของวันนี้ */}
-            <div className='d-flex justify-content-center mt-10'>
+            <div className='d-flex justify-content-center mt-6'>
                 <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80"
                     style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
 

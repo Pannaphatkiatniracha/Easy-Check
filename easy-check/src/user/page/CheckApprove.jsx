@@ -4,13 +4,15 @@ import { Link } from 'react-router-dom';
 
 const initialUsers = [
   { id: 1, name: "ปัณณพรรธน์ เกียรตินิรชา", employeeId: "010889", checkInTime: "09:00", profile: "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg", checkInPhoto: "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg" },
-  { id: 2, name: "ฐิติฉัตร ศิริบุตร", employeeId: "010101", checkInTime: "08:30", profile: "https://i.pinimg.com/736x/b4/a4/f1/b4a4f1b302296b6621b89c7d91ee9352.jpg", checkInPhoto: "https://i.redd.it/dte258y55e1c1.jpg" },
-  { id: 3, name: "ภทรพร แซ่ลี้", employeeId: "110400", checkInTime: "10:00", profile: "https://i.pinimg.com/736x/53/e5/ce/53e5ce1aec6f6dec22bb137680163136.jpg", checkInPhoto: "https://i.pinimg.com/736x/f8/d3/15/f8d315c29812464824e8aaf91970be46.jpg" },
+  { id: 2, name: "ฐิติฉัตร ศิริบุตร", employeeId: "010101", checkInTime: "08:30", profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg", checkInPhoto: "https://cdn.mania.kr/nbamania/g2/data/cheditor5/2402/view_thumbnail/mania-done-20240214105503_evzebkmp.jpg" },
+  { id: 3, name: "ภทรพร แซ่ลี้", employeeId: "110400", checkInTime: "10:00", profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large", checkInPhoto: "https://preview.redd.it/250728-karina-instagram-update-v0-7l1e5zr17mff1.jpg?width=640&crop=smart&auto=webp&s=d9ee4d6c794abcdb46210783defb38cf37c30b58" },
+  { id: 4, name: "กรณ์นภัส เศรษฐรัตนพงศ์", employeeId: "270502", checkInTime: "08:59", profile: "https://www.workpointtoday.com/_next/image?url=https%3A%2F%2Fimages.workpointtoday.com%2Fworkpointnews%2F2025%2F08%2F22145353%2F1755849232_726522-workpointtoday.webp&w=2048&q=75", checkInPhoto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS051l6Ix1YkE6dykvsMvYfaKK8F_7CXPCi4T8afAfiLlgwdZ_xxET5QCCD4FCG9iDSaMzl1SRn0Wvo1kUVzpkibqMUaO3nr5QEif7zIA&s=10" },
+  { id: 5, name: "ศิริลักษณ์ คอง", employeeId: "1110495", checkInTime: "11:30", profile: "https://www.siamzone.com/ig/media/6927166/3418396622193635427-1.jpg", checkInPhoto: "https://www.siamzone.com/ig/media/6927166/3507595347554542759-1.jpg" },
 ];
 
 const initialDelegateCheckins = [
-  { id: 1, name: "สราศินีย์ บุญมา", employeeId: "110500" },
-  { id: 2, name: "ฐนิก ทรัพย์โนนหวาย", employeeId: "110600" },
+  { id: 1, name: "สราศินีย์ บุญมา", employeeId: "130901" },
+  { id: 2, name: "ฐนิก ทรัพย์โนนหวาย", employeeId: "030996" },
 ];
 
 const getStatus = (checkIn) => {
