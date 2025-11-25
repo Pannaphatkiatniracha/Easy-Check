@@ -513,12 +513,12 @@ const EmployeeSystem = () => {
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="name">ชื่อ (A-Z)</option>
               <option value="id">รหัสพนักงาน</option>
-              <option value="rating">คะแนนประเมิน (สูง-ต่ำ)</option>
               <option value="workYears">อายุงาน (มาก-น้อย)</option>
               <option value="late">มาสาย (มาก-น้อย)</option>
-            </select>
+              </select>
           </div>
         </div>
+            
       )}
 
       <div className="select-all-container">
