@@ -108,7 +108,7 @@ function App() {
 
 
           {/* ฝั่ง ADMIN */}
-          <Route element={<Sidebar/> }>
+          <Route element={<AppLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
           </Route>
 
