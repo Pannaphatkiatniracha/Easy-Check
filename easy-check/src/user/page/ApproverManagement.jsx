@@ -109,24 +109,24 @@ function ApproverManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] text-white">
-      <div className="max-w-md mx-auto min-h-screen bg-[#3C467B]">
+    <div className="app-container min-h-screen bg-[#3C467B] text-white p-4 sm:p-6 md:p-8">
+      <div className="max-w-md mx-auto min-h-screen">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-6">
+        <div className="flex items-center justify-between py-6">
           <Link to="/home" className="text-white hover:bg-white/10 p-2 rounded-lg transition-all">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-xl font-semibold">Approver Management</h1>
+          <h1 className="text-xl font-semibold text-center flex-1">Approver Management</h1>
           <div className="w-6"></div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 px-4 mb-6">
+        <div className="flex gap-2 mb-6">
           <button
             onClick={() => setTab("manage")}
-            className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+            className={`flex-1 py-3 rounded-xl font-medium transition-all text-sm sm:text-base ${
               tab === "manage" ? "bg-white text-[#3C467B] shadow-lg" : "bg-white/10 text-white/70"
             }`}
           >
@@ -135,7 +135,7 @@ function ApproverManagement() {
 
           <button
             onClick={() => setTab("requests")}
-            className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+            className={`flex-1 py-3 rounded-xl font-medium transition-all text-sm sm:text-base ${
               tab === "requests" ? "bg-white text-[#3C467B] shadow-lg" : "bg-white/10 text-white/70"
             }`}
           >
@@ -145,7 +145,7 @@ function ApproverManagement() {
 
         {/* Manage Tab */}
         {tab === "manage" && (
-          <div className="px-4 space-y-4 pb-6">
+          <div className="space-y-4 pb-6">
             {/* Assign Form */}
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-5">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
@@ -256,7 +256,7 @@ function ApproverManagement() {
 
         {/* Requests Tab */}
         {tab === "requests" && (
-          <div className="px-4 space-y-4 pb-6">
+          <div className="space-y-4 pb-6">
             {/* Requests List styled like Manage Approvers */}
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-5">
               <h2 className="text-lg font-semibold mb-4 text-gray-800">Pending Requests</h2>

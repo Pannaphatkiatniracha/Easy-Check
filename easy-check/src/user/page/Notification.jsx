@@ -32,12 +32,15 @@ const Notification = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] p-6 text-white">
-      {/* Header */}
-      <div className="flex items-center mb-6">
-        <Link to="/home" className="text-white text-2xl">
-          <i className="bi bi-chevron-left"></i>
-        </Link>
+     <div className="app-container min-h-screen bg-[#3C467B] p-4 sm:p-6 md:p-8 flex flex-col items-center relative overflow-hidden">
+          {/* Header */}
+          <div className="w-full max-w-md flex items-center justify-between mb-6">
+            <Link
+              to="/home"
+              className="text-white text-2xl hover:scale-110 transition"
+            >
+              <i className="bi bi-chevron-left"></i>
+            </Link>
         <h1 className="ml-4 text-2xl font-bold">Notifications</h1>
         {notifications.length > 0 && (
           <button

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Button from 'react-bootstrap/Button';
 
 const initialRequests = [
   {
@@ -47,7 +48,7 @@ const initialRequests = [
 function PaymentRequest() {
   const [requests, setRequests] = useState(initialRequests);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("Pending"); // "Pending", "Approved", "Rejected"
+  const [activeTab, setActiveTab] = useState("Pending");
 
   const openImage = (src) => setSelectedImage(src);
   const closeImage = () => setSelectedImage(null);
@@ -61,40 +62,39 @@ function PaymentRequest() {
   const filteredRequests = requests.filter((r) => r.status === activeTab);
 
   return (
-    <div
-      className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center"
-      style={{ fontFamily: "Inter, sans-serif" }}
-    >
+    <div className="app-container min-h-screen bg-[#3C467B] flex flex-col items-center font-inter px-4 sm:px-6 md:px-8 py-6">
+
       {/* Header */}
-      <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <Link to="/home" className="text-white text-2xl hover:scale-110 transition">
-          <i className="bi bi-chevron-left"></i>
+      <div className="w-full max-w-md d-flex justify-content-between align-items-center mb-6 mx-auto">
+        <Link to="/home" className='text-decoration-none'>
+          <Button variant="link" className="p-0">
+            <i className="bi bi-chevron-left ms-3 text-white" style={{ fontSize: '1.5rem' }}></i>
+          </Button>
         </Link>
-        <h1 className="text-white text-2xl font-bold text-center flex-1">
+
+        <h1 className="text-white text-2xl fw-bold text-center flex-grow-1">
           Payment Requests
         </h1>
-        <div className="w-6"></div>
+
+        <div style={{ width: '2rem' }} />
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-center gap-4 mb-4">
+      <div className="w-full max-w-md d-flex justify-content-between gap-2 mb-6 mx-auto">
         {["Pending", "Approved", "Rejected"].map((tab) => (
-          <button
+          <Button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              activeTab === tab
-                ? "bg-white text-[#3C467B]"
-                : "bg-white/20 text-white hover:bg-white/30"
-            }`}
+            variant={activeTab === tab ? "light" : "outline-light"}
+            className="flex-grow-1"
           >
             {tab}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Request Cards */}
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md">
         {filteredRequests.length === 0 && (
           <p className="text-center text-white opacity-70">No {activeTab} requests</p>
         )}
@@ -102,50 +102,39 @@ function PaymentRequest() {
         {filteredRequests.map((req) => (
           <div
             key={req.id}
-            className="bg-white text-[#3C467B] p-4 rounded-xl shadow-lg border border-gray-200"
+            className="bg-white text-[#3C467B] p-4 rounded-3 mb-4 shadow border"
           >
-            <p className="text-lg font-semibold">{req.employee}</p>
-            <p className="text-sm opacity-80">{req.department}</p>
-            <p className="mt-1">Type: {req.type}</p>
-            <p>Amount: {req.amount} บาท</p>
-            <p className="mt-1 text-sm opacity-70">Submitted Date: {req.submittedDate}</p>
-            <p
-              className={`mt-1 font-medium ${
-                req.status === "Pending"
-                  ? "text-yellow-600"
-                  : req.status === "Approved"
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
-            >
+            <p className="fw-semibold">{req.employee}</p>
+            <p className="text-muted mb-1">{req.department}</p>
+            <p className="mb-1">Type: {req.type}</p>
+            <p className="mb-1">Amount: {req.amount} บาท</p>
+            <p className="text-muted mb-1">Submitted: {req.submittedDate}</p>
+            <p className={`fw-medium ${
+              req.status === "Pending"
+                ? "text-warning"
+                : req.status === "Approved"
+                ? "text-success"
+                : "text-danger"
+            }`}>
               Status: {req.status}
             </p>
 
-            {/* Attachment */}
-            <p className="mt-2">
-              <button
-                onClick={() => openImage(req.receipt)}
-                className="text-blue-600 underline hover:text-blue-800"
-              >
-                View Receipt
-              </button>
-            </p>
+            {/* Receipt */}
+            <div className="mt-2">
+              <Button variant="link" className="p-0" onClick={() => openImage(req.receipt)}>
+                <i className="bi bi-receipt text-primary me-2"></i> View Receipt
+              </Button>
+            </div>
 
-            {/* Buttons (only for Pending) */}
+            {/* Action Buttons */}
             {activeTab === "Pending" && (
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => handleStatus(req.id, "Approved")}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleStatus(req.id, "Rejected")}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
-                >
-                  Reject
-                </button>
+              <div className="d-flex gap-2 mt-3">
+                <Button onClick={() => handleStatus(req.id, "Approved")} variant="success" className="flex-grow-1">
+                  <i className="bi bi-check-circle me-2"></i> Approve
+                </Button>
+                <Button onClick={() => handleStatus(req.id, "Rejected")} variant="danger" className="flex-grow-1">
+                  <i className="bi bi-x-circle me-2"></i> Reject
+                </Button>
               </div>
             )}
           </div>
@@ -154,18 +143,16 @@ function PaymentRequest() {
 
       {/* Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="relative">
-            <img src={selectedImage} className="max-w-sm rounded-xl shadow-lg" />
-            <button
-              onClick={closeImage}
-              className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-lg"
-            >
+        <div className="fixed inset-0 bg-black/70 d-flex align-items-center justify-content-center z-50 p-4">
+          <div className="position-relative">
+            <img src={selectedImage} className="max-w-sm rounded shadow-lg" alt="receipt"/>
+            <Button onClick={closeImage} variant="danger" className="position-absolute top-2 end-2">
               ✕
-            </button>
+            </Button>
           </div>
         </div>
       )}
+
     </div>
   );
 }
