@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from "../data/mockUsers";
-import './Loginadmin.css';
+import { authenticateUser } from '../data/mockUsers';
+import './AdminLogin.css';
 
-const Login = () => {
+const AdminLogin = () => {
   const [formData, setFormData] = useState({
     id: '',
     password: ''
@@ -45,7 +45,7 @@ const Login = () => {
     try {
       // จำลองการตรวจสอบข้อมูล (เหมือนรอโหลด)
       setTimeout(() => {
-        // ✅ เรียกใช้ฟังก์ชัน authenticateUser จาก mockUsers.js
+        // เรียกใช้ฟังก์ชัน authenticateUser จาก mock
         const result = authenticateUser(formData.id, formData.password);
 
         if (result.success) {
@@ -53,8 +53,8 @@ const Login = () => {
           localStorage.setItem('token', result.token);
           localStorage.setItem('user', JSON.stringify(result.user));
 
-          // ไปหน้า home
-          navigate('/home');
+        /* จะทำให้มันlogin แล้วไปหน้า dashboard แต่มันไม่ไปฮื่อๆ */
+          navigate('/dashboard');
         } else {
           showError(result.message);
         }
@@ -68,9 +68,9 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-box">
+    <div className="admin-login-page">
+      <div className="admin-login-container">
+        <div className="admin-login-box">
           {/* Profile Image */}
           <div className="profile-circle">
             <div className="profile-placeholder">
@@ -83,7 +83,7 @@ const Login = () => {
           </div>
 
           {/* Login Form */}
-          <form className="login-form" onSubmit={handleSubmit}>
+          <form className="admin-login-form" onSubmit={handleSubmit}>
             {error && (
               <div className="error-message">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -151,11 +151,11 @@ const Login = () => {
             <div className="forgot-password-link">
               <a href="#forgot" onClick={(e) => {
                 e.preventDefault();
-                navigate('/forgot-password');
+                navigate('/adminforgotpassword');
               }}>Forgot Password?</a>
             </div>
 
-            <button type="submit" className="login-button" disabled={loading}>
+            <button type="submit" className="admin-login-button" disabled={loading}>
               {loading ? (
                 <>
                   <span className="spinner"></span>
@@ -167,33 +167,10 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Demo Accounts Info */}
-          <div className="demo-info">
-            <p style={{ 
-              textAlign: 'center', 
-              fontSize: '12px', 
-              color: '#666', 
-              marginTop: '20px',
-              fontWeight: '600'
-            }}>
-              🔑 บัญชีทดสอบ:
-            </p>
-            <div style={{ 
-              fontSize: '11px', 
-              color: '#888', 
-              textAlign: 'center',
-              marginTop: '8px',
-              lineHeight: '1.6'
-            }}>
-              <div>Admin1: admin1 / admin1234</div>
-              <div>Admin2: admin2 / admin5678</div>
-              <div>SuperAdmin: superadmin / super9999</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default AdminLogin;

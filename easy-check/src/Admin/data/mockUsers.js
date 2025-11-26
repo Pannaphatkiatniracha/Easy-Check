@@ -1,11 +1,8 @@
-// src/data/mockUsers.js
-// ข้อมูลผู้ใช้สำหรับการ Login
-
 let mockUsers = [
   {
-    id: 'admin001',
+    id: '222222',
     username: 'admin1',
-    password: 'admin1234',
+    password: 'pass',
     fullName: 'สมชาย ใจดี',
     role: 'admin',
     email: 'somchai.admin@company.com',
@@ -17,9 +14,9 @@ let mockUsers = [
     employeeCode: 'EMP001' // รหัสพนักงาน
   },
   {
-    id: 'admin002',
+    id: '333333',
     username: 'admin2',
-    password: 'admin5678',
+    password: 'pass',
     fullName: 'สมหญิง รักงาน',
     role: 'admin',
     email: 'somying.admin@company.com',
@@ -31,9 +28,9 @@ let mockUsers = [
     employeeCode: 'EMP002' // รหัสพนักงาน
   },
   {
-    id: 'superadmin001',
+    id: '444444',
     username: 'superadmin',
-    password: 'super9999',
+    password: 'pass',
     fullName: 'วิชัย ผู้จัดการ',
     role: 'superadmin',
     email: 'wichai.super@company.com',

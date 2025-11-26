@@ -1,4 +1,3 @@
-/* Reset & Base */
 * {
   margin: 0;
   padding: 0;
@@ -7,21 +6,21 @@
 
 body {
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #3C467B; /* พื้นหลังเต็มจอ */
 }
 
-/* Main Login Page */
-.login-page {
+/* Main Admin Login Page */
+.admin-login-page {
   height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0; /* ลบ padding ที่ดันให้ไม่ตรงกลาง */
+  padding: 0;
+  background-color: #3C467B;
 }
 
-.login-container {
-  height: 100%; /* ให้ลูกกินเต็มพื้นที่ login-page */
+.admin-login-container {
+  height: 100%; /* ให้ลูกกินเต็มพื้นที่ admin-login-page */
   width: 100%;
   display: flex;
   justify-content: center;
@@ -29,8 +28,8 @@ body {
 }
 
 
-/* login-box */
-.login-box {
+/* admin-login-box */
+.admin-login-box {
   background: #ffffff; /* กรอบสีขาวด้านหลัง */
   border-radius: 20px;
   width: 400px;        /* เพิ่มความกว้างของกรอบ */
@@ -60,8 +59,8 @@ body {
   object-fit: cover;
 }
 
-/* Login Form */
-.login-form {
+/* Admin Login Form */
+.admin-login-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -137,8 +136,8 @@ body {
   text-decoration: underline;
 }
 
-/* Login Button */
-.login-button {
+/* Admin Login Button */
+.admin-login-button {
   margin-top: 10px;
   padding: 14px 20px;
   width: 100%;
@@ -151,15 +150,15 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.login-button:hover {
+.admin-login-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(159, 159, 159, 0.4);
 }
 
-/* Error Message ลอยเหนือกรอบ login */
+/* Error Message ลอยเหนือกรอบ admin login */
 .error-message {
   position: absolute;
-  top: -50px; /* ขึ้นเหนือกรอบ login 50px */
+  top: -50px; /* ขึ้นเหนือกรอบ admin login 50px */
   left: 50%;  /* กึ่งกลางแนวนอน */
   transform: translateX(-50%);
   background-color: rgba(255, 77, 77, 0.1);
@@ -176,7 +175,7 @@ body {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .login-box {
+  .admin-login-box {
     padding: 50px 20px 20px;
   }
 

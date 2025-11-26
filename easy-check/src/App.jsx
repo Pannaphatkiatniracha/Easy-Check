@@ -31,6 +31,8 @@ import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 import Notification from "./user/page/Notification";
 import Dashboard from "./Admin/page/Dashboard";
 import AppLayouts from "./Admin/layouts/AppLayouts";
+import AdminLogin from "./Admin/page/AdminLogin";
+import AdminForgotPassword from "./Admin/page/AdminForgotPassword";
 
 
 
@@ -43,8 +45,10 @@ function App() {
       <BrowserRouter basename="/easycheck/">
         <Routes>
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
-          <Route path="forgotpassword" element={<ForgotPassword />} />
+          <Route path="forgotpassword" element={<ForgotPassword  />} />
           {/* route login ตรงนี้ */}
+          <Route path="/adminlogin" element={<AdminLogin/>} />
+          <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
 
 
 
