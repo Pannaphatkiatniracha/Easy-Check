@@ -67,17 +67,13 @@ const getStatus = (checkIn) => {
 function CheckApprove() {
   const [users, setUsers] = useState(initialUsers);
   const [delegateUsers, setDelegateUsers] = useState(initialDelegateCheckins);
-
-  // แยก state ของแต่ละหน้า
   const [approvedNormal, setApprovedNormal] = useState([]);
   const [rejectedNormal, setRejectedNormal] = useState([]);
   const [approvedDelegate, setApprovedDelegate] = useState([]);
   const [rejectedDelegate, setRejectedDelegate] = useState([]);
-
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewDelegate, setViewDelegate] = useState(false);
 
-  // --- ฟังก์ชันอนุมัติ/ไม่อนุมัติ ---
   const handleApproveNormal = (user) => {
     setApprovedNormal((prev) => [...prev, user]);
     setUsers((prev) => prev.filter((u) => u.id !== user.id));
@@ -95,19 +91,22 @@ function CheckApprove() {
     setDelegateUsers((prev) => prev.filter((u) => u.id !== user.id));
   };
 
-  // --- Card ผู้ใช้ ---
   const renderCard = (user, isDelegate = false) => {
     if (isDelegate) {
       return (
         <div
           key={user.id}
-          className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center justify-between"
+          className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-300 transform hover:-translate-y-1 hover:shadow-lg transition flex items-center justify-between"
         >
-          <div>
-            <div className="font-bold text-gray-800 text-lg">{user.name}</div>
-            <div className="text-xs text-gray-500">ID: {user.employeeId}</div>
+          <div className="min-w-0">
+            <div className="font-semibold text-gray-800 text-sm sm:text-base md:text-base truncate">
+              {user.name}
+            </div>
+            <div className="text-xs text-gray-500 truncate">
+              ID: {user.employeeId}
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 ml-4">
             <button
               onClick={() => handleApproveDelegate(user)}
               className="py-2 px-4 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition"
@@ -128,16 +127,18 @@ function CheckApprove() {
     return (
       <div
         key={user.id}
-        className="relative bg-white/90 p-4 rounded-2xl shadow-lg border border-gray-300 transform hover:-translate-y-1 hover:shadow-xl transition flex items-center gap-4"
+        className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-300 transform hover:-translate-y-1 hover:shadow-lg transition flex items-center gap-4"
       >
         <img
           src={user.profile}
           alt={user.name}
           className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover"
         />
-        <div className="flex-1">
-          <div className="font-bold text-gray-800 text-lg">{user.name}</div>
-          <div className="text-xs text-gray-500">ID: {user.employeeId}</div>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-gray-800 text-sm sm:text-base md:text-base truncate">
+            {user.name}
+          </div>
+          <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
           <div className="text-xs text-gray-600 mt-1">
             เวลาเช็กอิน: {user.checkInTime} -{" "}
             <span
@@ -176,7 +177,7 @@ function CheckApprove() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
+    <div className="app-container min-h-screen bg-[#3C467B] p-4 sm:p-6 md:p-8 flex flex-col items-center font-inter">
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-4">
         <Link to="/home">
@@ -222,7 +223,7 @@ function CheckApprove() {
       </div>
 
       {/* Modal */}
-      {selectedUser && !selectedUser.isDelegate && (
+      {selectedUser && !viewDelegate && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedUser(null)}
@@ -232,9 +233,7 @@ function CheckApprove() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-300">
-              <h2 className="text-lg font-bold text-gray-800">
-                {selectedUser.name}
-              </h2>
+              <h2 className="text-lg font-bold text-gray-800">{selectedUser.name}</h2>
               <button
                 onClick={() => setSelectedUser(null)}
                 className="p-2 text-lg text-gray-600"
@@ -275,30 +274,21 @@ function CheckApprove() {
 
       {/* Summary */}
       <div className="max-w-md w-full mt-6 space-y-4">
-        {/* Summary แยกหน้าชัดเจน */}
         {viewDelegate ? (
           <>
             {approvedDelegate.length > 0 && (
               <div className="bg-green-100/50 p-3 rounded-xl">
-                <div className="font-bold text-green-700 mb-1">
-                  อนุมัติแล้ว (แทนเพื่อน)
-                </div>
+                <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว (แทนเพื่อน)</div>
                 {approvedDelegate.map((u) => (
-                  <div key={u.id} className="text-green-800 text-sm">
-                    {u.name} (แทนเพื่อน)
-                  </div>
+                  <div key={u.id} className="text-green-800 text-sm truncate">{u.name}</div>
                 ))}
               </div>
             )}
             {rejectedDelegate.length > 0 && (
               <div className="bg-red-100/50 p-3 rounded-xl">
-                <div className="font-bold text-red-700 mb-1">
-                  ไม่อนุมัติ (แทนเพื่อน)
-                </div>
+                <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (แทนเพื่อน)</div>
                 {rejectedDelegate.map((u) => (
-                  <div key={u.id} className="text-red-800 text-sm">
-                    {u.name} (แทนเพื่อน)
-                  </div>
+                  <div key={u.id} className="text-red-800 text-sm truncate">{u.name}</div>
                 ))}
               </div>
             )}
@@ -307,11 +297,9 @@ function CheckApprove() {
           <>
             {approvedNormal.length > 0 && (
               <div className="bg-green-100/50 p-3 rounded-xl">
-                <div className="font-bold text-green-700 mb-1">
-                  อนุมัติแล้ว (ปกติ)
-                </div>
+                <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว (ปกติ)</div>
                 {approvedNormal.map((u) => (
-                  <div key={u.id} className="text-green-800 text-sm">
+                  <div key={u.id} className="text-green-800 text-sm truncate">
                     {u.name} - {u.checkInTime} - {getStatus(u.checkInTime)}
                   </div>
                 ))}
@@ -319,11 +307,9 @@ function CheckApprove() {
             )}
             {rejectedNormal.length > 0 && (
               <div className="bg-red-100/50 p-3 rounded-xl">
-                <div className="font-bold text-red-700 mb-1">
-                  ไม่อนุมัติ (ปกติ)
-                </div>
+                <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (ปกติ)</div>
                 {rejectedNormal.map((u) => (
-                  <div key={u.id} className="text-red-800 text-sm">
+                  <div key={u.id} className="text-red-800 text-sm truncate">
                     {u.name} - {u.checkInTime} - {getStatus(u.checkInTime)}
                   </div>
                 ))}
