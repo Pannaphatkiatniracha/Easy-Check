@@ -12,6 +12,7 @@ function CheckInOut() {
   const [checkInData, setCheckInData] = useState(null);
   const [checkOutData, setCheckOutData] = useState(null);
   const [mode, setMode] = useState("checkin");
+  const [confirmEarlyCheckout, setConfirmEarlyCheckout] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -77,6 +78,13 @@ function CheckInOut() {
       setMode("checkout");
       setPhoto(null);
     } else if (mode === "checkout") {
+      // ตรวจสอบเวลาเช็คเอาท์
+      const currentHour = now.getHours();
+      if (currentHour < 18 && !confirmEarlyCheckout) {
+        setConfirmEarlyCheckout(true);
+        return;
+      }
+
       const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
       setCheckOutData(data);
       localStorage.setItem("checkOutData", JSON.stringify(data));
@@ -88,6 +96,7 @@ function CheckInOut() {
       }
       setMode("done");
       setPhoto(null);
+      setConfirmEarlyCheckout(false);
     }
 
     const stream = videoRef.current?.srcObject;
@@ -97,6 +106,11 @@ function CheckInOut() {
     }
 
     setError("");
+  };
+
+  const handleEarlyConfirm = () => {
+    setConfirmEarlyCheckout(false);
+    handleConfirm();
   };
 
   const handleReset = () => {
@@ -111,22 +125,23 @@ function CheckInOut() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4">
-      <div className="max-w-md w-full space-y-6 relative">
+    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
+      <div className="max-w-md w-full space-y-6">
 
         {/* Header */}
-        <div className="flex justify-start">
+        <div className="flex justify-start mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
         </div>
 
-        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg text-center flex items-center gap-2">
-          <i className="bi bi-geo-alt-fill"></i> Check-In / Check-Out
+        {/* Title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg text-center mb-6">
+          Check-In / Check-Out
         </h1>
 
-        {/* Camera Card แนวตั้ง 3D floating */}
-        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4 transform hover:scale-105 transition-transform duration-300 hover:shadow-3xl perspective-1000">
+        {/* Camera Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4 hover:scale-105 transition-transform duration-300">
           <video
             ref={videoRef}
             autoPlay
@@ -156,7 +171,7 @@ function CheckInOut() {
           <img
             src={URL.createObjectURL(photo)}
             alt="preview"
-            className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover transform hover:scale-105 transition duration-300"
+            className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover hover:scale-105 transition duration-300"
           />
         )}
 
@@ -185,7 +200,7 @@ function CheckInOut() {
 
         {/* Check-In & Check-Out Data */}
         {checkInData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
               <i className="bi bi-geo-fill"></i> CheckIn
             </h3>
@@ -199,7 +214,7 @@ function CheckInOut() {
         )}
 
         {checkOutData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center transform hover:scale-105 transition duration-300">
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
               <i className="bi bi-flag-fill"></i> CheckOut
             </h3>
@@ -214,7 +229,7 @@ function CheckInOut() {
 
         {/* Message & Error */}
         {message && (
-          <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line transform hover:scale-105 transition duration-300">
+          <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line hover:scale-105 transition duration-300">
             {message}
           </div>
         )}
@@ -231,6 +246,32 @@ function CheckInOut() {
         )}
 
       </div>
+
+      {/* Modal ยืนยันเช็คเอาท์ก่อนเวลา */}
+      {confirmEarlyCheckout && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
+            <p className="mb-4 text-gray-800 font-semibold">
+              คุณกำลังเช็คเอาท์ก่อนเวลา 18:00 ต้องการยืนยันหรือไม่?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleEarlyConfirm}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
+              >
+                ยืนยัน
+              </button>
+              <button
+                onClick={() => setConfirmEarlyCheckout(false)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
+              >
+                ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
