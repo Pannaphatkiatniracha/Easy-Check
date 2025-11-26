@@ -1003,4 +1003,4 @@ const EmployeeSystem = () => {
   );
 };
 
-export default EmployeeSystem;
+export default Personalsummary;
