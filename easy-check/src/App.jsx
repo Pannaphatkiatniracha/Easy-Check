@@ -29,6 +29,8 @@ import DataToCheck from "./user/page/DataToCheck";
 import ApproverManagement from "./user/page/ApproverManagement";
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 import Notification from "./user/page/Notification";
+import Dashboard from "./Admin/page/Dashboard";
+import Sidebar from "./Admin/component/Sidebar/Sidebar";
 
 
 function App() {
@@ -79,6 +81,7 @@ function App() {
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
+                <Route path="dashboard" element={<Dashboard />} />
 
                 <Route
                   path="datacheck"
@@ -104,6 +107,18 @@ function App() {
               </Route>
             </>
           )}
+
+
+
+          <Route element={<Sidebar/> }>
+            <Route path="dashboard" element={<Dashboard />} />
+          </Route>
+
+
+
+
+
+
         </Routes>
       </BrowserRouter>
     </>

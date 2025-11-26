@@ -44,8 +44,9 @@ body {
 .dashboard {
   min-height: 100vh;
   padding: var(--spacing);
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
+  background-color: #636CCB;
 }
 
 /* Loading Screen */
