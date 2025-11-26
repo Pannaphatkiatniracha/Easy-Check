@@ -30,7 +30,8 @@ import ApproverManagement from "./user/page/ApproverManagement";
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 import Notification from "./user/page/Notification";
 import Dashboard from "./Admin/page/Dashboard";
-import Sidebar from "./Admin/component/Sidebar/Sidebar";
+import AppLayouts from "./Admin/layouts/AppLayouts";
+
 
 
 function App() {
@@ -43,6 +44,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
+          {/* route login ตรงนี้ */}
+
+
 
           {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
 
@@ -108,12 +112,9 @@ function App() {
 
 
           {/* ฝั่ง ADMIN */}
-          <Route element={<AppLayout />}>
+          <Route element={<AppLayouts />}>
             <Route path="dashboard" element={<Dashboard />} />
           </Route>
-
-
-
 
 
 
