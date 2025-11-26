@@ -87,10 +87,11 @@ const LeaveRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#3C467B] flex flex-col items-center py-10 px-4 font-inter">
-      <div className="max-w-lg w-full flex flex-col space-y-8">
-        {/* Back Button */}
-        <div className="w-full flex justify-start mb-4">
+    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
+      <div className="max-w-md w-full space-y-6">
+
+        {/* Header */}
+        <div className="flex justify-start mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>

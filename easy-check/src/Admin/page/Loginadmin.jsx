@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from '../../data/mockUsers';
+import { authenticateUser } from "../data/mockUsers";
 import './Loginadmin.css';
 
 const Login = () => {
