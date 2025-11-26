@@ -29,7 +29,11 @@ import DataToCheck from "./user/page/DataToCheck";
 import ApproverManagement from "./user/page/ApproverManagement";
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
 import Notification from "./user/page/Notification";
-
+import Dashboard from "./Admin/Dashboard.jsx";
+import SetGPS from "./Admin/SetGPS.jsx";
+import Personalsummary from "./Admin/Personalsummary.jsx";
+import MyProfile from "./Admin/MyProfile.jsx";
+import Manageusers from "./Admin/Manageusers.jsx";
 
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token") || "");
