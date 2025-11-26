@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Button, Form } from 'react-bootstrap'
-import { fetchApi } from '../data/Api'
+import { fetchApi } from '../../data/Api'
 import Dropdown from 'react-bootstrap/Dropdown'
 
 export default function AccessControl() {
