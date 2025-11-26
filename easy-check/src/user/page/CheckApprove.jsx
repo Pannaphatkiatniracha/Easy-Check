@@ -11,7 +11,7 @@ const initialUsers = [
     profile:
       "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
     checkInPhoto:
-      "https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg",
+      "https://i.pinimg.com/736x/03/33/26/033326e59137032928ceb27b8bd42b6f.jpg",
   },
   {
     id: 2,
