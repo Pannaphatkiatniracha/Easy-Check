@@ -34,8 +34,8 @@ import Sidebar from "./Admin/component/Sidebar/Sidebar";
 
 
 function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
-  const [role, setRole] = useState(() => localStorage.getItem("role") || "");
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "")
+  const [role, setRole] = useState(() => localStorage.getItem("role") || "")
 
   return (
     <>
@@ -73,16 +73,12 @@ function App() {
                 <Route path="privacypolicy" element={<PrivacyPolicy />} />
                 <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
-                
-                {/* Added missing pages */}
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
                 <Route path="notification" element={<Notification role={role} />} />
-
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 <Route path="dashboard" element={<Dashboard />} />
-
                 <Route
                   path="datacheck"
                   element={
@@ -91,8 +87,7 @@ function App() {
                     ) : (
                       <Navigate to="/home" replace />
                     )
-                  }
-                />
+                  }/>
 
                 <Route
                   path="datatocheck"
@@ -102,14 +97,17 @@ function App() {
                     ) : (
                       <Navigate to="/home" replace />
                     )
-                  }
-                />
+                  }/>
+
+
               </Route>
             </>
           )}
 
 
 
+
+          {/* ฝั่ง ADMIN */}
           <Route element={<Sidebar/> }>
             <Route path="dashboard" element={<Dashboard />} />
           </Route>

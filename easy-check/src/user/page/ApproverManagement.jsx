@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 // Mock Link component (replace with actual react-router-dom Link in your app)
-const Link = ({ to, children, className }) => (
-  <a href={to} className={className}>{children}</a>
-);
+// const Link = ({ to, children, className }) => (
+//   <a href={to} className={className}>{children}</a>
+// );
 
 // MOCK DATA
 const companies = [
@@ -111,13 +112,16 @@ function ApproverManagement() {
   return (
     <div className="app-container min-h-screen bg-[#3C467B] text-white p-4 sm:p-6 md:p-8">
       <div className="max-w-md mx-auto min-h-screen">
+
         {/* Header */}
         <div className="flex items-center justify-between py-6">
+          
           <Link to="/home" className="text-white hover:bg-white/10 p-2 rounded-lg transition-all">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
+
           <h1 className="text-xl font-semibold text-center flex-1">Approver Management</h1>
           <div className="w-6"></div>
         </div>
