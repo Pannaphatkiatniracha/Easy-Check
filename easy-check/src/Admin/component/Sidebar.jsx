@@ -63,7 +63,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Shift Schedule',
-      path: '/shift'
+      path: '/shiftschedule'
     },
     { 
       icon: (
@@ -76,7 +76,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Event Management',
-      path: '/events'
+      path: '/createevent'
     },
     { 
       icon: (
@@ -108,7 +108,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'GPS Status',
-      path: '/gps'
+      path: '/setGPS'
     },
     { 
       icon: (
@@ -118,7 +118,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Settings',
-      path: '/settings'
+      path: '/settingsadmin'
     },
   ];
 
