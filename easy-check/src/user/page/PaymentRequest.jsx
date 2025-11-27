@@ -46,6 +46,10 @@ function PaymentRequest() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeTab, setActiveTab] = useState("Pending");
 
+  // สำหรับ inline reject popup
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+
   const openImage = (src) => setSelectedImage(src);
   const closeImage = () => setSelectedImage(null);
 
@@ -55,14 +59,15 @@ function PaymentRequest() {
         r.id === id ? { ...r, status: newStatus, reason } : r
       )
     );
+    setRejectingId(null); // ปิด popup หลัง submit
   };
 
-  const handleReject = (id) => {
-    const reason = prompt("กรุณาใส่เหตุผลที่ไม่อนุมัติ:");
-    if (reason !== null && reason.trim() !== "") {
-      handleStatus(id, "Rejected", reason);
-    }
+  const startReject = (id) => {
+    setRejectingId(id);
+    setRejectReason("");
   };
+
+  const cancelReject = () => setRejectingId(null);
 
   const filteredRequests = requests.filter((r) => r.status === activeTab);
 
@@ -107,7 +112,7 @@ function PaymentRequest() {
         {filteredRequests.map((req) => (
           <div
             key={req.id}
-            className="bg-white text-[#3C467B] p-4 rounded-3 mb-4 shadow border"
+            className="bg-white text-[#3C467B] p-4 rounded-3 mb-4 shadow border relative"
           >
             <p className="fw-semibold">{req.employee}</p>
             <p className="text-muted mb-1">{req.department}</p>
@@ -139,16 +144,36 @@ function PaymentRequest() {
                 <Button onClick={() => handleStatus(req.id, "Approved")} variant="success" className="flex-grow-1">
                   <i className="bi bi-check-circle me-2"></i> Approve
                 </Button>
-                <Button onClick={() => handleReject(req.id)} variant="danger" className="flex-grow-1">
+                <Button onClick={() => startReject(req.id)} variant="danger" className="flex-grow-1">
                   <i className="bi bi-x-circle me-2"></i> Reject
                 </Button>
               </div>
             )}
+
+            {/* Inline Reject Popup */}
+            {rejectingId === req.id && (
+              <div className="absolute top-0 left-0 w-full h-full bg-black/30 flex flex-col justify-center items-center p-4 rounded" style={{ zIndex: 10 }}>
+                <div className="bg-white p-4 rounded shadow w-full">
+                  <h6 className="mb-2">กรุณาใส่เหตุผลที่ไม่อนุมัติ</h6>
+                  <textarea
+                    className="w-full p-2 border rounded mb-2"
+                    rows={3}
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                  />
+                  <div className="d-flex justify-content-end gap-2">
+                    <Button variant="secondary" onClick={cancelReject}>ยกเลิก</Button>
+                    <Button variant="danger" onClick={() => handleStatus(req.id, "Rejected", rejectReason)}>ไม่อนุมัติ</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Image Modal */}
       {selectedImage && (
         <div className="fixed inset-0 bg-black/70 d-flex align-items-center justify-content-center z-50 p-4">
           <div className="position-relative">
