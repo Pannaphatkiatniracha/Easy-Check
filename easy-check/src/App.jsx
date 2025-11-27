@@ -40,6 +40,10 @@ import AccessControl from "./Admin/page/AccessControl";
 import ShiftSchedule from "./Admin/page/ShiftSchedule";
 import SettingsAdmin from "./Admin/page/SettingsAdmin";
 import SetGPS from "./Admin/page/SetGPS";
+import ExportExcel from "./Admin/page/export-excel";
+import GroupNoti from "./Admin/page/group-noti";
+import GroupNoti2 from "./Admin/page/group2-noti";
+import Permission from "./Admin/page/Permission";
 
 
 
@@ -131,6 +135,10 @@ function App() {
             <Route path='accesscontrol' element={<AccessControl/>} />
             <Route path='shiftschedule' element={<ShiftSchedule/>} />
             <Route path='setGPS' element={<SetGPS/>} />
+            <Route path='exportexcel' element={<ExportExcel/>} />
+            <Route path='groupnoti' element={<GroupNoti />} />
+            <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
+            <Route path='permission' element={<Permission />} />
             
           </Route>
 
