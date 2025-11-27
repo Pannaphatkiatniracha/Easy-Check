@@ -44,9 +44,9 @@ let mockUsers = [
 ];
 
 // ฟังก์ชันสำหรับตรวจสอบการ Login
-export const authenticateUser = (username, password) => {
+export const authenticateUser = (id, password) => {
   const user = mockUsers.find(
-    u => u.username === username && u.password === password
+    u => u.id === id && u.password === password
   );
   
   if (user) {

@@ -7,7 +7,7 @@ const AppLayouts = () => {
         <div className="flex min-h-screen">
             
 
-            <div className="w-80 bg-white shadow-lg">
+            <div>
                 <Sidebar />
             </div>  
 
