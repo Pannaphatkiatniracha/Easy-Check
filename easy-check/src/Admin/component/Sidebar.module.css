@@ -15,12 +15,11 @@
   overflow: hidden;
 }
 
-/* เมื่อ hover ที่ sidebar จะขยายออกมา */
 .sidebar:hover {
-  width: 260px; /* ความกว้างตอนขยาย (แสดงทั้งไอคอนและข้อความ) */
+  width: 260px; 
 }
 
-/* Brand/Logo ด้านบน */
+
 .sidebarBrand {
   display: flex;
   align-items: center;
@@ -75,7 +74,7 @@
   font-size: 12px;
 }
 
-/* Navigation */
+
 .sidebarNav {
   display: flex;
   flex-direction: column;
@@ -85,7 +84,7 @@
   padding-right: 5px;
 }
 
-/* ปุ่มเมนูแต่ละรายการ */
+
 .sidebarItem {
   display: flex;
   align-items: center;
@@ -108,14 +107,12 @@
   transform: translateX(3px);
 }
 
-/* Active state สำหรับเมนูที่ถูกเลือก */
 .sidebarItem.active {
   background: #6E8CFB;
   color: rgb(255, 255, 255);
   font-weight: 600;
 }
 
-/* ไอคอน */
 .itemIcon {
   min-width: 24px;
   width: 24px;
@@ -131,7 +128,7 @@
   stroke: currentColor;
 }
 
-/* ข้อความ - ซ่อนตอนย่อ */
+
 .itemLabel {
   font-size: 14px;
   font-weight: 500;
@@ -148,13 +145,12 @@
 }
 
 .brandIcon.profileIcon img.profileImage {
-  width: 40px;      /* ขนาดความกว้าง */
-  height: 40px;     /* ขนาดความสูง */
-  border-radius: 50%; /* ทำให้เป็นวงกลม */
-  object-fit: cover;  /* ครอบรูปเต็มกรอบ */
+  width: 40px;      
+  height: 40px;     
+  border-radius: 50%; 
+  object-fit: cover;  
 }
 
-/* เพิ่มส่วนนี้ลงในไฟล์ Sidebar.module.css */
 
 .sidebarFooter {
   margin-top: auto;

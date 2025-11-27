@@ -11,7 +11,7 @@ let mockUsers = [
     department: 'IT Department',
     position: 'System Administrator',
     joinDate: '2023-01-15',
-    employeeCode: 'EMP001' // รหัสพนักงาน
+    employeeCode: 'EMP001'
   },
   {
     id: '333333',
@@ -25,7 +25,7 @@ let mockUsers = [
     department: 'HR Department',
     position: 'HR Administrator',
     joinDate: '2023-03-20',
-    employeeCode: 'EMP002' // รหัสพนักงาน
+    employeeCode: 'EMP002'
   },
   {
     id: '444444',
@@ -39,7 +39,7 @@ let mockUsers = [
     department: 'Management',
     position: 'Chief Administrator',
     joinDate: '2022-11-01',
-    employeeCode: 'EMP003' // รหัสพนักงาน
+    employeeCode: 'EMP003'
   }
 ];
 

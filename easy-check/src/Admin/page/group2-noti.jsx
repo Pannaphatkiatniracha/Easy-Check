@@ -27,7 +27,7 @@ const GroupNoti2 = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/adminlogin');
   };
 
 
@@ -56,7 +56,7 @@ const GroupNoti2 = () => {
   };
 
   const handleBack = () => {
-    navigate('/group-noti');
+    navigate('/groupnoti');
   };
 
   if (!user) {
