@@ -5,15 +5,17 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Form } from 'react-bootstrap';
 
 function SettingsAdmin() {
+
     const goToPagePrivacyPolicyAdmin = () => {
         window.location.href = "/easycheck/adminprivacypolicy";
     };
+
     return (
         <>
 
             <div className="main-content-only" style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-                width: '80vw',
+                width: '100vw',
                 height: '100vh',
                 margin: 0,
                 overflowY: 'auto',
@@ -46,7 +48,7 @@ function SettingsAdmin() {
 
                             {/* Dark Mode */}
                             <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}>
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}>
                                 <div className="d-flex align-items-center gap-2 text-white">
                                     <i className="bi bi-circle-half fs-4"></i> &nbsp;&nbsp;
                                     <span>Dark Mode</span>
@@ -58,7 +60,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-pencil-fill fs-4"></i> &nbsp;&nbsp;
@@ -71,7 +73,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-person-fill-gear fs-4"></i> &nbsp;&nbsp;
@@ -84,7 +86,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
                                 onClick={goToPagePrivacyPolicyAdmin}
                             >
                                 <div className="d-flex align-items-center gap-2">
@@ -98,7 +100,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-crosshair fs-4"></i> &nbsp;&nbsp;

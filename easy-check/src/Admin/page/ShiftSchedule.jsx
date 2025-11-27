@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { fetchApi } from '../../data/Api';
 import { Button, Form, Table, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
+// import '../../css/custom.css';
 import '../../css/custom.css';
 
 const ShiftSchedule = () => {
@@ -100,9 +101,14 @@ const ShiftSchedule = () => {
   return (
     <div style={{
       background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-      minHeight: '98vh',
-      width: '80vw',
+      minHeight: '100vh',
+      width: '100vw',
+      overflow: 'hidden',
+      padding: '5rem',
+      position: 'relative',
+
     }}>
+
 
 
       {/* header */}
@@ -111,9 +117,6 @@ const ShiftSchedule = () => {
           Shift Schedule
         </h1>
       </div>
-
-
-
 
 
       {/* control box / filter */}
