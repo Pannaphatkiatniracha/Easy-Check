@@ -75,7 +75,7 @@ function ApproverManagement() {
     try {
       const user = users.find((u) => u.id === selectedUser);
       
-      // อัปเดตข้อมูลใน MockAPI
+      // อัปเดตข้อมูลใน Mock API
       await fetch(`https://68fbd77794ec960660275293.mockapi.io/users/${selectedUser}`, {
         method: 'PUT',
         headers: {
@@ -104,6 +104,7 @@ function ApproverManagement() {
 
   const handleDeleteApprover = async (id) => {
     try {
+
       // อัปเดตใน MockAPI
       await fetch(`https://68fbd77794ec960660275293.mockapi.io/users/${id}`, {
         method: 'PUT',
@@ -125,6 +126,7 @@ function ApproverManagement() {
 
   const handleApprove = async (id) => {
     try {
+
       // อัปเดตใน MockAPI
       await fetch(`https://68fbd77794ec960660275293.mockapi.io/users/${id}`, {
         method: 'PUT',
@@ -146,6 +148,7 @@ function ApproverManagement() {
 
   const handleReject = async (id) => {
     try {
+      
       // อัปเดตใน MockAPI
       await fetch(`https://68fbd77794ec960660275293.mockapi.io/users/${id}`, {
         method: 'PUT',
@@ -163,19 +166,6 @@ function ApproverManagement() {
       console.error("Error rejecting request:", error);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="app-container min-h-screen bg-[#3C467B] flex flex-col items-center justify-center">
-        <div className="text-center text-white">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="app-container min-h-screen bg-[#3C467B] text-white p-4 sm:p-6 md:p-8">

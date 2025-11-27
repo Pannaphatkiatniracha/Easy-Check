@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 const DataCheck = () => {
     
     
-    const [data, setData] = useState([]) // State สำหรับเก็บข้อมูลจาก MockAPI
+    const [data, setData] = useState([]) // เอาไว้เก็บข้อมูลจาก Mock API
     const [loading, setLoading] = useState(true)
 
 
@@ -45,16 +45,6 @@ const DataCheck = () => {
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
-
-
-            {loading && (
-                <div className="text-center text-white mt-8">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <p className="mt-2">Loading...</p>
-                </div>
-            )}
 
 
             {/* รายชื่อ */}

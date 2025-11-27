@@ -10,6 +10,14 @@ function SettingsAdmin() {
         window.location.href = "/easycheck/adminprivacypolicy";
     };
 
+    const goToPagePermission = () => {
+        window.location.href = "/easycheck/permission";
+    };
+
+    const goToPageEditProfile = () => {
+        window.location.href = "/easycheck/EditProfile";
+    };
+
     return (
         <>
 
@@ -33,8 +41,9 @@ function SettingsAdmin() {
 
                             {/* Notification */}
 
-                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}>
+                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
+                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', marginTop: '50px', borderRadius: '40px', width: '400px' }}>
+
                                 <div className="d-flex align-items-center gap-2 text-white">
                                     <i className="bi bi-bell-fill fs-4"></i> &nbsp;&nbsp;
                                     <span>Notification</span>
@@ -47,8 +56,8 @@ function SettingsAdmin() {
                             </div>
 
                             {/* Dark Mode */}
-                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}>
+                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
+                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '50px', width: '400px' }}>
                                 <div className="d-flex align-items-center gap-2 text-white">
                                     <i className="bi bi-circle-half fs-4"></i> &nbsp;&nbsp;
                                     <span>Dark Mode</span>
@@ -59,8 +68,9 @@ function SettingsAdmin() {
                             {/* Edit Profile */}
                             <Button
                                 variant="link"
-                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
+                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px' , borderRadius: '50px', width: '400px' }}
+                                onClick={goToPageEditProfile}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-pencil-fill fs-4"></i> &nbsp;&nbsp;
@@ -72,8 +82,9 @@ function SettingsAdmin() {
                             {/* User Permission */}
                             <Button
                                 variant="link"
-                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
+                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '50px', width: '400px' }}
+                                onClick={goToPagePermission}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-person-fill-gear fs-4"></i> &nbsp;&nbsp;
@@ -85,26 +96,13 @@ function SettingsAdmin() {
                             {/* Privacy Policy */}
                             <Button
                                 variant="link"
-                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
+                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '50px', width: '400px' }}
                                 onClick={goToPagePrivacyPolicyAdmin}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-shield-lock fs-4"></i> &nbsp;&nbsp;
                                     <span>Privacy Policy</span>
-                                </div>
-                                <i className="bi bi-chevron-right fs-4"></i>
-                            </Button>
-
-                            {/* Set Permission Area */}
-                            <Button
-                                variant="link"
-                                className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px' }}
-                            >
-                                <div className="d-flex align-items-center gap-2">
-                                    <i className="bi bi-crosshair fs-4"></i> &nbsp;&nbsp;
-                                    <span>Set Permission Area</span>
                                 </div>
                                 <i className="bi bi-chevron-right fs-4"></i>
                             </Button>
