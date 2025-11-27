@@ -1,60 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const initialLeaveRequests = [
-  {
-    id: 1,
-    profile:
-      "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
-    name: "ปัณณพรรธน์ เกียรตินิรชา",
-    employeeId: "010889",
-    reasons: ["Sick-self"],
-    leaveStart: "2025-11-20",
-    leaveEnd: "2025-11-22",
-    otherReason: "",
-    evidencePreview:
-      "https://consumerthai.s3.ap-southeast-1.amazonaws.com/news-img/news-216-1.jpg",
-  },
-  {
-    id: 2,
-    profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
-    name: "ฐิติฉัตร ศิริบุตร",
-    employeeId: "010101",
-    reasons: ["Vacation"],
-    leaveStart: "2025-11-25",
-    leaveEnd: "2025-11-27",
-    otherReason: "",
-    evidencePreview: null,
-  },
-  {
-    id: 3,
-    profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
-    name: "ภทรพร แซ่ลี้",
-    employeeId: "110400",
-    reasons: ["Vacation"],
-    leaveStart: "2025-11-25",
-    leaveEnd: "2025-11-27",
-    otherReason: "",
-    evidencePreview: null,
-  },
-  {
-    id: 4,
-    profile: "https://i.pinimg.com/736x/da/73/d2/da73d286b8d797a0f085220cb2a83280.jpg",
-    name: "สราศินีย์ บุญมา",
-    employeeId: "010101",
-    reasons: ["Other"],
-    leaveStart: "2025-11-15",
-    leaveEnd: "2025-11-16",
-    otherReason: "Urgent family matter",
-    evidencePreview: null,
-  },
-];
-
 function LeaveRequestApprove() {
-  const [requests, setRequests] = useState(initialLeaveRequests);
+  const [requests, setRequests] = useState([]);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users");
+        const employees = await res.json();
+        
+        const employeesWithLeaveRequests = employees.filter(employee => 
+          employee.leaveStart && employee.leaveEnd && employee.leaveStatus
+        );
+        
+        const leaveRequests = employeesWithLeaveRequests.map(employee => ({
+          id: employee.id,
+          profile: employee.avatar,
+          name: employee.name,
+          employeeId: employee.userid,
+          reasons: employee.leaveReasons ? [employee.leaveReasons] : ["Sick-self"],
+          leaveStart: employee.leaveStart,
+          leaveEnd: employee.leaveEnd,
+          otherReason: "",
+          evidencePreview: employee.leaveEvidence || null,
+          department: employee.department,
+          position: employee.position
+        }));
+        
+        setRequests(leaveRequests);
+      } catch (error) {
+        console.error("Error loading leave requests:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   const handleApprove = (req) => {
     setApproved([...approved, req]);
@@ -66,9 +53,21 @@ function LeaveRequestApprove() {
     setRequests(requests.filter((r) => r.id !== req.id));
   };
 
+  if (loading) {
+    return (
+      <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center justify-center">
+        <div className="text-center text-white">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-2">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container min-h-screen bg-[#3C467B] p-4 sm:p-6 md:p-8 flex flex-col items-center relative overflow-hidden">
-      {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-6">
         <Link
           to="/home"
@@ -82,36 +81,29 @@ function LeaveRequestApprove() {
         <div className="w-8" />
       </div>
 
-      {/* Leave Request Cards */}
       <div className="max-w-md w-full space-y-5">
         {requests.map((req) => (
           <div
             key={req.id}
             className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-200 transform hover:-translate-y-2 hover:shadow-lg transition duration-300 flex items-center gap-3"
           >
-            {/* Profile */}
             <img
               src={req.profile}
               alt={req.name}
               className="w-14 h-14 rounded-full border-2 border-[#ff00c8] object-cover"
             />
-            {/* Info */}
-<div className="flex-1 min-w-0">
-  <div className="font-semibold text-gray-900 text-[0.9rem] sm:text-sm md:text-base leading-snug">
-    {req.name}
-  </div>
-  <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
-  <div className="text-xs text-gray-700 mt-1">
-    {req.reasons.includes("Other") ? req.otherReason : req.reasons.join(", ")}
-  </div>
-  <div className="text-xs text-gray-700">
-    วันที่ลา: {req.leaveStart} → {req.leaveEnd}
-  </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-gray-900 text-[0.9rem] sm:text-sm md:text-base leading-snug">
+                {req.name}
+              </div>
+              <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
+              <div className="text-xs text-gray-700 mt-1">
+                {req.reasons.includes("Other") ? req.otherReason : req.reasons.join(", ")}
+              </div>
+              <div className="text-xs text-gray-700">
+                วันที่ลา: {req.leaveStart} → {req.leaveEnd}
+              </div>
 
-
-
-
-              {/* Evidence */}
               {req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
@@ -121,7 +113,6 @@ function LeaveRequestApprove() {
                 </button>
               )}
             </div>
-            {/* Buttons */}
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => handleApprove(req)}
@@ -140,7 +131,6 @@ function LeaveRequestApprove() {
         ))}
       </div>
 
-      {/* Evidence Modal */}
       {selectedEvidence && (
         <div
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
@@ -167,7 +157,6 @@ function LeaveRequestApprove() {
         </div>
       )}
 
-      {/* Approved / Rejected Summary */}
       <div className="max-w-md w-full mt-8 space-y-4">
         {approved.length > 0 && (
           <div>
