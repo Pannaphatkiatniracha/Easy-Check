@@ -22,7 +22,9 @@ export default function AccessControl() {
       style={{
         background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
         minHeight: '100vh',
-        paddingBottom: '60px'
+        paddingBottom: '60px',
+        width: '80vw',
+        height: '200vh',
       }}
     >
       {/* header */}
@@ -165,7 +167,7 @@ export default function AccessControl() {
                     <Form.Check type="checkbox" id={item.id} label={item.label} />
                   </Form>
                 </Card>
-                
+
               ))}
 
             </div>

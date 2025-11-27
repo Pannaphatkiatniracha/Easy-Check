@@ -41,20 +41,12 @@ const CreateEvent = () => {
             style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
                 minHeight: '100vh',
+                width: '80vw',
+                height: '110vh',
             }}
         >
             {/* Header */}
             <div className="d-flex justify-content-center align-items-center py-5 position-relative">
-                <i
-                    className="bi bi-chevron-left position-absolute"
-                    style={{
-                        color: '#FFFF',
-                        fontSize: '30px',
-                        left: '20px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                    }}
-                ></i>
                 <h1 className="text-white m-0">Event Management</h1>
             </div>
 
@@ -65,8 +57,8 @@ const CreateEvent = () => {
                         <Card
                             className="shadow-lg rounded-4 mt-5 mx-auto"
                             style={{
-                                width: '90vw',
-                                height: '500px',
+                                width: '45vw',
+                                height: '530px',
                                 background: 'linear-gradient(to bottom, #FFFFFF, #A4B7FC)',
                                 border: 'none',
                                 overflow: 'hidden',
@@ -97,7 +89,7 @@ const CreateEvent = () => {
 
                                     {/* Calendar Grid */}
                                     {['first', 'second', 'third', 'fourth', 'fifth'].map((week, i) => (
-                                        <Row key={i} className="text-center mb-3 " title="Select the date and time" style={{ cursor: "pointer"}}>
+                                        <Row key={i} className="text-center mb-3 " title="Select the date and time" style={{ cursor: "pointer" }}>
                                             {getDaysForWeek(week).map((day, idx) => (
                                                 <Col
                                                     key={idx}

@@ -5,20 +5,23 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Form } from 'react-bootstrap';
 
 function SettingsAdmin() {
+    const goToPagePrivacyPolicyAdmin = () => {
+        window.location.href = "/easycheck/adminprivacypolicy";
+    };
     return (
         <>
 
-            <div style={{
+            <div className="main-content-only" style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+                width: '80vw',
+                height: '100vh',
+                margin: 0,
+                overflowY: 'auto',
             }}>
 
                 <Container fluid className="min-vh-100 py-5">
                     <Row className="mb-4">
                         <Col className="text-center">
-                            <i
-                                className="bi bi-chevron-left position-absolute"
-                                style={{ color: '#FFFF', fontSize: '30px', left: '20px', top: '50%', transform: 'translateY(-50%)' }}
-                            ></i>
                             <h1 className="fw-bold" style={{ color: '#FFFF' }}>Settings</h1>
                         </Col>
                     </Row>
@@ -82,6 +85,7 @@ function SettingsAdmin() {
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2"
                                 style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px' }}
+                                onClick={goToPagePrivacyPolicyAdmin}
                             >
                                 <div className="d-flex align-items-center gap-2">
                                     <i className="bi bi-shield-lock fs-4"></i> &nbsp;&nbsp;

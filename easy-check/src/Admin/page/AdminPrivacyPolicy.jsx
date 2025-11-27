@@ -5,18 +5,25 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
 function AdminPrivacyPolicy() {
+
+    const goback = () => {
+        window.location.href = "/easycheck/settingsadmin";
+    };
+
     return (
 
         <div
             style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
                 minHeight: '100vh',
+                width: '80vw',
             }}>
 
             <div className="position-relative py-5">
 
                 <i
                     className="bi bi-chevron-left position-absolute"
+                    onClick={goback}
                     style={{
                         color: '#FFFF',
                         fontSize: '30px',
