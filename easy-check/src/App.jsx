@@ -47,6 +47,9 @@ import Permission from "./Admin/page/Permission";
 
 
 
+
+
+
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token") || "")
   const [role, setRole] = useState(() => localStorage.getItem("role") || "")
@@ -94,7 +97,7 @@ function App() {
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
                 <Route path="notification" element={<Notification role={role} />} />
-                <Route path="checkapprove" element={<CheckApporve />} />
+                <Route path="checkapprove" element={<CheckApporve role={role} />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 
