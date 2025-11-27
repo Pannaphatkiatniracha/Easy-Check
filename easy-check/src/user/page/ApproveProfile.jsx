@@ -108,7 +108,6 @@ const ApproveProfile = () => {
 
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
-            {/* เปลี่ยนจาก w-25 เป็นการกำหนด width และ height แบบ fixed */}
             <div className="mx-auto mt-6 position-relative"
                 style={{width: "100px", height: "100px"}}>
 
@@ -139,7 +138,6 @@ const ApproveProfile = () => {
                         name="name" value={user.name} onChange={handleChange} readOnly />
                 </div>
 
-
                 {/* รหัสพนักงาน */}
                 <div className='mb-3 w-75'>
                     <InputGroup>
@@ -150,7 +148,6 @@ const ApproveProfile = () => {
                             name='userid' value={user.userid} onChange={handleChange} readOnly />
                     </InputGroup>
                 </div>
-
 
                 {/* อีเมล */}
                 <div className="mb-3 w-75">
@@ -163,85 +160,116 @@ const ApproveProfile = () => {
                     </InputGroup>
                 </div>
 
-
                 {/* เบอร์โทร */}
-                <div className="mb-12 w-75">
+                <div className="mb-4 w-75">
                     <InputGroup>
                         <InputGroup.Text className='text-secondary'>
                             <i className="bi bi-telephone-fill"></i>
-                            {/* <i class="bi bi-telephone"></i> */}
                         </InputGroup.Text>
                         <FormControl type='text' placeholder='Phone Number'
                             name="phone" value={user.phone} onChange={handleChange} />
                     </InputGroup>
                 </div>
 
+
+
+
+                {/* ข้อมูลการทำงาน */}
+                <div className='w-75'>
+                    <label className="text-white fw-light form-label">Work Information</label>
+                </div>
+
                 {/* ตำแหน่ง */}
-                {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
-                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                 <div className='mb-3 w-75'>
-                    <label className="text-white fw-light form-label" htmlFor="">Position</label><br />
-                    <input className="rounded-1 form-control fw-semibold" type="text"
-                        name='position' value={user.position} onChange={handleChange} readOnly />
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                            <i className="bi bi-briefcase-fill"></i>
+                        </InputGroup.Text>
+                        <FormControl className='fw-semibold' type="text"
+                            name='position' value={user.position} onChange={handleChange} readOnly />
+                    </InputGroup>
                 </div>
 
                 {/* แผนก */}
                 <div className='mb-3 w-75'>
-                    <label className="text-white fw-light form-label" htmlFor="">Department</label><br />
-                    <Form.Select aria-label='Select dapartment'
-                        name='department' value={user.department} onChange={handleChange}>
-                        <option value="Creative">Creative</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="IT">IT</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Customer Service">Customer Service</option>
-                    </Form.Select>
-                    {/* <input className="rounded-1 form-control" type="text" 
-                     /> */}
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                            <i className="bi bi-building-fill"></i>
+                        </InputGroup.Text>
+                        <Form.Select aria-label='Select department' className='fw-semibold'
+                            name='department' value={user.department} onChange={handleChange}>
+                            <option value="Creative">Creative</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="IT">IT</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Customer Service">Customer Service</option>
+                        </Form.Select>
+                    </InputGroup>
                 </div>
 
                 {/* สาขา */}
                 <div className='mb-3 w-75'>
-                    <label className="text-white fw-light form-label" htmlFor="">Branch</label><br />
-                    <Form.Select aria-label='Select branch'
-                        name='branch' value={user.branch} onChange={handleChange}>
-                        <option value="Bangkok">กรุงเทพมหานคร</option>
-                        <option value="ChiangMai">เชียงใหม่</option>
-                        <option value="Phuket">ภูเก็ต</option>
-                        <option value="Chonburi">ชลบุรี</option>
-                        <option value="Khonkaen">ขอนแก่น</option>
-                    </Form.Select>
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                            <i className="bi bi-geo-alt-fill"></i>
+                        </InputGroup.Text>
+                        <Form.Select aria-label='Select branch' className='fw-semibold'
+                            name='branch' value={user.branch} onChange={handleChange}>
+                            <option value="Bangkok">กรุงเทพมหานคร</option>
+                            <option value="ChiangMai">เชียงใหม่</option>
+                            <option value="Phuket">ภูเก็ต</option>
+                            <option value="Chonburi">ชลบุรี</option>
+                            <option value="Khonkaen">ขอนแก่น</option>
+                        </Form.Select>
+                    </InputGroup>
                 </div>
 
                 {/* กะงาน */}
-                <div className='mb-3 w-75'>
-                    <label className="text-white fw-light form-label" htmlFor="">Shift Schedule</label><br />
-                    <input className="rounded-1 form-control fw-semibold" type="text"
-                        name='shift' value={user.shift} onChange={handleChange} readOnly />
+                <div className='mb-4 w-75'>
+                    <InputGroup>
+                        <InputGroup.Text className='text-secondary'>
+                            <i className="bi bi-clock-fill"></i>
+                        </InputGroup.Text>
+                        <FormControl className='fw-semibold' type="text"
+                            name='shift' value={user.shift} onChange={handleChange} readOnly />
+                    </InputGroup>
                 </div>
 
-
-            </div>
-
-            {/* ข้อมูลที่ให้เลือก */}
-            <div className='px-5 mt-12'>
-                <label className='text-white fw-light form-label' htmlFor="">Birth</label>
-                <input className='form-control' type="date"
-                    name='birth' value={user.birth} onChange={handleChange} />
             </div>
 
 
 
-            <div className='px-5 mt-3'>
-                <label className="text-white fw-light form-label">Gender</label>
-                <Form.Select aria-label="Select gender"
-                    name='gender' value={user.gender} onChange={handleChange}>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </Form.Select>
 
+            {/* ข้อมูลส่วนตัว */}
+            <div className='px-5 mt-2'>
+                <label className='text-white fw-light form-label'>Personal Information</label>
             </div>
+
+            <div className='px-5'>
+                <InputGroup className='mb-3'>
+                    <InputGroup.Text className='text-secondary'>
+                        <i className="bi bi-calendar3"></i>
+                    </InputGroup.Text>
+                    <FormControl type="date"
+                        name='birth' value={user.birth} onChange={handleChange} />
+                </InputGroup>
+            </div>
+
+            <div className='px-5'>
+                <InputGroup>
+                    <InputGroup.Text className='text-secondary'>
+                        <i className="bi bi-gender-ambiguous"></i>
+                    </InputGroup.Text>
+                    <Form.Select aria-label="Select gender"
+                        name='gender' value={user.gender} onChange={handleChange}>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </Form.Select>
+                </InputGroup>
+            </div>
+
+
 
 
             {/* ปุ่ม */}
@@ -251,10 +279,12 @@ const ApproveProfile = () => {
                 </div>
             </Link>
 
+
             <div className='text-center mt-3 mb-5'>
                 <Button className='rounded-5 w-25 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
                     onClick={handleSave}>SAVE</Button>
             </div>
+
 
             {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
             <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
