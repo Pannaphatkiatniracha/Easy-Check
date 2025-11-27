@@ -200,11 +200,11 @@ function CheckApprove() {
     <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-4">
-        <Link to="/home">
-          <button className="text-white text-2xl hover:scale-110">
-            <i className="bi bi-chevron-left"></i>
-          </button>
-        </Link>
+        <Link to="/home" className='text-decoration-none'>
+                    <Button variant="link" className="p-0">
+                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    </Button>
+                </Link>
         <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
           Check Approve
         </h1>

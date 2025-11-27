@@ -4,7 +4,7 @@
 /* การตั้งค่าพื้นฐาน */
 body {
   font-family: 'Sarabun', sans-serif;
-  background-color: #3C467B; /* สีเทาอ่อน */
+  
   margin: 0;
   padding: 2rem;
   display: flex;
@@ -15,14 +15,16 @@ body {
 }
 
 /* คอนเทนเนอร์หลักของหน้า */
-.page-container {
-  display: flex;
+.page-con {
+    display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
   padding: 2rem;
   box-sizing: border-box;
 }
+  
+
 
 /* หัวข้อเรื่องของหน้า */
 .page-title {
@@ -106,7 +108,7 @@ body {
 }
 
 /* ปุ่มบันทึก */
-.save-button {
+.save-btn {
   width: 100%;
   max-width: 200px;
   padding: 0.75rem;
