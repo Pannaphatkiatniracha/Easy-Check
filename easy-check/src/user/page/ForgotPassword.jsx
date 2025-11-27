@@ -125,9 +125,6 @@ const ForgotPassword = () => {
                             <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                             <h5 className="fw-bold mt-2">Email Sent</h5>
                             <p className="mt-3">The system has sent the OTP password reset link to your email.</p>
-                            <div className="mt-3">
-                                <small className="text-muted">Redirecting to home page...</small>
-                            </div>
                         </>
                     ) 
                     

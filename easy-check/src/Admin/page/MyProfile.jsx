@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Lock, Briefcase, Camera, UserRound } from 'lucide-react';
 import './MyProfile.css'
 
-function App() {
+function MyProfile () {
   const [adminData, setAdminData] = useState({
     // ข้อมูลส่วนตัว
     fullName: "แอ้ว  น่ารัก",

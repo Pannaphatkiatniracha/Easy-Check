@@ -9,7 +9,7 @@ const PersonIcon = () => (
 );
 
 // คอมโพเนนต์หลักของแอป
-function App() {
+function Manageusers() {
   // State สำหรับเก็บ URL ของรูปโปรไฟล์ (สำหรับ Preview)
   const [profileImage, setProfileImage] = useState(null);
   
@@ -90,7 +90,7 @@ function App() {
             เปลี่ยนรูปโปรไฟล์
           </label>
 
-          <button className="save-button" onClick={handleSubmit}>
+          <button className="save-btn" onClick={handleSubmit}>
             บันทึก
           </button>
         </div>

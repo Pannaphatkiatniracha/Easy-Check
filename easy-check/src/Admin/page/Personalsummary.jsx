@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { User, Star, Phone, Mail, Calendar, Briefcase, Edit, X, Search, Filter, ChevronDown, Clock, UserCheck, Plus, Trash2, Check } from 'lucide-react';
-import './Personalsummary.css'
-const EmployeeSystem = () => {
+// import './Personalsummary.css'
+import '../page/Personalsummary.css'
+const Personalsummary = () => {
   const [employees, setEmployees] = useState([
     {
       id: 'EMP001',
