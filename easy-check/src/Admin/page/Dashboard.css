@@ -34,14 +34,12 @@
   --spacing: 24px;
 }
 
-body {
+
+.dashboard {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--primary);
   color: var(--gray-800);
   line-height: 1.6;
-}
-
-.dashboard {
   min-height: 100vh;
   padding: var(--spacing);
   /* max-width: 1600px; */

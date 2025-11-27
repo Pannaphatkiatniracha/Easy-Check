@@ -1,9 +1,10 @@
 /* ใช้ Google Font (Sarabun) หรือ Font ที่คุณต้องการ */
 @import url('https://fonts.googleapis.com/css2?family=sarabun:wght@400;500;600;700&display=swap');
 
-/* การตั้งค่าพื้นฐาน */
-body {
-  font-family: 'Sarabun', sans-serif;
+
+/* คอนเทนเนอร์หลักของหน้า */
+.page-con {
+   font-family: 'Sarabun', sans-serif;
   
   margin: 0;
   padding: 2rem;
@@ -12,10 +13,6 @@ body {
   align-items: flex-start; /* จัดให้อยู่ด้านบน */
   min-height: 100vh;
   color: #333;
-}
-
-/* คอนเทนเนอร์หลักของหน้า */
-.page-con {
     display: flex;
   flex-direction: column;
   align-items: center;
