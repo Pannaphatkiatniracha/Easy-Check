@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Form } from 'react-bootstrap';
 
-function Settings() {
+function SettingsAdmin() {
     return (
         <>
 
@@ -112,6 +112,6 @@ function Settings() {
     );
 }
 
-export default Settings;
+export default SettingsAdmin;
 
 
