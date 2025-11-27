@@ -32,7 +32,7 @@ const ForgotPassword = () => {
 
 
     const handleSend = () => {
-        
+
         // ตรวจสอบว่าอีเมลที่กรอกตรงกับอีเมลที่อยู่ใน profile ไหม
         if (email === profileEmail) {
             setIsEmailValid(true)
@@ -42,7 +42,7 @@ const ForgotPassword = () => {
             // โชว์ modal เสร็จ 3s ให้ไปหน้า home
             setTimeout(() => {
                 setShowModal(false)
-                navigate('/home')
+                navigate('/login')
             }, 3000)
 
         } else {
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
     // ปิด modal success
     const handleSuccessClose = () => {
         setShowModal(false)
-        navigate('/home')
+        navigate('/login')
     }
 
 
@@ -69,6 +69,7 @@ const ForgotPassword = () => {
     return (
         <div className="app-container">
 
+
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
                 <Link to="/login" className='text-decoration-none'>
@@ -80,6 +81,7 @@ const ForgotPassword = () => {
                 <h3 className="fw-bold">Forgot password ?</h3>
                 <div className="me-4"></div>
             </div>
+
 
             {/* กล่องกรอกอีเมล */}
             <div className="d-flex flex-column align-items-center">

@@ -58,7 +58,7 @@ const ShiftSchedule = () => {
 
 
   const startIndex = (curPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage; 
+  const endIndex = startIndex + rowsPerPage;
   const pagedData = filteredData.slice(startIndex, endIndex); //ตัดข้อมูลเฉพาะช่วงที่ต้องแสดงในหน้าปัจจุบัน
 
 
@@ -70,7 +70,7 @@ const ShiftSchedule = () => {
     if (Idemployee.trim() === '' || Shift.trim() === '' || Level.trim() === '') {
       alert("Please fill in all required fields.");
       return;
-    } // ตัดช่องว่างด้วย trim() ถ้ามีช่องว่างให้แจ้งเตือนว่าให้กรอกข้อมูลให้ครบถ้วน
+    } // ตัดช่องว่างด้วย trim() ถ้ามีช่องว่างให้แจ้งเตือนว่าให้กรอกข้อมูลให้ครบ
 
     const newData = {
       id: Date.now(),
@@ -98,22 +98,15 @@ const ShiftSchedule = () => {
 
 
   return (
-    <div style={{ background: 'linear-gradient(to bottom, #3C467B, #6E80E1)' }}>
+    <div style={{
+      background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+      minHeight: '98vh',
+      width: '80vw',
+    }}>
 
 
       {/* header */}
       <div className="position-relative py-4">
-        <i
-          className="bi bi-chevron-left position-absolute"
-          style={{
-            color: '#FFFF',
-            fontSize: '30px',
-            left: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            cursor: 'pointer'
-          }}
-        />
         <h1 className="text-center m-4" style={{ color: '#FFFF', fontWeight: 500 }}>
           Shift Schedule
         </h1>
@@ -177,7 +170,7 @@ const ShiftSchedule = () => {
           <tbody style={{ color: '#ffffff' }}>
             {pagedData.map((item) => (
               <tr key={item.id}>
-                <td className="flex justify-center items-center p-3">
+                <td style={{ textAlign: 'left', verticalAlign: 'middle', padding: '1rem' }}>
                   <img
                     src={item.photo}
                     alt={`${item.Firstname} ${item.Lastname}`}
@@ -185,17 +178,17 @@ const ShiftSchedule = () => {
                       width: '50px',
                       height: '50px',
                       objectFit: 'cover',
-                      borderRadius: '50px',
-                      display: 'block'
+                      borderRadius: '50%',
+                      display: 'inline-block' // ใช้ inline-block แทน block เพื่อไม่บังคับให้อยู่กลาง
                     }}
-                    className="w-16 h-16 object-cover rounded-full"
                   />
                 </td>
-                <td className="flex justify-center items-center p-4">{item.Idemployee}</td>
-                <td className="flex justify-center items-center p-4">{item.Firstname}</td>
-                <td className="flex justify-center items-center p-4">{item.Lastname}</td>
-                <td className="flex justify-center items-center p-4">{item.Shift}</td>
-                <td className="flex justify-center items-center p-4">{item.Level}</td>
+
+                <td className="justify-center items-center p-4">{item.Idemployee}</td>
+                <td className="justify-center items-center p-4">{item.Firstname}</td>
+                <td className="justify-center items-center p-4">{item.Lastname}</td>
+                <td className="justify-center items-center p-4">{item.Shift}</td>
+                <td className="justify-center items-center p-4">{item.Level}</td>
               </tr>
             ))}
           </tbody>
