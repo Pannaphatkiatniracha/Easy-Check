@@ -50,6 +50,7 @@ import Manageusers from "./Admin/page/Manageusers";
 import Personalsummary from "./Admin/page/Personalsummary";
 
 import CheckApprove from "./user/page/CheckApprove";
+import EditProfile from "./Admin/page/EditProfile";
 
 
 
@@ -155,6 +156,7 @@ function App() {
             <Route path="MyProfile" element={<MyProfile/>} />
             <Route path="Manageusers" element={<Manageusers />} />
             <Route path="Personalsummary" element={<Personalsummary />} />
+            <Route path="EditProfile" element={<EditProfile />} />
           </Route>
 
 
