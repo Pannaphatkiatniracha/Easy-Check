@@ -11,7 +11,6 @@ const initialRequests = [
     type: "ค่ารักษาพยาบาล (ค่าหมอ)",
     status: "Pending",
     receipt: "https://i.pinimg.com/736x/e6/ea/c6/e6eac67cfe131915426ba32b14331a27.jpg",
-    submittedDate: "2025-11-22",
   },
   {
     id: 2,
@@ -21,7 +20,6 @@ const initialRequests = [
     type: "ค่ารักษาพยาบาล (ค่ายา)",
     status: "Pending",
     receipt: "https://i.pinimg.com/736x/e6/ea/c6/e6eac67cfe131915426ba32b14331a27.jpg",
-    submittedDate: "2025-11-23",
   },
   {
     id: 3,
@@ -31,7 +29,6 @@ const initialRequests = [
     type: "ค่าทันตกรรม (อุดฟัน)",
     status: "Pending",
     receipt: "https://i.pinimg.com/736x/e6/ea/c6/e6eac67cfe131915426ba32b14331a27.jpg",
-    submittedDate: "2025-11-21",
   },
   {
     id: 4,
@@ -41,7 +38,6 @@ const initialRequests = [
     type: "ค่าทันตกรรม (ขูดหินปูน)",
     status: "Pending",
     receipt: "https://i.pinimg.com/736x/e6/ea/c6/e6eac67cfe131915426ba32b14331a27.jpg",
-    submittedDate: "2025-11-20",
   },
 ];
 
@@ -53,10 +49,19 @@ function PaymentRequest() {
   const openImage = (src) => setSelectedImage(src);
   const closeImage = () => setSelectedImage(null);
 
-  const handleStatus = (id, newStatus) => {
+  const handleStatus = (id, newStatus, reason = "") => {
     setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+      prev.map((r) =>
+        r.id === id ? { ...r, status: newStatus, reason } : r
+      )
     );
+  };
+
+  const handleReject = (id) => {
+    const reason = prompt("กรุณาใส่เหตุผลที่ไม่อนุมัติ:");
+    if (reason !== null && reason.trim() !== "") {
+      handleStatus(id, "Rejected", reason);
+    }
   };
 
   const filteredRequests = requests.filter((r) => r.status === activeTab);
@@ -108,7 +113,6 @@ function PaymentRequest() {
             <p className="text-muted mb-1">{req.department}</p>
             <p className="mb-1">Type: {req.type}</p>
             <p className="mb-1">Amount: {req.amount} บาท</p>
-            <p className="text-muted mb-1">Submitted: {req.submittedDate}</p>
             <p className={`fw-medium ${
               req.status === "Pending"
                 ? "text-warning"
@@ -118,6 +122,9 @@ function PaymentRequest() {
             }`}>
               Status: {req.status}
             </p>
+            {req.status === "Rejected" && req.reason && (
+              <p className="text-sm text-gray-700 mt-1">เหตุผล: {req.reason}</p>
+            )}
 
             {/* Receipt */}
             <div className="mt-2">
@@ -132,7 +139,7 @@ function PaymentRequest() {
                 <Button onClick={() => handleStatus(req.id, "Approved")} variant="success" className="flex-grow-1">
                   <i className="bi bi-check-circle me-2"></i> Approve
                 </Button>
-                <Button onClick={() => handleStatus(req.id, "Rejected")} variant="danger" className="flex-grow-1">
+                <Button onClick={() => handleReject(req.id)} variant="danger" className="flex-grow-1">
                   <i className="bi bi-x-circle me-2"></i> Reject
                 </Button>
               </div>
