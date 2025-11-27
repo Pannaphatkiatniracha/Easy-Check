@@ -28,7 +28,7 @@ import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
 import ApproverManagement from "./user/page/ApproverManagement";
 import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
-import Notification from "./user/page/Notification";
+
 import Dashboard from "./Admin/page/Dashboard";
 import AppLayouts from "./Admin/layouts/AppLayouts";
 import AdminLogin from "./Admin/page/AdminLogin";
@@ -50,6 +50,7 @@ import Manageusers from "./Admin/page/Manageusers";
 import Personalsummary from "./Admin/page/Personalsummary";
 
 import CheckApprove from "./user/page/CheckApprove";
+import EditProfile from "./Admin/page/EditProfile";
 
 
 
@@ -104,7 +105,7 @@ function App() {
                 <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
-                <Route path="notification" element={<Notification role={role} />} />
+                
                 <Route path="checkapprove" element={<CheckApprove role={role} />} />
 
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
@@ -155,6 +156,7 @@ function App() {
             <Route path="MyProfile" element={<MyProfile/>} />
             <Route path="Manageusers" element={<Manageusers />} />
             <Route path="Personalsummary" element={<Personalsummary />} />
+            <Route path="EditProfile" element={<EditProfile />} />
           </Route>
 
 

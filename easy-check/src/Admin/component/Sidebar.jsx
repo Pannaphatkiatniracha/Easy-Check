@@ -63,7 +63,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Shift Schedule',
-      path: '/shift'
+      path: '/shiftschedule'
     },
     { 
       icon: (
@@ -76,7 +76,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Event Management',
-      path: '/events'
+      path: '/createevent'
     },
     { 
       icon: (
@@ -108,7 +108,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'GPS Status',
-      path: '/gps'
+      path: '/setGPS'
     },
     { 
       icon: (
@@ -118,7 +118,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Settings',
-      path: '/settings'
+      path: '/settingsadmin'
     },
   ];
 
@@ -130,25 +130,30 @@ const Sidebar = () => {
     <div className={styles.sidebar}>
       
 
-      <div className={styles.sidebarBrand}>
-        <div className={`${styles.brandIcon} ${styles.profileIcon}`}>
-          <img
-            src={user.profileImage || "https://i.pinimg.com/736x/e9/6e/66/e96e6640dd63927d0c179eb6e80956ad.jpg"}
-            alt="Profile"
-            className={styles.profileImage}
-          />
-        </div>
+<div 
+  className={styles.sidebarBrand} 
+  onClick={() => navigate('/MyProfile')}
+  style={{ cursor: "pointer" }}
+>
+  <div className={`${styles.brandIcon} ${styles.profileIcon}`}>
+    <img
+      src={user.profileImage || "https://i.pinimg.com/736x/e9/6e/66/e96e6640dd63927d0c179eb6e80956ad.jpg"}
+      alt="Profile"
+      className={styles.profileImage}
+    />
+  </div>
 
-        <div className={styles.brandInfo}>
-          <span className={styles.brandText}>
-            {user.fullName || 'Admin Panel'}
-          </span>
-          <span className={styles.brandSubtext}>
-            {user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
-            {user.department && ` • ${user.department}`}
-          </span>
-        </div>
-      </div>
+  <div className={styles.brandInfo}>
+    <span className={styles.brandText}>
+      {user.fullName || 'Admin Panel'}
+    </span>
+    <span className={styles.brandSubtext}>
+      {user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
+      {user.department && ` • ${user.department}`}
+    </span>
+  </div>
+</div>
+
 
       {/* Menu Items */}
       <nav className={styles.sidebarNav}>

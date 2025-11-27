@@ -41,7 +41,7 @@ const CreateEvent = () => {
             style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
                 minHeight: '100vh',
-                width: '80vw',
+                width: '100vw',
                 height: '110vh',
             }}
         >

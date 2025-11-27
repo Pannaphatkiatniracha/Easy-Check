@@ -16,7 +16,8 @@ function AdminPrivacyPolicy() {
             style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
                 minHeight: '100vh',
-                width: '80vw',
+                width: 'auto',
+                padding:'5rem',
             }}>
 
             <div className="position-relative py-5">

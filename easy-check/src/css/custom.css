@@ -27,3 +27,22 @@
   align-items: center;
   text-align: left; /* ให้ข้อความชิดซ้าย */
 }
+
+.modal-dialog {
+  margin: auto !important;
+  max-width: 600px;
+  width: 100%;
+}
+
+.modal-content {
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal {
+  z-index: 1050 !important;
+}
