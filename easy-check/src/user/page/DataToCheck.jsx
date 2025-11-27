@@ -44,16 +44,6 @@ const DataToCheck = () => {
             </div>
 
 
-            {/* Loading State */}
-            {loading && (
-                <div className="text-center text-white mt-8">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <p className="mt-2">Loading...</p>
-                </div>
-            )}
-
             {/* รายชื่อ */}
             {!loading && (
                 <div className="w-full space-y-4 px-4 mt-8">
