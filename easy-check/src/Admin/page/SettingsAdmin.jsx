@@ -42,7 +42,7 @@ function SettingsAdmin() {
                             {/* Notification */}
 
                             <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px', width: '400px' }}>
+                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', marginTop: '50px', borderRadius: '40px', width: '400px' }}>
 
                                 <div className="d-flex align-items-center gap-2 text-white">
                                     <i className="bi bi-bell-fill fs-4"></i> &nbsp;&nbsp;
@@ -57,7 +57,7 @@ function SettingsAdmin() {
 
                             {/* Dark Mode */}
                             <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '8px', width: '400px' }}>
+                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '50px', width: '400px' }}>
                                 <div className="d-flex align-items-center gap-2 text-white">
                                     <i className="bi bi-circle-half fs-4"></i> &nbsp;&nbsp;
                                     <span>Dark Mode</span>
@@ -69,7 +69,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px', width: '400px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px' , borderRadius: '50px', width: '400px' }}
                                 onClick={goToPageEditProfile}
                             >
                                 <div className="d-flex align-items-center gap-2">
@@ -83,7 +83,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px', width: '400px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '50px', width: '400px' }}
                                 onClick={goToPagePermission}
                             >
                                 <div className="d-flex align-items-center gap-2">
@@ -97,7 +97,7 @@ function SettingsAdmin() {
                             <Button
                                 variant="link"
                                 className="d-flex justify-content-between align-items-center text-decoration-none text-white shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '8px', width: '400px' }}
+                                style={{ backgroundColor: '#0A0043', marginBottom: '25px', borderRadius: '50px', width: '400px' }}
                                 onClick={goToPagePrivacyPolicyAdmin}
                             >
                                 <div className="d-flex align-items-center gap-2">
