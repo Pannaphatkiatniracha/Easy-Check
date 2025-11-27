@@ -28,21 +28,17 @@
   text-align: left; /* ให้ข้อความชิดซ้าย */
 }
 
-.modal-dialog {
-  margin: auto !important;
-  max-width: 600px;
-  width: 100%;
+
+.dropdown-menu {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: none;
 }
 
-.modal-content {
-  width: 100%;
-  border-radius: 0.5rem;
+.dropdown-item {
+  color: #000000 !important;
 }
 
-.modal-backdrop {
-  z-index: 1040 !important;
-}
-
-.modal {
-  z-index: 1050 !important;
+.dropdown-item:hover {
+  background-color: #1a1a80 !important;
 }
