@@ -27,7 +27,7 @@ function LeaveRequestApprove() {
           leaveStart: employee.leaveStart,
           leaveEnd: employee.leaveEnd,
           otherReason: "",
-          evidencePreview: employee.leaveEvidence || null,
+          evidencePreview: employee.leaveEvidence || null, // ถ้าไม่มีให้เป็น null
           department: employee.department,
           position: employee.position
         }));
@@ -91,6 +91,7 @@ function LeaveRequestApprove() {
                 วันที่ลา: {req.leaveStart} → {req.leaveEnd}
               </div>
 
+              {/* แสดงปุ่มดูรูปแนบเฉพาะถ้ามี evidencePreview จริงๆ */}
               {req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
@@ -117,6 +118,7 @@ function LeaveRequestApprove() {
           </div>
         ))}
       </div>
+
 
       {selectedEvidence && (
         <div
