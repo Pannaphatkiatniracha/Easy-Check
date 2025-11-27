@@ -4,7 +4,7 @@ import Sidebar from "../component/Sidebar"
 
 const AppLayouts = () => {
     return (
-        <div className="flex min-h-screen">
+        <div>
             
 
             <div>
@@ -12,7 +12,7 @@ const AppLayouts = () => {
             </div>  
 
 
-            <main className="flex-1 p-6 overflow-auto">
+            <main>
                 <Outlet /> 
             </main>
 
