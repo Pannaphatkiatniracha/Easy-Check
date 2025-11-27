@@ -95,9 +95,9 @@ const Personalsummary = () => {
     email: '',
     supervisor: '',
     startDate: '',
-    attendanceRate: 100,
+    attendanceRate: 0,
     workStats: { present: 0, late: 0, absent: 0 },
-    leaveBalance: { personal: 6, sick: 30, vacation: 10, maternity: 0 },
+    leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
     avatarColor: '#3C4678'
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,10 +126,11 @@ const Personalsummary = () => {
   const openDetails = (employee) => {
     setSelectedEmployee(employee);
     setEditData({
-      startDate: employee.startDate,
-      attendanceRate: employee.attendanceRate,
-      workStats: { ...employee.workStats },
-      leaveBalance: { ...employee.leaveBalance }
+      phone: employee.phone,
+      email: employee.email,
+      position: employee.position,
+      department: employee.department,
+      supervisor: employee.supervisor
     });
     setIsEditing(false);
     setShowModal(true);
@@ -158,10 +159,11 @@ const Personalsummary = () => {
 
   const handleCancel = () => {
     setEditData({
-      startDate: selectedEmployee.startDate,
-      attendanceRate: selectedEmployee.attendanceRate,
-      workStats: { ...selectedEmployee.workStats },
-      leaveBalance: { ...selectedEmployee.leaveBalance }
+      phone: selectedEmployee.phone,
+      email: selectedEmployee.email,
+      position: selectedEmployee.position,
+      department: selectedEmployee.department,
+      supervisor: selectedEmployee.supervisor
     });
     setIsEditing(false);
   };
@@ -188,9 +190,9 @@ const Personalsummary = () => {
       email: '',
       supervisor: '',
       startDate: '',
-      attendanceRate: 100,
+      attendanceRate: 0,
       workStats: { present: 0, late: 0, absent: 0 },
-      leaveBalance: { personal: 6, sick: 30, vacation: 10, maternity: 0 },
+      leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
       avatarColor: '#3C4678'
     });
   };
@@ -274,8 +276,8 @@ const Personalsummary = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={closeModal}>×</button>
             
-            <div className="modal-header">
-              <div className="avatar-large" style={{ backgroundColor: selectedEmployee.avatarColor }}>
+            <div className="modal-header-Personalsummary">
+              <div className="avatar-large-Personalsummary" style={{ backgroundColor: selectedEmployee.avatarColor }}>
                 {getInitials(selectedEmployee.firstName, selectedEmployee.lastName)}
               </div>
               <h2>{selectedEmployee.firstName} {selectedEmployee.lastName}</h2>
@@ -284,26 +286,66 @@ const Personalsummary = () => {
 
             <div className="modal-body">
               <section className="info-section">
-                <h3>ข้อมูลติดต่อ</h3>
+                <h3>ข้อมูลทั่วไป</h3>
                 <div className="info-row">
                   <span className="label">เบอร์โทรศัพท์:</span>
-                  <span>{selectedEmployee.phone}</span>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editData.phone}
+                      onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    />
+                  ) : (
+                    <span>{selectedEmployee.phone}</span>
+                  )}
                 </div>
                 <div className="info-row">
                   <span className="label">อีเมล:</span>
-                  <span>{selectedEmployee.email}</span>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      value={editData.email}
+                      onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    />
+                  ) : (
+                    <span>{selectedEmployee.email}</span>
+                  )}
                 </div>
                 <div className="info-row">
                   <span className="label">ตำแหน่ง:</span>
-                  <span>{selectedEmployee.position}</span>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editData.position}
+                      onChange={(e) => setEditData({ ...editData, position: e.target.value })}
+                    />
+                  ) : (
+                    <span>{selectedEmployee.position}</span>
+                  )}
                 </div>
                 <div className="info-row">
                   <span className="label">แผนก:</span>
-                  <span>{selectedEmployee.department}</span>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editData.department}
+                      onChange={(e) => setEditData({ ...editData, department: e.target.value })}
+                    />
+                  ) : (
+                    <span>{selectedEmployee.department}</span>
+                  )}
                 </div>
                 <div className="info-row">
                   <span className="label">หัวหน้า:</span>
-                  <span>{selectedEmployee.supervisor}</span>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editData.supervisor}
+                      onChange={(e) => setEditData({ ...editData, supervisor: e.target.value })}
+                    />
+                  ) : (
+                    <span>{selectedEmployee.supervisor}</span>
+                  )}
                 </div>
               </section>
 
@@ -311,36 +353,20 @@ const Personalsummary = () => {
                 <h3>ข้อมูลการทำงาน</h3>
                 <div className="info-row">
                   <span className="label">วันเริ่มงาน:</span>
-                  {isEditing ? (
-                    <input 
-                      type="date" 
-                      value={editData.startDate}
-                      onChange={(e) => setEditData({...editData, startDate: e.target.value})}
-                    />
-                  ) : (
-                    <span>{new Date(selectedEmployee.startDate).toLocaleDateString('th-TH')}</span>
-                  )}
+                  <span>{new Date(selectedEmployee.startDate).toLocaleDateString('th-TH')}</span>
                 </div>
                 <div className="info-row">
                   <span className="label">อายุงาน:</span>
-                  <span>{calculateWorkDuration(isEditing ? editData.startDate : selectedEmployee.startDate)}</span>
+                  <span>{calculateWorkDuration(selectedEmployee.startDate)}</span>
                 </div>
                 <div className="info-row">
                   <span className="label">สถิติการทำงานเดือนนี้:</span>
                   <div className="work-stats">
-                    {isEditing ? (
-                      <>
-                        <span>มา: <input type="number" value={editData.workStats.present} onChange={(e) => setEditData({...editData, workStats: {...editData.workStats, present: parseInt(e.target.value) || 0}})} style={{width: '50px'}} /> วัน</span>
-                        <span>สาย: <input type="number" value={editData.workStats.late} onChange={(e) => setEditData({...editData, workStats: {...editData.workStats, late: parseInt(e.target.value) || 0}})} style={{width: '50px'}} /> วัน</span>
-                        <span>ขาด: <input type="number" value={editData.workStats.absent} onChange={(e) => setEditData({...editData, workStats: {...editData.workStats, absent: parseInt(e.target.value) || 0}})} style={{width: '50px'}} /> วัน</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>มา: {selectedEmployee.workStats.present} วัน</span>
-                        <span>สาย: {selectedEmployee.workStats.late} วัน</span>
-                        <span>ขาด: {selectedEmployee.workStats.absent} วัน</span>
-                      </>
-                    )}
+                    <>
+                      <span>มา: {selectedEmployee.workStats.present} วัน</span>
+                      <span>สาย: {selectedEmployee.workStats.late} วัน</span>
+                      <span>ขาด: {selectedEmployee.workStats.absent} วัน</span>
+                    </>
                   </div>
                 </div>
               </section>
@@ -350,22 +376,11 @@ const Personalsummary = () => {
                 <div className="progress-container">
                   <div className="progress-bar">
                     <div 
-                      className="progress-fill" 
-                      style={{ width: `${isEditing ? editData.attendanceRate : selectedEmployee.attendanceRate}%` }}
+                      className="progress-fill"
+                      style={{ width: `${selectedEmployee.attendanceRate}%` }}
                     ></div>
                   </div>
-                  {isEditing ? (
-                    <input 
-                      type="number" 
-                      value={editData.attendanceRate}
-                      onChange={(e) => setEditData({...editData, attendanceRate: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))})}
-                      min="0"
-                      max="100"
-                      style={{width: '60px', marginLeft: '10px'}}
-                    />
-                  ) : (
-                    <span className="progress-text">{selectedEmployee.attendanceRate}%</span>
-                  )}
+                  <span className="progress-text">{selectedEmployee.attendanceRate}%</span>
                 </div>
               </section>
 
@@ -374,69 +389,33 @@ const Personalsummary = () => {
                 <div className="leave-grid">
                   <div className="leave-item">
                     <span className="leave-label">ลากิจ</span>
-                    {isEditing ? (
-                      <input 
-                        type="number" 
-                        value={editData.leaveBalance.personal}
-                        onChange={(e) => setEditData({...editData, leaveBalance: {...editData.leaveBalance, personal: parseInt(e.target.value) || 0}})}
-                        style={{width: '50px'}}
-                      />
-                    ) : (
-                      <span className="leave-value">{selectedEmployee.leaveBalance.personal} วัน</span>
-                    )}
+                    <span className="leave-value">{selectedEmployee.leaveBalance.personal} วัน</span>
                   </div>
                   <div className="leave-item">
                     <span className="leave-label">ลาป่วย</span>
-                    {isEditing ? (
-                      <input 
-                        type="number" 
-                        value={editData.leaveBalance.sick}
-                        onChange={(e) => setEditData({...editData, leaveBalance: {...editData.leaveBalance, sick: parseInt(e.target.value) || 0}})}
-                        style={{width: '50px'}}
-                      />
-                    ) : (
-                      <span className="leave-value">{selectedEmployee.leaveBalance.sick} วัน</span>
-                    )}
+                    <span className="leave-value">{selectedEmployee.leaveBalance.sick} วัน</span>
                   </div>
                   <div className="leave-item">
                     <span className="leave-label">ลาพักร้อน</span>
-                    {isEditing ? (
-                      <input 
-                        type="number" 
-                        value={editData.leaveBalance.vacation}
-                        onChange={(e) => setEditData({...editData, leaveBalance: {...editData.leaveBalance, vacation: parseInt(e.target.value) || 0}})}
-                        style={{width: '50px'}}
-                      />
-                    ) : (
-                      <span className="leave-value">{selectedEmployee.leaveBalance.vacation} วัน</span>
-                    )}
+                    <span className="leave-value">{selectedEmployee.leaveBalance.vacation} วัน</span>
                   </div>
                   <div className="leave-item">
                     <span className="leave-label">ลาคลอด</span>
-                    {isEditing ? (
-                      <input 
-                        type="number" 
-                        value={editData.leaveBalance.maternity}
-                        onChange={(e) => setEditData({...editData, leaveBalance: {...editData.leaveBalance, maternity: parseInt(e.target.value) || 0}})}
-                        style={{width: '50px'}}
-                      />
-                    ) : (
-                      <span className="leave-value">{selectedEmployee.leaveBalance.maternity} วัน</span>
-                    )}
+                    <span className="leave-value">{selectedEmployee.leaveBalance.maternity} วัน</span>
                   </div>
                 </div>
               </section>
 
-              <div className="modal-actions">
+              <div className="modal-actions-Personalsummary">
                 {isEditing ? (
                   <>
-                    <button className="save-btn" onClick={handleSave}>บันทึก</button>
+                    <button className="save-Personalsummary-btn" onClick={handleSave}>บันทึก</button>
                     <button className="cancel-btn" onClick={handleCancel}>ยกเลิก</button>
                   </>
                 ) : (
-                  <button className="edit-btn" onClick={handleEdit}>แก้ไขข้อมูลการทำงาน</button>
+                  <button className="edit-btn" onClick={handleEdit}>แก้ไขข้อมูล</button>
                 )}
-                <button className="delete-btn" onClick={() => handleDeleteEmployee(selectedEmployee.id)}>ลบพนักงาน</button>
+                <button className="delete-btn" onClick={() => handleDeleteEmployee(selectedEmployee.id)}>ลบ</button>
               </div>
             </div>
           </div>
@@ -448,7 +427,7 @@ const Personalsummary = () => {
           <div className="modal-content add-modal" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={() => setShowAddModal(false)}>×</button>
             
-            <div className="modal-header">
+            <div className="modal-header-Personalsummary">
               <h2>เพิ่มพนักงานใหม่</h2>
             </div>
 
@@ -528,8 +507,8 @@ const Personalsummary = () => {
                 </div>
               </div>
 
-              <div className="modal-actions">
-                <button className="save-btn" onClick={handleAddEmployee}>เพิ่มพนักงาน</button>
+              <div className="modal-actions-Personalsummary">
+                <button className="save-Personalsummary-btn" onClick={handleAddEmployee}>เพิ่มพนักงาน</button>
                 <button className="cancel-btn" onClick={() => setShowAddModal(false)}>ยกเลิก</button>
               </div>
             </div>

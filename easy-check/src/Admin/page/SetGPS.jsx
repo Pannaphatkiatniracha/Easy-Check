@@ -810,7 +810,7 @@ export default function GPSAdminDashboard() {
                 step="10"
                 value={formData.radius}
                 onChange={handleInputChange}
-                className="radius-slider"
+                className="radius-slider-SetGPS"
               />
               <div className="radius-marks">
                 <span>10m</span>

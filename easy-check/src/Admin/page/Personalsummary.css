@@ -13,7 +13,8 @@
   padding: 20px;
   background: #3C4678;
   width: 1400px;
-  margin: 0 auto;
+  margin: 10px;
+  border-radius: 10px
 }
 
 /* Header */
@@ -253,14 +254,15 @@
   transform: rotate(90deg);
 }
 
-.modal-header {
+.modal-header-Personalsummary {
   text-align: center;
+  border-radius: 10px;
   padding: 40px 30px 30px;
   background: linear-gradient(135deg, #3C4678 0%, #50589C 100%);
   color: white;
 }
 
-.avatar-large {
+.avatar-large-Personalsummary {
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -274,12 +276,12 @@
   border: 4px solid rgba(255, 255, 255, 0.2);
 }
 
-.modal-header h2 {
+.modal-header-Personalsummary h2 {
   font-size: 28px;
   margin-bottom: 8px;
 }
 
-.modal-header .emp-code {
+.modal-header-Personalsummary .emp-code {
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
 }
@@ -439,7 +441,7 @@
   font-weight: 700;
 }
 
-.modal-actions {
+.modal-actions-Personalsummary {
   display: flex;
   gap: 15px;
   margin-top: 30px;
@@ -448,7 +450,7 @@
 }
 
 .edit-btn,
-.save-btn,
+.save-Personalsummary-btn,
 .cancel-btn {
   flex: 1;
   padding: 14px;
@@ -471,13 +473,13 @@
   box-shadow: 0 6px 20px rgba(110, 140, 251, 0.6);
 }
 
-.save-btn {
+.save-Personalsummary-btn {
   background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
   color: white;
   box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
 }
 
-.save-btn:hover {
+.save-Personalsummary-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(74, 222, 128, 0.6);
 }
@@ -530,12 +532,16 @@
 
 /* --- Modal Buttons --- */
 
-.modal-actions .delete-btn {
+.modal-actions-Personalsummary .delete-btn {
   background-color: #e74c3c; /* Red */
   color: white;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 600px;
 }
 
-.modal-actions .delete-btn:hover {
+.modal-actions-Personalsummary .delete-btn:hover {
   background-color: #c0392b; /* Darker Red */
 }
 
@@ -591,7 +597,7 @@
     max-height: 85vh;
   }
 
-  .modal-actions {
+  .modal-actions-Personalsummary {
     flex-direction: column;
   }
 }
