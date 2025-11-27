@@ -39,6 +39,7 @@ import AdminPrivacyPolicy from "./Admin/page/AdminPrivacyPolicy";
 import AccessControl from "./Admin/page/AccessControl";
 import ShiftSchedule from "./Admin/page/ShiftSchedule";
 import SettingsAdmin from "./Admin/page/SettingsAdmin";
+import SetGPS from "./Admin/page/SetGPS";
 
 
 
@@ -92,7 +93,7 @@ function App() {
                 <Route path="checkapprove" element={<CheckApporve />} />
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
-                <Route path="dashboard" element={<Dashboard />} />
+                
                 <Route
                   path="datacheck"
                   element={
@@ -129,6 +130,8 @@ function App() {
             <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
             <Route path='accesscontrol' element={<AccessControl/>} />
             <Route path='shiftschedule' element={<ShiftSchedule/>} />
+            <Route path='setGPS' element={<SetGPS/>} />
+            
           </Route>
 
 

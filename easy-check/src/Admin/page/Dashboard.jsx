@@ -42,7 +42,6 @@ const generateEmployees = (count) => {
   const shuffledIndices = [...Array(count).keys()].sort(() => 0.5 - Math.random());
   let currentIndex = 0;
 
-  // 2 คน ลาคลอด (เลือกชื่อผู้หญิง)
   const femaleNames = ['สมหญิง', 'สุดา', 'นภา', 'มานี', 'วันดี', 'พิมพ์'];
   let maternityCount = 0;
   for (let i = 0; i < count && maternityCount < 2; i++) {
@@ -300,7 +299,7 @@ const Dashboard = () => {
             labels: leaveTypes,
             datasets: [{
               data: leaveData,
-              backgroundColor: ['#3C467B', '#50589C', '#636CCB'],
+              backgroundColor: ['#3C467B', '#50589C', '#636CCB','#7F8CFF'],
               borderWidth: 0,
               hoverOffset: 10
             }]
@@ -367,17 +366,9 @@ const Dashboard = () => {
             <Calendar size={18} />
             <span>วันอาทิตย์ที่ 9 พฤศจิกายน 2568</span>
           </div>
-          
-            <div className="header-Export">
-            <button className="btn-Export-new" >
-                    <ArrowDownToLine size={18} /> 
-                    Export
-                  </button>
-         
-         </div>
-          
-        </div>
-      </header>
+          </div>
+           
+           </header>
 
       <section className="hero-section">
         <div className="hero-kpi-grid">
@@ -779,3 +770,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+        
+     

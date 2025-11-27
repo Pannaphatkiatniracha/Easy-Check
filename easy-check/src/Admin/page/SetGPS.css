@@ -11,7 +11,7 @@ body {
 }
 
 /* ==================== Main Container ==================== */
-.app-container {
+.app-con {
   min-height: 100vh;
   background: #3C467B;;
   padding: 20px;
@@ -112,7 +112,7 @@ body {
 
 
 
-.header-icon {
+.head-icon {
   
   padding: 15px;
   border-radius: 15px;
@@ -1453,7 +1453,7 @@ body {
     display: none !important;
   }
 
-  .app-container {
+  .app-con {
     background: white;
   }
 
