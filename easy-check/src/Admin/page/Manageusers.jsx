@@ -64,7 +64,7 @@ function Manageusers() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-con">
       
       
       <div className="profile-card">

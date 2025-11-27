@@ -36,6 +36,7 @@
 
 
 .dashboard {
+
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--primary);
   color: var(--gray-800);
@@ -43,8 +44,9 @@
   min-height: 100vh;
   padding: var(--spacing);
   /* max-width: 1600px; */
-  margin: 0 auto;
+  margin: 20px;
   background-color: #3C467B;
+  border-radius: 20px;
 }
 
 /* Loading Screen */
@@ -72,7 +74,7 @@
 }
 
 /* Header */
-.header {
+.header-dashboard {
   background: var(--primary-lightest);
   padding: 28px 36px;
   border-radius: var(--radius-lg);
@@ -103,7 +105,7 @@
   font-size: 20px;
 }
 
-.header h1 {
+.header-dashboard h1 {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 2px;

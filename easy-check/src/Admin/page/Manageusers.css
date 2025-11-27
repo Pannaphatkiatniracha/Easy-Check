@@ -1,12 +1,14 @@
 /* ใช้ Google Font (Sarabun) หรือ Font ที่คุณต้องการ */
 @import url('https://fonts.googleapis.com/css2?family=sarabun:wght@400;500;600;700&display=swap');
 
-
+.page-con {  
+  margin: 50px;
+}
 /* คอนเทนเนอร์หลักของหน้า */
 .page-con {
    font-family: 'Sarabun', sans-serif;
   
-  margin: 0;
+  margin: 0px;
   padding: 2rem;
   display: flex;
   justify-content: center;
@@ -21,21 +23,9 @@
   box-sizing: border-box;
 }
   
-
-
-/* หัวข้อเรื่องของหน้า */
-.page-title {
-  width: 150%;
-  display: flex;
-  align-items: center;
-  font-size: 1.75rem; /* 28px */
-  font-weight: 600;
-  color: #1f2937; /* สีเทาเข้ม */
-  margin-bottom: 1.5rem;
-}
-
 /* การ์ดหลักที่แบ่งซ้ายขวา */
 .profile-card {
+  margin: 10px;
   max-width: 1000px;
   background: #ffffff;
   border-radius: 16px;
@@ -119,7 +109,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-.save-button:hover {
+.save-btn:hover {
   background-color: #4f46e5;
 }
 
@@ -127,6 +117,7 @@
 .right-pane {
   overflow-y: auto; /* 2 ใน 3 ส่วน */
   padding: 2.5rem ;
+  border-radius: 10px;
 }
 
 .right-pane form {
@@ -165,7 +156,7 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db; /* สีเทาขอบ */
-  border-radius: 8px;
+  border-radius: 5px; /* ใช้ค่าสูงเพื่อให้โค้งมนเต็มที่ */
   box-sizing: border-box; /* ทำให้ padding ไม่กระทบความกว้าง */
   font-size: 0.95rem;
   font-family: 'Sarabun', sans-serif;
