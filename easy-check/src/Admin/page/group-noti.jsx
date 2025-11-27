@@ -48,7 +48,7 @@ const GroupNoti = () => {
   };
 
   const handleViewDetails = (departmentId) => {
-    navigate(`/group-noti2/${departmentId}`);
+    navigate(`/groupnoti2/${departmentId}`);
   };
 
   const handleSend = () => {

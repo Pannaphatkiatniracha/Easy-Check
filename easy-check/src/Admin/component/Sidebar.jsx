@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styles from './Sidebar.module.css'; // ✔ ใช้ CSS Module ให้ถูกต้อง
+import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Group Notification',
-      path: '/group-noti'
+      path: '/groupnoti'
     },
     { 
       icon: (
@@ -98,7 +98,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Export Excel/PDF',
-      path: '/export'
+      path: '/exportexcel'
     },
     { 
       icon: (
@@ -129,7 +129,7 @@ const Sidebar = () => {
   return (
     <div className={styles.sidebar}>
       
-      {/* Profile Section */}
+
       <div className={styles.sidebarBrand}>
         <div className={`${styles.brandIcon} ${styles.profileIcon}`}>
           <img
@@ -165,7 +165,7 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      {/* Logout Button */}
+
       <div className={styles.sidebarFooter}>
         <button 
           className={`${styles.sidebarItem} ${styles.logoutItem}`} 
