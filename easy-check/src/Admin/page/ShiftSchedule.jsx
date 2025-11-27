@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { fetchApi } from '../../data/Api';
 import { Button, Form, Table, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
-import '../css/custom.css';
+import '../../css/custom.css';
 
 const ShiftSchedule = () => {
   const [apiRaw, setApiRaw] = useState([]);
