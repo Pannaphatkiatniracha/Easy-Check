@@ -480,7 +480,7 @@ export default function GPSAdminDashboard() {
   }, [filteredLogs]);
 
   return (
-    <div className="app-container">
+    <div className="app-con">
       {toast.show && (
         <div className={`toast toast-${toast.type}`}>
           {toast.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
@@ -501,7 +501,7 @@ export default function GPSAdminDashboard() {
               <h1 className="header-title">ระบบจัดการ GPS </h1>
               
             </div>
-            <div className="header-icon">
+            <div className="head-icon">
               <MapPin size={40} color="white" />
             </div>
           </div>

@@ -4,15 +4,15 @@ import Sidebar from "../component/Sidebar"
 
 const AppLayouts = () => {
     return (
-        <div className="flex min-h-screen">
+        <div>
             
 
-            <div className="w-80 bg-white shadow-lg">
+            <div>
                 <Sidebar />
             </div>  
 
 
-            <main className="flex-1 p-6 overflow-auto">
+            <main>
                 <Outlet /> 
             </main>
 
