@@ -6,14 +6,13 @@ import { useLocation } from "react-router-dom";
 
 const ExRegister = ({ role }) => {
 
-    const location = useLocation() // รับข้อมูลจาก state
-    const selectedEvent = location.state?.selectedEvent || "" // ข้อมูล event ที่เลือก
-    const eventData = location.state?.event // ข้อมูลเต็มของ event
-
+    const location = useLocation()  // รับข้อมูลจาก state
+    const selectedEvent = location.state?.event  //  ข้อมูล event ที่เลือก
+    const registrationData = location.state?.registrationData // รับข้อมูลเพิ่มเติมสำหรับการลงทะเบียน
 
     const [showModal, setShowModal] = useState(false)
     const [notes, setNotes] = useState("") // State สำหรับเก็บหมายเหตุเพิ่มเติม
-
+    const [registrationDate, setRegistrationDate] = useState("") // State สำหรับวันที่ลงทะเบียน
 
     // กำหนด API URL ตาม role
     const getApiUrls = () => {
@@ -30,29 +29,19 @@ const ExRegister = ({ role }) => {
         }
     }
 
-
     const apiUrls = getApiUrls()
-
-
+    
     // setUser ใช้ตอนเปลี่ยนค่า user
-    const [user, setUser] = useState(
-        {
-            name: "", //ค่าตั้งต้น
-            userid: "",
-            position: "",
-            department: "",
-            branch: "",
-            events: selectedEvent || ""  // เซ็ตค่าเริ่มต้นจาก event ที่เลือกกดเข้ามา
-        }
-    )
+    const [user, setUser] = useState({
+        name: "", //ค่าตั้งต้น
+        userid: "",
+        position: "",
+        department: "",
+        branch: "",
+        events: selectedEvent?.title || ""  // เซ็ตค่าเริ่มต้นจาก event ที่เลือกกดเข้ามา
+    })
 
     // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจาก Mock API
-
-    // async คือเป็นเป็นนางประกาศ บอกชาวบ้านเขาว่ากำลังจะมีงานใหญ่มานะแก
-    // const res = await fetch ("") ก็คือให้ res นางเป็นตัวรับค่าข้อมูลในลิ้งมา ซึ่งพอมี await ก็คือบอกให้รอโหลดให้เสร็จก่อนนะ
-    // const data = await res.json() ก็คือเอาให้ res แปลงสภาพตัวเองเป็น json แต่อยู่ในนาม data เพราะ res คือตัวแปรข้อมูลดิบ และให้ รอนางแปลงสภาพเสร็จก่อน
-
-
     useEffect(() => {
         const loadData = async () => {
             const res = await fetch(apiUrls.profile)
@@ -63,31 +52,51 @@ const ExRegister = ({ role }) => {
                 position: data.position || "",
                 department: data.department || "",
                 branch: data.branch || "",
-                events: selectedEvent || ""
+                events: selectedEvent?.title || ""
             })
         }
         loadData()
-    }, [selectedEvent])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
-
+        // ตั้งค่าวันที่ลงทะเบียนเป็นวันที่ปัจจุบัน
+        if (registrationData?.currentDate) {
+            setRegistrationDate(registrationData.currentDate)
+        } else {
+            setRegistrationDate(new Date().toISOString().split('T')[0])
+        }
+    }, [selectedEvent, registrationData])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        const registrationData = {
+        const registrationDataToSend = {
             ...user,
-            notes: notes // เพิ่มหมายเหตุในการลงทะเบียน
+            notes: notes, // เพิ่มหมายเหตุในการลงทะเบียน
+            registrationDate: registrationDate, // วันที่ลงทะเบียน
+            eventTitle: selectedEvent?.title,
+            eventDate: selectedEvent?.date,
+            eventTime: selectedEvent?.time,
+            eventLocation: selectedEvent?.location,
+            eventIcon: selectedEvent?.icon
         }
 
-        await fetch(apiUrls.register, {
-            method: "PUT", // อัปเดต
-            headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
-            body: JSON.stringify(registrationData),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
-        })
-        setShowModal(true)
+        try {
+            await fetch(apiUrls.register, {
+                method: "PUT", // อัปเดต
+                headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
+                body: JSON.stringify(registrationDataToSend),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
+            })
+            setShowModal(true)
+        } catch (error) {
+            console.error("Error saving registration:", error)
+            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล")
+        }
     }
 
-
-
+    // ใช้ข้อมูลจาก registrationData ก่อน ถ้าไม่มีค่อยใช้ selectedEvent
+    const eventTitle = registrationData?.eventTitle || selectedEvent?.title
+    const eventDate = registrationData?.eventDate || selectedEvent?.date
+    const eventTime = registrationData?.eventTime || selectedEvent?.time
+    const eventLocation = registrationData?.eventLocation || selectedEvent?.location
+    const eventIcon = registrationData?.eventIcon || selectedEvent?.icon
 
     const UserPage = (
         <div className='app-container'>
@@ -104,14 +113,14 @@ const ExRegister = ({ role }) => {
 
                 <div className="d-flex flex-column align-items-center">
                     <h3 className="fw-bold">Register to</h3>
-                    <h5 className="text-white mb-0">{selectedEvent}</h5>
+                    <h5 className="text-white mb-0">{eventTitle}</h5>
                 </div>
 
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
 
-            {/* ข้อมูลอีเว้น*/}
+            {/* ข้อมูลอีเว้น */}
             <div className="mt-6">
                 <div className="mb-3 rounded-3 text-black mx-3"
                     style={{ backgroundColor: '#D9D9D9' }}>
@@ -123,7 +132,7 @@ const ExRegister = ({ role }) => {
                             <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
                                 style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
 
-                                <i className="bi bi-calendar-event fs-5 text-[#6D29F6]"></i>
+                                <i className={`bi ${eventIcon || 'bi-globe'} fs-5 text-[#6D29F6]`}></i>
 
                             </div>
 
@@ -131,13 +140,13 @@ const ExRegister = ({ role }) => {
                             <div className="flex-grow-1">
 
                                 <div className="h6 mb-2">
-                                    <b>{selectedEvent}</b>
+                                    <b>{eventTitle}</b>
                                 </div>
 
                                 <div className="small mb-2">
-                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
-                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventDate} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventTime} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation}
                                 </div>
 
                                 <div className="small text-success">
@@ -151,7 +160,7 @@ const ExRegister = ({ role }) => {
                 </div>
             </div>
 
-            {/* ข้อมูลที่ลิ้งมาจาก profile */}
+            {/* ข้อมูลที่ลิ้งมาจากหน้า profile */}
             <div className="d-flex flex-column align-items-center mt-6">
 
                 <div className="mb-3 w-75">
@@ -186,14 +195,8 @@ const ExRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
-                {/* วันที่ที่ลงอีเว้น */}
-                <div className='mb-3 w-75'>
-                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
-                    <input className='rounded-1 form-control fw-semibold' type="date" />
-                </div>
-
                 {/* กล่องหมายเหตุ */}
-                <div className='mb-6 w-75'>
+                <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
                     <textarea
                         className="rounded-1 form-control fw-semibold"
@@ -208,7 +211,6 @@ const ExRegister = ({ role }) => {
                 </div>
 
             </div>
-
 
             {/* ปุ่ม */}
             <div className='text-center mt-12 mb-12'>
@@ -226,7 +228,7 @@ const ExRegister = ({ role }) => {
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
-                    <p><i>{user.name}</i> registered for<br />{selectedEvent}</p>
+                    <p><i>{user.name}</i> registered for<br />{eventTitle}</p>
                     {notes && (
                         <div className="mt-3 p-2 bg-light rounded">
                             <small className="text-muted">
@@ -234,16 +236,16 @@ const ExRegister = ({ role }) => {
                             </small>
                         </div>
                     )}
+                    <div className="mt-2 p-2 bg-light rounded">
+                        <small className="text-muted">
+                            <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
+                        </small>
+                    </div>
                 </Modal.Body>
             </Modal>
 
         </div>
     )
-
-
-
-
-
 
     const ApprovePage = (
         <div className='app-container'>
@@ -260,7 +262,7 @@ const ExRegister = ({ role }) => {
 
                 <div className="d-flex flex-column align-items-center">
                     <h3 className="fw-bold">Register to</h3>
-                    <h5 className="text-white">{selectedEvent}</h5>
+                    <h5 className="text-white">{eventTitle}</h5>
                     <small className="text-warning">👑 Approver</small>
                 </div>
 
@@ -268,7 +270,7 @@ const ExRegister = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
-            {/* ข้อมูลอีเว้น*/}
+            {/* ข้อมูลอีเว้นที่เราจะลงทะเบียน */}
             <div className="mt-6">
                 <div className="mb-3 rounded-3 text-black mx-3"
                     style={{ backgroundColor: '#D9D9D9' }}>
@@ -280,7 +282,7 @@ const ExRegister = ({ role }) => {
                             <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
                                 style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
 
-                                <i className="bi bi-calendar-event fs-5 text-[#6D29F6]"></i>
+                                <i className={`bi ${eventIcon || 'bi-globe'} fs-5 text-[#6D29F6]`}></i>
 
                             </div>
 
@@ -288,13 +290,13 @@ const ExRegister = ({ role }) => {
                             <div className="flex-grow-1">
 
                                 <div className="h6 mb-2">
-                                    <b>{selectedEvent}</b>
+                                    <b>{eventTitle}</b>
                                 </div>
 
                                 <div className="small mb-2">
-                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventData?.date || "ข้อมูลวันที่"} <br />
-                                    <i className="bi bi-clock me-1"></i> เวลา: {eventData?.time || "ข้อมูลเวลา"} <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventData?.location || "ข้อมูลสถานที่"}
+                                    <i className="bi bi-calendar3 me-1"></i> วันที่: {eventDate} <br />
+                                    <i className="bi bi-clock me-1"></i> เวลา: {eventTime} <br />
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation}
                                 </div>
 
                                 <div className="small text-success">
@@ -308,7 +310,7 @@ const ExRegister = ({ role }) => {
                 </div>
             </div>
 
-            {/* ข้อมูลที่แสดงลิ้งมาจากหน้า profile */}
+            {/* ข้อมูลตรงนี้ลิ้งมาจาก profile ของแต่ละ role */}
             <div className="d-flex flex-column align-items-center mt-6">
 
                 <div className="mb-3 w-75">
@@ -343,13 +345,8 @@ const ExRegister = ({ role }) => {
                         name='branch' value={user.branch} readOnly />
                 </div>
 
-                <div className='mb-3 w-75'>
-                    <label className='text-white fw-light form-label' htmlFor="">Registration date</label>
-                    <input className='rounded-1 form-control fw-semibold' type="date" />
-                </div>
-
                 {/* กล่องหมายเหตุ */}
-                <div className='mb-6 w-75'>
+                <div className='mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Additional Notes</label>
                     <textarea
                         className="rounded-1 form-control fw-semibold"
@@ -381,7 +378,7 @@ const ExRegister = ({ role }) => {
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
-                    <p><i>{user.name}</i> (Approver) registered for<br />{selectedEvent}</p>
+                    <p className='mt-3'><i>{user.name}</i> registered for<br />{eventTitle}</p>
                     {notes && (
                         <div className="mt-3 p-2 bg-light rounded">
                             <small className="text-muted">
@@ -389,6 +386,11 @@ const ExRegister = ({ role }) => {
                             </small>
                         </div>
                     )}
+                    <div className="mt-2 p-2 bg-light rounded">
+                        <small className="text-muted">
+                            <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
+                        </small>
+                    </div>
                 </Modal.Body>
             </Modal>
 
@@ -396,7 +398,6 @@ const ExRegister = ({ role }) => {
     )
 
     return role === "approver" ? ApprovePage : UserPage
-
 }
 
 export default ExRegister
