@@ -75,22 +75,25 @@ function PaymentRequest() {
     <div className="app-container min-h-screen bg-[#3C467B] flex flex-col items-center font-inter px-4 sm:px-6 md:px-8 py-6">
 
       {/* Header */}
-      <div className="w-full max-w-md d-flex justify-content-between align-items-center mb-6 mx-auto">
+      <div className="w-full max-w-md flex items-center justify-between mb-6 mx-auto">
+        {/* Icon กลับไปหน้า Home */}
         <Link to="/home" className='text-decoration-none'>
           <Button variant="link" className="p-0">
-            <i className="bi bi-chevron-left ms-3 text-white" style={{ fontSize: '1.5rem' }}></i>
+            <i className="bi bi-chevron-left text-white text-2xl"></i>
           </Button>
         </Link>
 
-        <h1 className="text-white text-2xl fw-bold text-center flex-grow-1">
+        {/* หัวข้อ */}
+        <h1 className="text-white text-2xl font-bold text-center flex-grow">
           Payment Requests
         </h1>
 
+        {/* Spacer เพื่อให้หัวข้ออยู่ตรงกลาง */}
         <div style={{ width: '2rem' }} />
       </div>
 
       {/* Tabs */}
-      <div className="w-full max-w-md d-flex justify-content-between gap-2 mb-6 mx-auto">
+      <div className="w-full max-w-md flex justify-between gap-2 mb-6 mx-auto">
         {["Pending", "Approved", "Rejected"].map((tab) => (
           <Button
             key={tab}

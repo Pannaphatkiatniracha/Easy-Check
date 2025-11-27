@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-
 const initialUsers = [
   {
     id: 1,
@@ -23,21 +22,23 @@ const initialUsers = [
     checkInPhoto:
       "https://cdn.mania.kr/nbamania/g2/data/cheditor5/2402/view_thumbnail/mania-done-20240214105503_evzebkmp.jpg",
   },
-    {
+  {
     id: 3,
     name: "สราศินีย์ บุญมา",
     employeeId: "100003",
     checkInTime: "08:30",
-    profile: "https://i.pinimg.com/736x/14/2b/f0/142bf06d188725faa3824815f8772f7f.jpg",
+    profile:
+      "https://i.pinimg.com/736x/14/2b/f0/142bf06d188725faa3824815f8772f7f.jpg",
     checkInPhoto:
       "https://i.pinimg.com/736x/3d/a4/30/3da43051883bcf170a3e5660bd6caf8d.jpg",
   },
-    {
+  {
     id: 4,
     name: "ฐนิก ทรัพย์โนนหวาย",
     employeeId: "100004",
     checkInTime: "08:30",
-    profile: "https://i.pinimg.com/736x/06/3a/74/063a74f72578c9e3c5d1081032912e7d.jpg",
+    profile:
+      "https://i.pinimg.com/736x/06/3a/74/063a74f72578c9e3c5d1081032912e7d.jpg",
     checkInPhoto:
       "https://i.pinimg.com/736x/e9/1d/d8/e91dd8c706bcc5dbd14cb39dbd7e01ac.jpg",
   },
@@ -58,19 +59,16 @@ const initialDelegateCheckins = [
     name: "สฤณี จันทร์สว่าง",
     employeeId: "100006",
     profile:
-      "https://i.pinimg.com/736x/b6/7b/99/b67b99c76b19dd60911db5897211ce50.jpg", // ใส่ URL โปรไฟล์จริง
-   
+      "https://i.pinimg.com/736x/b6/7b/99/b67b99c76b19dd60911db5897211ce50.jpg",
   },
   {
     id: 2,
     name: "สิรินทรา ศรีสวัสดิ์",
     employeeId: "100007",
     profile:
-      "https://i.pinimg.com/736x/27/35/c7/2735c7b69c0d042fcb219024c7082782.jpg", // ใส่ URL โปรไฟล์จริง
-    
+      "https://i.pinimg.com/736x/27/35/c7/2735c7b69c0d042fcb219024c7082782.jpg",
   },
 ];
-
 
 const getStatus = (checkIn) => {
   const checkInDate = new Date(`1970-01-01T${checkIn}:00`);
@@ -131,86 +129,82 @@ function CheckApprove() {
   };
 
   const renderCard = (user, isDelegate = false) => {
-  const buttonClasses =
-    "flex-1 py-2 rounded-full text-white text-xs font-semibold hover:scale-105 transition-all";
-  return (
-    <div
-      key={user.id}
-      className="relative bg-white p-4 rounded-2xl shadow-md border border-gray-300 flex items-center gap-4"
-    >
-      {/* แสดงรูปโปรไฟล์ทุกคน */}
-      {user.profile && (
-        <img
-          src={user.profile}
-          alt={user.name}
-          className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover"
-        />
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold text-gray-800 text-sm truncate">{user.name}</div>
-        <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
-        {/* แสดงเวลาเช็กอินเฉพาะ normal users */}
-        {!isDelegate && (
-          <div className="text-xs text-gray-600 mt-1">
-            เวลาเช็กอิน: {user.checkInTime} -{" "}
-            <span
-              className={
-                getStatus(user.checkInTime) === "สาย"
-                  ? "text-red-500"
-                  : "text-green-500"
-              }
-            >
-              {getStatus(user.checkInTime)}
-            </span>
-          </div>
+    const buttonClasses =
+      "flex-1 py-2 rounded-full text-white text-xs font-semibold hover:scale-105 transition-all";
+    return (
+      <div
+        key={user.id}
+        className="relative bg-white p-4 rounded-2xl shadow-md border border-gray-300 flex items-center gap-4"
+      >
+        {user.profile && (
+          <img
+            src={user.profile}
+            alt={user.name}
+            className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover"
+          />
         )}
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={() =>
-              isDelegate ? handleApproveDelegate(user) : handleApproveNormal(user)
-            }
-            className={`${buttonClasses} bg-green-500 hover:bg-green-600`}
-          >
-            อนุมัติ
-          </button>
-          <button
-            onClick={() =>
-              isDelegate ? handleRejectDelegate(user) : handleRejectNormal(user)
-            }
-            className={`${buttonClasses} bg-red-500 hover:bg-red-600`}
-          >
-            ไม่อนุมัติ
-          </button>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-gray-800 text-sm truncate">{user.name}</div>
+          <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
+          {!isDelegate && (
+            <div className="text-xs text-gray-600 mt-1">
+              เวลาเช็กอิน: {user.checkInTime} -{" "}
+              <span
+                className={
+                  getStatus(user.checkInTime) === "สาย"
+                    ? "text-red-500"
+                    : "text-green-500"
+                }
+              >
+                {getStatus(user.checkInTime)}
+              </span>
+            </div>
+          )}
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() =>
+                isDelegate ? handleApproveDelegate(user) : handleApproveNormal(user)
+              }
+              className={`${buttonClasses} bg-green-500 hover:bg-green-600`}
+            >
+              อนุมัติ
+            </button>
+            <button
+              onClick={() =>
+                isDelegate ? handleRejectDelegate(user) : handleRejectNormal(user)
+              }
+              className={`${buttonClasses} bg-red-500 hover:bg-red-600`}
+            >
+              ไม่อนุมัติ
+            </button>
+          </div>
         </div>
+        {!isDelegate && (
+          <button
+            onClick={() => setSelectedUser(user)}
+            className="text-gray-700 text-2xl hover:scale-110"
+          >
+            <i className="bi bi-camera"></i>
+          </button>
+        )}
       </div>
-      {/* ปุ่มดูรูปเช็กอิน เฉพาะ normal users */}
-      {!isDelegate && (
-        <button
-          onClick={() => setSelectedUser(user)}
-          className="text-gray-700 text-2xl hover:scale-110"
-        >
-          <i className="bi bi-camera"></i>
-        </button>
-      )}
-    </div>
-  );
-};
-
+    );
+  };
 
   return (
     <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
-      {/* Header */}
-      <div className="w-full max-w-md flex items-center justify-between mb-4">
-        <Link to="/home" className='text-decoration-none'>
-                    <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-white"></i>
-                    </Button>
-                </Link>
-        <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
-          Check Approve
-        </h1>
-        <div className="w-8" />
-      </div>
+   {/* Header */}
+<div className="d-flex justify-content-between text-white mt-16 mb-4 w-full max-w-md">
+  <Link to="/home" className="text-decoration-none">
+    <Button variant="link" className="p-0">
+      <i className="bi bi-chevron-left ms-3 text-white text-2xl"></i>
+    </Button>
+  </Link>
+  <h3 className="fw-bold text-center flex-grow-1">Check Approve</h3>
+  <div className="me-4" /> {/* ช่องว่างด้านขวา */}
+</div>
+
+
 
       {/* Toggle Buttons */}
       <div className="flex gap-2 mb-4 w-full max-w-md justify-center">
