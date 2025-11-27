@@ -12,7 +12,11 @@ function CheckInOut() {
   const [checkInData, setCheckInData] = useState(null);
   const [checkOutData, setCheckOutData] = useState(null);
   const [mode, setMode] = useState("checkin");
-  const [confirmEarlyCheckout, setConfirmEarlyCheckout] = useState(false);
+
+  // สำหรับคำขอออกก่อนเวลา
+  const [earlyRequest, setEarlyRequest] = useState(null);
+  const [showEarlyModal, setShowEarlyModal] = useState(false);
+  const [earlyReason, setEarlyReason] = useState("");
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -78,13 +82,14 @@ function CheckInOut() {
       setMode("checkout");
       setPhoto(null);
     } else if (mode === "checkout") {
-      // ตรวจสอบเวลาเช็คเอาท์
       const currentHour = now.getHours();
-      if (currentHour < 18 && !confirmEarlyCheckout) {
-        setConfirmEarlyCheckout(true);
+      // ถ้ายังไม่ถึง 18:00 ให้สร้างคำขอออกก่อนเวลา
+      if (currentHour < 18 && !earlyRequest) {
+        setShowEarlyModal(true);
         return;
       }
 
+      // ถ้ามีคำขอออกก่อนเวลา และอนุมัติแล้ว ให้บันทึกเช็คเอาท์
       const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
       setCheckOutData(data);
       localStorage.setItem("checkOutData", JSON.stringify(data));
@@ -96,7 +101,7 @@ function CheckInOut() {
       }
       setMode("done");
       setPhoto(null);
-      setConfirmEarlyCheckout(false);
+      setEarlyRequest(null);
     }
 
     const stream = videoRef.current?.srcObject;
@@ -108,9 +113,20 @@ function CheckInOut() {
     setError("");
   };
 
-  const handleEarlyConfirm = () => {
-    setConfirmEarlyCheckout(false);
-    handleConfirm();
+  const handleEarlySubmit = () => {
+    if (!earlyReason.trim()) return setError("กรุณากรอกเหตุผล");
+    const request = { reason: earlyReason, status: "pending" };
+    setEarlyRequest(request);
+    setShowEarlyModal(false);
+    setEarlyReason("");
+    setMessage("ส่งคำขอออกก่อนเวลาเรียบร้อย\nรอผู้อนุมัติ");
+  };
+
+  const handleApproveEarly = () => {
+    // สมมติผู้อนุมัติอนุมัติทันที
+    if (!earlyRequest) return;
+    setEarlyRequest({ ...earlyRequest, status: "approved" });
+    setMessage("คำขออนุมัติแล้ว สามารถเช็คเอาท์ได้");
   };
 
   const handleReset = () => {
@@ -122,25 +138,25 @@ function CheckInOut() {
     setMode("checkin");
     setMessage("");
     setError("");
+    setEarlyRequest(null);
+    setEarlyReason("");
+    setShowEarlyModal(false);
   };
 
   return (
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
 
-        {/* Header */}
         <div className="flex justify-start mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
         </div>
 
-        {/* Title */}
         <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg text-center mb-6">
           Check-In / Check-Out
         </h1>
 
-        {/* Camera Card */}
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4 hover:scale-105 transition-transform duration-300">
           <video
             ref={videoRef}
@@ -166,7 +182,6 @@ function CheckInOut() {
           </div>
         </div>
 
-        {/* Preview Photo */}
         {photo && (
           <img
             src={URL.createObjectURL(photo)}
@@ -175,13 +190,11 @@ function CheckInOut() {
           />
         )}
 
-        {/* Time & Date */}
         <div className="w-full grid grid-cols-2 gap-4">
           <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{time}</div>
           <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{date}</div>
         </div>
 
-        {/* Location & Confirm */}
         <button
           onClick={handleLocation}
           className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg hover:scale-105 transition transform"
@@ -198,7 +211,6 @@ function CheckInOut() {
           </button>
         )}
 
-        {/* Check-In & Check-Out Data */}
         {checkInData && (
           <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
             <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
@@ -227,7 +239,6 @@ function CheckInOut() {
           </div>
         )}
 
-        {/* Message & Error */}
         {message && (
           <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line hover:scale-105 transition duration-300">
             {message}
@@ -235,7 +246,6 @@ function CheckInOut() {
         )}
         {error && <p className="mt-3 text-red-300 font-semibold">{error}</p>}
 
-        {/* Reset */}
         {mode === "done" && (
           <button
             onClick={handleReset}
@@ -245,24 +255,40 @@ function CheckInOut() {
           </button>
         )}
 
+        {/* ปุ่มอนุมัติคำขอออกก่อนเวลา (สมมติฝั่งผู้อนุมัติ) */}
+        {earlyRequest && earlyRequest.status === "pending" && (
+          <button
+            onClick={handleApproveEarly}
+            className="w-full py-3 rounded-xl bg-yellow-400 text-black font-bold shadow-lg hover:scale-105 transition transform mt-3"
+          >
+            อนุมัติคำขอออกก่อนเวลา
+          </button>
+        )}
+
       </div>
 
-      {/* Modal ยืนยันเช็คเอาท์ก่อนเวลา */}
-      {confirmEarlyCheckout && (
+      {/* Modal กรอกเหตุผลออกก่อนเวลา */}
+      {showEarlyModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
-            <p className="mb-4 text-gray-800 font-semibold">
-              คุณกำลังเช็คเอาท์ก่อนเวลา 18:00 ต้องการยืนยันหรือไม่?
+            <p className="mb-2 text-gray-800 font-semibold">
+              คุณต้องการเช็คเอาท์ก่อนเวลา 18:00 กรุณากรอกเหตุผล
             </p>
+            <textarea
+              value={earlyReason}
+              onChange={(e) => setEarlyReason(e.target.value)}
+              placeholder="กรอกเหตุผลที่ต้องการออกก่อนเวลา"
+              className="w-full p-2 border rounded-md mb-4"
+            />
             <div className="flex justify-center gap-4">
               <button
-                onClick={handleEarlyConfirm}
+                onClick={handleEarlySubmit}
                 className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
               >
-                ยืนยัน
+                ส่งคำขอ
               </button>
               <button
-                onClick={() => setConfirmEarlyCheckout(false)}
+                onClick={() => setShowEarlyModal(false)}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
               >
                 ยกเลิก
