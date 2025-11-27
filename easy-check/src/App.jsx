@@ -33,11 +33,12 @@ import Dashboard from "./Admin/page/Dashboard";
 import AppLayouts from "./Admin/layouts/AppLayouts";
 import AdminLogin from "./Admin/page/AdminLogin";
 import AdminForgotPassword from "./Admin/page/AdminForgotPassword";
-import Settings from "./Admin/page/Settings";
+import Settings from "./Admin/page/SettingsAdmin";
 import CreateEvent from "./Admin/page/CreateEvent";
 import AdminPrivacyPolicy from "./Admin/page/AdminPrivacyPolicy";
 import AccessControl from "./Admin/page/AccessControl";
 import ShiftSchedule from "./Admin/page/ShiftSchedule";
+import SettingsAdmin from "./Admin/page/SettingsAdmin";
 
 
 
@@ -123,7 +124,7 @@ function App() {
           {/* ฝั่ง ADMIN */}
           <Route element={<AppLayouts />}>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path='settings' element={<Settings />} />
+            <Route path='settingsadmin' element={<SettingsAdmin/>} />
             <Route path='createevent' element={<CreateEvent />} />
             <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
             <Route path='accesscontrol' element={<AccessControl/>} />
