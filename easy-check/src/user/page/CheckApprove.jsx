@@ -6,7 +6,7 @@ const initialUsers = [
   {
     id: 1,
     name: "ปัณณพรรธน์ เกียรตินิรชา",
-    employeeId: "010889",
+    employeeId: "100001",
     checkInTime: "09:00",
     profile:
       "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
@@ -16,47 +16,60 @@ const initialUsers = [
   {
     id: 2,
     name: "ฐิติฉัตร ศิริบุตร",
-    employeeId: "010101",
+    employeeId: "100002",
     checkInTime: "08:30",
     profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
     checkInPhoto:
       "https://cdn.mania.kr/nbamania/g2/data/cheditor5/2402/view_thumbnail/mania-done-20240214105503_evzebkmp.jpg",
   },
-  {
+    {
     id: 3,
+    name: "สราศินีย์ บุญมา",
+    employeeId: "100003",
+    checkInTime: "08:30",
+    profile: "https://i.pinimg.com/736x/14/2b/f0/142bf06d188725faa3824815f8772f7f.jpg",
+    checkInPhoto:
+      "https://i.pinimg.com/736x/3d/a4/30/3da43051883bcf170a3e5660bd6caf8d.jpg",
+  },
+    {
+    id: 4,
+    name: "ฐนิก ทรัพย์โนนหวาย",
+    employeeId: "100004",
+    checkInTime: "08:30",
+    profile: "https://i.pinimg.com/736x/06/3a/74/063a74f72578c9e3c5d1081032912e7d.jpg",
+    checkInPhoto:
+      "https://i.pinimg.com/736x/e9/1d/d8/e91dd8c706bcc5dbd14cb39dbd7e01ac.jpg",
+  },
+  {
+    id: 5,
     name: "ภทรพร แซ่ลี้",
-    employeeId: "110400",
+    employeeId: "100005",
     checkInTime: "10:00",
     profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
     checkInPhoto:
       "https://preview.redd.it/250728-karina-instagram-update-v0-7l1e5zr17mff1.jpg?width=640&crop=smart&auto=webp&s=d9ee4d6c794abcdb46210783defb38cf37c30b58",
   },
-  {
-    id: 4,
-    name: "กรณ์นภัส เศรษฐรัตนพงศ์",
-    employeeId: "270502",
-    checkInTime: "08:59",
-    profile:
-      "https://www.workpointtoday.com/_next/image?url=https%3A%2F%2Fimages.workpointtoday.com%2Fworkpointnews%2F2025%2F08%2F22145353%2F1755849232_726522-workpointtoday.webp&w=2048&q=75",
-    checkInPhoto:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS051l6Ix1YkE6dykvsMvYfaKK8F_7CXPCi4T8afAfiLlgwdZ_xxET5QCCD4FCG9iDSaMzl1SRn0Wvo1kUVzpkibqMUaO3nr5QEif7zIA&s=10",
-  },
-  {
-    id: 5,
-    name: "ศิริลักษณ์ คอง",
-    employeeId: "1110495",
-    checkInTime: "11:30",
-    profile:
-      "https://www.siamzone.com/ig/media/6927166/3418396622193635427-1.jpg",
-    checkInPhoto:
-      "https://www.siamzone.com/ig/media/6927166/3507595347554542759-1.jpg",
-  },
 ];
 
 const initialDelegateCheckins = [
-  { id: 1, name: "สราศินีย์ บุญมา", employeeId: "130901" },
-  { id: 2, name: "ฐนิก ทรัพย์โนนหวาย", employeeId: "030996" },
+  {
+    id: 1,
+    name: "สฤณี จันทร์สว่าง",
+    employeeId: "100006",
+    profile:
+      "https://i.pinimg.com/736x/b6/7b/99/b67b99c76b19dd60911db5897211ce50.jpg", // ใส่ URL โปรไฟล์จริง
+   
+  },
+  {
+    id: 2,
+    name: "สิรินทรา ศรีสวัสดิ์",
+    employeeId: "100007",
+    profile:
+      "https://i.pinimg.com/736x/27/35/c7/2735c7b69c0d042fcb219024c7082782.jpg", // ใส่ URL โปรไฟล์จริง
+    
+  },
 ];
+
 
 const getStatus = (checkIn) => {
   const checkInDate = new Date(`1970-01-01T${checkIn}:00`);
@@ -74,71 +87,69 @@ function CheckApprove() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewDelegate, setViewDelegate] = useState(false);
 
+  const [rejectReasonUser, setRejectReasonUser] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+
   const handleApproveNormal = (user) => {
     setApprovedNormal((prev) => [...prev, user]);
-    setUsers((prev) => prev.filter((u) => u.id !== user.id));
-  };
-  const handleRejectNormal = (user) => {
-    setRejectedNormal((prev) => [...prev, user]);
     setUsers((prev) => prev.filter((u) => u.id !== user.id));
   };
   const handleApproveDelegate = (user) => {
     setApprovedDelegate((prev) => [...prev, user]);
     setDelegateUsers((prev) => prev.filter((u) => u.id !== user.id));
   };
+
+  const handleRejectNormal = (user) => {
+    setRejectReasonUser(user);
+    setRejectReason("");
+  };
   const handleRejectDelegate = (user) => {
-    setRejectedDelegate((prev) => [...prev, user]);
-    setDelegateUsers((prev) => prev.filter((u) => u.id !== user.id));
+    setRejectReasonUser(user);
+    setRejectReason("");
+  };
+
+  const submitRejectReason = () => {
+    if (!rejectReasonUser) return;
+
+    if (viewDelegate) {
+      setRejectedDelegate((prev) => [
+        ...prev,
+        { ...rejectReasonUser, reason: rejectReason },
+      ]);
+      setDelegateUsers((prev) =>
+        prev.filter((u) => u.id !== rejectReasonUser.id)
+      );
+    } else {
+      setRejectedNormal((prev) => [
+        ...prev,
+        { ...rejectReasonUser, reason: rejectReason },
+      ]);
+      setUsers((prev) => prev.filter((u) => u.id !== rejectReasonUser.id));
+    }
+    setRejectReasonUser(null);
   };
 
   const renderCard = (user, isDelegate = false) => {
-    if (isDelegate) {
-      return (
-        <div
-          key={user.id}
-          className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-300 transform hover:-translate-y-1 hover:shadow-lg transition flex items-center justify-between"
-        >
-          <div className="min-w-0">
-            <div className="font-semibold text-gray-800 text-sm sm:text-base md:text-base truncate">
-              {user.name}
-            </div>
-            <div className="text-xs text-gray-500 truncate">
-              ID: {user.employeeId}
-            </div>
-          </div>
-          <div className="flex gap-2 ml-4">
-            <button
-              onClick={() => handleApproveDelegate(user)}
-              className="py-2 px-4 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition"
-            >
-              อนุมัติ
-            </button>
-            <button
-              onClick={() => handleRejectDelegate(user)}
-              className="py-2 px-4 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition"
-            >
-              ไม่อนุมัติ
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div
-        key={user.id}
-        className="relative bg-white p-4 rounded-2xl shadow-2xl border border-gray-300 transform hover:-translate-y-1 hover:shadow-lg transition flex items-center gap-4"
-      >
+  const buttonClasses =
+    "flex-1 py-2 rounded-full text-white text-xs font-semibold hover:scale-105 transition-all";
+  return (
+    <div
+      key={user.id}
+      className="relative bg-white p-4 rounded-2xl shadow-md border border-gray-300 flex items-center gap-4"
+    >
+      {/* แสดงรูปโปรไฟล์ทุกคน */}
+      {user.profile && (
         <img
           src={user.profile}
           alt={user.name}
           className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover"
         />
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-gray-800 text-sm sm:text-base md:text-base truncate">
-            {user.name}
-          </div>
-          <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-gray-800 text-sm truncate">{user.name}</div>
+        <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
+        {/* แสดงเวลาเช็กอินเฉพาะ normal users */}
+        {!isDelegate && (
           <div className="text-xs text-gray-600 mt-1">
             เวลาเช็กอิน: {user.checkInTime} -{" "}
             <span
@@ -151,37 +162,46 @@ function CheckApprove() {
               {getStatus(user.checkInTime)}
             </span>
           </div>
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => handleApproveNormal(user)}
-              className="flex-1 py-2 rounded-full bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition"
-            >
-              อนุมัติ
-            </button>
-            <button
-              onClick={() => handleRejectNormal(user)}
-              className="flex-1 py-2 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition"
-            >
-              ไม่อนุมัติ
-            </button>
-          </div>
+        )}
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={() =>
+              isDelegate ? handleApproveDelegate(user) : handleApproveNormal(user)
+            }
+            className={`${buttonClasses} bg-green-500 hover:bg-green-600`}
+          >
+            อนุมัติ
+          </button>
+          <button
+            onClick={() =>
+              isDelegate ? handleRejectDelegate(user) : handleRejectNormal(user)
+            }
+            className={`${buttonClasses} bg-red-500 hover:bg-red-600`}
+          >
+            ไม่อนุมัติ
+          </button>
         </div>
+      </div>
+      {/* ปุ่มดูรูปเช็กอิน เฉพาะ normal users */}
+      {!isDelegate && (
         <button
           onClick={() => setSelectedUser(user)}
-          className="text-gray-700 text-2xl hover:scale-110 transition"
+          className="text-gray-700 text-2xl hover:scale-110"
         >
           <i className="bi bi-camera"></i>
         </button>
-      </div>
-    );
-  };
+      )}
+    </div>
+  );
+};
+
 
   return (
-    <div className="app-container min-h-screen bg-[#3C467B] p-4 sm:p-6 md:p-8 flex flex-col items-center font-inter">
+    <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-4">
         <Link to="/home">
-          <button className="text-white text-2xl hover:scale-110 transition">
+          <button className="text-white text-2xl hover:scale-110">
             <i className="bi bi-chevron-left"></i>
           </button>
         </Link>
@@ -196,20 +216,16 @@ function CheckApprove() {
         <button
           onClick={() => setViewDelegate(false)}
           className={`w-[48%] py-2 rounded-full ${
-            !viewDelegate
-              ? "bg-blue-600 text-white"
-              : "bg-gray-300 text-gray-700"
-          } font-semibold transition`}
+            !viewDelegate ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-700"
+          } font-semibold`}
         >
           เช็กอินปกติ
         </button>
         <button
           onClick={() => setViewDelegate(true)}
           className={`w-[48%] py-2 rounded-full ${
-            viewDelegate
-              ? "bg-blue-600 text-white"
-              : "bg-gray-300 text-gray-700"
-          } font-semibold transition`}
+            viewDelegate ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-700"
+          } font-semibold`}
         >
           เช็กอินแทนเพื่อน
         </button>
@@ -222,7 +238,7 @@ function CheckApprove() {
           : users.map((u) => renderCard(u))}
       </div>
 
-      {/* Modal */}
+      {/* Modal แสดงรูปเช็กอิน */}
       {selectedUser && !viewDelegate && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -272,23 +288,68 @@ function CheckApprove() {
         </div>
       )}
 
+      {/* Modal ป้อนเหตุผลไม่อนุมัติ */}
+      {rejectReasonUser && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2"
+          onClick={() => setRejectReasonUser(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-lg w-full max-w-xs p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-gray-800 font-semibold text-base mb-2">
+              ไม่อนุมัติ: {rejectReasonUser.name}
+            </h2>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="ระบุเหตุผล..."
+              className="w-full h-20 p-2 border border-gray-300 rounded-md resize-none text-sm"
+            />
+            <div className="flex justify-end gap-2 mt-3">
+              <button
+                onClick={() => setRejectReasonUser(null)}
+                className="px-3 py-1 text-gray-700 rounded-md bg-gray-200 hover:bg-gray-300 text-sm"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={submitRejectReason}
+                className="px-3 py-1 text-white rounded-md bg-red-500 hover:bg-red-600 text-sm"
+              >
+                ส่ง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Summary */}
       <div className="max-w-md w-full mt-6 space-y-4">
         {viewDelegate ? (
           <>
             {approvedDelegate.length > 0 && (
               <div className="bg-green-100/50 p-3 rounded-xl">
-                <div className="font-bold text-green-700 mb-1">อนุมัติแล้ว (แทนเพื่อน)</div>
+                <div className="font-bold text-green-700 mb-1">
+                  อนุมัติแล้ว (แทนเพื่อน)
+                </div>
                 {approvedDelegate.map((u) => (
-                  <div key={u.id} className="text-green-800 text-sm truncate">{u.name}</div>
+                  <div key={u.id} className="text-green-800 text-sm truncate">
+                    {u.name}
+                  </div>
                 ))}
               </div>
             )}
             {rejectedDelegate.length > 0 && (
               <div className="bg-red-100/50 p-3 rounded-xl">
-                <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (แทนเพื่อน)</div>
+                <div className="font-bold text-red-700 mb-1">
+                  ไม่อนุมัติ (แทนเพื่อน)
+                </div>
                 {rejectedDelegate.map((u) => (
-                  <div key={u.id} className="text-red-800 text-sm truncate">{u.name}</div>
+                  <div key={u.id} className="text-red-800 text-sm truncate">
+                    {u.name} - {u.reason}
+                  </div>
                 ))}
               </div>
             )}
@@ -310,7 +371,8 @@ function CheckApprove() {
                 <div className="font-bold text-red-700 mb-1">ไม่อนุมัติ (ปกติ)</div>
                 {rejectedNormal.map((u) => (
                   <div key={u.id} className="text-red-800 text-sm truncate">
-                    {u.name} - {u.checkInTime} - {getStatus(u.checkInTime)}
+                    {u.name} - {u.checkInTime} - {getStatus(u.checkInTime)} -{" "}
+                    {u.reason}
                   </div>
                 ))}
               </div>
