@@ -44,7 +44,9 @@ import ExportExcel from "./Admin/page/export-excel";
 import GroupNoti from "./Admin/page/group-noti";
 import GroupNoti2 from "./Admin/page/group2-noti";
 import Permission from "./Admin/page/Permission";
-
+import MyProfile from "./Admin/page/MyProfile";
+import Manageusers from "./Admin/page/Manageusers";
+import Personalsummary from "./Admin/page/Personalsummary";
 
 
 function App() {
@@ -98,6 +100,7 @@ function App() {
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 
+                
                 <Route
                   path="datacheck"
                   element={
@@ -139,7 +142,9 @@ function App() {
             <Route path='groupnoti' element={<GroupNoti />} />
             <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
             <Route path='permission' element={<Permission />} />
-            
+            <Route path="MyProfile" element={<MyProfile/>} />
+            <Route path="Manageusers" element={<Manageusers />} />
+            <Route path="Personalsummary" element={<Personalsummary />} />
           </Route>
 
 
