@@ -44,9 +44,18 @@ import ExportExcel from "./Admin/page/export-excel";
 import GroupNoti from "./Admin/page/group-noti";
 import GroupNoti2 from "./Admin/page/group2-noti";
 import Permission from "./Admin/page/Permission";
+
 import MyProfile from "./Admin/page/MyProfile";
 import Manageusers from "./Admin/page/Manageusers";
 import Personalsummary from "./Admin/page/Personalsummary";
+
+import CheckApprove from "./user/page/CheckApprove";
+
+
+
+
+
+
 
 
 function App() {
@@ -96,7 +105,8 @@ function App() {
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
                 <Route path="notification" element={<Notification role={role} />} />
-                <Route path="checkapprove" element={<CheckApporve />} />
+                <Route path="checkapprove" element={<CheckApprove role={role} />} />
+
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 
