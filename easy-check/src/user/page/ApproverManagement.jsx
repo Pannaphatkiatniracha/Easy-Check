@@ -15,10 +15,10 @@ const provinces = {
 const departments = ["Project Manager", "Product Manager", "IT", "Marketing", "Finance"];
 
 const users = [
-  { id: 1, name: "ปัณณพรรธน์ เกียรตินิรชา" },
-  { id: 2, name: "ฐิติฉัตร ศิริบุตร" },
-  { id: 3, name: "ภทรพร แซ่ลี้" },
-  { id: 4, name: "สราศินีย์ บุญมา" },
+  { id: 670000, name: "ปัณณพรรธน์ เกียรตินิรชา" },
+  { id: 670001, name: "ฐิติฉัตร ศิริบุตร" },
+  { id: 670002, name: "ภทรพร แซ่ลี้" },
+  { id: 670003, name: "สราศินีย์ บุญมา" },
 ];
 
 
@@ -26,8 +26,8 @@ let mockApprovers = [];
 let mockRequests = [
   {
     id: 101,
-    user: "ภทรพร แซ่ลี้",
-    userId: 3,
+    user: "คิมแทย็อน",
+    userId: 690000,
     company: "Company A",
     province: "Bangkok",
     department: "IT",
@@ -35,8 +35,8 @@ let mockRequests = [
   },
   {
     id: 102,
-    user: "สราศินีย์ บุญมา",
-    userId: 4,
+    user: "สเตฟานี ยังฮวัง",
+    userId: 690001,
     company: "Company B",
     province: "Khon Kaen",
     department: "Marketing",

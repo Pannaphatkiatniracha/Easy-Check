@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authenticateUser } from '../data/mockUsers';
-import './AdminLogin.css';
+import styles from './AdminLogin.module.css';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -53,7 +53,7 @@ const AdminLogin = () => {
           localStorage.setItem('token', result.token);
           localStorage.setItem('user', JSON.stringify(result.user));
 
-        /* จะทำให้มันlogin แล้วไปหน้า dashboard แต่มันไม่ไปฮื่อๆ */
+          // Navigate to dashboard
           navigate('/dashboard');
         } else {
           showError(result.message);
@@ -68,24 +68,24 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="admin-login-page">
-      <div className="admin-login-container">
-        <div className="admin-login-box">
+    <div className={styles.adminLoginPage}>
+      <div className={styles.adminLoginContainer}>
+        <div className={styles.adminLoginBox}>
           {/* Profile Image */}
-          <div className="profile-circle">
-            <div className="profile-placeholder">
+          <div className={styles.profileCircle}>
+            <div className={styles.profilePlaceholder}>
               <img
                 src="https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_hybrid&w=740&q=80"
                 alt="Profile"
-                className="profile-image"
+                className={styles.profileImage}
               />
             </div>
           </div>
 
           {/* Login Form */}
-          <form className="admin-login-form" onSubmit={handleSubmit}>
+          <form className={styles.adminLoginForm} onSubmit={handleSubmit}>
             {error && (
-              <div className="error-message">
+              <div className={styles.errorMessage}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -95,9 +95,9 @@ const AdminLogin = () => {
               </div>
             )}
 
-            <div className="form-group">
-              <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className={styles.formGroup}>
+              <div className={styles.inputWrapper}>
+                <svg className={styles.inputIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
@@ -105,7 +105,7 @@ const AdminLogin = () => {
                   type="text"
                   id="id"
                   name="id"
-                  placeholder="Username"
+                  placeholder="Employee ID"
                   value={formData.id}
                   onChange={handleChange}
                   disabled={loading}
@@ -113,9 +113,9 @@ const AdminLogin = () => {
               </div>
             </div>
 
-            <div className="form-group">
-              <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className={styles.formGroup}>
+              <div className={styles.inputWrapper}>
+                <svg className={styles.inputIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
@@ -130,7 +130,7 @@ const AdminLogin = () => {
                 />
                 <button
                   type="button"
-                  className="toggle-password"
+                  className={styles.togglePassword}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -148,17 +148,17 @@ const AdminLogin = () => {
               </div>
             </div>
 
-            <div className="forgot-password-link">
+            <div className={styles.forgotPasswordLink}>
               <a href="#forgot" onClick={(e) => {
                 e.preventDefault();
                 navigate('/adminforgotpassword');
               }}>Forgot Password?</a>
             </div>
 
-            <button type="submit" className="admin-login-button" disabled={loading}>
+            <button type="submit" className={styles.adminLoginButton} disabled={loading}>
               {loading ? (
                 <>
-                  <span className="spinner"></span>
+                  <span className={styles.spinner}></span>
                   กำลังเข้าสู่ระบบ...
                 </>
               ) : (
