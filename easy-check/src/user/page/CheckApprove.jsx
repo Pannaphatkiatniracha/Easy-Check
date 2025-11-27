@@ -178,20 +178,6 @@ function CheckApprove() {
     );
   };
 
-  // Loading State
-  if (loading) {
-    return (
-      <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center justify-center font-inter">
-        <div className="text-center text-white">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
       {/* Header */}
