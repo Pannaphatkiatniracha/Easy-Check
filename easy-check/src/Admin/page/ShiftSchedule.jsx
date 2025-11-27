@@ -4,6 +4,7 @@ import { Button, Form, Table, Modal, Dropdown, DropdownButton } from 'react-boot
 // import '../../css/custom.css';
 import '../../css/custom.css';
 
+
 const ShiftSchedule = () => {
   const [apiRaw, setApiRaw] = useState([]);
   const [Api, setApi] = useState([]);
@@ -202,9 +203,14 @@ const ShiftSchedule = () => {
 
 
       {/* modal */}
-      <Modal show={show} onHide={handleClose} >
+      <Modal
+        show={show}
+        onHide={handleClose}
+        centered
+        backdrop="static"
+        keyboard={false} >
         <Modal.Header closeButton style={{ backgroundColor: '#000957', color: '#ffffff' }}>
-          <Modal.Title>ADD Shift Schedule</Modal.Title>
+          <Modal.Title closeButton style={{ color: '#ffffff' }}>ADD Shift Schedule</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ backgroundColor: '#000957', color: '#ffffff' }}>
           <Form>
