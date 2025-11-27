@@ -32,6 +32,7 @@ const ForgotPassword = () => {
 
 
     const handleSend = () => {
+        
         // ตรวจสอบว่าอีเมลที่กรอกตรงกับอีเมลที่อยู่ใน profile ไหม
         if (email === profileEmail) {
             setIsEmailValid(true)
@@ -52,17 +53,18 @@ const ForgotPassword = () => {
     }
 
 
-    // modal success
+    // ปิด modal success
     const handleSuccessClose = () => {
         setShowModal(false)
         navigate('/home')
     }
 
-    // ✅ ฟังก์ชันสำหรับ modal error
+
+    // ปิด modal error
     const handleErrorClose = () => {
         setShowModal(false)
-
     }
+
 
     return (
         <div className="app-container">
@@ -100,17 +102,20 @@ const ForgotPassword = () => {
                 </div>
             </div>
 
+
+
+
             {/* ปุ่ม */}
             <div className="text-center mt-20">
-                <Button 
-                    className="w-25 rounded-5 fw-semibold" 
-                    style={{ backgroundColor: '#636CCB', border: 'none' }}
-                    onClick={handleSend}>
+                <Button className="w-25 rounded-5 fw-semibold" 
+                style={{ backgroundColor: '#636CCB', border: 'none' }}
+                onClick={handleSend}>
                     SEND
                 </Button>
             </div>
 
-            {/* Modal */}
+
+
             <Modal size="sm" show={showModal} onHide={modalType === "success" ? handleSuccessClose : handleErrorClose} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
                     {modalType === "success" ? (
@@ -122,16 +127,18 @@ const ForgotPassword = () => {
                                 <small className="text-muted">Redirecting to home page...</small>
                             </div>
                         </>
-                    ) : (
+                    ) 
+                    
+                    : 
+                    
+                    (
                         <>
                             <i className="bi bi-x-circle-fill fs-1 text-danger"></i>
                             <h5 className="fw-bold mt-2">Email Not Found</h5>
                             <p className="mt-3">The email you entered does not match our records. <br /> Please check and try again.</p>
-                            <Button 
-                                className="mt-3 rounded-5 fw-semibold" 
-                                style={{ backgroundColor: '#636CCB', border: 'none' }}
-                                onClick={handleErrorClose}
-                            >
+                            
+                            <Button className="mt-3 rounded-5 fw-semibold text-decoration-none" variant="link"
+                                onClick={handleErrorClose}>
                                 TRY AGAIN
                             </Button>
                         </>
