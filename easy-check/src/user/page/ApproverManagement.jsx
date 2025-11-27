@@ -123,23 +123,51 @@ function ApproverManagement() {
       {tab === "manage" && (
         <div className="space-y-4 w-full max-w-md">
           <Card title="Assign Approver">
-            <select value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedProvince(""); }} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800">
+            <select
+              value={selectedCompany}
+              onChange={(e) => setSelectedCompany(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800"
+            >
               <option value="">Select Company</option>
               {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            <select value={selectedProvince} onChange={(e) => setSelectedProvince(e.target.value)} disabled={!selectedCompany} className="w-full px-3 py-2 rounded-lg border border-gray-300 disabled:opacity-50 text-gray-800">
+
+            <select
+              value={selectedProvince}
+              onChange={(e) => setSelectedProvince(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 mt-2"
+            >
               <option value="">Select Province</option>
-              {selectedCompany && provinces[selectedCompany].map((p) => <option key={p} value={p}>{p}</option>)}
+              {/* รวมทุกจังหวัดจากทุกบริษัท */}
+              {Object.values(provinces).flat().map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
-            <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800">
+
+            <select
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 mt-2"
+            >
               <option value="">Select Department</option>
               {departments.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
-            <select value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800">
+
+            <select
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-800 mt-2"
+            >
               <option value="">Select User</option>
               {users.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
-            <button onClick={handleAssign} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-sm transition mt-2">Add Approver</button>
+
+            <button
+              onClick={handleAssign}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-sm transition mt-2"
+            >
+              Add Approver
+            </button>
           </Card>
 
           <Card title="Current Approvers">

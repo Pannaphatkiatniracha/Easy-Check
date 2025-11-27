@@ -211,33 +211,36 @@ function CheckInOut() {
           </button>
         )}
 
-        {checkInData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
-            <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
-              <i className="bi bi-geo-fill"></i> CheckIn
-            </h3>
-            <p className="text-white">เวลา: {checkInData.time}</p>
-            <img
-              src={URL.createObjectURL(checkInData.photo)}
-              alt="Check-In"
-              className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
-            />
-          </div>
-        )}
+       {checkInData && (
+  <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
+    <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
+      <i className="bi bi-geo-fill"></i>
+      <span>CheckIn</span>
+    </h3>
+    <p className="text-white">เวลา: {checkInData.time}</p>
+    <img
+      src={URL.createObjectURL(checkInData.photo)}
+      alt="Check-In"
+      className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
+    />
+  </div>
+)}
 
-        {checkOutData && (
-          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
-            <h3 className="font-bold text-white mb-2 flex justify-center items-center gap-2">
-              <i className="bi bi-flag-fill"></i> CheckOut
-            </h3>
-            <p className="text-white">Time: {checkOutData.time}</p>
-            <img
-              src={URL.createObjectURL(checkOutData.photo)}
-              alt="Check-Out"
-              className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
-            />
-          </div>
-        )}
+{checkOutData && (
+  <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
+    <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
+      <i className="bi bi-flag-fill"></i>
+      <span>CheckOut</span>
+    </h3>
+    <p className="text-white">Time: {checkOutData.time}</p>
+    <img
+      src={URL.createObjectURL(checkOutData.photo)}
+      alt="Check-Out"
+      className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
+    />
+  </div>
+)}
+
 
         {message && (
           <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line hover:scale-105 transition duration-300">

@@ -14,6 +14,10 @@ const LeaveRequest = () => {
     evidencePreview: null,
   });
 
+  // State สำหรับ Reject Popup
+  const [rejectPopup, setRejectPopup] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
   const leaveOptions = [
     "Sick Leave",
     "Personal Leave",
@@ -82,8 +86,23 @@ const LeaveRequest = () => {
     alert("Leave filed successfully!");
     console.log(formData);
 
-    // Navigate back to previous page
     navigate(-1);
+  };
+
+  // ฟังก์ชันเปิด Popup Reject
+  const openRejectPopup = () => {
+    setRejectReason("");
+    setRejectPopup(true);
+  };
+
+  // ฟังก์ชันยืนยัน Reject
+  const handleRejectSubmit = () => {
+    if (!rejectReason.trim()) {
+      alert("กรุณากรอกเหตุผลที่ไม่อนุมัติ");
+      return;
+    }
+    alert("ไม่อนุมัติคำขอ: " + rejectReason);
+    setRejectPopup(false);
   };
 
   return (
@@ -97,7 +116,6 @@ const LeaveRequest = () => {
           </Link>
         </div>
 
-        {/* Header */}
         <h2 className="text-center text-3xl font-bold text-[#FFFFFF] drop-shadow-lg py-4 rounded-xl bg-white/10 backdrop-blur-md shadow-lg">
           LEAVE REQUEST
         </h2>
@@ -158,7 +176,6 @@ const LeaveRequest = () => {
             ))}
           </div>
 
-          {/* Other reason input */}
           {formData.leaveReasons.includes("Other") && (
             <div className="mt-4">
               <label className="block font-semibold mb-2 text-[#FFFFFF]">
@@ -194,7 +211,6 @@ const LeaveRequest = () => {
             <p className="text-white/80 text-sm">Click to upload evidence</p>
           </div>
 
-          {/* Preview */}
           {formData.evidencePreview && (
             <div className="mt-3 flex justify-start gap-2">
               <img
@@ -206,14 +222,58 @@ const LeaveRequest = () => {
           )}
         </div>
 
-        {/* Submit */}
-        <button
-          onClick={handleFileLeave}
-          className="w-full py-3 rounded-xl bg-[#636CCB] text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
-        >
-          File Leave
-        </button>
+        {/* Submit Buttons */}
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={handleFileLeave}
+            className="w-full py-3 rounded-xl bg-[#636CCB] text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
+          >
+            File Leave
+          </button>
+
+          <button
+            onClick={() => setRejectPopup(true)}
+            className="w-full py-3 rounded-xl bg-red-600 text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
+          >
+            ❌ Reject
+          </button>
+        </div>
       </div>
+
+      {/* Reject Popup */}
+      {rejectPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 z-[999]">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-[#3C467B] text-center mb-4">
+              กรุณากรอกเหตุผลที่ไม่อนุมัติ
+            </h3>
+
+            <textarea
+              rows={3}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-red-300"
+              placeholder="ระบุเหตุผล..."
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setRejectPopup(false)}
+                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
+              >
+                ยกเลิก
+              </button>
+
+              <button
+                onClick={handleRejectSubmit}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+              >
+                ยืนยัน
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
