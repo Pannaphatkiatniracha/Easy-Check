@@ -192,14 +192,28 @@ function ApproverManagement() {
         {tab === "manage" && (
           <div className="space-y-4 px-4">
             <Card title="Assign Approver">
-              <select value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedProvince(""); }} className="w-full px-3 py-2 rounded-lg border border-gray-300">
+              <select 
+                value={selectedCompany} 
+                onChange={(e) => { setSelectedCompany(e.target.value); setSelectedProvince(""); }} 
+                className="w-full px-3 py-2 rounded-lg border border-gray-300"
+              >
                 <option value="">Select Company</option>
                 {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <select value={selectedProvince} onChange={(e) => setSelectedProvince(e.target.value)} disabled={!selectedCompany} className="w-full px-3 py-2 rounded-lg border border-gray-300 disabled:opacity-50">
+
+              {/* Province Select: สามารถเลือกได้เลย */}
+              <select 
+                value={selectedProvince} 
+                onChange={(e) => setSelectedProvince(e.target.value)} 
+                className="w-full px-3 py-2 rounded-lg border border-gray-300"
+              >
                 <option value="">Select Province</option>
-                {selectedCompany && provinces[selectedCompany].map((p) => <option key={p} value={p}>{p}</option>)}
+                {selectedCompany
+                  ? provinces[selectedCompany].map((p) => <option key={p} value={p}>{p}</option>)
+                  : Object.values(provinces).flat().map((p) => <option key={p} value={p}>{p}</option>)
+                }
               </select>
+
               <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300">
                 <option value="">Select Department</option>
                 {departments.map((d) => <option key={d} value={d}>{d}</option>)}
