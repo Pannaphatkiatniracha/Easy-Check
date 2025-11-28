@@ -1,6 +1,6 @@
 const users = [
     {
-        user: '000000',
+        user: '060606',
         pass: 'pass',
         role: 'user',
         token: 'usertoken',
