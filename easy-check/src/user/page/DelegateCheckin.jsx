@@ -39,7 +39,7 @@ const DelegateCheckin = () => {
         second: "2-digit",
       });
 
-<<<<<<< HEAD
+
       setIsLoading(false);
       setCheckedInEmployee({
         id: employeeId,
@@ -49,14 +49,14 @@ const DelegateCheckin = () => {
       setStatus(
         `✅ เช็กอินเรียบร้อยแล้ว\nID: ${employeeId}\nชื่อ: ${employees[employeeId]}\nเวลา: ${time}`
       );
-=======
+
       setCheckedInEmployee({ 
         id: foundEmployee.userid, 
         name: foundEmployee.name, 
         time 
       });
       setStatus(`✅ เช็กอินเรียบร้อยแล้ว\nID: ${foundEmployee.userid}\nชื่อ: ${foundEmployee.name}\nเวลา: ${time}`);
->>>>>>> df2e0c4410d370927aa21b7b44d1e29613867805
+
       setEmployeeId("");
 
     } catch (error) {
