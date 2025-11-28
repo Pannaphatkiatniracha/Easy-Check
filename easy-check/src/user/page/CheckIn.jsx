@@ -86,7 +86,16 @@ function CheckInOut() {
       };
       setCheckInData(data);
       localStorage.setItem("checkInData", JSON.stringify(data));
-      setMessage(`เช็คอินสำเร็จ\nเวลา: ${time}`);
+
+      // ⭐ ตรวจสอบเวลาเช็คอินสาย
+      const workStart = new Date();
+      workStart.setHours(9, 0, 0, 0); // เวลาเริ่มงาน 09:00
+      let messageText = `เช็คอินสำเร็จ\nเวลา: ${time}`;
+      if (timestamp > workStart.getTime()) {
+        messageText += "\n⚠️ มาสาย";
+      }
+
+      setMessage(messageText);
       setMode("checkout");
       setPhoto(null);
     } else if (mode === "checkout") {
