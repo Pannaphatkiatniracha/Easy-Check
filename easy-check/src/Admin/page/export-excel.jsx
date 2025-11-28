@@ -1,10 +1,8 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import styles from './export-excel.module.css';
 
 const ExportExcel = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [format, setFormat] = useState('excel');
@@ -27,24 +25,13 @@ const ExportExcel = () => {
   const departments = ['all', 'IT', 'HR', 'Finance', 'Marketing'];
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        setUser({});
-      }
-    } else {
-      setUser({});
-    }
+    const userData = { name: 'Admin User', role: 'admin' };
+    setUser(userData);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     navigate('/login');
   };
-
 
   const filteredData = selectedDepartment === 'all' 
     ? employeeData 
@@ -74,7 +61,6 @@ const ExportExcel = () => {
   };
 
   const exportToExcel = () => {
-    // สร้างข้อมูล CSV
     const csvContent = [
       ['รายงานการเข้างานพนักงาน'],
       [`วันที่: ${selectedDate}`],
@@ -84,7 +70,6 @@ const ExportExcel = () => {
       ...filteredData.map(emp => [emp.id, emp.name, emp.department, emp.status, emp.checkIn, emp.checkOut])
     ].map(row => row.join(',')).join('\n');
 
-    // สร้างและดาวน์โหลดไฟล์
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -93,79 +78,78 @@ const ExportExcel = () => {
   };
 
   const exportToPDF = () => {
-    // ในระบบจริงจะใช้ library เช่น jsPDF
     alert('กำลังสร้างไฟล์ PDF... (ในระบบจริงจะใช้ library เช่น jsPDF)');
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   return (
-    <div className="home-layout">
+    <div className="min-h-screen" style={{ backgroundColor: '#3C467B' }}>
       {/* Success Message */}
       {showSuccess && (
-        <div className={styles.successMessage}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '24px', height: '24px' }}>
+        <div className="fixed top-5 right-5 bg-gradient-to-r from-emerald-500 to-green-400 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-in z-50">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
-          <span>ส่งออกไฟล์สำเร็จ!</span>
+          <span className="font-semibold">ส่งออกไฟล์สำเร็จ!</span>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="main-content">
-
-
-        <div className={styles.container}>
+      <div className="w-full max-w-7xl mx-auto px-4 py-10">
+        <div className="bg-white rounded-xl shadow-sm p-10">
           
           {/* Header */}
-          <div className={styles.header}>
-            <h1>📊 ส่งออกรายงานการเข้างาน</h1>
-            <p>เลือกวันที่และแผนกเพื่อส่งออกข้อมูลเป็นไฟล์ Excel หรือ PDF</p>
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">📊 ส่งออกรายงานการเข้างาน</h1>
+            <p className="text-gray-500 text-lg">เลือกวันที่และแผนกเพื่อส่งออกข้อมูลเป็นไฟล์ Excel หรือ PDF</p>
           </div>
 
           {/* Stats Cards */}
-          <div className={styles.statsGrid}>
-            <div className={`${styles.statCard} ${styles.total}`}>
-              <div className={styles.statLabel}>พนักงานทั้งหมด</div>
-              <div className={styles.statValue}>{stats.total}</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-8">
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="text-sm opacity-90 mb-2">พนักงานทั้งหมด</div>
+              <div className="text-4xl font-bold">{stats.total}</div>
             </div>
-            <div className={`${styles.statCard} ${styles.present}`}>
-              <div className={styles.statLabel}>มาทำงาน</div>
-              <div className={styles.statValue}>{stats.present}</div>
+            <div className="bg-gradient-to-br from-teal-500 to-green-400 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="text-sm opacity-90 mb-2">มาทำงาน</div>
+              <div className="text-4xl font-bold">{stats.present}</div>
             </div>
-            <div className={`${styles.statCard} ${styles.late}`}>
-              <div className={styles.statLabel}>สาย</div>
-              <div className={styles.statValue}>{stats.late}</div>
+            <div className="bg-gradient-to-br from-pink-400 to-red-400 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="text-sm opacity-90 mb-2">สาย</div>
+              <div className="text-4xl font-bold">{stats.late}</div>
             </div>
-            <div className={`${styles.statCard} ${styles.leave}`}>
-              <div className={styles.statLabel}>ลา</div>
-              <div className={styles.statValue}>{stats.leave}</div>
+            <div className="bg-gradient-to-br from-pink-400 to-yellow-300 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="text-sm opacity-90 mb-2">ลา</div>
+              <div className="text-4xl font-bold">{stats.leave}</div>
             </div>
-            <div className={`${styles.statCard} ${styles.absent}`}>
-              <div className={styles.statLabel}>ขาด</div>
-              <div className={styles.statValue}>{stats.absent}</div>
+            <div className="bg-gradient-to-br from-cyan-400 to-indigo-900 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="text-sm opacity-90 mb-2">ขาด</div>
+              <div className="text-4xl font-bold">{stats.absent}</div>
             </div>
           </div>
 
           {/* Filters */}
-          <div className={styles.filterSection}>
-            <h2>🔍 ตัวกรองข้อมูล</h2>
-            <div className={styles.filterGrid}>
-              <div className={styles.filterGroup}>
-                <label>📅 เลือกวันที่</label>
+          <div className="bg-gray-50 p-8 rounded-2xl mb-8 border-2 border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800 mb-5">🔍 ตัวกรองข้อมูล</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">📅 เลือกวันที่</label>
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all bg-white"
                 />
               </div>
 
-              <div className={styles.filterGroup}>
-                <label>🏢 เลือกแผนก</label>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">🏢 เลือกแผนก</label>
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all bg-white"
                 >
                   <option value="all">ทั้งหมด</option>
                   {departments.filter(d => d !== 'all').map(dept => (
@@ -174,18 +158,26 @@ const ExportExcel = () => {
                 </select>
               </div>
 
-              <div className={styles.filterGroup}>
-                <label>📄 รูปแบบไฟล์</label>
-                <div className={styles.formatButtons}>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">📄 รูปแบบไฟล์</label>
+                <div className="flex gap-2">
                   <button
-                    className={`${styles.formatBtn} ${format === 'excel' ? styles.active : ''}`}
                     onClick={() => setFormat('excel')}
+                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${
+                      format === 'excel' 
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600' 
+                        : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
+                    }`}
                   >
                     📊 Excel
                   </button>
                   <button
-                    className={`${styles.formatBtn} ${format === 'pdf' ? styles.active : ''}`}
                     onClick={() => setFormat('pdf')}
+                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${
+                      format === 'pdf' 
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600' 
+                        : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
+                    }`}
                   >
                     📑 PDF
                   </button>
@@ -195,40 +187,40 @@ const ExportExcel = () => {
           </div>
 
           {/* Data Table */}
-          <div className={styles.dataTableSection}>
-            <div className={styles.tableHeader}>
-              <h2>📋ข้อมูลที่จะส่งออก</h2>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-md mb-8">
+            <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-8 py-5">
+              <h2 className="text-xl font-semibold text-white">📋 ข้อมูลที่จะส่งออก</h2>
             </div>
             
-            <div className={styles.tableWrapper}>
-              <table className={styles.dataTable}>
-                <thead>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th>รหัสพนักงาน</th>
-                    <th>ชื่อ-นามสกุล</th>
-                    <th>แผนก</th>
-                    <th className={styles.center}>สถานะ</th>
-                    <th className={styles.center}>เวลาเข้างาน</th>
-                    <th className={styles.center}>เวลาออกงาน</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">รหัสพนักงาน</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">ชื่อ-นามสกุล</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">แผนก</th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">สถานะ</th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาเข้างาน</th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาออกงาน</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredData.map((emp, index) => (
-                    <tr key={index}>
-                      <td>{emp.id}</td>
-                      <td className={styles.employeeName}>{emp.name}</td>
-                      <td className={styles.departmentName}>{emp.department}</td>
-                      <td className={styles.center}>
-                        <span className={`${styles.statusBadge} ${
-                          emp.status === 'มาทำงาน' ? styles.statusPresent : 
-                          emp.status === 'สาย' ? styles.statusLate : 
-                          emp.status === 'ลา' ? styles.statusLeave : styles.statusAbsent
+                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-4 text-sm text-gray-800">{emp.id}</td>
+                      <td className="px-4 py-4 text-sm text-gray-800 font-medium">{emp.name}</td>
+                      <td className="px-4 py-4 text-sm text-gray-500">{emp.department}</td>
+                      <td className="px-4 py-4 text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                          emp.status === 'มาทำงาน' ? 'bg-green-100 text-green-800' : 
+                          emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' : 
+                          emp.status === 'ลา' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {emp.status}
                         </span>
                       </td>
-                      <td className={styles.center}>{emp.checkIn}</td>
-                      <td className={styles.center}>{emp.checkOut}</td>
+                      <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkIn}</td>
+                      <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkOut}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -237,20 +229,20 @@ const ExportExcel = () => {
           </div>
 
           {/* Export Button */}
-          <div className={styles.exportButtonSection}>
+          <div className="text-center pt-8">
             <button
-              className={styles.exportButton}
               onClick={handleExport}
               disabled={isExporting}
+              className="inline-flex items-center gap-3 px-16 py-5 bg-gradient-to-r from-indigo-600 to-blue-500 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {isExporting ? (
                 <>
-                  <div className={styles.spinner} />
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   กำลังสร้างไฟล์...
                 </>
               ) : (
                 <>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -263,6 +255,22 @@ const ExportExcel = () => {
 
         </div>
       </div>
+
+      <style>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.4s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

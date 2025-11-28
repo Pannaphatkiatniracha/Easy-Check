@@ -2,20 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-// สมมติเป็น database พนักงาน (ID → ชื่อ)
-const employees = {
-  "670000": "ปัณณพรรธน์ เกียรตินิรชา",
-  "670001": "ฐิติฉัตร ศิริบุตร",
-  "670002": "ภทรพร แซ่ลี้",
-};
-
 const DelegateCheckin = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [checkedInEmployee, setCheckedInEmployee] = useState(null);
 
-  const handleCheckIn = (e) => {
+  const handleCheckIn = async (e) => {
     e.preventDefault();
 
     if (!/^\d{6}$/.test(employeeId)) {
@@ -23,15 +16,22 @@ const DelegateCheckin = () => {
       return;
     }
 
-    if (!employees[employeeId]) {
-      setStatus("❌ The employee ID was not found in the system");
-      return;
-    }
-
     setIsLoading(true);
     setStatus("");
 
-    setTimeout(() => {
+    try {
+      // ค้นหาพนักงานจาก MockAPI
+      const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users");
+      const employees = await res.json();
+      
+      const foundEmployee = employees.find(emp => emp.userid === employeeId);
+      
+      if (!foundEmployee) {
+        setStatus("❌ The employee ID was not found in the system");
+        return;
+      }
+
+      // ถ้ามีพนักงานอยู่แล้วให้ผ่าน (ไม่ต้องเช็ค canBeCheckedIn)
       const now = new Date();
       const time = now.toLocaleTimeString("th-TH", {
         hour: "2-digit",
@@ -39,6 +39,7 @@ const DelegateCheckin = () => {
         second: "2-digit",
       });
 
+<<<<<<< HEAD
       setIsLoading(false);
       setCheckedInEmployee({
         id: employeeId,
@@ -48,8 +49,22 @@ const DelegateCheckin = () => {
       setStatus(
         `✅ เช็กอินเรียบร้อยแล้ว\nID: ${employeeId}\nชื่อ: ${employees[employeeId]}\nเวลา: ${time}`
       );
+=======
+      setCheckedInEmployee({ 
+        id: foundEmployee.userid, 
+        name: foundEmployee.name, 
+        time 
+      });
+      setStatus(`✅ เช็กอินเรียบร้อยแล้ว\nID: ${foundEmployee.userid}\nชื่อ: ${foundEmployee.name}\nเวลา: ${time}`);
+>>>>>>> df2e0c4410d370927aa21b7b44d1e29613867805
       setEmployeeId("");
-    }, 1000);
+
+    } catch (error) {
+      console.error("Error checking in:", error);
+      setStatus("❌ Error connecting to system");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

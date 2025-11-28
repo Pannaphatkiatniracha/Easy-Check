@@ -144,7 +144,7 @@ const AttendanceSum = ({ role }) => {
     const DateGridModal = ({ dates, title, color }) => (
         <div>
             <h4 className="fw-bold mb-3 text-center">
-                {title} <span className="badge bg-dark ms-2">{dates.length} วัน</span>
+                {title}
             </h4>
 
             <div className="row g-2">
@@ -367,9 +367,6 @@ const AttendanceSum = ({ role }) => {
              */}
 
             <Modal show={showModal} onHide={() => setShowModal(false)} size="sm" centered backdrop={true} keyboard={true}>
-                <Modal.Header closeButton className="border-0">
-                    <Modal.Title className="fw-bold">{modalData.title}</Modal.Title>
-                </Modal.Header>
                 <Modal.Body className="p-4">
                     <DateGridModal
                         dates={modalData.dates}

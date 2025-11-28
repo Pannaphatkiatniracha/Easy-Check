@@ -1,93 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-const initialUsers = [
-  {
-    id: 1,
-    name: "ปัณณพรรธน์ เกียรตินิรชา",
-    employeeId: "100001",
-    checkInTime: "09:00",
-    profile:
-      "https://i.pinimg.com/736x/2f/a6/bb/2fa6bb34b6f86794f5917989a427e0a4.jpg",
-    checkInPhoto:
-      "https://i.pinimg.com/736x/03/33/26/033326e59137032928ceb27b8bd42b6f.jpg",
-  },
-  {
-    id: 2,
-    name: "ฐิติฉัตร ศิริบุตร",
-    employeeId: "100002",
-    checkInTime: "08:30",
-    profile: "https://img.hankyung.com/photo/202509/BF.41797059.1.jpg",
-    checkInPhoto:
-      "https://cdn.mania.kr/nbamania/g2/data/cheditor5/2402/view_thumbnail/mania-done-20240214105503_evzebkmp.jpg",
-  },
-  {
-    id: 3,
-    name: "สราศินีย์ บุญมา",
-    employeeId: "100003",
-    checkInTime: "08:30",
-    profile:
-      "https://i.pinimg.com/736x/14/2b/f0/142bf06d188725faa3824815f8772f7f.jpg",
-    checkInPhoto:
-      "https://i.pinimg.com/736x/3d/a4/30/3da43051883bcf170a3e5660bd6caf8d.jpg",
-  },
-  {
-    id: 4,
-    name: "ฐนิก ทรัพย์โนนหวาย",
-    employeeId: "100004",
-    checkInTime: "08:30",
-    profile:
-      "https://i.pinimg.com/736x/06/3a/74/063a74f72578c9e3c5d1081032912e7d.jpg",
-    checkInPhoto:
-      "https://i.pinimg.com/736x/e9/1d/d8/e91dd8c706bcc5dbd14cb39dbd7e01ac.jpg",
-  },
-  {
-    id: 5,
-    name: "ภทรพร แซ่ลี้",
-    employeeId: "100005",
-    checkInTime: "10:00",
-    profile: "https://pbs.twimg.com/media/GurZlQBagAA3-Z0.jpg:large",
-    checkInPhoto:
-      "https://preview.redd.it/250728-karina-instagram-update-v0-7l1e5zr17mff1.jpg?width=640&crop=smart&auto=webp&s=d9ee4d6c794abcdb46210783defb38cf37c30b58",
-  },
-];
-
-const initialDelegateCheckins = [
-  {
-    id: 1,
-    name: "สฤณี จันทร์สว่าง",
-    employeeId: "100006",
-    profile:
-      "https://i.pinimg.com/736x/b6/7b/99/b67b99c76b19dd60911db5897211ce50.jpg",
-  },
-  {
-    id: 2,
-    name: "สิรินทรา ศรีสวัสดิ์",
-    employeeId: "100007",
-    profile:
-      "https://i.pinimg.com/736x/27/35/c7/2735c7b69c0d042fcb219024c7082782.jpg",
-  },
-];
-
 const getStatus = (checkIn) => {
+  if (!checkIn) return "ไม่มีข้อมูล";
   const checkInDate = new Date(`1970-01-01T${checkIn}:00`);
   const officialStart = new Date(`1970-01-01T09:00:00`);
   return checkInDate > officialStart ? "สาย" : "ตรงเวลา";
 };
 
 function CheckApprove() {
-  const [users, setUsers] = useState(initialUsers);
-  const [delegateUsers, setDelegateUsers] = useState(initialDelegateCheckins);
+  const [users, setUsers] = useState([]);
+  const [delegateUsers, setDelegateUsers] = useState([]);
   const [approvedNormal, setApprovedNormal] = useState([]);
   const [rejectedNormal, setRejectedNormal] = useState([]);
   const [approvedDelegate, setApprovedDelegate] = useState([]);
   const [rejectedDelegate, setRejectedDelegate] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewDelegate, setViewDelegate] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [rejectReasonUser, setRejectReasonUser] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+
+  // Fetch ข้อมูลจาก MockAPI
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users");
+        const employees = await res.json();
+        
+        console.log("ข้อมูลจาก API:", employees); // เช็คข้อมูลที่ได้จาก API
+        
+        // สร้างข้อมูลตัวอย่างถ้าไม่มี checkInTime
+        const usersWithCheckin = employees.map(user => ({
+          ...user,
+          checkInTime: user.checkInTime || getRandomCheckInTime(), // ถ้าไม่มีให้สุ่มเวลา
+          checkInPhoto: user.checkInPhoto || user.avatar // ถ้าไม่มีใช้ avatar แทน
+        }));
+        
+        setUsers(usersWithCheckin);
+        
+        // สำหรับ delegate users
+        setDelegateUsers([
+          {
+            id: 1001,
+            name: "สฤณี จันทร์สว่าง",
+            userid: "100006",
+            avatar: "https://i.pinimg.com/736x/b6/7b/99/b67b99c76b19dd60911db5897211ce50.jpg",
+          },
+          {
+            id: 1002,
+            name: "สิรินทรา ศรีสวัสดิ์", 
+            userid: "100007",
+            avatar: "https://i.pinimg.com/736x/27/35/c7/2735c7b69c0d042fcb219024c7082782.jpg",
+          },
+        ]);
+      } catch (error) {
+        console.error("Error loading employees:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // ฟังก์ชันสุ่มเวลาเช็คอิน
+  const getRandomCheckInTime = () => {
+    const times = ["08:30", "08:45", "09:00", "09:15", "09:30"];
+    return times[Math.floor(Math.random() * times.length)];
+  };
 
   const handleApproveNormal = (user) => {
     setApprovedNormal((prev) => [...prev, user]);
@@ -136,16 +117,19 @@ function CheckApprove() {
         key={user.id}
         className="relative bg-white p-4 rounded-2xl shadow-md border border-gray-300 flex items-center gap-4"
       >
-        {user.profile && (
+        {/* ใช้ avatar จาก MockAPI */}
+        {user.avatar && (
           <img
-            src={user.profile}
+            src={user.avatar}
             alt={user.name}
             className="w-14 h-14 rounded-full border-2 border-gray-400 object-cover"
           />
         )}
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-gray-800 text-sm truncate">{user.name}</div>
-          <div className="text-xs text-gray-500 truncate">ID: {user.employeeId}</div>
+          {/* ใช้ userid จาก MockAPI */}
+          <div className="text-xs text-gray-500 truncate">ID: {user.userid}</div>
+          {/* แสดงเวลาเช็กอินเฉพาะ normal users */}
           {!isDelegate && (
             <div className="text-xs text-gray-600 mt-1">
               เวลาเช็กอิน: {user.checkInTime} -{" "}
@@ -153,7 +137,9 @@ function CheckApprove() {
                 className={
                   getStatus(user.checkInTime) === "สาย"
                     ? "text-red-500"
-                    : "text-green-500"
+                    : getStatus(user.checkInTime) === "ตรงเวลา" 
+                    ? "text-green-500"
+                    : "text-gray-500"
                 }
               >
                 {getStatus(user.checkInTime)}
@@ -179,6 +165,7 @@ function CheckApprove() {
             </button>
           </div>
         </div>
+        {/* ปุ่มดูรูปเช็กอิน เฉพาะ normal users */}
         {!isDelegate && (
           <button
             onClick={() => setSelectedUser(user)}
@@ -193,18 +180,18 @@ function CheckApprove() {
 
   return (
     <div className="app-container min-h-screen bg-[#3C467B] p-4 flex flex-col items-center font-inter">
-   {/* Header */}
-<div className="d-flex justify-content-between text-white mt-16 mb-4 w-full max-w-md">
-  <Link to="/home" className="text-decoration-none">
-    <Button variant="link" className="p-0">
-      <i className="bi bi-chevron-left ms-3 text-white text-2xl"></i>
-    </Button>
-  </Link>
-  <h3 className="fw-bold text-center flex-grow-1">Check Approve</h3>
-  <div className="me-4" /> {/* ช่องว่างด้านขวา */}
-</div>
-
-
+      {/* Header */}
+      <div className="w-full max-w-md flex items-center justify-between mb-4">
+        <Link to="/home" className='text-decoration-none'>
+          <Button variant="link" className="p-0">
+            <i className="bi bi-chevron-left ms-3 text-white"></i>
+          </Button>
+        </Link>
+        <h1 className="text-white text-xl md:text-2xl font-bold text-center flex-1">
+          Check Approve
+        </h1>
+        <div className="w-8" />
+      </div>
 
       {/* Toggle Buttons */}
       <div className="flex gap-2 mb-4 w-full max-w-md justify-center">
@@ -214,7 +201,7 @@ function CheckApprove() {
             !viewDelegate ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-700"
           } font-semibold`}
         >
-          เช็กอินปกติ
+          เช็กอินปกติ ({users.length})
         </button>
         <button
           onClick={() => setViewDelegate(true)}
@@ -222,7 +209,7 @@ function CheckApprove() {
             viewDelegate ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-700"
           } font-semibold`}
         >
-          เช็กอินแทนเพื่อน
+          เช็กอินแทนเพื่อน ({delegateUsers.length})
         </button>
       </div>
 
@@ -230,7 +217,14 @@ function CheckApprove() {
       <div className="max-w-md w-full space-y-5">
         {viewDelegate
           ? delegateUsers.map((u) => renderCard(u, true))
-          : users.map((u) => renderCard(u))}
+          : users.length > 0 
+            ? users.map((u) => renderCard(u))
+            : (
+                <div className="text-center text-white p-4">
+                  <p>ไม่มีข้อมูลการเช็คอินปกติ</p>
+                </div>
+              )
+        }
       </div>
 
       {/* Modal แสดงรูปเช็กอิน */}
@@ -254,7 +248,7 @@ function CheckApprove() {
             </div>
             <div className="p-4 space-y-2 text-gray-700">
               <div>
-                <strong>รหัสพนักงาน:</strong> {selectedUser.employeeId}
+                <strong>รหัสพนักงาน:</strong> {selectedUser.userid}
               </div>
               <div>
                 <strong>เวลาเช็กอิน:</strong> {selectedUser.checkInTime}
@@ -265,7 +259,9 @@ function CheckApprove() {
                   className={
                     getStatus(selectedUser.checkInTime) === "สาย"
                       ? "text-red-500"
-                      : "text-green-500"
+                      : getStatus(selectedUser.checkInTime) === "ตรงเวลา"
+                      ? "text-green-500"
+                      : "text-gray-500"
                   }
                 >
                   {getStatus(selectedUser.checkInTime)}

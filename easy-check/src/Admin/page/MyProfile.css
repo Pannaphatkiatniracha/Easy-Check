@@ -12,12 +12,12 @@
 
 
 
-.admin-profile-container {
+.admin-profile-con {
   font-family: 'Inter', 'Sarabun', sans-serif;
   margin: 0;
   color: var(--text-primary);
   line-height: 1.6;
-  max-width: 900px; /* ลดความกว้างลงเล็กน้อยเพื่อให้กระชับขึ้น */
+  width: 900px; 
   margin: 40px auto;
   background-color: var(--card-bg);
   border-radius: 16px;

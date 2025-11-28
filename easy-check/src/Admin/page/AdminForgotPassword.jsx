@@ -245,13 +245,6 @@ const AdminForgotPassword = () => {
                   'ส่งรหัส OTP'
                 )}
               </button>
-
-              <div className="info-box">
-                <p>💡 <strong>ทดสอบด้วยข้อมูลนี้:</strong></p>
-                <p>• EMP001 / somchai.admin@company.com</p>
-                <p>• EMP002 / somying.admin@company.com</p>
-                <p>• EMP003 / wichai.super@company.com</p>
-              </div>
             </form>
           )}
 

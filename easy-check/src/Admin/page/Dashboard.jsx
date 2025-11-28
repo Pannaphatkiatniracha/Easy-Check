@@ -351,7 +351,7 @@ const Dashboard = () => {
   return (
      
     <div className="dashboard">
-      <header className="header">
+      <header className="header-dashboard">
         <div className="header-left">
           <div className="logo-section">
             <div className="logo-icon">EC</div>

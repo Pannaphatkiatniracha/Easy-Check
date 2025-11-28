@@ -29,6 +29,18 @@ const Sidebar = () => {
   };
 
   const menuItems = [
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      ),
+      label: 'Dashboard',
+      path: '/dashboard'
+    },
     { 
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -39,7 +51,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Manage Users',
-      path: '/users'
+      path: '/Manageusers'
     },
     { 
       icon: (
@@ -51,7 +63,7 @@ const Sidebar = () => {
         </svg>
       ),
       label: 'Personal Summary',
-      path: '/summary'
+      path: '/Personalsummary'
     },
     { 
       icon: (

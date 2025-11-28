@@ -41,7 +41,7 @@ function MyProfile () {
   }, []);
 
   return (
-    <div className="admin-profile-container">
+    <div className="admin-profile-con">
     
       <div className="gradient-header-bg"></div>
 
