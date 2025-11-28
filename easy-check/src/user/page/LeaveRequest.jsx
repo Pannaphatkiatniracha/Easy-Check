@@ -109,16 +109,18 @@ const LeaveRequest = () => {
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
 
-        {/* Header */}
-        <div className="flex justify-start mb-4">
-          <Link to="/home" className="text-white text-2xl">
+        {/* Header + Title */}
+        <div className="flex items-center justify-center relative mb-2">
+          {/* Icon อยู่ซ้ายสุด */}
+          <Link to="/home" className="absolute left-0 text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
-        </div>
 
-        <h2 className="text-center text-3xl font-bold text-[#FFFFFF] drop-shadow-lg py-4 rounded-xl bg-white/10 backdrop-blur-md shadow-lg">
-          LEAVE REQUEST
-        </h2>
+          {/* หัวข้อ: ตรงกลาง, ฟอนต์เล็กลง, ไม่มีกรอบ */}
+          <h2 className="text-xl font-bold text-white text-center">
+            LEAVE REQUEST
+          </h2>
+        </div>
 
         {/* Leave Dates */}
         <div className="grid grid-cols-1 gap-6">
