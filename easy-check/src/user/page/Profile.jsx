@@ -197,15 +197,8 @@ const Profile = ( {role} ) => {
                         <InputGroup.Text className='text-secondary'>
                             <i className="bi bi-building-fill"></i>
                         </InputGroup.Text>
-                        <Form.Select aria-label='Select department' className='fw-semibold'
-                            name='department' value={user.department} onChange={handleChange}>
-                            <option value="Creative">Creative</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Sales">Sales</option>
-                            <option value="IT">IT</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Customer Service">Customer Service</option>
-                        </Form.Select>
+                        <FormControl className='fw-semibold' type="text"
+                            name='department' value={user.department} onChange={handleChange} readOnly />
                     </InputGroup>
                 </div>
 
