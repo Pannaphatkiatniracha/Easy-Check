@@ -40,40 +40,50 @@ const DelegateCheckin = () => {
       });
 
       setIsLoading(false);
-      setCheckedInEmployee({ id: employeeId, name: employees[employeeId], time });
-      setStatus(`✅ เช็กอินเรียบร้อยแล้ว\nID: ${employeeId}\nชื่อ: ${employees[employeeId]}\nเวลา: ${time}`);
+      setCheckedInEmployee({
+        id: employeeId,
+        name: employees[employeeId],
+        time,
+      });
+      setStatus(
+        `✅ เช็กอินเรียบร้อยแล้ว\nID: ${employeeId}\nชื่อ: ${employees[employeeId]}\nเวลา: ${time}`
+      );
       setEmployeeId("");
     }, 1000);
   };
 
   return (
-       <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
+    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
 
-        {/* Header */}
-        <div className="flex justify-start mb-4">
+        {/* ⭐ Header — ไอคอนซ้าย + หัวข้อกลาง */}
+        <div className="flex items-center justify-between mb-4 relative">
+          {/* ไอคอนซ้าย */}
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
-        </div>
 
-        {/* Header */}
-        <header className="mb-6 text-center">
-          <h1 className="text-white text-xl font-bold tracking-wide">
-            DELEGATE CHECKIN
+          {/* หัวข้ออยู่กลางจริง */}
+          <h1 className="absolute left-1/2 -translate-x-1/2 text-white text-xl font-bold tracking-wide whitespace-nowrap">
+            Delegate CheckIn
           </h1>
-        </header>
+
+          {/* ไว้ให้ flex balance (ไม่แสดงจริง) */}
+          <div className="w-6"></div>
+        </div>
 
         {/* Form */}
         <form onSubmit={handleCheckIn} className="space-y-5">
           <div>
             <label className="block text-white text-sm font-semibold mb-2">
-              EMPLOYEE ID
+              Employess ID
             </label>
             <input
               type="text"
               value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value.replace(/\D/, ""))}
+              onChange={(e) =>
+                setEmployeeId(e.target.value.replace(/\D/, ""))
+              }
               maxLength={6}
               placeholder="FRIEND'S EMPLOYEE ID 6 DIGITS"
               className="w-full px-4 py-2 rounded-lg bg-white/80 text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#636CCB]"
@@ -110,7 +120,9 @@ const DelegateCheckin = () => {
         {status && !checkedInEmployee && (
           <p
             className={`mt-4 text-center text-sm font-medium whitespace-pre-line ${
-              status.startsWith("✅") ? "text-green-400" : "text-red-400"
+              status.startsWith("✅")
+                ? "text-green-400"
+                : "text-red-400"
             }`}
           >
             {status}

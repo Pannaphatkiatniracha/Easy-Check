@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 function CheckInOut() {
   const [location, setLocation] = useState(null);
@@ -13,7 +13,6 @@ function CheckInOut() {
   const [checkOutData, setCheckOutData] = useState(null);
   const [mode, setMode] = useState("checkin");
 
-  // สำหรับคำขอออกก่อนเวลา
   const [earlyRequest, setEarlyRequest] = useState(null);
   const [showEarlyModal, setShowEarlyModal] = useState(false);
   const [earlyReason, setEarlyReason] = useState("");
@@ -34,7 +33,9 @@ function CheckInOut() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+      });
       videoRef.current.srcObject = stream;
       setError("");
     } catch (err) {
@@ -75,7 +76,14 @@ function CheckInOut() {
     const timestamp = now.getTime();
 
     if (mode === "checkin") {
-      const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
+      const data = {
+        time,
+        date,
+        lat: location.lat,
+        lng: location.lng,
+        photo,
+        timestamp,
+      };
       setCheckInData(data);
       localStorage.setItem("checkInData", JSON.stringify(data));
       setMessage(`เช็คอินสำเร็จ\nเวลา: ${time}`);
@@ -83,21 +91,30 @@ function CheckInOut() {
       setPhoto(null);
     } else if (mode === "checkout") {
       const currentHour = now.getHours();
-      // ถ้ายังไม่ถึง 18:00 ให้สร้างคำขอออกก่อนเวลา
       if (currentHour < 18 && !earlyRequest) {
         setShowEarlyModal(true);
         return;
       }
 
-      // ถ้ามีคำขอออกก่อนเวลา และอนุมัติแล้ว ให้บันทึกเช็คเอาท์
-      const data = { time, date, lat: location.lat, lng: location.lng, photo, timestamp };
+      const data = {
+        time,
+        date,
+        lat: location.lat,
+        lng: location.lng,
+        photo,
+        timestamp,
+      };
       setCheckOutData(data);
       localStorage.setItem("checkOutData", JSON.stringify(data));
       if (checkInData) {
         const durationMs = timestamp - checkInData.timestamp;
         const hours = Math.floor(durationMs / (1000 * 60 * 60));
-        const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-        setMessage(`เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`);
+        const minutes = Math.floor(
+          (durationMs % (1000 * 60 * 60)) / (1000 * 60)
+        );
+        setMessage(
+          `เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`
+        );
       }
       setMode("done");
       setPhoto(null);
@@ -123,7 +140,6 @@ function CheckInOut() {
   };
 
   const handleApproveEarly = () => {
-    // สมมติผู้อนุมัติอนุมัติทันที
     if (!earlyRequest) return;
     setEarlyRequest({ ...earlyRequest, status: "approved" });
     setMessage("คำขออนุมัติแล้ว สามารถเช็คเอาท์ได้");
@@ -146,16 +162,16 @@ function CheckInOut() {
   return (
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
-
-        <div className="flex justify-start mb-4">
+        {/* ⭐ หัวข้อ + ไอคอน อยู่บรรทัดเดียว */}
+        <div className="flex items-center gap-3 mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
-        </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg text-center mb-6">
-          Check-In / Check-Out
-        </h1>
+          <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg whitespace-nowrap">
+            Check-In / Check-Out
+          </h1>
+        </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4 hover:scale-105 transition-transform duration-300">
           <video
@@ -170,7 +186,8 @@ function CheckInOut() {
               onClick={startCamera}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg hover:scale-105 transition transform"
             >
-              <i className="bi bi-camera-video-fill"></i> Open Camera ({mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
+              <i className="bi bi-camera-video-fill"></i> Open Camera (
+              {mode === "checkin" ? "เช็คอิน" : "เช็คเอาท์"})
             </button>
 
             <button
@@ -191,8 +208,12 @@ function CheckInOut() {
         )}
 
         <div className="w-full grid grid-cols-2 gap-4">
-          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{time}</div>
-          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">{date}</div>
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
+            {time}
+          </div>
+          <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-semibold shadow-inner">
+            {date}
+          </div>
         </div>
 
         <button
@@ -211,36 +232,35 @@ function CheckInOut() {
           </button>
         )}
 
-       {checkInData && (
-  <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
-    <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
-      <i className="bi bi-geo-fill"></i>
-      <span>CheckIn</span>
-    </h3>
-    <p className="text-white">เวลา: {checkInData.time}</p>
-    <img
-      src={URL.createObjectURL(checkInData.photo)}
-      alt="Check-In"
-      className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
-    />
-  </div>
-)}
+        {checkInData && (
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
+            <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
+              <i className="bi bi-geo-fill"></i>
+              <span>CheckIn</span>
+            </h3>
+            <p className="text-white">เวลา: {checkInData.time}</p>
+            <img
+              src={URL.createObjectURL(checkInData.photo)}
+              alt="Check-In"
+              className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
+            />
+          </div>
+        )}
 
-{checkOutData && (
-  <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
-    <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
-      <i className="bi bi-flag-fill"></i>
-      <span>CheckOut</span>
-    </h3>
-    <p className="text-white">Time: {checkOutData.time}</p>
-    <img
-      src={URL.createObjectURL(checkOutData.photo)}
-      alt="Check-Out"
-      className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
-    />
-  </div>
-)}
-
+        {checkOutData && (
+          <div className="w-full p-4 rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/20 text-center hover:scale-105 transition duration-300">
+            <h3 className="font-bold text-white mb-2 flex items-center justify-center gap-2">
+              <i className="bi bi-flag-fill"></i>
+              <span>CheckOut</span>
+            </h3>
+            <p className="text-white">Time: {checkOutData.time}</p>
+            <img
+              src={URL.createObjectURL(checkOutData.photo)}
+              alt="Check-Out"
+              className="mt-2 w-full h-40 rounded-2xl object-cover border-2 border-white shadow-lg"
+            />
+          </div>
+        )}
 
         {message && (
           <div className="mt-4 p-3 bg-white/30 rounded-2xl text-[#3C467B] w-full text-center font-semibold shadow-md whitespace-pre-line hover:scale-105 transition duration-300">
@@ -258,7 +278,6 @@ function CheckInOut() {
           </button>
         )}
 
-        {/* ปุ่มอนุมัติคำขอออกก่อนเวลา (สมมติฝั่งผู้อนุมัติ) */}
         {earlyRequest && earlyRequest.status === "pending" && (
           <button
             onClick={handleApproveEarly}
@@ -267,32 +286,34 @@ function CheckInOut() {
             อนุมัติคำขอออกก่อนเวลา
           </button>
         )}
-
       </div>
 
-      {/* Modal กรอกเหตุผลออกก่อนเวลา */}
+      {/* ⭐ Popup กล่องขนาดเล็กลง */}
       {showEarlyModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
-            <p className="mb-2 text-gray-800 font-semibold">
+          <div className="bg-white rounded-2xl p-4 max-w-xs w-full text-center shadow-xl">
+            <p className="mb-2 text-gray-800 font-semibold text-sm">
               คุณต้องการเช็คเอาท์ก่อนเวลา 18:00 กรุณากรอกเหตุผล
             </p>
+
             <textarea
               value={earlyReason}
               onChange={(e) => setEarlyReason(e.target.value)}
               placeholder="กรอกเหตุผลที่ต้องการออกก่อนเวลา"
-              className="w-full p-2 border rounded-md mb-4"
+              className="w-full p-2 border rounded-md mb-3 text-sm"
+              rows={3}
             />
-            <div className="flex justify-center gap-4">
+
+            <div className="flex justify-center gap-4 mt-1">
               <button
                 onClick={handleEarlySubmit}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
+                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 text-sm"
               >
                 ส่งคำขอ
               </button>
               <button
                 onClick={() => setShowEarlyModal(false)}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 text-sm"
               >
                 ยกเลิก
               </button>
@@ -300,7 +321,6 @@ function CheckInOut() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
