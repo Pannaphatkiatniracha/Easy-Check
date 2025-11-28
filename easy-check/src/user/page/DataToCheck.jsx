@@ -57,10 +57,12 @@ const DataToCheck = () => {
                             <img className="w-12 h-12 rounded-full border-2 border-[#7f5cff] object-cover"
                             src={person.avatar} alt={person.name}/>
 
-                            {/* กล่องชื่อ + id + ปุ่ม */}
+                            {/* กล่องชื่อ + id + position + department + ปุ่ม */}
                             <div className="flex-1">
                                 <div className="font-bold text-gray-800 text-base">{person.name}</div>
                                 <div className="text-xs text-gray-500">ID: {person.userid}</div>
+                                <div className="text-xs text-gray-500 mt-1 fw-semibold">{person.position}</div>
+                                <div className="text-xs text-gray-500">by {person.department}</div>
 
                                 {/* ปุ่ม */}
                                 <div className="flex gap-2 mt-1">
