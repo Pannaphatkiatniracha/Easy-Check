@@ -68,36 +68,52 @@ function CheckInOut() {
     );
   };
 
-  const handleConfirm = () => {
+  //  แก้ไขฟังก์ชัน handleConfirm ตรงนี้ เพื่อยิง API ไปหา Backend
+  const handleConfirm = async () => {
     if (!location) return setError("กรุณาขอตำแหน่งก่อน");
     if (!photo) return setError("กรุณาถ่ายรูปยืนยันตัวตน");
 
     const now = new Date();
     const timestamp = now.getTime();
 
+    //  เตรียมข้อมูล (FormData) เพื่อส่งรูปและพิกัดไป Backend
+    const formData = new FormData();
+    formData.append("lat", location.lat);
+    formData.append("lng", location.lng);
+    formData.append("photo", photo);
+
     if (mode === "checkin") {
-      const data = {
-        time,
-        date,
-        lat: location.lat,
-        lng: location.lng,
-        photo,
-        timestamp,
-      };
-      setCheckInData(data);
-      localStorage.setItem("checkInData", JSON.stringify(data));
+      try {
+        // ยิง API เช็คอิน
+        const response = await fetch("http://localhost:5000/attendance/check-in", {
+          method: "POST",
+          body: formData,
+        });
 
-      // ⭐ ตรวจสอบเวลาเช็คอินสาย
-      const workStart = new Date();
-      workStart.setHours(9, 0, 0, 0); // เวลาเริ่มงาน 09:00
-      let messageText = `เช็คอินสำเร็จ\nเวลา: ${time}`;
-      if (timestamp > workStart.getTime()) {
-        messageText += "\n⚠️ มาสาย";
+        const result = await response.json();
+
+        if (response.ok) {
+          const data = {
+            time,
+            date,
+            lat: location.lat,
+            lng: location.lng,
+            photo,
+            timestamp,
+          };
+          setCheckInData(data);
+          localStorage.setItem("checkInData", JSON.stringify(data));
+
+          // อัปเดตข้อความโดยเอา status จากหลังบ้านมาโชว์
+          setMessage(`เช็คอินสำเร็จ\nเวลา: ${time}\nสถานะ: ${result.status === 'late' ? '⚠️ มาสาย' : '✅ ตรงเวลา'}`);
+          setMode("checkout");
+          setPhoto(null);
+        } else {
+          setError(result.message || "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์");
+        }
+      } catch (err) {
+        setError("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
       }
-
-      setMessage(messageText);
-      setMode("checkout");
-      setPhoto(null);
     } else if (mode === "checkout") {
       const currentHour = now.getHours();
       if (currentHour < 18 && !earlyRequest) {
@@ -105,31 +121,51 @@ function CheckInOut() {
         return;
       }
 
-      const data = {
-        time,
-        date,
-        lat: location.lat,
-        lng: location.lng,
-        photo,
-        timestamp,
-      };
-      setCheckOutData(data);
-      localStorage.setItem("checkOutData", JSON.stringify(data));
-      if (checkInData) {
-        const durationMs = timestamp - checkInData.timestamp;
-        const hours = Math.floor(durationMs / (1000 * 60 * 60));
-        const minutes = Math.floor(
-          (durationMs % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        setMessage(
-          `เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที`
-        );
+      try {
+        // ยิง API เช็คเอาท์
+        const response = await fetch("http://localhost:5000/attendance/check-out", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          const data = {
+            time,
+            date,
+            lat: location.lat,
+            lng: location.lng,
+            photo,
+            timestamp,
+          };
+          setCheckOutData(data);
+          localStorage.setItem("checkOutData", JSON.stringify(data));
+          
+          if (checkInData) {
+            const durationMs = timestamp - checkInData.timestamp;
+            const hours = Math.floor(durationMs / (1000 * 60 * 60));
+            const minutes = Math.floor(
+              (durationMs % (1000 * 60 * 60)) / (1000 * 60)
+            );
+            setMessage(
+              `เช็คเอาท์สำเร็จ\nเวลา: ${time}\n⏱ เวลาทำงานรวม: ${hours} ชั่วโมง ${minutes} นาที\nสถานะ: ${result.status === 'early' ? '⚠️ ออกก่อนเวลา' : '✅ ปกติ'}`
+            );
+          } else {
+            setMessage(`เช็คเอาท์สำเร็จ\nเวลา: ${time}\nสถานะ: ${result.status === 'early' ? '⚠️ ออกก่อนเวลา' : '✅ ปกติ'}`);
+          }
+          setMode("done");
+          setPhoto(null);
+          setEarlyRequest(null);
+        } else {
+          setError(result.message || "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์");
+        }
+      } catch (err) {
+        setError("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
       }
-      setMode("done");
-      setPhoto(null);
-      setEarlyRequest(null);
     }
 
+    // ปิดกล้อง
     const stream = videoRef.current?.srcObject;
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -171,7 +207,7 @@ function CheckInOut() {
   return (
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
-        {/* ⭐ หัวข้อ + ไอคอน อยู่บรรทัดเดียว */}
+       
         <div className="flex items-center gap-3 mb-4">
           <Link to="/home" className="text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
@@ -297,7 +333,7 @@ function CheckInOut() {
         )}
       </div>
 
-      {/* ⭐ Popup กล่องขนาดเล็กลง */}
+      {/*  Popup กล่องขนาดเล็กลง */}
       {showEarlyModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-4 max-w-xs w-full text-center shadow-xl">
