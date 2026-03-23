@@ -11,4 +11,8 @@ router.get('/home-data', verifyToken, (req,res) => {
     res.json({message: "Success"})
 })
 
+router.get("/", (req, res) => {
+  res.send("auth route working");
+});
+
 export default router

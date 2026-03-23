@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise'
 // pool มันจะอารมณ์เหมือนตัวกลางเชื่อมให้ระบบเข้าถึงฐานข้อมูลได้ไวขึ้น
 const db = mysql.createPool({
     host: 'localhost',      
-    port: 3307, // port ของเราเองอันนี้
+    port: 3306, // port ของเราเองอันนี้
     user: 'root',           
     password: 'root',
     database: 'easycheck',
