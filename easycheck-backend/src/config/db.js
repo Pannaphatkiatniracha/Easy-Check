@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise'
 
 
 // pool มันจะอารมณ์เหมือนตัวกลางเชื่อมให้ระบบเข้าถึงฐานข้อมูลได้ไวขึ้น
-const pool = mysql.createPool({
+const db = mysql.createPool({
     host: 'localhost',      
     port: 3307, // port ของเราเองอันนี้
     user: 'root',           
@@ -13,4 +13,4 @@ const pool = mysql.createPool({
     queueLimit: 0 // 0 = unlimit คือรอไปเลยจ้าอันลิมิต
 })
 
-export default pool
+export default db

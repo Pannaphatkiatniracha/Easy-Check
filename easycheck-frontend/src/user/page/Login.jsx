@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { verifyUser } from "../data/users";
 import { Modal } from 'react-bootstrap';
 
+import axios from 'axios';
+
+const HOST = 'localhost'
+const PORT = '3000'
 
 const Login = ({ setToken, setRole }) => {
 
@@ -22,29 +26,31 @@ const Login = ({ setToken, setRole }) => {
 
 
     // result มันคือสิ่งที่ verifyUser จะ return ค่ากลับมาเว้ย
-    const handleLogin = () => {
+    const handleLogin = async () => {
+        // ล้างค่า Error เก่าก่อน
+        setError('')
 
-        // result คือคำตอบจากการตรวจสอบ verifyUser
-        const result = verifyUser(username, password)
+        try {
+            const response = await axios.post(`http://${HOST}:${PORT}/auth/login`, {
+                employee_id: username,
+                password: password // ส่ง username,password ไปแบคเอนในนาม employee_id,password ตาม db
+            })
 
-        // ถ้าเช็คแล้ว username กับ password เป็นจริง จะเข้าสู่ {} แรก
-        if (result) {
+            // ถ้าผ่าน axios จะเอาข้อมูลเก็บใส่ .data ให้เลย ก็คือส่งกลับ token กับ role คืนมา
+            const { token, role } = response.data
 
-            // ถ้าใช่จะเอา token จาก verifyUser มายัดใส่ token ปัจจุบันด้วย setToken
-            // แล้ว navigate ไปที่หน้า home เลยถ้าใช่ โดย replace: true ก็คือแทนที่ login ด้วยหน้า home เลยจ่ะ แบบ back กลับไม่ได้ด้วย
+            // เก็บข้อมูลที่แบคเอนส่งมาลงเครื่องเหมือนเดิม
+            localStorage.setItem('token', token)
+            localStorage.setItem('role', role)
 
-            // บันทึกลง localStorage
-            // .setItem(key, value)
-            localStorage.setItem('token', result.token)
-            localStorage.setItem('role', result.role)
-
-            // อัปเดต state ของ App.jsx ด้วย
-            setToken(result.token)
-            setRole(result.role)
-
+            // อัปเดต State และนำทาง
+            setToken(token)
+            setRole(role)
             navigate('/home', { replace: true })
-        } else {
-            setError('Username or Password is incorrect')
+
+        } catch (err) {
+            const errMsg = err.response?.data?.message // อันนี้คือไปดึงข้อความที่ error ตามหลังบ้านมาเลย
+            setError(errMsg)
             setShowModal(true)
         }
     }
@@ -82,7 +88,7 @@ const Login = ({ setToken, setRole }) => {
                             }} />
 
 
-                            {/* 
+                        {/* 
                                 >>>>> text.replace(สิ่งที่อยากหา, สิ่งที่อยากแทนที่)
                                 \D = ไม่ใช่ตัวเลข
                                 /…/g = / สิ่งที่อยากหา / ตัวเลือก
@@ -90,7 +96,7 @@ const Login = ({ setToken, setRole }) => {
                                 ส่วนที่ลบก็แทนที่ด้วยค่าว่าง "" นั่นเองง ✨ 
                             */}
 
-                            {/* 
+                        {/* 
                                 "123456789".slice(3,6)
                                 = 456 
                                 เพราะ(ตัวแรก,ตัวสอง) ตัวแรกคือตัวแรกที่เริ่มนับ ตัวสอง
