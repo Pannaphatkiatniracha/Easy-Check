@@ -11,7 +11,7 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - 3307:3306       # ตัวกลางของเรากับ port มาตรฐาน
+      - 3309:3306       # ตัวกลางของเรากับ port มาตรฐาน
     volumes:
        - ./mysql-data:/var/lib/mysql # เก็บข้อมูลไว้ในเครื่องเป็น text
     environment:
