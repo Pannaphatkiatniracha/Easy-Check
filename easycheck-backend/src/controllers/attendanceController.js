@@ -3,10 +3,10 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// 🧠 mock database (ใช้ array ไปก่อน)
+
 let attendanceDB = [];
 
-// ================== CHECK IN ==================
+/*check in*/ 
 export const checkIn = [
   upload.single("photo"),
   (req, res) => {
@@ -20,7 +20,7 @@ export const checkIn = [
 
       const now = new Date();
 
-      // ⏰ เวลาเริ่มงาน 09:00
+      /*เวลาเข้างาน 09:00*/ 
       const workStart = new Date();
       workStart.setHours(9, 0, 0, 0);
 
@@ -48,7 +48,7 @@ export const checkIn = [
   },
 ];
 
-// ================== CHECK OUT ==================
+/*check out*/ 
 export const checkOut = [
   upload.single("photo"),
   (req, res) => {
@@ -62,7 +62,7 @@ export const checkOut = [
 
       const now = new Date();
 
-      // ⏰ เวลาเลิกงาน 18:00
+  /*เวลาเลิกงาน 18:00*/ 
       const workEnd = new Date();
       workEnd.setHours(18, 0, 0, 0);
 
@@ -90,7 +90,7 @@ export const checkOut = [
   },
 ];
 
-// ================== HISTORY ==================
+/*history*/
 export const getHistory = (req, res) => {
   try {
     res.json(attendanceDB);
@@ -99,7 +99,7 @@ export const getHistory = (req, res) => {
   }
 };
 
-// ================== STATUS ==================
+/*status*/
 export const getStatus = (req, res) => {
   try {
     const today = new Date().toDateString();
