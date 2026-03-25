@@ -6,32 +6,31 @@ import authRouter from './routers/authRouter.js'
 import userRouter from './routers/userRouter.js'
 import attendanceRouter from './routers/attendanceRouter.js'
 import eventRouter from './routers/eventRouter.js'
+import leaveRouter from './routers/leaveRouter.js'
 
-import pool from './config/db.js' 
+import pool from './config/db.js'
 
 dotenv.config()
 
-const PORT = process.env.SERVER_PORT || 5000
-const HOST = process.env.SERVER_HOST || 'localhost'
+const PORT = 5000
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-// log ทุก request (debug ง่ายมาก)
 app.use((req, res, next) => {
-  console.log(`[LOG] ${req.method} ${req.url}`)
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
   next()
 })
 
-// เติม ; ดักหน้าวงเล็บเพื่อป้องกัน Error 
 ;(async () => {
   try {
     await pool.execute('SELECT 1')
-    console.log('Database Connected')
+    console.log('✅ Database Connected')
   } catch (err) {
-    console.error('Database Error:', err.message)
+    console.error('❌ Database Error:', err.message)
   }
 })()
 
@@ -39,17 +38,20 @@ app.use('/auth', authRouter)
 app.use('/users', userRouter)
 app.use('/attendance', attendanceRouter)
 app.use('/events', eventRouter)
+app.use('/leave', leaveRouter)
 
 app.get('/', (req, res) => {
-  res.send('EasyCheck API is running')
+  res.send('EasyCheck API is running 🚀')
 })
 
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack)
-  res.status(500).json({ message: 'Something went wrong' })
+  console.error('💥 ERROR:', err)
+  res.status(500).json({
+    message: 'Server Error',
+    error: err.message
+  })
 })
 
-// ================== start server ==================
-app.listen(PORT, HOST, () => {
-  console.log(`Server http://${HOST}:${PORT} is running ...`)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
 })

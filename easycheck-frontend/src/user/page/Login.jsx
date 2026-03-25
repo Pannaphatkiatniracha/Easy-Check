@@ -1,7 +1,6 @@
 import { InputGroup, FormControl, Button } from 'react-bootstrap';
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from 'react';
-import { verifyUser } from "../data/users";
 import { Modal } from 'react-bootstrap';
 
 import axios from 'axios';

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import axios from "axios"; // เพิ่ม axios
 
 const LeaveRequest = () => {
   const navigate = useNavigate();
@@ -14,9 +15,9 @@ const LeaveRequest = () => {
     evidencePreview: null,
   });
 
-  // State สำหรับ Reject Popup
   const [rejectPopup, setRejectPopup] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [loading, setLoading] = useState(false); // สำหรับเช็คสถานะตอนกดส่ง
 
   const leaveOptions = [
     "Sick Leave",
@@ -62,40 +63,56 @@ const LeaveRequest = () => {
     });
   };
 
-  const handleFileLeave = () => {
+  // --- ส่วนที่แก้ไข: เชื่อมต่อ API ---
+  const handleFileLeave = async () => {
+    // 1. Validation (เหมือนเดิมของคุณ)
     if (!formData.leaveStart || !formData.leaveEnd) {
       alert("Please select start and end dates.");
       return;
     }
-
     if (formData.leaveReasons.length === 0) {
       alert("Please select at least one leave reason.");
       return;
     }
-
     if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
       alert("Please provide a reason for 'Other'.");
       return;
     }
-
     if (formData.leaveReasons.includes("Sick Leave") && !formData.evidenceFile) {
       alert("Please attach a medical certificate.");
       return;
     }
 
-    alert("Leave filed successfully!");
-    console.log(formData);
+    setLoading(true);
 
-    navigate(-1);
+    // 2. สร้าง FormData เพื่อส่งไฟล์
+    const data = new FormData();
+    // ดึงรหัสพนักงานจาก localStorage (เช็คชื่อ Key ให้ตรงกับที่คุณเก็บตอน Login นะครับ)
+    const empId = localStorage.getItem("role") === "admin" ? "061004" : localStorage.getItem("token") ? "061004" : "061004"; 
+    
+    data.append("userId", empId); 
+    data.append("leaveStart", formData.leaveStart);
+    data.append("leaveEnd", formData.leaveEnd);
+    data.append("leaveReasons", JSON.stringify(formData.leaveReasons)); // ส่งเป็น array string
+    data.append("otherReasonText", formData.otherReasonText);
+    
+    if (formData.evidenceFile) {
+      data.append("evidenceFile", formData.evidenceFile); // "evidenceFile" ต้องตรงกับใน multer (upload.single)
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/leave/request", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("ยื่นคำขอลางานสำเร็จ!");
+      navigate(-1);
+    } catch (err) {
+      alert("เกิดข้อผิดพลาด: " + (err.response?.data?.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้"));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // ฟังก์ชันเปิด Popup Reject
-  const openRejectPopup = () => {
-    setRejectReason("");
-    setRejectPopup(true);
-  };
-
-  // ฟังก์ชันยืนยัน Reject
   const handleRejectSubmit = () => {
     if (!rejectReason.trim()) {
       alert("กรุณากรอกเหตุผลที่ไม่อนุมัติ");
@@ -111,12 +128,9 @@ const LeaveRequest = () => {
 
         {/* Header + Title */}
         <div className="flex items-center justify-center relative mb-2">
-          {/* Icon อยู่ซ้ายสุด */}
           <Link to="/home" className="absolute left-0 text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
           </Link>
-
-          {/* หัวข้อ: ตรงกลาง, ฟอนต์เล็กลง, ไม่มีกรอบ */}
           <h2 className="text-xl font-bold text-white text-center">
             LEAVE REQUEST
           </h2>
@@ -170,10 +184,12 @@ const LeaveRequest = () => {
                 <span className="font-medium">{reason}</span>
                 <input
                   type="checkbox"
+                  className="hidden" 
                   checked={formData.leaveReasons.includes(reason)}
                   onChange={() => handleReasonChange(reason)}
-                  className="form-checkbox h-6 w-6 text-[#636CCB]"
                 />
+                {/* แสดง icon แทน checkbox ถ้าเลือกแล้ว */}
+                {formData.leaveReasons.includes(reason) && <i className="bi bi-check-circle-fill text-[#3C467B]"></i>}
               </label>
             ))}
           </div>
@@ -228,9 +244,12 @@ const LeaveRequest = () => {
         <div className="flex flex-col gap-4">
           <button
             onClick={handleFileLeave}
-            className="w-full py-3 rounded-xl bg-[#636CCB] text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
+            disabled={loading}
+            className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all ${
+              loading ? "bg-gray-500" : "bg-[#636CCB]"
+            }`}
           >
-            File Leave
+            {loading ? "Processing..." : "File Leave"}
           </button>
 
           <button
