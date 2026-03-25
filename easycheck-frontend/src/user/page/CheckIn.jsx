@@ -20,8 +20,7 @@ function CheckInOut() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // สมมติ userId เป็น 1 (ในระบบจริงควรดึงจาก Auth Context หรือ LocalStorage ที่เก็บตอน Login)
-  const USER_ID = "1"; 
+  const USER_ID = "070504";
 
   useEffect(() => {
     const nowTime = () => {
@@ -79,22 +78,23 @@ function CheckInOut() {
 
     const now = new Date();
     
-    // Logic ตรวจสอบการออกก่อนเวลา (ก่อน 18:00)
+    // ตรวจสอบการออกก่อนเวลา 18:00
     if (mode === "checkout" && now.getHours() < 18 && !isEarlyConfirmed) {
       setShowEarlyModal(true);
       return;
     }
 
     const formData = new FormData();
-    formData.append("userId", USER_ID); // ส่ง ID ไปให้ DB รู้ว่าเป็นใคร
+    formData.append("userId", USER_ID); 
     formData.append("lat", location.lat);
     formData.append("lng", location.lng);
     formData.append("photo", photo);
-    if (earlyReason) formData.append("reason", earlyReason);
+    if (earlyReason) formData.append("reason", earlyReason); // <--- ส่งเหตุผลไปด้วย!
 
     const apiPath = mode === "checkin" ? "check-in" : "check-out";
 
     try {
+      // ยิงไปที่ /attendance/... ตาม API Spec
       const response = await fetch(`http://localhost:5000/attendance/${apiPath}`, {
         method: "POST",
         body: formData,
@@ -104,12 +104,7 @@ function CheckInOut() {
 
       if (response.ok) {
         const data = {
-          time,
-          date,
-          lat: location.lat,
-          lng: location.lng,
-          photo: URL.createObjectURL(photo),
-          timestamp: now.getTime(),
+          time, date, lat: location.lat, lng: location.lng, photo: URL.createObjectURL(photo), timestamp: now.getTime(),
         };
 
         if (mode === "checkin") {
@@ -122,7 +117,6 @@ function CheckInOut() {
           setMode("done");
         }
         
-        // เคลียร์ค่าหลังทำงานเสร็จ
         setPhoto(null);
         setIsEarlyConfirmed(false);
         setEarlyReason("");
@@ -147,7 +141,6 @@ function CheckInOut() {
     if (!earlyReason.trim()) return alert("กรุณากรอกเหตุผล");
     setIsEarlyConfirmed(true);
     setShowEarlyModal(false);
-    // หลังจากกดส่งเหตุผล ให้รัน handleConfirm ต่อทันที
     setTimeout(() => handleConfirm(), 100);
   };
 
@@ -167,9 +160,7 @@ function CheckInOut() {
       <div className="max-w-md w-full space-y-6">
         
         <div className="flex items-center gap-3 mb-4">
-          <Link to="/home" className="text-white text-2xl">
-            <i className="bi bi-chevron-left"></i>
-          </Link>
+          <Link to="/home" className="text-white text-2xl"><i className="bi bi-chevron-left"></i></Link>
           <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">
             {mode === "checkin" ? "Check-In" : mode === "checkout" ? "Check-Out" : "Success"}
           </h1>
@@ -177,26 +168,14 @@ function CheckInOut() {
 
         {mode !== "done" && (
           <div className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-white/20 flex flex-col items-center space-y-4">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full rounded-2xl border-4 border-white object-cover aspect-[3/4] bg-black"
-            ></video>
+            <video ref={videoRef} autoPlay playsInline className="w-full rounded-2xl border-4 border-white object-cover aspect-[3/4] bg-black"></video>
             <canvas ref={canvasRef} className="hidden"></canvas>
 
             <div className="flex flex-col w-full gap-3">
-              <button
-                onClick={startCamera}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg active:scale-95 transition"
-              >
+              <button onClick={startCamera} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white font-bold shadow-lg active:scale-95 transition">
                 <i className="bi bi-camera-video-fill mr-2"></i> Open Camera
               </button>
-
-              <button
-                onClick={capturePhoto}
-                className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg active:scale-95 transition"
-              >
+              <button onClick={capturePhoto} className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg active:scale-95 transition">
                 <i className="bi bi-camera-fill mr-2"></i> Take a photo
               </button>
             </div>
@@ -205,11 +184,7 @@ function CheckInOut() {
 
         {photo && mode !== "done" && (
           <div className="relative">
-             <img
-              src={URL.createObjectURL(photo)}
-              alt="preview"
-              className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover"
-            />
+             <img src={URL.createObjectURL(photo)} alt="preview" className="w-full max-h-[300px] rounded-2xl border-4 border-white shadow-xl object-cover" />
             <p className="text-center text-white text-sm mt-1">รูปถ่ายปัจจุบัน</p>
           </div>
         )}
@@ -219,19 +194,13 @@ function CheckInOut() {
           <div className="bg-white text-[#3C467B] py-2 rounded-xl text-center font-bold shadow-inner">{date}</div>
         </div>
 
-        <button
-          onClick={handleLocation}
-          className={`w-full py-3 rounded-xl font-bold shadow-lg transition ${location ? 'bg-green-500 text-white' : 'bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white'}`}
-        >
+        <button onClick={handleLocation} className={`w-full py-3 rounded-xl font-bold shadow-lg transition ${location ? 'bg-green-500 text-white' : 'bg-gradient-to-r from-[#636CCB] to-[#7F5CFF] text-white'}`}>
           <i className="bi bi-geo-alt-fill mr-2"></i> 
           {location ? `พิกัด: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : "Request position access"}
         </button>
 
         {mode !== "done" && (
-          <button
-            onClick={handleConfirm}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-[#34FFB9] to-[#12C27E] text-black font-black text-xl shadow-xl active:scale-95 transition"
-          >
+          <button onClick={handleConfirm} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#34FFB9] to-[#12C27E] text-black font-black text-xl shadow-xl active:scale-95 transition">
             DONE {mode.toUpperCase()}
           </button>
         )}
@@ -267,46 +236,28 @@ function CheckInOut() {
         )}
 
         {mode === "done" && (
-          <button
-            onClick={handleReset}
-            className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg hover:bg-gray-100 transition"
-          >
+          <button onClick={handleReset} className="w-full py-3 rounded-xl bg-white text-[#3C467B] font-bold shadow-lg hover:bg-gray-100 transition">
             เริ่มใหม่ (Reset)
           </button>
         )}
       </div>
 
-      {/* Modal เหตุผลการออกก่อนเวลา */}
       {showEarlyModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
-            <div className="text-yellow-500 text-5xl mb-4">
-              <i className="bi bi-exclamation-circle-fill"></i>
-            </div>
+            <div className="text-yellow-500 text-5xl mb-4"><i className="bi bi-exclamation-circle-fill"></i></div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">ออกก่อนเวลา 18:00</h3>
             <p className="text-gray-600 mb-4 text-sm">กรุณาระบุเหตุผลที่ต้องการออกก่อนเวลาเพื่อแจ้งให้ผู้ดูแลทราบ</p>
 
             <textarea
-              value={earlyReason}
-              onChange={(e) => setEarlyReason(e.target.value)}
+              value={earlyReason} onChange={(e) => setEarlyReason(e.target.value)}
               placeholder="เช่น ทำงานเสร็จแล้ว หรือ มีธุระด่วน..."
-              className="w-full p-3 border-2 border-gray-200 rounded-xl mb-4 focus:border-[#636CCB] outline-none transition"
-              rows={3}
+              className="w-full p-3 border-2 border-gray-200 rounded-xl mb-4 focus:border-[#636CCB] outline-none transition" rows={3}
             />
 
             <div className="flex gap-3">
-               <button
-                onClick={() => setShowEarlyModal(false)}
-                className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300"
-              >
-                ยกเลิก
-              </button>
-              <button
-                onClick={handleEarlySubmit}
-                className="flex-1 py-3 bg-[#12C27E] text-white rounded-xl font-bold shadow-lg hover:bg-[#0ea86d]"
-              >
-                ส่งและยืนยัน
-              </button>
+               <button onClick={() => setShowEarlyModal(false)} className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300">ยกเลิก</button>
+              <button onClick={handleEarlySubmit} className="flex-1 py-3 bg-[#12C27E] text-white rounded-xl font-bold shadow-lg hover:bg-[#0ea86d]">ส่งและยืนยัน</button>
             </div>
           </div>
         </div>
