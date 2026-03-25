@@ -1,84 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Phone, Mail, Briefcase, MapPin, Calendar, Plus, X, User, TrendingUp, Clock, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
 
+const AVATAR_COLORS = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
+
 const Personalsummary = () => {
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      firstName: 'สมชาย',
-      lastName: 'ใจดี',
-      empCode: 'EMP001',
-      position: 'Frontend Developer',
-      department: 'Development',
-      phone: '081-234-5678',
-      email: 'somchai@company.com',
-      supervisor: 'คุณสมหมาย',
-      startDate: '2022-01-15',
-      attendanceRate: 95,
-      workStats: {
-        present: 20,
-        late: 1,
-        absent: 0
-      },
-      leaveBalance: {
-        personal: 5,
-        sick: 25,
-        vacation: 8,
-        maternity: 0
-      },
-      avatarColor: '#50589C'
-    },
-    {
-      id: 2,
-      firstName: 'สมหญิง',
-      lastName: 'รักที',
-      empCode: 'EMP002',
-      position: 'UI/UX Designer',
-      department: 'Design',
-      phone: '082-345-6789',
-      email: 'somying@company.com',
-      supervisor: 'คุณสมศรี',
-      startDate: '2021-06-20',
-      attendanceRate: 98,
-      workStats: {
-        present: 21,
-        late: 0,
-        absent: 0
-      },
-      leaveBalance: {
-        personal: 6,
-        sick: 28,
-        vacation: 10,
-        maternity: 90
-      },
-      avatarColor: '#636CCB'
-    },
-    {
-      id: 3,
-      firstName: 'สมพงษ์',
-      lastName: 'มั่งคั่ง',
-      empCode: 'EMP003',
-      position: 'Backend Developer',
-      department: 'Development',
-      phone: '083-456-7890',
-      email: 'sompong@company.com',
-      supervisor: 'คุณสมหมาย',
-      startDate: '2020-03-10',
-      attendanceRate: 92,
-      workStats: {
-        present: 19,
-        late: 2,
-        absent: 0
-      },
-      leaveBalance: {
-        personal: 4,
-        sick: 22,
-        vacation: 6,
-        maternity: 0
-      },
-      avatarColor: '#6E8CFB'
-    }
-  ]);
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch('http://localhost:5000/personal-summary', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          const mapped = json.data.map((user, index) => {
+            const nameParts = user.full_name.trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            return {
+              id: user.id,
+              firstName,
+              lastName,
+              empCode: user.employee_id,
+              position: user.position || '',
+              department: user.department || '',
+              branch: user.branch || '',
+              phone: user.phone || '',
+              email: user.email || '',
+              supervisor: '',
+              startDate: user.join_date ? user.join_date.split('T')[0] : '',
+              attendanceRate: 0,
+              workStats: { present: 0, late: 0, absent: 0 },
+              leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
+              avatarColor: AVATAR_COLORS[index % AVATAR_COLORS.length]
+            };
+          });
+          setEmployees(mapped);
+        }
+      })
+      .catch(err => console.error('Failed to fetch employees:', err));
+  }, []);
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);

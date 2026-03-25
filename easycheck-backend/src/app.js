@@ -6,7 +6,11 @@ import authRouter from './routers/authRouter.js'
 import userRouter from './routers/userRouter.js'
 import attendanceRouter from './routers/attendanceRouter.js'
 import eventRouter from './routers/eventRouter.js'
+
 import leaveRouter from './routers/leaveRouter.js'
+
+import personalSummaryRouter from './routers/personalSummaryRouter.js'
+
 
 import pool from './config/db.js'
 
@@ -24,6 +28,16 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
   next()
 })
+// ----------------------------------------------------------------------------
+
+
+app.use('/auth', authRouter)
+app.use('/users', userRouter)
+app.use('/attendance', attendanceRouter)
+app.use('/events', eventRouter)
+
+
+
 
 ;(async () => {
   try {
@@ -34,11 +48,17 @@ app.use((req, res, next) => {
   }
 })()
 
+
 app.use('/auth', authRouter)
 app.use('/users', userRouter)
 app.use('/attendance', attendanceRouter)
 app.use('/events', eventRouter)
+
 app.use('/leave', leaveRouter)
+
+app.use('/personal-summary', personalSummaryRouter)
+
+
 
 app.get('/', (req, res) => {
   res.send('EasyCheck API is running 🚀')

@@ -52,13 +52,6 @@ import Personalsummary from "./Admin/page/Personalsummary";
 import CheckApprove from "./user/page/CheckApprove";
 import EditProfile from "./Admin/page/EditProfile";
 
-
-
-
-
-
-
-
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token") || "")
   const [role, setRole] = useState(() => localStorage.getItem("role") || "")
@@ -66,19 +59,21 @@ function App() {
   return (
     <>
       <BrowserRouter basename="/easycheck/">
+        
         <Routes>
+          {/* --- ส่วนที่ใครก็เข้าได้ --- */}
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword  />} />
-          {/* route login ตรงนี้ */}
+          
           <Route path="/adminlogin" element={<AdminLogin/>} />
           <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
 
-
-
-          {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
-
-          {token && (
+          {/* --- ถ้าไม่มี Token ให้ดีดกลับไปหน้า Login เสมอ --- */}
+          {!token ? (
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          ) : (
             <>
+              {/* --- กลุ่มหน้า USER --- */}
               <Route element={<AppLayout />}>
                 <Route path="home" element={<Home role={role} />} />
                 <Route path="event" element={<Event />} />
@@ -86,7 +81,6 @@ function App() {
                   path="setting"
                   element={<Setting role={role} setToken={setToken} setRole={setRole} />}
                 />
-                <Route path="*" element={<NotFound />} />
               </Route>
 
               <Route element={<AppNobar />}>
@@ -111,7 +105,6 @@ function App() {
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 
-                
                 <Route
                   path="datacheck"
                   element={
@@ -131,36 +124,36 @@ function App() {
                       <Navigate to="/home" replace />
                     )
                   }/>
-
-
               </Route>
+
+              {/* --- หน้า ADMIN --- */}
+              {role === "admin" ? (
+                <Route element={<AppLayouts />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path='settingsadmin' element={<SettingsAdmin/>} />
+                  <Route path='createevent' element={<CreateEvent />} />
+                  <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
+                  <Route path='accesscontrol' element={<AccessControl/>} />
+                  <Route path='shiftschedule' element={<ShiftSchedule/>} />
+                  <Route path='setGPS' element={<SetGPS/>} />
+                  <Route path='exportexcel' element={<ExportExcel/>} />
+                  <Route path='groupnoti' element={<GroupNoti />} />
+                  <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
+                  <Route path='permission' element={<Permission />} />
+                  <Route path="MyProfile" element={<MyProfile/>} />
+                  <Route path="Manageusers" element={<Manageusers />} />
+                  <Route path="Personalsummary" element={<Personalsummary />} />
+                  <Route path="EditProfile" element={<EditProfile />} />
+                </Route>
+              ) : (
+                /* ถ้าไม่ใช่ Admin แต่พยายามเข้าหน้า Dashboard ให้ดีดไปหน้า Home ของ User */
+                <Route path="dashboard" element={<Navigate to="/home" replace />} />
+              )}
+
+              {/* หน้า NotFound สำหรับคนที่ Login แล้ว แต่พิมพ์ URL มั่ว */}
+              <Route path="*" element={<NotFound />} />
             </>
           )}
-
-
-
-
-          {/* ฝั่ง ADMIN */}
-          <Route element={<AppLayouts />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path='settingsadmin' element={<SettingsAdmin/>} />
-            <Route path='createevent' element={<CreateEvent />} />
-            <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
-            <Route path='accesscontrol' element={<AccessControl/>} />
-            <Route path='shiftschedule' element={<ShiftSchedule/>} />
-            <Route path='setGPS' element={<SetGPS/>} />
-            <Route path='exportexcel' element={<ExportExcel/>} />
-            <Route path='groupnoti' element={<GroupNoti />} />
-            <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
-            <Route path='permission' element={<Permission />} />
-            <Route path="MyProfile" element={<MyProfile/>} />
-            <Route path="Manageusers" element={<Manageusers />} />
-            <Route path="Personalsummary" element={<Personalsummary />} />
-            <Route path="EditProfile" element={<EditProfile />} />
-          </Route>
-
-
-
         </Routes>
       </BrowserRouter>
     </>
