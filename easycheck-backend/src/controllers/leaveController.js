@@ -1,62 +1,150 @@
-import db from "../config/db.js";
 import multer from "multer";
+import db from "../config/db.js";
 
 const storage = multer.memoryStorage();
-export const uploadLeave = multer({ storage });
+export const upload = multer({ storage });
 
-/* ฟังก์ชันแปลงรูปภาพจาก Database เป็น Base64 เพื่อส่งไปแสดงผลที่ React */
 const bufferToBase64 = (buffer) => {
   if (!buffer) return null;
   return `data:image/jpeg;base64,${buffer.toString("base64")}`;
 };
 
-// 1. ส่งคำขอลางาน (POST /leave/request)
-export const fileLeaveRequest = async (req, res) => {
+// =======================
+// ✅ ส่งคำขอลางาน
+// =======================
+export const createLeaveRequest = async (req, res) => {
   try {
-    const { userId, leaveStart, leaveEnd, leaveReasons, otherReasonText } = req.body;
-    const file = req.file; 
+    const {
+      userId,
+      leaveStart,
+      leaveEnd,
+      leaveReasons,
+      otherReasonText,
+    } = req.body;
+
+    const file = req.file;
 
     if (!userId || !leaveStart || !leaveEnd || !leaveReasons) {
-      return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
+      return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
     }
 
-    // สำคัญ: เนื่องจาก leaveReasons จาก FormData มักจะมาเป็น String JSON 
-    // เราควรเก็บเป็น String หรือแปลงให้เรียบร้อยก่อนลง DB
-    const reasonsStr = typeof leaveReasons === 'string' ? leaveReasons : JSON.stringify(leaveReasons);
+    const reasons = JSON.parse(leaveReasons);
 
-    const [result] = await db.execute(
-      "INSERT INTO leave_requests (user_id, leave_start, leave_end, leave_reasons, other_reason, evidence_file, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [userId, leaveStart, leaveEnd, reasonsStr, otherReasonText || null, file ? file.buffer : null, 'pending']
+    await db.execute(
+      `INSERT INTO leave_requests 
+      (user_id, leave_start, leave_end, reasons, other_reason, evidence, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())`,
+      [
+        userId,
+        leaveStart,
+        leaveEnd,
+        JSON.stringify(reasons),
+        otherReasonText || null,
+        file ? file.buffer : null,
+      ]
     );
 
-    res.json({ message: "ยื่นคำขอลางานสำเร็จ", id: result.insertId });
+    res.json({ message: "ส่งคำขอลางานสำเร็จ" });
   } catch (err) {
-    console.error("Error in fileLeaveRequest:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// 2. ดูประวัติการลา (GET /leave/history)
+// =======================
+// ✅ ประวัติการลา
+// =======================
 export const getLeaveHistory = async (req, res) => {
   try {
     const { userId } = req.query;
-    if (!userId) return res.status(400).json({ message: "ต้องระบุ userId" });
 
     const [rows] = await db.execute(
-      "SELECT id, user_id, leave_start, leave_end, leave_reasons, other_reason, status, evidence_file, reject_reason, created_at FROM leave_requests WHERE user_id = ? ORDER BY created_at DESC",
+      `SELECT id, leave_start, leave_end, reasons, other_reason, status, created_at
+       FROM leave_requests
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
       [userId]
     );
 
-    // แปลงข้อมูลก่อนส่งกลับไปที่หน้าบ้าน (เช่น แปลงรูปภาพ)
-    const formattedData = rows.map(item => ({
-      ...item,
-      // แปลง Buffer เป็น Base64 เพื่อให้แท็ก <img src={...} /> ใน React ทำงานได้
-      evidenceFile: bufferToBase64(item.evidence_file)
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// =======================
+// ✅ pending (สำหรับ manager)
+// =======================
+export const getPendingLeaves = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT 
+        l.id,
+        l.user_id as userId,
+        u.name,
+        u.avatar,
+        l.leave_start,
+        l.leave_end,
+        l.reasons,
+        l.other_reason,
+        l.evidence,
+        l.status
+      FROM leave_requests l
+      LEFT JOIN users u ON l.user_id = u.userid
+      WHERE l.status = 'pending'
+      ORDER BY l.created_at DESC
+    `);
+
+    const formatted = rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      employeeId: r.userId,
+      profile: r.avatar,
+      leaveStart: r.leave_start,
+      leaveEnd: r.leave_end,
+      reasons: JSON.parse(r.reasons),
+      otherReason: r.other_reason,
+      evidencePreview: bufferToBase64(r.evidence),
     }));
 
-    res.json(formattedData);
+    res.json(formatted);
   } catch (err) {
-    console.error("Error in getLeaveHistory:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// =======================
+// ✅ approve
+// =======================
+export const approveLeave = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.execute(
+      "UPDATE leave_requests SET status = 'approved' WHERE id = ?",
+      [id]
+    );
+
+    res.json({ message: "อนุมัติการลาเรียบร้อย" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// =======================
+// ✅ reject
+// =======================
+export const rejectLeave = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    await db.execute(
+      "UPDATE leave_requests SET status = 'rejected', reject_reason = ? WHERE id = ?",
+      [reason || "ไม่ระบุเหตุผล", id]
+    );
+
+    res.json({ message: "ไม่อนุมัติการลาเรียบร้อย" });
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };

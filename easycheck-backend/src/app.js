@@ -54,7 +54,7 @@ app.use('/users', userRouter)
 app.use('/attendance', attendanceRouter)
 app.use('/events', eventRouter)
 
-app.use('/leave', leaveRouter)
+app.use('/leave-approve', leaveRouter)
 
 app.use('/personal-summary', personalSummaryRouter)
 
