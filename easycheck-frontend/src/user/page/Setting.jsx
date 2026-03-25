@@ -1,6 +1,10 @@
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
+
 import axios from 'axios';
+
+const HOST = 'localhost'
+const PORT = '5000'
 
 const Setting = ({ role, setToken, setRole }) => {
 

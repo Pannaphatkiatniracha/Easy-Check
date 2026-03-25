@@ -107,48 +107,33 @@ function App() {
                 
                 <Route
                   path="datacheck"
-                  element={
-                    role === "approver" ? (
-                      <DataCheck role={role} />
-                    ) : (
-                      <Navigate to="/home" replace />
-                    )
-                  }/>
+                  element={<DataCheck role={role} />}
+                />
 
                 <Route
                   path="datatocheck"
-                  element={
-                    role === "approver" ? (
-                      <DataToCheck role={role} />
-                    ) : (
-                      <Navigate to="/home" replace />
-                    )
-                  }/>
+                  element={<DataToCheck role={role} />}
+                />
               </Route>
 
               {/* --- หน้า ADMIN --- */}
-              {role === "admin" ? (
-                <Route element={<AppLayouts />}>
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path='settingsadmin' element={<SettingsAdmin/>} />
-                  <Route path='createevent' element={<CreateEvent />} />
-                  <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
-                  <Route path='accesscontrol' element={<AccessControl/>} />
-                  <Route path='shiftschedule' element={<ShiftSchedule/>} />
-                  <Route path='setGPS' element={<SetGPS/>} />
-                  <Route path='exportexcel' element={<ExportExcel/>} />
-                  <Route path='groupnoti' element={<GroupNoti />} />
-                  <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
-                  <Route path='permission' element={<Permission />} />
-                  <Route path="MyProfile" element={<MyProfile/>} />
-                  <Route path="Manageusers" element={<Manageusers />} />
-                  <Route path="Personalsummary" element={<Personalsummary />} />
-                  <Route path="EditProfile" element={<EditProfile />} />
-                </Route>
-              ) : (
-                /* ถ้าไม่ใช่ Admin แต่พยายามเข้าหน้า Dashboard ให้ดีดไปหน้า Home ของ User */
-                <Route path="dashboard" element={<Navigate to="/home" replace />} />
-              )}
+              <Route element={<AppLayouts />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path='settingsadmin' element={<SettingsAdmin/>} />
+                <Route path='createevent' element={<CreateEvent />} />
+                <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
+                <Route path='accesscontrol' element={<AccessControl/>} />
+                <Route path='shiftschedule' element={<ShiftSchedule/>} />
+                <Route path='setGPS' element={<SetGPS/>} />
+                <Route path='exportexcel' element={<ExportExcel/>} />
+                <Route path='groupnoti' element={<GroupNoti />} />
+                <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
+                <Route path='permission' element={<Permission />} />
+                <Route path="MyProfile" element={<MyProfile/>} />
+                <Route path="Manageusers" element={<Manageusers />} />
+                <Route path="Personalsummary" element={<Personalsummary />} />
+                <Route path="EditProfile" element={<EditProfile />} />
+              </Route>
 
               {/* หน้า NotFound สำหรับคนที่ Login แล้ว แต่พิมพ์ URL มั่ว */}
               <Route path="*" element={<NotFound />} />
