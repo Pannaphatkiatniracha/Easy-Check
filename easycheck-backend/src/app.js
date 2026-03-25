@@ -3,9 +3,9 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 
 import authRouter from './routers/authRouter.js'
-// import userRouter from './routers/userRouter.js'
-// import attendanceRouter from './routers/attendanceRouter.js'
-// import eventRouter from './routers/eventRouter.js'
+import userRouter from './routers/userRouter.js'
+import attendanceRouter from './routers/attendanceRouter.js'
+import eventRouter from './routers/eventRouter.js'
 
 import pool from './config/db.js' 
 
@@ -27,9 +27,9 @@ app.use((req, res, next) => {
 // ----------------------------------------------------------------------------
 
 app.use('/auth', authRouter)
-// app.use('/users', userRouter)
-// app.use('/attendance', attendanceRouter)
-// app.use('/events', eventRouter)
+app.use('/users', userRouter)
+app.use('/attendance', attendanceRouter)
+app.use('/events', eventRouter)
 
 
 // ----------------------------------------------------------------------------
@@ -42,7 +42,6 @@ app.use('/auth', authRouter)
     console.error('Database Error:', err.message)
   }
 })()
-
 
 app.get('/', (req, res) => {
   res.send('EasyCheck API is running')
