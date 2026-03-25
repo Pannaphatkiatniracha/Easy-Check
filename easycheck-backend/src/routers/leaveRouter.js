@@ -1,8 +1,8 @@
 import express from "express";
 import { 
-  fileLeaveRequest, 
+  createLeaveRequest,  // 🐰🤍
   getLeaveHistory, 
-  uploadLeave,
+  upload, // 🐰🤍
   getPendingLeaves,
   approveLeave,
   rejectLeave
@@ -13,7 +13,7 @@ const router = express.Router();
 // =======================
 // 👤 USER
 // =======================
-router.post("/request", uploadLeave.single("evidenceFile"), fileLeaveRequest);
+router.post("/request", upload.single("evidenceFile"), createLeaveRequest); // 🐰🤍
 router.get("/history", getLeaveHistory);
 
 // =======================

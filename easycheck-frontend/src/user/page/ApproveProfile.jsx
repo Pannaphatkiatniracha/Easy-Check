@@ -5,6 +5,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 
+import axios from 'axios';
+
+const HOST = 'localhost'
+const PORT = '5000'
+
 const ApproveProfile = () => {
 
     const [showModal, setShowModal] = useState(false)
@@ -17,7 +22,7 @@ const ApproveProfile = () => {
             userid: "",
             email: "",
             phone: "",
-            birth: "",
+            joinDate: "",
             position: "",
             department: "",
             branch: "",
@@ -36,21 +41,36 @@ const ApproveProfile = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            const res = await fetch("https://6918ce1c21a9635948713999.mockapi.io/users/1")
-            const data = await res.json()
-            setUser({
-                name: data.name || "",
-                userid: data.userid || "",
-                email: data.email || "",
-                phone: data.phone || "",
-                birth: data.birth || "",
-                position: data.position || "",
-                department: data.department || "",
-                branch: data.branch || "",
-                gender: data.gender || "Female",
-                avatar: data.avatar || "/easycheck/img/an.jpg",
-                shift: data.shift || "",
-            })
+            try {
+                const token = localStorage.getItem('token')
+                
+                const response = await axios.get(`http://${HOST}:${PORT}/users/profile`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}` // ส่งไปก็จะต้องไปเจอ verifyToken ก่อน
+                    }
+                })
+
+                // axios จะเอาข้อมูลใส่ไว้ใน .data ให้เลย
+                const data = response.data
+                console.log("Data from Backend (Axios):", data)
+
+                setUser({
+                    name: data.full_name || "",
+                    userid: data.employee_id || "",
+                    email: data.email || "",
+                    phone: data.phone || "",
+                    joinDate: data.join_date ? data.join_date.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
+                    position: data.position || "",
+                    department: data.department || "",
+                    branch: data.branch || "Bangkok",
+                    gender: data.gender || "Female",
+                    avatar: data.avatar || "/easycheck/img/an.jpg",
+                    shift: data.shift || "",
+                })
+
+            } catch (error) {
+                console.error("Error loading data:", error.response?.data?.message || error.message) // ตอบกลับตามที่แบคเอนส่งมา
+            }
         }
         loadData()
     }, [])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
@@ -71,12 +91,33 @@ const ApproveProfile = () => {
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://6918ce1c21a9635948713999.mockapi.io/users/1", {
-            method: "PUT", // อัปเดต
-            headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
-            body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
-        })
-        setShowModal(true)
+        try {
+            const token = localStorage.getItem('token')
+            
+            // สิ่งที่จะส่งกลับไปให้แบคเอน
+            const bodyData = {
+                full_name: user.name,
+                phone: user.phone,
+                email: user.email,
+                branch: user.branch,
+                gender: user.gender
+            }
+
+            // ใช้ axios.put ส่งของไปหลังบ้าน
+            const response = await axios.put(`http://${HOST}:${PORT}/users/profile`, bodyData, {
+                headers: { 
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            // ถ้าฝั่งแบคโอนส่งกลับมาว่าโอเก
+            if (response.status === 200) {
+                setShowModal(true)
+            }
+        } catch (error) {
+            console.error("Save error:", error.response?.data?.message || error.message)
+            alert("บันทึกไม่สำเร็จ: " + (error.response?.data?.message || "เกิดข้อผิดพลาดจากระบบ"))
+        }
     }
     
     
@@ -99,7 +140,13 @@ const ApproveProfile = () => {
                     </Button>
                 </Link>
 
-                <h3 className="fw-bold">Edit Profile</h3>
+                <div className="d-flex flex-column align-items-center">
+                        <h3 className="fw-bold m-0">Edit Profile</h3>
+                        <small className="text-warning fw-semibold mb-2">
+                            <i className="bi bi-crown-fill me-1"></i> Approver 👑
+                        </small>
+                </div>
+
                 {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
@@ -245,7 +292,7 @@ const ApproveProfile = () => {
                         <i className="bi bi-calendar3"></i>
                     </InputGroup.Text>
                     <FormControl type="date"
-                        name='birth' value={user.birth} onChange={handleChange} />
+                        name='joinDate' value={user.joinDate} readOnly />
                 </InputGroup>
             </div>
 

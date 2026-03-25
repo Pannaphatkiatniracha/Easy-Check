@@ -12,7 +12,7 @@ export const verifyToken = (req, res, next) => {
 
     // กรณีรอดมี token มาให้เช็ต
     try {
-        // check
+        // check (ตัว token มันถูกสร้างจาก process.env.JWT_SECRET ด้วยเลยฟีลเหมือนเช็คว่ามาจากตัวแม่พิมพ์นี้จริงรึเปล่าไรเงี้ย)
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         // ถ้า check ผ่าน จะเอาข้อมูล user แปะไปใน req ด้วย
