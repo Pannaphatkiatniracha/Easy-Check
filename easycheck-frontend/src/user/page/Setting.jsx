@@ -1,5 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Setting = ({ role, setToken, setRole }) => {
 
@@ -8,12 +9,36 @@ const Setting = ({ role, setToken, setRole }) => {
 
 
     // ฟังก์ชัน logout
-    const handleLogout = () => {
-        localStorage.removeItem('token') // ล้าง token
-        localStorage.removeItem('role')
-        setToken("")
-        setRole("")
-        navigate('/login')
+    const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('token') 
+
+            await axios.post('http://localhost:5000/auth/logout', {}, {
+            headers: {
+                Authorization: `Bearer ${token}` // ต้องส่ง token ไปด้วยเพราะว่าใน authRouter API มัน (for ต่อท่อ)
+            }
+        })
+
+            // ลบ token,role หลังจากแบคเอนรับทราบแล้วว่า user จะออก
+            localStorage.removeItem('token')
+            localStorage.removeItem('role')
+            
+            // อัพเดตค่าทันทีที่ลบ token,role นางจะได้เนวิเกตไปล้อคอิน
+            setToken("")
+            setRole("")
+
+            navigate('/login')
+
+        } catch (error) {
+            console.error("Logout Error:", error)
+            
+            // ถึงแบคเอนนางจะพัง แต่เราก็ควรลบ token ฝั่งเราทิ้งอยู่ดีเพื่อความปลอดภัย
+            localStorage.removeItem('token')
+            localStorage.removeItem('role')
+            setToken("")
+            setRole("")
+            navigate('/login')
+        }
     }
 
 
