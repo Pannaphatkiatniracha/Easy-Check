@@ -25,7 +25,15 @@ app.use((req, res, next) => {
   console.log(`[LOG] ${req.method} ${req.url}`)
   next()
 })
+// ----------------------------------------------------------------------------
 
+app.use('/auth', authRouter)
+app.use('/users', userRouter)
+app.use('/attendance', attendanceRouter)
+app.use('/events', eventRouter)
+
+
+// ----------------------------------------------------------------------------
 // เติม ; ดักหน้าวงเล็บเพื่อป้องกัน Error 
 ;(async () => {
   try {
@@ -36,11 +44,13 @@ app.use((req, res, next) => {
   }
 })()
 
+
 app.use('/auth', authRouter)
 app.use('/users', userRouter)
 app.use('/attendance', attendanceRouter)
 app.use('/events', eventRouter)
 app.use('/personal-summary', personalSummaryRouter)
+
 
 app.get('/', (req, res) => {
   res.send('EasyCheck API is running')

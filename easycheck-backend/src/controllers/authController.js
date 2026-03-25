@@ -5,6 +5,8 @@ import dotenv from 'dotenv'
 
 dotenv.config() // พอสั่ง config() ปุ๊บ ทุกอย่างที่เขียนในไฟล์ .env จะถูกเก็บใส่ process.env
 
+
+// 🐻🐻 LOGIN
 export const login = async (req, res) => {
     const { employee_id, password } = req.body // req.body คือสิ่งที่ฟ้อนเอนส่งมาให้
     const JWT_SECRET = process.env.JWT_SECRET // ดึง JWT_SECRET ใน .env มา
@@ -38,7 +40,7 @@ export const login = async (req, res) => {
 
         // สร้าง Token ให้พนักงาน
         const token = jwt.sign (
-            {id: user.id, role: user.role,},
+            {id: user.id, role: user.role,full_name: user.full_name},
             JWT_SECRET, {expiresIn: '30m'})
 
         console.log("✅ 7. Login สำเร็จ! กำลังส่ง Token กลับไป...")
@@ -53,4 +55,12 @@ export const login = async (req, res) => {
         console.error("🔥 เกิด Error:", error)
         res.status(500).json({ message: 'Internal server error นางงอแง' })
     }
+}
+
+
+// 🐻🐻 LOGOUT
+export const logout = (req, res) => {
+    console.log(`${req.user.full_name} is logging out...`)
+    
+    res.status(200).json({ message: 'Logout successful' })
 }
