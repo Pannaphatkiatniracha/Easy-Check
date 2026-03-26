@@ -13,7 +13,7 @@ const router = express.Router();
 // =======================
 // 👤 USER
 // =======================
-router.post("/request", upload.single("evidenceFile"), createLeaveRequest); // 🐰🤍
+router.post("/request", upload.single("evidence"), createLeaveRequest);
 /**
  * @swagger
  * /leave-approve/request:

@@ -22,7 +22,21 @@ export const createLeaveRequest = async (req, res) => {
       return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
     }
 
-    const reasons = JSON.parse(leaveReasons);
+    // --- โค้ดส่วนที่แก้ใหม่ เพื่อรับมือกับข้อมูลทุกรูปแบบจาก Swagger ---
+    let reasons = [];
+    if (Array.isArray(leaveReasons)) {
+      // ถ้าส่งมาเป็น Array อยู่แล้ว ก็จับใส่เลย
+      reasons = leaveReasons;
+    } else {
+      try {
+        // ลองแปลงเป็น JSON ดู (ถ้าส่งมาเป็น Text แบบ '["sick"]')
+        reasons = JSON.parse(leaveReasons);
+      } catch (err) {
+        // ถ้าแปลงไม่ได้ (ส่งมาเป็น Text ดื้อๆ แบบ "sick") ก็จับใส่ Array ซะ
+        reasons = [leaveReasons];
+      }
+    }
+    // -------------------------------------------------------------
 
     await db.execute(
       `INSERT INTO leave_requests 
@@ -32,7 +46,7 @@ export const createLeaveRequest = async (req, res) => {
         userId,
         leaveStart,
         leaveEnd,
-        JSON.stringify(reasons),
+        JSON.stringify(reasons), // บันทึกลงฐานข้อมูลเป็น JSON String
         otherReasonText || null,
         file ? file.buffer : null,
       ]
