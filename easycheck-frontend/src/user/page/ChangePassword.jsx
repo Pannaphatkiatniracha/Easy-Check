@@ -1,42 +1,31 @@
 import { Link } from "react-router-dom";
-import { InputGroup, FormControl, Button } from 'react-bootstrap';
+import { InputGroup, FormControl, Button, Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { Modal } from 'react-bootstrap';
+import axios from 'axios';
+
+const HOST = 'localhost'
+const PORT = '5000'
 
 const ChangePassword = () => {
-
-
+    
+    // State สำหรับควบคุม Modal และข้อความ
     const [showModal, setShowModal] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(true)
+    const [modalMessage, setModalMessage] = useState("")
+
 
     // setUser ใช้ตอนเปลี่ยนค่า user
-    const [user, setUser] = useState(
-        {
-            current: "", //ค่าตั้งต้น
-            new: "",
-            confirm: "",
-        }
-    )
-
-    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจาก Mock API
-
-    // async คือเป็นเป็นนางประกาศ บอกชาวบ้านเขาว่ากำลังจะมีงานใหญ่มานะแก
-    // const res = await fetch ("") ก็คือให้ res นางเป็นตัวรับค่าข้อมูลในลิ้งมา ซึ่งพอมี await ก็คือบอกให้รอโหลดให้เสร็จก่อนนะ
-    // const data = await res.json() ก็คือเอาให้ res แปลงสภาพตัวเองเป็น json แต่อยู่ในนาม data เพราะ res คือตัวแปรข้อมูลดิบ และให้ รอนางแปลงสภาพเสร็จก่อน
+    const [user, setUser] = useState({
+        current: "", //ค่าตั้งต้น
+        new: "",
+        confirm: "",
+    })
 
 
+    // เปิดหน้าเว็บมาให้นางเป้นค่าว่าง
     useEffect(() => {
-        const loadData = async () => {
-            const res = await fetch("https://69037e5cd0f10a340b249323.mockapi.io/password/1")
-            const data = await res.json()
-            setUser({
-                current: data.current || "",
-                new: data.new || "",
-                confirm: data.confirm || "",
-            })
-        }
-        loadData()
-    }, [])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
-
+        setUser({ current: "", new: "", confirm: "" })
+    }, [])
 
 
     // แก้ข้อมูลใน input
@@ -46,139 +35,120 @@ const ChangePassword = () => {
         const { name, value } = e.target
         // ...oldUser  คือเหมือนก็อปสำเนาเก็บไว้ เพราะเราจะเปลี่ยนค่า user โดยใช้ setUser เพื่อเปลี่ยนข้อความในกล่อง input
         // แต่เพราะว่าอาจจะไม่ใช่ input ทุกตัวที่โดนเปลี่ยนเลยต้องสำเนาตัวเดิมไว้ แล้วแก้เฉพาะ [name]: value นั้น ส่วนตัวอื่นจะยังเหมือนเดิม
-        setUser((oldUSer) => ({ ...oldUSer, [name]: value }))
+        setUser((oldUser) => ({ ...oldUser, [name]: value }))
     }
-
 
 
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        await fetch("https://69037e5cd0f10a340b249323.mockapi.io/password/1", {
-            method: "PUT", // อัปเดต
-            headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
-            body: JSON.stringify(user),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
-        })
-        setShowModal(true)
+        
+        // ถ้ารหัสใหม่กับรหัสคอนเฟิร์มไม่ตรงกัน
+        if (user.new !== user.confirm) {
+            setIsSuccess(false)
+            setModalMessage("New password and confirm password do not match")
+            setShowModal(true)
+            return
+        }
+
+        // บังคับให้รหัสต้อง 6 ตัวเป็นอย่างต่ำ
+        if (user.new.length < 6) {
+            setIsSuccess(false)
+            setModalMessage("Password must be at least 6 characters")
+            setShowModal(true)
+            return
+        }
+
+        try {
+            // รับ token
+            const token = localStorage.getItem('token')
+
+            const response = await axios.put(`http://${HOST}:${PORT}/users/change-password`, 
+                {
+                    currentPassword: user.current, // รหัสปัจจุบัน
+                    newPassword: user.new // รหัสใหม่
+                }, 
+                {
+                    headers: { Authorization: `Bearer ${token}` } // ส่ง token ให้ middleware เช็ค
+                }
+            )
+
+            if (response.data.success) {
+                setIsSuccess(true)
+                setModalMessage("Password changed successfully")
+                setShowModal(true)
+                setUser({ current: "", new: "", confirm: "" }) // ล้างข้อมูลในช่อง input ให้หลังเปลี่ยนรหัสแล้ว
+            }
+
+        } catch (err) {
+            setIsSuccess(false)
+            const errorMsg = err.response?.data?.message || "Something went wrong"
+            setModalMessage(errorMsg)
+            setShowModal(true)
+        }
     }
 
 
     return (
-
         <div className="app-container">
-
-            {/* หัวข้อ */}
+            {/* ส่วน Header */}
             <div className="d-flex justify-content-between text-white mt-16">
-
-                {/* variant เป็น link = ปุ่มไม่มีพื้นหลัง แล้วก็ลบ padding ออก */}
                 <Link to="/userprofile" className='text-decoration-none'>
                     <Button variant="link" className="p-0">
                         <i className="bi bi-chevron-left ms-3 text-white"></i>
                     </Button>
                 </Link>
-
                 <h3 className="fw-bold">Change your password</h3>
-                {/* สร้างกล่องปลอมมาแล้วก็ใช้ margin end ช่วยให้เลเอ้ามันตรงกับดีไซน์ */}
                 <div className="me-4"></div>
             </div>
 
-
             <div className="d-flex flex-column align-items-center">
-
-                {/* password เก่า */}
+                {/* Current Password */}
                 <div className='mt-16 w-75'>
                     <InputGroup>
-                        <InputGroup.Text>
-                            <i className="bi bi-lock-fill"></i>
-                        </InputGroup.Text>
-                        <FormControl type='password' placeholder='Current password'
-                            name="current" value={user.current} onChange={handleChange} />
+                        <InputGroup.Text><i className="bi bi-lock-fill"></i></InputGroup.Text>
+                        <FormControl type='password' placeholder='Current password' name="current" value={user.current} onChange={handleChange} />
                     </InputGroup>
-
-                    <Link to="/forgotpassword" className='text-decoration-none'>
+                    <Link to="/forgotpassword" data-bs-theme="dark" className='text-decoration-none'>
                         <p className='text-white text-end fw-lighter mt-2'>Forget Password?</p>
                     </Link>
                 </div>
 
-
-                {/* เส้น */}
                 <hr className="w-75 mx-auto my-4 border-white opacity-75" />
 
-
-                {/* password ใหม่ */}
+                {/* New Password */}
                 <div className="mt-3 mb-4 w-75">
                     <InputGroup>
-                        <InputGroup.Text>
-                            <i className="bi bi-lock-fill"></i>
-                        </InputGroup.Text>
-                        <FormControl type='password' placeholder='New password'
-                            name="new" value={user.new} onChange={handleChange} />
+                        <InputGroup.Text><i className="bi bi-lock-fill"></i></InputGroup.Text>
+                        <FormControl type='password' placeholder='New password' name="new" value={user.new} onChange={handleChange} />
                     </InputGroup>
                 </div>
 
-
-                {/* confirm password ใหม่ */}
+                {/* Confirm Password */}
                 <div className="w-75">
                     <InputGroup>
-                        <InputGroup.Text>
-                            <i className="bi bi-lock-fill"></i>
-                        </InputGroup.Text>
-                        <FormControl type='password' placeholder='Confirm password'
-                            name="confirm" value={user.confirm} onChange={handleChange} />
+                        <InputGroup.Text><i className="bi bi-lock-fill"></i></InputGroup.Text>
+                        <FormControl type='password' placeholder='Confirm password' name="confirm" value={user.confirm} onChange={handleChange} />
                     </InputGroup>
                 </div>
-
             </div>
 
-
-            {/* ปุ่ม */}
+            {/* ปุ่ม SAVE */}
             <div className='text-center mt-20'>
-                <Button className='rounded-5 w-25 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }} onClick={handleSave} >SAVE</Button>
+                <Button className='rounded-5 w-25 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }} onClick={handleSave}>SAVE</Button>
             </div>
 
-
-            {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
-            {/* <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Body className="text-center py-5">
-                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
-                    <h5 className="fw-bold mb-3">Password changed</h5>
-                    <p>Your password has been <br /> successfully updated</p>
-
-                    <Button variant="primary" className='fw-semibold' style={{ backgroundColor: '#BE2623', border: 'none' }}
-                        onClick={() => setShowModal(false)}>
-                        CLOSE
-                    </Button>
-
-                </Modal.Body>
-            </Modal> */}
-
-            {/* <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton className="border-0"></Modal.Header>
-                <Modal.Body className="text-center py-4">
-
-                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
-
-                    <h5 className="fw-bold mb-2">Password changed</h5>
-                    <p>Your password has been <br /> successfully updated</p>
-
-                </Modal.Body>
-            </Modal> */}
-
-
-
-            {/* 
-                backdrop = ให้คลิกด้านนอก modal ก็ปิดตัว modal ได้
-                keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
-            */}
-            
+            {/* Modal */}
             <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
-
-                    <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
-                    <h5 className="fw-bold mt-2">Password changed</h5>
-                    {/* <p>Your password has been <br /> successfully updated</p> */}
+                    {isSuccess ? (
+                        <i className="bi bi-check-circle-fill fs-1" style={{ color: '#50AE67' }}></i>
+                    ) : (
+                        <i className="bi bi-x-circle-fill fs-1 text-danger"></i>
+                    )}
+                    <h5 className="fw-bold mt-3">{isSuccess ? "Success" : "Error"}</h5>
+                    <p className="text-muted mb-0">{modalMessage}</p>
                 </Modal.Body>
             </Modal>
-
 
         </div>
     )

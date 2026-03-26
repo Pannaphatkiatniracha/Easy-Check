@@ -1,4 +1,5 @@
 import pool from '../config/db.js' // ท่อที่เชื่อมไป db
+import bcrypt from 'bcrypt'
 
 
 // 🐰🐰 ดึงข้อมูลออกมาโชว์
@@ -70,5 +71,59 @@ export const updateProfile = async (req, res) => {
             message: "Internal Server Error", 
             error: err.message 
         })
+    }
+}
+
+// 🐰🐰 เปลี่ยน password
+export const changePassword = async (req, res) => {
+    try {
+        // ดึงข้อมูล id จาก req.user (หน้า authMiddleware)
+        const userId = req.user.id
+        const { currentPassword, newPassword } = req.body // รับรหัส current,new
+
+        // ไปเอา hashpass ของ id คนนี้มา
+        const [users] = await pool.execute('SELECT password FROM users WHERE id = ?'
+            , [userId])
+        
+
+        // กรณีหา user ไม่เจอ
+        if (users.length === 0) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const user = users[0] // ดึงหยิบคนนี้
+
+
+        // เช็คว่ารหัสผ่านปัจจุบันตรงกับใน db มั้ย
+        const isMatch = await bcrypt.compare(currentPassword, user.password)
+        if (!isMatch) {
+            return res.status(400).json({ message: "Current password is incorrect" })
+        }
+
+        // hash รหัสผ่านใหม่
+        const salt = await bcrypt.genSalt(10)
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt) // รหัสผ่านใหม่ที่ hash แล้ว
+
+        // อัพเดตข้อมูลลง db
+        const [result] = await pool.execute(
+            'UPDATE users SET password = ? WHERE id = ?',
+            [hashedNewPassword, userId]
+        )
+
+
+        // result.affectedRows === 0 คือเช็คว่ามีการแก้ไขข้อมูลจริงๆ ไหม 
+        // ถ้าเป็น 0 แปลว่าอัพเดตล้มเหลว
+        if (result.affectedRows === 0) {
+            return res.status(500).json({ message: "Failed to update password" })
+        }
+
+        res.json({ 
+            success: true, 
+            message: "Password changed successfully" 
+        })
+
+    } catch (err) {
+        console.error('Change Password Error:', err)
+        res.status(500).json({ message: "Internal Server Error", error: err.message })
     }
 }
