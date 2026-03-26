@@ -8,7 +8,7 @@ const Personalsummary = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5000/personal-summary', {
+    fetch('http://localhost:5000/personal-summary/list', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
