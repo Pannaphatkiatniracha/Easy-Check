@@ -10,6 +10,8 @@ import eventRouter from './routers/eventRouter.js'
 import leaveRouter from './routers/leaveRouter.js'
 import personalSummaryRouter from './routers/personalSummaryRouter.js'
 
+import adminRouter from './routers/adminRouter.js'
+
 
 import pool from './config/db.js'
 
@@ -41,6 +43,7 @@ app.use('/events', eventRouter)
 app.use('/leave-approve', leaveRouter)
 app.use('/personal-summary', personalSummaryRouter)
 
+app.use('/admin', adminRouter)
 
 
 // ---------------------------------------------------------------------------------------------
