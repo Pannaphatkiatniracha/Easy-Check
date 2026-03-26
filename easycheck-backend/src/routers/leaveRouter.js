@@ -1,8 +1,8 @@
 import express from "express";
 import { 
-  createLeaveRequest,  // 🐰🤍
+  createLeaveRequest,  
   getLeaveHistory, 
-  upload, // 🐰🤍
+  upload, 
   getPendingLeaves,
   approveLeave,
   rejectLeave
@@ -13,7 +13,8 @@ const router = express.Router();
 // =======================
 // 👤 USER
 // =======================
-router.post("/request", upload.single("evidenceFile"), createLeaveRequest); // 🐰🤍
+// จุดสำคัญ: ชื่อ field ต้องเป็น "evidenceFile" เหมือนฝั่ง Frontend ส่งมา
+router.post("/request", upload.single("evidenceFile"), createLeaveRequest); 
 router.get("/history", getLeaveHistory);
 
 // =======================

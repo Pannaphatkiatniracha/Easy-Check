@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import axios from "axios"; // เพิ่ม axios
+import axios from "axios";
 
 const LeaveRequest = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const LeaveRequest = () => {
 
   const [rejectPopup, setRejectPopup] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [loading, setLoading] = useState(false); // สำหรับเช็คสถานะตอนกดส่ง
+  const [loading, setLoading] = useState(false);
 
   const leaveOptions = [
     "Sick Leave",
@@ -38,9 +38,11 @@ const LeaveRequest = () => {
     let updated = [...formData.leaveReasons];
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
-      if (reason === "Other")
+      if (reason === "Other") {
         setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
-      else setFormData({ ...formData, leaveReasons: updated });
+      } else {
+        setFormData({ ...formData, leaveReasons: updated });
+      }
     } else {
       updated.push(reason);
       setFormData({ ...formData, leaveReasons: updated });
@@ -63,9 +65,8 @@ const LeaveRequest = () => {
     });
   };
 
-  // --- ส่วนที่แก้ไข: เชื่อมต่อ API ---
   const handleFileLeave = async () => {
-    // 1. Validation (เหมือนเดิมของคุณ)
+    // 1. ตรวจสอบข้อมูลก่อนส่ง
     if (!formData.leaveStart || !formData.leaveEnd) {
       alert("Please select start and end dates.");
       return;
@@ -85,25 +86,24 @@ const LeaveRequest = () => {
 
     setLoading(true);
 
-    // 2. สร้าง FormData เพื่อส่งไฟล์
+    // 2. สร้าง FormData เพื่อส่งข้อมูลพร้อมไฟล์
     const data = new FormData();
-    // ดึงรหัสพนักงานจาก localStorage (เช็คชื่อ Key ให้ตรงกับที่คุณเก็บตอน Login นะครับ)
-    const empId = localStorage.getItem("role") === "admin" ? "061004" : localStorage.getItem("token") ? "061004" : "061004"; 
+    const empId = localStorage.getItem("role") === "admin" ? "061004" : (localStorage.getItem("token") ? "061004" : "061004"); 
     
     data.append("userId", empId); 
     data.append("leaveStart", formData.leaveStart);
     data.append("leaveEnd", formData.leaveEnd);
-    data.append("leaveReasons", JSON.stringify(formData.leaveReasons)); // ส่งเป็น array string
+    data.append("leaveReasons", JSON.stringify(formData.leaveReasons));
     data.append("otherReasonText", formData.otherReasonText);
     
+    // ตรงนี้ชื่อ Field "evidenceFile" จะตรงกับ upload.single("evidenceFile") ใน Backend
     if (formData.evidenceFile) {
-      data.append("evidenceFile", formData.evidenceFile); // "evidenceFile" ต้องตรงกับใน multer (upload.single)
+      data.append("evidenceFile", formData.evidenceFile); 
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/leave/request", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // ไม่ต้องใส่ headers: { "Content-Type": "multipart/form-data" } เพื่อให้เบราว์เซอร์จัดการ boundary ให้อัตโนมัติ
+      const response = await axios.post("http://localhost:5000/leave/request", data);
       alert("ยื่นคำขอลางานสำเร็จ!");
       navigate(-1);
     } catch (err) {
@@ -188,7 +188,6 @@ const LeaveRequest = () => {
                   checked={formData.leaveReasons.includes(reason)}
                   onChange={() => handleReasonChange(reason)}
                 />
-                {/* แสดง icon แทน checkbox ถ้าเลือกแล้ว */}
                 {formData.leaveReasons.includes(reason) && <i className="bi bi-check-circle-fill text-[#3C467B]"></i>}
               </label>
             ))}
@@ -250,13 +249,6 @@ const LeaveRequest = () => {
             }`}
           >
             {loading ? "Processing..." : "File Leave"}
-          </button>
-
-          <button
-            onClick={() => setRejectPopup(true)}
-            className="w-full py-3 rounded-xl bg-red-600 text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all"
-          >
-            ❌ Reject
           </button>
         </div>
       </div>
