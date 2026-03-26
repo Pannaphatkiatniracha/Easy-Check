@@ -10,9 +10,8 @@ import {
 
 const router = express.Router();
 
-// =======================
-// 👤 USER
-// =======================
+/*👤 USER*/
+
 router.post("/request", upload.single("evidence"), createLeaveRequest);
 /**
  * @swagger
@@ -165,9 +164,7 @@ router.get("/history", getLeaveHistory);
 
 
 
-// =======================
-// 👨‍💼 MANAGER
-// =======================
+/*👨‍💼 MANAGER*/
 router.get("/pending", getPendingLeaves);
 /**
  * @swagger

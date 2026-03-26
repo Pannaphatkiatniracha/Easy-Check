@@ -10,9 +10,9 @@ const bufferToBase64 = (buffer) => {
   return `data:image/jpeg;base64,${buffer.toString("base64")}`;
 };
 
-// =======================
-// ✅ ส่งคำขอลางาน
-// =======================
+
+/*✅ ส่งคำขอลางาน*/
+
 export const createLeaveRequest = async (req, res) => {
   try {
     const { userId, leaveStart, leaveEnd, leaveReasons, otherReasonText } = req.body;
@@ -36,7 +36,7 @@ export const createLeaveRequest = async (req, res) => {
         reasons = [leaveReasons];
       }
     }
-    // -------------------------------------------------------------
+    
 
     await db.execute(
       `INSERT INTO leave_requests 
@@ -59,9 +59,8 @@ export const createLeaveRequest = async (req, res) => {
   }
 };
 
-// =======================
-// ✅ ประวัติการลา
-// =======================
+/*✅ ประวัติการลา*/
+
 export const getLeaveHistory = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -80,9 +79,7 @@ export const getLeaveHistory = async (req, res) => {
   }
 };
 
-// =======================
-// ✅ pending (สำหรับ manager)
-// =======================
+/*✅ pending (สำหรับ manager)*/
 export const getPendingLeaves = async (req, res) => {
   try {
     // 1. ดึงข้อมูลการลาทั้งหมด
@@ -127,9 +124,9 @@ export const getPendingLeaves = async (req, res) => {
   }
 };
 
-// =======================
-// ✅ approve
-// =======================
+
+/*✅ approve*/
+
 export const approveLeave = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,9 +137,8 @@ export const approveLeave = async (req, res) => {
   }
 };
 
-// =======================
-// ✅ reject
-// =======================
+/*✅ reject*/
+
 export const rejectLeave = async (req, res) => {
   try {
     const { id } = req.params;
