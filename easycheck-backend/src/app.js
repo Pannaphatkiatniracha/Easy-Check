@@ -2,6 +2,9 @@ import express from 'express'
 import cors from 'cors' // ทำให้ฟ้อนเอนกับแบคเอนคุยกันรู้เรื่อง
 import dotenv from 'dotenv'
 
+import { swaggerUi, swaggerSpec } from './config/swaggerConfig.js'
+
+
 import authRouter from './routers/authRouter.js'
 import userRouter from './routers/userRouter.js'
 import attendanceRouter from './routers/attendanceRouter.js'
@@ -44,6 +47,10 @@ app.use('/leave', leaveRouter)
 app.use('/personal-summary', personalSummaryRouter)
 
 app.use('/admin', adminRouter)
+
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 
 // ---------------------------------------------------------------------------------------------
