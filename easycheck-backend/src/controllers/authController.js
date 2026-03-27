@@ -21,7 +21,7 @@ export const login = async (req, res) => {
 
         if (users.length === 0) {
             console.log("❌ 2. หา ID นี้ไม่เจอใน Database:", employee_id)
-            return res.status(404).json({ message: 'Employee ID not found' })
+            return res.status(404).json({ message: 'Login failed' }) // แก้ให้เป็น Login failed ทั้งคู่ตาม logic ที่เหมาะสม
         }
         
         // result
@@ -37,7 +37,7 @@ export const login = async (req, res) => {
 
         if (!isMatch) {
             console.log("❌ 6. รหัสผ่านไม่ตรงกันจ้า!");
-            return res.status(401).json({ message: 'Incorrect password' })
+            return res.status(401).json({ message: 'Login failed' }) // แก้ให้เป็น Login failed ทั้งคู่ตาม logic ที่เหมาะสม
         }
 
         // สร้าง Token ให้พนักงาน
