@@ -1,7 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { InputGroup, FormControl, Button } from "react-bootstrap";
-import { Modal } from 'react-bootstrap';
+import { InputGroup, FormControl, Button, Spinner, Modal } from "react-bootstrap";
 import { useState, useEffect } from 'react';
+
+import axios from 'axios';
+
+const HOST = 'localhost'
+const PORT = '5000'
 
 const ForgotPassword = () => {
 
@@ -10,12 +14,12 @@ const ForgotPassword = () => {
     
     const [showModal, setShowModal] = useState(false)
     const [email, setEmail] = useState("")
-    const [profileEmail, setProfileEmail] = useState("")
     const [isEmailValid, setIsEmailValid] = useState(false)
     const [modalType, setModalType] = useState("success")
+    const [loading, setLoading] = useState(false) // ไว้เช็คว่าตอนนี้กำลังรอแบคเอนตอบกลับอยู่ไหม (ถ้า true ปุ่มจะกดซ้ำไม่ได้)
 
 
-    // ลิ้งข้อมูลจากหน้า profile
+    /*
     useEffect(() => {
         const loadProfileEmail = async () => {
             try {
@@ -28,27 +32,45 @@ const ForgotPassword = () => {
         }
         loadProfileEmail()
     }, [])
+    */
 
 
 
-    const handleSend = () => {
+    const handleSend = async () => {
 
-        // ตรวจสอบว่าอีเมลที่กรอกตรงกับอีเมลที่อยู่ใน profile ไหม
-        if (email === profileEmail) {
-            setIsEmailValid(true)
-            setModalType("success")
+        if (!email) {
+            setModalType("error")
             setShowModal(true)
-            
-            // โชว์ modal เสร็จ 3s ให้ไปหน้า home
-            setTimeout(() => {
-                setShowModal(false)
-                navigate('/login')
-            }, 3000)
+            return
+        }
 
-        } else {
+        setLoading(true) // เปลี่ยนสถานะเป็น "กำลังส่ง"
+
+        try {
+            const response = await axios.post(`http://${HOST}:${PORT}/auth/forgot-password`, {
+                email: email
+            })
+
+            // ถ้าแบคเอนเจออีเมลและสร้าง token
+            if (response.status === 200) {
+                setIsEmailValid(true)
+                setModalType("success")
+                setShowModal(true)
+                
+                // โชว์ modal เสร็จโชว์วินึงแล้วให้ redirect กลับไปหน้า login
+                setTimeout(() => {
+                    setShowModal(false)
+                    navigate('/login')
+                }, 1100)
+            }
+
+        } catch (error) {
+            console.error("Error from backend: ", error.response?.data)
             setIsEmailValid(false)
             setModalType("error")
             setShowModal(true)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -109,10 +131,27 @@ const ForgotPassword = () => {
 
             {/* ปุ่ม */}
             <div className="text-center mt-20">
-                <Button className="w-25 rounded-5 fw-semibold" 
-                style={{ backgroundColor: '#636CCB', border: 'none' }}
-                onClick={handleSend}>
-                    SEND
+                <Button 
+                    className="w-25 rounded-5 fw-semibold d-flex align-items-center justify-content-center mx-auto" 
+                    style={{ backgroundColor: '#636CCB', border: 'none', height: '45px' }} // เพิ่ม height ให้ปุ่มไม่ขยับตอน Spinner มา
+                    onClick={handleSend}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="me-2" // เว้นระยะห่างจากข้อความนิดนึง
+                            />
+                            
+                        </>
+                    ) : (
+                        "SEND"
+                    )}
                 </Button>
             </div>
 
@@ -124,7 +163,7 @@ const ForgotPassword = () => {
                         <>
                             <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                             <h5 className="fw-bold mt-2">Email Sent</h5>
-                            <p className="mt-3">The system has sent the OTP password reset link to your email.</p>
+                            <p className="mt-3">The system has sent the password reset link to your email.</p>
                         </>
                     ) 
                     
@@ -133,8 +172,12 @@ const ForgotPassword = () => {
                     (
                         <>
                             <i className="bi bi-x-circle-fill fs-1 text-danger"></i>
-                            <h5 className="fw-bold mt-2">Email Not Found</h5>
-                            <p className="mt-3">The email you entered does not match our records. <br /> Please check and try again.</p>
+                            <h5 className="fw-bold mt-2">
+                                { !email ? "Missing Email" : "Email Not Found" }
+                            </h5>
+                            <p className="mt-3">
+                                { !email ? "Please enter your email address before sending." : "The email you entered does not match our records. Please check and try again." }
+                            </p>
                             
                             <Button className="mt-3 rounded-5 fw-semibold text-decoration-none" variant="link"
                                 onClick={handleErrorClose}>

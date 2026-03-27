@@ -51,6 +51,7 @@ import Personalsummary from "./Admin/page/Personalsummary";
 
 import CheckApprove from "./user/page/CheckApprove";
 import EditProfile from "./Admin/page/EditProfile";
+import ForgotToChange from "./user/page/ForgotToChange";
 
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token") || "")
@@ -64,6 +65,9 @@ function App() {
           {/* --- ส่วนที่ใครก็เข้าได้ --- */}
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword  />} />
+
+          {/* ตรงนี้ต้องใส่ token เพื่อให้มันรู้ว่าคนนี้มีสิทธิ์ reset รหัสผ่านนะ */}
+          <Route path="resetpassword/:token" element={<ForgotToChange />} />
           
           <Route path="/adminlogin" element={<AdminLogin/>} />
           <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
