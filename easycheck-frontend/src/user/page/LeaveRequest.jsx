@@ -65,54 +65,71 @@ const LeaveRequest = () => {
     });
   };
 
-  const handleFileLeave = async () => {
-    // 1. ตรวจสอบข้อมูลก่อนส่ง
-    if (!formData.leaveStart || !formData.leaveEnd) {
-      alert("Please select start and end dates.");
-      return;
-    }
-    if (formData.leaveReasons.length === 0) {
-      alert("Please select at least one leave reason.");
-      return;
-    }
-    if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
-      alert("Please provide a reason for 'Other'.");
-      return;
-    }
-    if (formData.leaveReasons.includes("Sick Leave") && !formData.evidenceFile) {
-      alert("Please attach a medical certificate.");
-      return;
-    }
+ const handleFileLeave = async () => {
+  // 1. validate
+  if (!formData.leaveStart || !formData.leaveEnd) {
+    alert("Please select start and end dates.");
+    return;
+  }
 
-    setLoading(true);
+  if (formData.leaveReasons.length === 0) {
+    alert("Please select at least one leave reason.");
+    return;
+  }
 
-    // 2. สร้าง FormData เพื่อส่งข้อมูลพร้อมไฟล์
+  if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
+    alert("Please provide a reason for 'Other'.");
+    return;
+  }
+
+  if (formData.leaveReasons.includes("Sick Leave") && !formData.evidenceFile) {
+    alert("Please attach a medical certificate.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
     const data = new FormData();
-    const empId = localStorage.getItem("role") === "admin" ? "061004" : (localStorage.getItem("token") ? "061004" : "061004"); 
-    
-    data.append("userId", empId); 
+
+   
+    const empId = "061004";
+
+    data.append("userId", empId);
     data.append("leaveStart", formData.leaveStart);
     data.append("leaveEnd", formData.leaveEnd);
     data.append("leaveReasons", JSON.stringify(formData.leaveReasons));
     data.append("otherReasonText", formData.otherReasonText);
-    
-    // ตรงนี้ชื่อ Field "evidenceFile" จะตรงกับ upload.single("evidenceFile") ใน Backend
+
+
     if (formData.evidenceFile) {
-      data.append("evidenceFile", formData.evidenceFile); 
+      data.append("evidence", formData.evidenceFile); 
     }
 
-    try {
-      // ไม่ต้องใส่ headers: { "Content-Type": "multipart/form-data" } เพื่อให้เบราว์เซอร์จัดการ boundary ให้อัตโนมัติ
-      const response = await axios.post("http://localhost:5000/leave/request", data);
-      alert("ยื่นคำขอลางานสำเร็จ!");
-      navigate(-1);
-    } catch (err) {
-      alert("เกิดข้อผิดพลาด: " + (err.response?.data?.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้"));
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+    const response = await axios.post(
+      "http://localhost:5000/leave-approve/request",
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`, // เผื่อมี token
+        },
+      }
+    );
 
+    alert("ยื่นคำขอลางานสำเร็จ!");
+    navigate(-1);
+
+  } catch (err) {
+    console.error(err);
+    alert(
+      "เกิดข้อผิดพลาด: " +
+        (err.response?.data?.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้")
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   const handleRejectSubmit = () => {
     if (!rejectReason.trim()) {
       alert("กรุณากรอกเหตุผลที่ไม่อนุมัติ");
