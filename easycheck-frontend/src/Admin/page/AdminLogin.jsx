@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from '../data/mockUsers';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ id: '', password: '' });
@@ -20,29 +19,53 @@ const AdminLogin = () => {
     setTimeout(() => setError(''), 5000);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    if (!formData.id || !formData.password) {
-      showError('กรุณากรอกข้อมูลให้ครบถ้วน');
-      setLoading(false);
-      return;
+  if (!formData.id || !formData.password) {
+    showError('กรุณากรอกข้อมูลให้ครบถ้วน');
+    setLoading(false);
+    return;
+  }
+
+  try {
+
+    const res = await fetch("http://localhost:5000/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        employee_id: formData.id,
+        password: formData.password
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      navigate('/dashboard');
+
+    } else {
+
+      showError(data.message || "Login failed");
+
     }
 
-    setTimeout(() => {
-      const result = authenticateUser(formData.id, formData.password);
-      if (result.success) {
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-        navigate('/dashboard');
-      } else {
-        showError(result.message);
-      }
-      setLoading(false);
-    }, 800);
-  };
+  } catch (err) {
+
+    showError("Server error");
+
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#3C467B' }}>
