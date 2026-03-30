@@ -42,13 +42,22 @@ export const login = async (req, res) => {
 
         // สร้าง Token ให้พนักงาน
         const token = jwt.sign (
-            {id: user.id, role: user.role,full_name: user.full_name},
+            {id: user.id, role: user.role},
             JWT_SECRET, {expiresIn: '30m'})
+
+
+        // สร้าง Refresh Token (ตั๋วใบยาว)
+        const refreshToken = jwt.sign(
+            { id: user.id },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        )
 
         console.log("✅ 7. Login สำเร็จ! กำลังส่ง Token กลับไป...")
         res.status(200).json({
             message: 'Login successful',
             token: token,
+            refreshToken: refreshToken,
             role: user.role,
             full_name: user.full_name
         })
@@ -162,5 +171,54 @@ export const resetPassword = async (req, res) => {
 
     } catch (err) {
         res.status(400).json({ message: 'Invalid or expired token', error: err.message })
+    }
+}
+
+// 🐻🐻 REFRESH TOKEN
+export const refreshToken = async (req, res) => {
+    // รับ refreshToken จากฟ้อนเอนมา
+    const { refreshToken } = req.body
+
+    // check ว่ามีการส่ง token มามั้ย
+    if (!refreshToken) {
+        return res.status(401).json({ message: "Missing refresh token" })
+    }
+
+    try {
+        // มา check (verify) ว่า token นี้หมดอายุรึยังแล้วเอาไปเทียบกับ JWT_SECRET เพราะ token มีสารตั้งต้นเป็น JWT_SECRET ว่าถูกต้องไหม
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET)
+
+        
+        // ก็คือให้ไปหาที่ db ไปเอา id ของพนักงานคนนั้นมาเก็บไว้ใน 'user'
+        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.id])
+        const user = users[0]
+        
+        if (!user) {
+            return res.status(403).json({ message: "User not found" })
+        }
+
+        // สร้าง token ใหม่ (ระยะสั้น)
+        const newAccessToken = jwt.sign( // jwt.sign(...) คือคำสั่งให้ JWT สร้างสตริงยาว ๆ มาชุดนึง โดยเอาข้อมูลที่เราส่งไปมาเข้ารหัสและประทับตราด้วย JWT_SECRET
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '30m' }
+        )
+
+        // สร้าง token ต่ออายุ (ระยะยาว)
+        const newRefreshToken = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        // เอา token ใหม่ส่งกลับไปฟ้อนเอนในนาม accessToken
+        return res.status(200).json({
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
+        })
+
+    } catch (error) {
+        // ถ้า token พังหรือหมดอายุจริง ๆ ก็ให้นางไป login ใหม่
+        return res.status(403).json({ message: "Invalid or expired refresh token" })
     }
 }
