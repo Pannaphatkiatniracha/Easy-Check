@@ -42,6 +42,8 @@ app.use('/auth', authRouter)
 app.use('/users', userRouter)
 app.use('/attendance', attendanceRouter)
 app.use('/events', eventRouter)
+// express.static() คือการให้คนนอกเข้าถึงไฟล์ใน folder uploads ส่วน uploads ตัวไว้สร้าง path เริ่มต้นแล้วเติมด้วยชื่อไฟล์ในโฟลเดอร์ uploads
+app.use('/uploads', express.static('uploads')) 
 
 app.use('/leave-approve', leaveRouter)
 app.use('/personal-summary', personalSummaryRouter)

@@ -127,3 +127,32 @@ export const changePassword = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message })
     }
 }
+
+// 🐰🐰 เปลี่ยน avatar
+export const uploadAvatar = async (req, res) => {
+    try {
+        // เช็คว่ามีไฟล์มาถึงเรามั้ย ตรงนี้ปกติเป็น req.body แต่ด้วยความเป็นรูป multer นางเลยใช้เป็น req.file
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" })
+        }
+
+        // ดึง id มาเพราะเราจะได้รู้ว่าจะไปเปลี่ยนรูปให้ user คนไหน
+        const userId = req.user.id // ตรงนี้เอามาจาก vertifyToken
+        
+        // multer มันจะตั้งชื่อไฟล์รูปภาพให้เราใหม่โดยอัตโนมัติเพราะกันมัน replace กันก็ต้องเอามาเตรียมไว้ด้วย
+        const fileName = req.file.filename
+
+        // อัพเดตชื่อไฟล์ลง db คือเราเก็บแค่ชื่อไฟล์ แล้วอาไปต่อเป็น URL ในหน้าบ้าน
+        const sql = "UPDATE users SET avatar = ? WHERE id = ?"
+        await pool.query(sql, [fileName, userId]) // await pool.query(...) เป็นคำสั่งให้มันไปทำงานใน mysql จริง ๆ
+
+        res.status(200).json({
+            message: "Avatar updated successfully",
+            avatar: fileName // ส่งชื่อไฟล์กลับไปให้ฟ้อนเอน
+        })
+
+    } catch (error) {
+        console.error("Upload Error:", error)
+        res.status(500).json({ message: "Server error during upload" })
+    }
+}
