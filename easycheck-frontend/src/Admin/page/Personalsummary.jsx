@@ -6,6 +6,7 @@ const AVATAR_COLORS = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
 const Personalsummary = () => {
   const [employees, setEmployees] = useState([]);
 
+// ดึงข้อมูลจาก API
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetch('http://localhost:5000/personal-summary/list', {
