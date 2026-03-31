@@ -15,28 +15,23 @@ const Personalsummary = () => {
       .then(res => res.json())
       .then(json => {
         if (json.success) {
-          const mapped = json.data.map((user, index) => {
-            const nameParts = user.full_name.trim().split(' ');
-            const firstName = nameParts[0] || '';
-            const lastName = nameParts.slice(1).join(' ') || '';
-            return {
-              id: user.id,
-              firstName,
-              lastName,
-              empCode: user.employee_id,
-              position: user.position || '',
-              department: user.department || '',
-              branch: user.branch || '',
-              phone: user.phone || '',
-              email: user.email || '',
-              supervisor: '',
-              startDate: user.join_date ? user.join_date.split('T')[0] : '',
-              attendanceRate: 0,
-              workStats: { present: 0, late: 0, absent: 0 },
-              leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
-              avatarColor: AVATAR_COLORS[index % AVATAR_COLORS.length]
-            };
-          });
+          const mapped = json.data.map((user, index) => ({
+            id: user.id,
+            firstName: user.firstname,
+            lastName: user.lastname,
+            empCode: user.id_employee,
+            position: user.position || '',
+            department: user.department || '',
+            branch: user.branch || '',
+            phone: user.phone || '',
+            email: user.email || '',
+            supervisor: '',
+            startDate: user.joindate ? user.joindate.split('T')[0] : '',
+            attendanceRate: 0,
+            workStats: { present: 0, late: 0, absent: 0 },
+            leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
+            avatarColor: AVATAR_COLORS[index % AVATAR_COLORS.length]
+          }));
           setEmployees(mapped);
         }
       })
