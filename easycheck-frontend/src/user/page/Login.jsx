@@ -32,23 +32,23 @@ const Login = ({ setToken, setRole }) => {
 
         try {
             const response = await Api.post('/auth/login', { // ตรงนี้เรียก axios ที่ 'Api' แล้ว
-                employee_id: username,
+                id_employee: username,
                 password: password // ส่ง username,password ไปแบคเอนในนาม employee_id,password ตาม db
             })
 
             // ถ้าผ่าน axios จะเอาข้อมูลเก็บใส่ .data ให้เลย ก็คือส่งกลับ token,refreshToken,role คืนมา
-            const { token, refreshToken, role } = response.data
+            const { token, refreshToken, level } = response.data
 
             // เก็บข้อมูลที่แบคเอนส่งมาลงเครื่องเหมือนเดิม
             localStorage.setItem('token', token)
-            localStorage.setItem('role', role)
+            localStorage.setItem('role', level)
             
             // เก็บ refreshToken ลงในเครื่อง เพื่อเอาไว้ใช้ต่ออายุ token
             localStorage.setItem('refreshToken', refreshToken)
 
             // อัปเดต State และนำทาง
             setToken(token)
-            setRole(role)
+            setRole(level)
             navigate('/home', { replace: true })
 
         } catch (err) {

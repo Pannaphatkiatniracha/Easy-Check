@@ -63,11 +63,13 @@ const Profile = ( {role} ) => {
                     : "/easycheck/img/an.jpg"
 
                 setUser({
-                    name: data.full_name || "",
-                    userid: data.employee_id || "",
+                    name: (data.firstname && data.lastname) 
+                        ? data.firstname + " " + data.lastname 
+                        : "",
+                    userid: data.id_employee || "",
                     email: data.email || "",
                     phone: data.phone || "",
-                    joinDate: data.join_date ? data.join_date.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
+                    joinDate: data.joindate ? data.joindate.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
                     position: data.position || "",
                     department: data.department || "",
                     branch: data.branch || "Bangkok",
@@ -167,11 +169,9 @@ const Profile = ( {role} ) => {
 
         <div className="app-container">
 
-
             {/* <div className="text-center text-white mt-16">
                 <h2 className="fw-bold">Edit Profile</h2>
             </div> */}
-
 
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
@@ -188,8 +188,6 @@ const Profile = ( {role} ) => {
                 <div className="me-4"></div>
             </div>
 
-
-
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
             <div className="mx-auto mt-6 position-relative"
@@ -198,7 +196,6 @@ const Profile = ( {role} ) => {
                 {/* objectFit: "cover" = ไม่ให้รูปโดนบีบ */}
                 <img src={user.avatar} className="rounded-circle w-100 h-100" 
                 style={{width: "100%",height: "100%",objectFit: "cover"}}/>
-
 
                 <button className='position-absolute bottom-0 end-0 rounded-circle btn-sm btn'
                     style={{ transform: "translate(25%, 10%)", backgroundColor: '#636CCB', border: 'none', color: 'white' }}
@@ -217,11 +214,9 @@ const Profile = ( {role} ) => {
             </div>
 
 
-
             {/* form ต่าง ๆ */}
             {/* พอใช้ d-flex แล้วก็กลายเป็น inline ต้องใช้ flex-column มา set ให้นางเป็นแนวตั้งอีกที */}
             <div className="d-flex flex-column align-items-center">
-
 
                 {/* ชื่อ */}
                 <div className='mt-4 mb-3 w-75'>
@@ -257,15 +252,11 @@ const Profile = ( {role} ) => {
                     <InputGroup>
                         <InputGroup.Text className='text-secondary'>
                             <i className="bi bi-telephone-fill"></i>
-                            {/* <i class="bi bi-telephone"></i> */}
                         </InputGroup.Text>
                         <FormControl type='text' placeholder='Phone Number'
                             name="phone" value={user.phone} onChange={handleChange} />
                     </InputGroup>
                 </div>
-
-
-
 
                 {/* ข้อมูลการทำงาน */}
                 <div className='w-75'>
@@ -294,7 +285,6 @@ const Profile = ( {role} ) => {
                     </InputGroup>
                 </div>
 
-
                 {/* สาขา */}
                 <div className='mb-3 w-75'>
                     <InputGroup>
@@ -305,7 +295,6 @@ const Profile = ( {role} ) => {
                             name='branch' value={user.branch} onChange={handleChange} readOnly />
                     </InputGroup>
                 </div>
-
 
                 {/* กะงาน */}
                 <div className='mb-4 w-75'>
@@ -319,9 +308,6 @@ const Profile = ( {role} ) => {
                 </div>
 
             </div>
-
-
-
 
             {/* ข้อมูลส่วนตัว */}
             <div className='px-5 mt-2'>
@@ -351,9 +337,6 @@ const Profile = ( {role} ) => {
                 </InputGroup>
             </div>
 
-
-
-
             {/* ปุ่ม */}
             <Link to="/changepassword" className='text-decoration-none'>
                 <div className='text-center mt-5'>
@@ -361,12 +344,10 @@ const Profile = ( {role} ) => {
                 </div>
             </Link>
 
-
             <div className='text-center mt-3 mb-5'>
                 <Button className='rounded-5 w-25 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
                     onClick={handleSave}>SAVE</Button>
             </div>
-
 
             {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
             {/* Modal สำหรับ Success */}
@@ -386,7 +367,6 @@ const Profile = ( {role} ) => {
                     <Button variant="secondary" size="sm" className="mt-2 rounded-pill px-4" onClick={() => setShowErrorModal(false)}>Close</Button>
                 </Modal.Body>
             </Modal>
-
 
         </div>
     )
