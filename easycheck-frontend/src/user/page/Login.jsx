@@ -37,22 +37,39 @@ const Login = ({ setToken, setRole }) => {
             })
 
             // ถ้าผ่าน axios จะเอาข้อมูลเก็บใส่ .data ให้เลย ก็คือส่งกลับ token,refreshToken,role คืนมา
-            const { token, refreshToken, level } = response.data
+            const { token, refreshToken, role } = response.data
+
+            // 🐷🐷 ตรวจสอบสิทธิ์ก่อน
+            const isAdmin = role === "admin" || role === "super admin"
+        
+
+            if (isAdmin) {
+                // 🐷🐷 ถ้าเป็น Admin ให้เตะออกไปทาง catch เลยจ้า
+                throw new Error("Admins must login through the Admin page")
+            }
+
+            // 🐷🐷 แปลงนัง level มาเป็น role ของเราโดยมีค่าเริ่มต้นเป็น user
+            let mappedRole = "user"
+            
+            if (role === "approver") {
+                mappedRole = "approver";
+            } else {
+                mappedRole = "user";
+            }
 
             // เก็บข้อมูลที่แบคเอนส่งมาลงเครื่องเหมือนเดิม
             localStorage.setItem('token', token)
-            localStorage.setItem('role', level)
-            
-            // เก็บ refreshToken ลงในเครื่อง เพื่อเอาไว้ใช้ต่ออายุ token
-            localStorage.setItem('refreshToken', refreshToken)
+            localStorage.setItem('role', mappedRole) // 🐷🐷 ใช้ mappedRole ที่เราแปลงแล้วแทน
+            localStorage.setItem('refreshToken', refreshToken) // เก็บ refreshToken ลงในเครื่อง เพื่อเอาไว้ใช้ต่ออายุ token
 
             // อัปเดต State และนำทาง
             setToken(token)
-            setRole(level)
+            setRole(mappedRole) // 🐷🐷 ใช้ mappedRole เพื่อให้หน้า Setting/Home เช็คเงื่อนไขผ่าน
             navigate('/home', { replace: true })
 
         } catch (err) {
-            const errMsg = err.response?.data?.message // อันนี้คือไปดึงข้อความที่ error ตามหลังบ้านมาเลย
+            // 🐷🐷 ถ้าโดน throw Error มา หรือ Backend พัง จะมาจบที่นี่
+            const errMsg = err.response?.data?.message || err.message
             setError(errMsg)
             setShowModal(true)
         }

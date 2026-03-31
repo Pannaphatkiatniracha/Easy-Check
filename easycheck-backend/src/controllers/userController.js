@@ -10,7 +10,10 @@ export const getProfile = async (req, res) => {
 
         // ดึง db
         const [rows] = await pool.execute(
-            'SELECT * FROM users WHERE id = ?', 
+            `SELECT Users.*, Roles.role
+            FROM Users 
+            JOIN Roles ON Users.role_id = Roles.role_id 
+            WHERE Users.id = ?`, 
             [userId] // userId ก็คือ '?'
         )
 
@@ -36,18 +39,19 @@ export const updateProfile = async (req, res) => {
         const userId = req.user.id
 
         // รับข้อมูลจากฟ้อนเอนที่ axios.put มา (bodyData)
-        const { full_name, phone, email, gender, branch } = req.body
+        const { first_name, last_name, phone, email, gender, branch } = req.body
 
         // เขียนคำสั่ง sql ให้ไปอัพเดตค่าที่ db
         const sql = `
             UPDATE users 
-            SET full_name = ?, phone = ?, email = ?, gender = ?, branch = ? 
+            SET first_name = ?, last_name = ?, phone = ?, email = ?, gender = ?, branch = ? 
             WHERE id = ?
         `
         
         // ตรงนี้คือสั่งรันคำสั่ง sql ด้วย pool.execute
         const [result] = await pool.execute(sql, [
-            full_name, // '?' จับคู่เรียงกันตามข้อมูล
+            first_name, // '?' จับคู่เรียงกันตามข้อมูล
+            last_name,
             phone, 
             email, 
             gender, 

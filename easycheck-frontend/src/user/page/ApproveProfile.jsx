@@ -11,7 +11,7 @@ import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 const HOST = 'localhost'
 const PORT = '5000'
 
-const ApproveProfile = () => {
+const ApproveProfile = ({ role }) => {
 
     const [showModal, setShowModal] = useState(false)
     const [showErrorModal, setShowErrorModal] = useState(false) // สร้าง Modal สำหรับ Error แยกออกมา
@@ -141,7 +141,8 @@ const ApproveProfile = () => {
             
             // สิ่งที่จะส่งกลับไปให้แบคเอน
             const bodyData = {
-                full_name: user.name,
+                firstname: user.firstname,
+                lastname: user.lastname,
                 phone: user.phone,
                 email: user.email,
                 branch: user.branch,

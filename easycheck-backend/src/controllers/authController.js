@@ -17,7 +17,14 @@ export const login = async (req, res) => {
     console.log("1. Backend ได้รับข้อมูล:", { id_employee, password })
 
     try {
-        const [users] = await db.query('SELECT * FROM users WHERE id_employee = ?', [id_employee])
+        // ไปดึงข้อมูลใน user และ join ตาราง roles เพื่อดึง level มาแสดง
+        const [users] = await db.query(
+            `SELECT Users.*, Roles.role
+            FROM Users 
+            JOIN Roles ON Users.role_id = Roles.role_id 
+            WHERE Users.id_employee = ?`, 
+            [id_employee]
+        )
 
         if (users.length === 0) {
             console.log("❌ 2. หา ID นี้ไม่เจอใน Database:", id_employee)
@@ -26,7 +33,7 @@ export const login = async (req, res) => {
         
         // result
         const user = users[0]
-        console.log("3. เจอ User ใน DB ชื่อ:", user.firstname)
+        console.log("3. เจอ User ใน DB ชื่อ:", user.firstname + user.lastname)
         console.log("4. hash password คือ:", user.password)
 
         
@@ -42,7 +49,7 @@ export const login = async (req, res) => {
 
         // สร้าง Token ให้พนักงาน
         const token = jwt.sign (
-            {id: user.id, role: user.role_id},
+            {id: user.id, role: user.role},
             JWT_SECRET, {expiresIn: '30m'})
 
 
@@ -58,7 +65,7 @@ export const login = async (req, res) => {
             message: 'Login successful',
             token: token,
             refreshToken: refreshToken,
-            level: user.role_id,
+            role: user.role,
             id_employee: user.id_employee,
             firstname: user.firstname,
             lastname: user.lastname
@@ -73,7 +80,7 @@ export const login = async (req, res) => {
 
 // 🐻🐻 LOGOUT
 export const logout = (req, res) => {
-    console.log(`${req.user.full_name} is logging out...`)
+    console.log(`${req.user.firstname} is logging out...`)
     
     res.status(200).json({ message: 'Logout successful' })
 }
@@ -192,7 +199,13 @@ export const refreshToken = async (req, res) => {
 
         
         // ก็คือให้ไปหาที่ db ไปเอา id ของพนักงานคนนั้นมาเก็บไว้ใน 'user'
-        const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.id])
+        const [users] = await db.query(
+            `SELECT Users.*, Roles.role 
+            FROM Users 
+            JOIN Roles ON Users.role_id = Roles.role_id 
+            WHERE Users.id = ?`, 
+            [decoded.id] // join ตารางเพื่อเอาชื่อ role มาใส่ใน token ใหม่
+        )
         const user = users[0]
         
         if (!user) {
@@ -201,7 +214,7 @@ export const refreshToken = async (req, res) => {
 
         // สร้าง token ใหม่ (ระยะสั้น)
         const newAccessToken = jwt.sign( // jwt.sign(...) คือคำสั่งให้ JWT สร้างสตริงยาว ๆ มาชุดนึง โดยเอาข้อมูลที่เราส่งไปมาเข้ารหัสและประทับตราด้วย JWT_SECRET
-            { id: user.id, role: user.role_id },
+            { id: user.id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '30m' }
         )

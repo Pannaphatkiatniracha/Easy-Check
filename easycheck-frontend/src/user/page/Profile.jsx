@@ -140,7 +140,8 @@ const Profile = ( {role} ) => {
             
             // สิ่งที่จะส่งกลับไปให้แบคเอน
             const bodyData = {
-                full_name: user.name,
+                firstname: user.firstname,
+                lastname: user.lastname,
                 phone: user.phone,
                 email: user.email,
                 branch: user.branch,
