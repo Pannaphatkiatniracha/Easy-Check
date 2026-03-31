@@ -4,16 +4,14 @@ import jwt from 'jsonwebtoken'
 
 //admin login
 export const loginAdmin = async (req, res) => {
-
     try {
-
         console.log("BODY:", req.body)
-        const { employee_id, password } = req.body
+        const { id_employee, password } = req.body
 
         // หา admin ใน db
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE employee_id = ? AND role IN ('admin','superadmin')",
-            [employee_id]
+            "SELECT * FROM users WHERE id_employee = ? AND position IN ('admin','superadmin')",
+            [id_employee]
         )
 
         if (rows.length === 0) {
@@ -29,9 +27,9 @@ export const loginAdmin = async (req, res) => {
             return res.status(401).json({ message: "Password incorrect" })
         }
 
-        // สร้าง token
+        // สร้าง token (เปลี่ยน role -> position)
         const token = jwt.sign(
-            { id: admin.id, role: admin.role },
+            { id: admin.id, position: admin.position },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         )
@@ -42,7 +40,7 @@ export const loginAdmin = async (req, res) => {
             user: {
                 id: admin.id,
                 full_name: admin.full_name,
-                role: admin.role
+                position: admin.position
             }
         })
 
@@ -50,7 +48,6 @@ export const loginAdmin = async (req, res) => {
         console.error("Admin Login Error:", err)
         res.status(500).json({ message: "Server Error" })
     }
-
 }
 
 
@@ -90,7 +87,7 @@ export const forgotPassword = async (req, res) => {
         const { email } = req.body
 
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE email = ? AND role IN ('admin','superadmin')",
+            "SELECT * FROM users WHERE email = ? AND position IN ('admin','superadmin')",
             [email]
         )
 
