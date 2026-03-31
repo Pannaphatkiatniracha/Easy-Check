@@ -33,7 +33,9 @@ const Profile = ( {role} ) => {
             branch: "",
             gender: "Female",
             avatar: "/easycheck/img/who.webp",
-            shift: ""
+            shift: "",
+            startTime: "",
+            endTime: ""
         }
     )
 
@@ -75,7 +77,9 @@ const Profile = ( {role} ) => {
                     branch: data.branch || "Bangkok",
                     gender: data.gender || "Female",
                     avatar: avatarPath,
-                    shift: data.shift || "",
+                    startTime: data.start_time ? data.start_time.substring(0, 5) : "--:--", 
+                    endTime: data.end_time ? data.end_time.substring(0, 5) : "--:--",
+                    shift: data.shift_name || "No Shift"
                 })
 
             } catch (error) {
@@ -304,7 +308,10 @@ const Profile = ( {role} ) => {
                             <i className="bi bi-clock-fill"></i>
                         </InputGroup.Text>
                         <FormControl className='fw-semibold' type="text"
-                            name='shift' value={user.shift} onChange={handleChange} readOnly />
+                            name='shift' readOnly
+                            value={user.startTime && user.endTime 
+                            ? `${user.startTime} - ${user.endTime}` 
+                            : "No Shift Assigned"} />
                     </InputGroup>
                 </div>
 
