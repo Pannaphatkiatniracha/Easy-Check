@@ -1,4 +1,3 @@
-
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
@@ -237,4 +236,3 @@ export const refreshToken = async (req, res) => {
         return res.status(403).json({ message: "Invalid or expired refresh token" })
     }
 }
-
