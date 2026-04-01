@@ -1,5 +1,5 @@
 import express from "express";
-import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift } from "../controllers/adminController.js";
+import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift , settingsAdmin} from "../controllers/adminController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
 
@@ -413,6 +413,51 @@ router.delete('/deleteUserShift' , deleteUserShift )
 
 router.put('/editShift', editShift)
 router.get('/editShift', editShift)
+
+
+router.get('/settingsAdmin', settingsAdmin)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //-----------------------------------------------tar----------------------------------------//
 

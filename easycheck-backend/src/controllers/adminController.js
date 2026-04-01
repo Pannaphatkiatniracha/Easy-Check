@@ -263,6 +263,27 @@ export const editShift = async (req, res) => {
     }
 };
 
+export const settingsAdmin = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [rows] = await pool.execute(
+      "SELECT notification_enabled FROM User_settings WHERE user_id = ?",
+      [userId]
+    );
+
+    // ถ้ายังไม่มี rows เข้ามา ให้default = เปิด
+    if (rows.length === 0) {
+      return res.json({ notification_enabled: 1 });
+    }
+
+    return res.json(rows[0]);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching settings" });
+  }
+};
 
 
 

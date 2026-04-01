@@ -55,16 +55,6 @@ function SettingsAdmin() {
                                 />
                             </div>
 
-                            {/* Dark Mode */}
-                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '50px', width: '400px' }}>
-                                <div className="d-flex align-items-center gap-2 text-white">
-                                    <i className="bi bi-circle-half fs-4"></i> &nbsp;&nbsp;
-                                    <span>Dark Mode</span>
-                                </div>
-                                <Form.Check type="switch" id="dark-mode-switch" label="" />
-                            </div>
-
                             {/* Edit Profile */}
                             <Button
                                 variant="link"
