@@ -1,6 +1,7 @@
 import express from "express";
 import { verifyToken } from '../middlewares/authMiddleware.js'
-import { getProfile, updateProfile, changePassword } from '../controllers/userController.js'
+import { getProfile, updateProfile, changePassword, uploadAvatar } from '../controllers/userController.js'
+import { upload } from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router();
 
@@ -235,7 +236,8 @@ router.put('/change-password', verifyToken, changePassword)
  *                   example: "Database connection failed"
  */
 
-
+// single คือจะรับแค่ไฟล์เดียวน้า avatar คือตัวรับต้องตรงกับตัวส่งที่ฟ้อนเอนส่งมาด้วย
+router.post('/upload-avatar', verifyToken, upload.single('avatar'), uploadAvatar)
 
 // ----------------------------------------------------------------
 router.get("/", (req, res) => {

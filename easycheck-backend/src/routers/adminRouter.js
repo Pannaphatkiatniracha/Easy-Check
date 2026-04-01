@@ -140,3 +140,71 @@ router.get("/me", verifyToken, getAdmin)
 
 
 router.post("/forgot-password", forgotPassword)
+<<<<<<< HEAD
+=======
+/**
+ * @swagger
+ * /admin/forgot-password:
+ *   post:
+ *     summary: Forgot password (Admin)
+ *     description: Request a password reset for an admin or superadmin account.
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Admin email address
+ *                 example: "admin@example.com"
+ *     responses:
+ *       200:
+ *         description: Reset password placeholder response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Reset password feature coming soon"
+ *       404:
+ *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Admin not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
+ */
+
+
+// -----------------------------------------
+
+router.get("/", (req, res) => {
+  res.send("admin route working");
+});
+
+export default router;
+>>>>>>> 56c72163ddd2a4e80cf7eeb1beb81bca78a93881

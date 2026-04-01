@@ -3,10 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
-const HOST = 'localhost'
-const PORT = '5000'
+// const HOST = 'localhost'
+// const PORT = '5000'
 
 const Login = ({ setToken, setRole }) => {
 
@@ -30,25 +31,45 @@ const Login = ({ setToken, setRole }) => {
         setError('')
 
         try {
-            const response = await axios.post(`http://${HOST}:${PORT}/auth/login`, {
-                employee_id: username,
+            const response = await Api.post('/auth/login', { // ตรงนี้เรียก axios ที่ 'Api' แล้ว
+                id_employee: username,
                 password: password // ส่ง username,password ไปแบคเอนในนาม employee_id,password ตาม db
             })
 
-            // ถ้าผ่าน axios จะเอาข้อมูลเก็บใส่ .data ให้เลย ก็คือส่งกลับ token กับ role คืนมา
-            const { token, role } = response.data
+            // ถ้าผ่าน axios จะเอาข้อมูลเก็บใส่ .data ให้เลย ก็คือส่งกลับ token,refreshToken,role คืนมา
+            const { token, refreshToken, role } = response.data
+
+            // 🐷🐷 ตรวจสอบสิทธิ์ก่อน
+            const isAdmin = role === "admin" || role === "super admin"
+        
+
+            if (isAdmin) {
+                // 🐷🐷 ถ้าเป็น Admin ให้เตะออกไปทาง catch เลยจ้า
+                throw new Error("Admins must login through the Admin page")
+            }
+
+            // 🐷🐷 แปลงนัง level มาเป็น role ของเราโดยมีค่าเริ่มต้นเป็น user
+            let mappedRole = "user"
+            
+            if (role === "approver") {
+                mappedRole = "approver";
+            } else {
+                mappedRole = "user";
+            }
 
             // เก็บข้อมูลที่แบคเอนส่งมาลงเครื่องเหมือนเดิม
             localStorage.setItem('token', token)
-            localStorage.setItem('role', role)
+            localStorage.setItem('role', mappedRole) // 🐷🐷 ใช้ mappedRole ที่เราแปลงแล้วแทน
+            localStorage.setItem('refreshToken', refreshToken) // เก็บ refreshToken ลงในเครื่อง เพื่อเอาไว้ใช้ต่ออายุ token
 
             // อัปเดต State และนำทาง
             setToken(token)
-            setRole(role)
+            setRole(mappedRole) // 🐷🐷 ใช้ mappedRole เพื่อให้หน้า Setting/Home เช็คเงื่อนไขผ่าน
             navigate('/home', { replace: true })
 
         } catch (err) {
-            const errMsg = err.response?.data?.message // อันนี้คือไปดึงข้อความที่ error ตามหลังบ้านมาเลย
+            // 🐷🐷 ถ้าโดน throw Error มา หรือ Backend พัง จะมาจบที่นี่
+            const errMsg = err.response?.data?.message || err.message
             setError(errMsg)
             setShowModal(true)
         }
@@ -87,16 +108,14 @@ const Login = ({ setToken, setRole }) => {
                             }} />
 
 
-                        {/* 
-                                >>>>> text.replace(สิ่งที่อยากหา, สิ่งที่อยากแทนที่)
+                        {/* >>>>> text.replace(สิ่งที่อยากหา, สิ่งที่อยากแทนที่)
                                 \D = ไม่ใช่ตัวเลข
                                 /…/g = / สิ่งที่อยากหา / ตัวเลือก
                                 g = ช่วยลบตัวที่ไม่ใช่ตัวเลขทุกตัวที่กรอกมาเลย ไม่งั้นมันจะลบแค่ตัวแรกที่มันเจอ
                                 ส่วนที่ลบก็แทนที่ด้วยค่าว่าง "" นั่นเองง ✨ 
                             */}
 
-                        {/* 
-                                "123456789".slice(3,6)
+                        {/* "123456789".slice(3,6)
                                 = 456 
                                 เพราะ(ตัวแรก,ตัวสอง) ตัวแรกคือตัวแรกที่เริ่มนับ ตัวสอง
                             */}
@@ -124,8 +143,7 @@ const Login = ({ setToken, setRole }) => {
 
 
 
-                    {/* 
-                        AND
+                    {/* AND
                         condition && <SomeComponent />
                         ถ้าไม่ตรง condition ก็คือจะไม่แสดงอะไรไปเลย
                         แต่ถ้าตรงก็จะแสดงสิ่งที่อยู่หลัง &&
