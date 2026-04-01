@@ -1,5 +1,5 @@
 import express from 'express'
-import { login, logout, forgotPassword, resetPassword } from '../controllers/authController.js'
+import { login, logout, forgotPassword, resetPassword, refreshToken } from '../controllers/authController.js'
 import { verifyToken } from '../middlewares/authMiddleware.js'
 
 const router = express.Router() // ก็คือเหมือน router ไปยังหน้าต่าง ๆ ตาม url ที่เราเขียนต่อ
@@ -96,9 +96,130 @@ router.post('/logout', verifyToken, logout)
 
 
 router.post('/forgot-password', forgotPassword)
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request a password reset link via email
+ *     tags: [User]
+ *     description: Sends a password reset token to the user's email address.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The email address of the user who wants to reset their password.
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Successfully sent a reset token to the user's email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Reset token sent successfully to your email"
+ *                 resetToken:
+ *                   type: string
+ *                   description: A JWT token for password reset.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWN0aW9uIjoicmVzZXQgcGFzc3dvcmQifQ.1PtdMhAxfid9aj1dV-PsCdeI6WxhH5RoDoZti9Vpdsc"
+ *       404:
+ *         description: Email not found in the system.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email not found"
+ *       500:
+ *         description: Server error while processing the request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message here"
+ */
 
 router.put('/reset-password/:token', resetPassword)
+/**
+ * @swagger
+ * /auth/reset-password/{token}:
+ *   put:
+ *     summary: Reset a user's password
+ *     tags: [User]
+ *     description: Resets the password of a user by using a password reset token.
+ *     parameters:
+ *       - name: token
+ *         in: path
+ *         required: true
+ *         description: The token used for resetting the password.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *                 description: The new password that the user wants to set.
+ *                 example: "newSecurePassword123!"
+ *     responses:
+ *       200:
+ *         description: Password reset was successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password reset successful"
+ *       400:
+ *         description: Invalid or expired token, or other errors.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid or expired token"
+ *                 error:
+ *                   type: string
+ *                   example: "jwt malformed"
+ *       500:
+ *         description: Server error while processing the request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message here"
+ */
 
+router.post('/refresh-token', refreshToken)
 
 // via ------------------------------------------------------------
 router.get("/", (req, res) => {

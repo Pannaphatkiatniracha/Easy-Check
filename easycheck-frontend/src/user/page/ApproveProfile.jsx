@@ -1,18 +1,23 @@
 import './User.css'
 import { Button, FormSelect, InputGroup, FormControl } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // เพิ่ม useRef มาเป็นนิ้ววิเศษเหมือนเดิม
 import { Link } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
 const HOST = 'localhost'
 const PORT = '5000'
 
-const ApproveProfile = () => {
+const ApproveProfile = ({ role }) => {
 
     const [showModal, setShowModal] = useState(false)
+    const [showErrorModal, setShowErrorModal] = useState(false) // สร้าง Modal สำหรับ Error แยกออกมา
+    const [errorMessage, setErrorMessage] = useState("") // เก็บข้อความ Error ภาษาอังกฤษ
+    
+    const fileInputRef = useRef(null) // สร้าง Ref สำหรับปุ่มแก้ไขรูป
 
 
     // setUser ใช้ตอนเปลี่ยนค่า user
@@ -28,7 +33,9 @@ const ApproveProfile = () => {
             branch: "",
             gender: "Female",
             avatar: "/easycheck/img/who.webp",
-            shift: ""
+            shift: "",
+            startTime: "",
+            endTime: ""
         }
     )
 
@@ -44,28 +51,38 @@ const ApproveProfile = () => {
             try {
                 const token = localStorage.getItem('token')
                 
-                const response = await axios.get(`http://${HOST}:${PORT}/users/profile`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}` // ส่งไปก็จะต้องไปเจอ verifyToken ก่อน
-                    }
-                })
+                // จาก Api.jsx จะมีการส่ง `Bearer ${token}` ไปอยู่แล้ว
+                const response = await Api.get('/users/profile')
 
                 // axios จะเอาข้อมูลใส่ไว้ใน .data ให้เลย
                 const data = response.data
                 console.log("Data from Backend (Axios):", data)
 
+                // เช็คว่ามีรูปจากแบคเอนไหม
+                const avatarPath = data.avatar // ถามว่าใน db มีรูปไหม
+                    ? (data.avatar.startsWith('http') // ถ้ามีมันขึ้นต้นด้วย http ไหม
+                        ? data.avatar  // ถ้ามีแล้วขึ้นต้นด้วย http ก็เอามาใช้เลย
+                        : `${Api.defaults.baseURL}/uploads/avatars/${data.avatar}`) // ถ้าไม่ใช่ให้เติมชื่อ server เราไปมันจะได้ใช้ได้ซึ่งตรงนี้นี่แหละคือรูปที่ user อัพเอง
+                    : "/easycheck/img/an.jpg"
+
                 setUser({
-                    name: data.full_name || "",
-                    userid: data.employee_id || "",
+                    // name: (data.firstname && data.lastname) 
+                    //     ? data.firstname + " " + data.lastname 
+                    //     : "",
+                    firstname: data.firstname || "",
+                    lastname: data.lastname || "",
+                    userid: data.id_employee || "",
                     email: data.email || "",
                     phone: data.phone || "",
-                    joinDate: data.join_date ? data.join_date.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
+                    joinDate: data.joindate ? data.joindate.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
                     position: data.position || "",
                     department: data.department || "",
                     branch: data.branch || "Bangkok",
                     gender: data.gender || "Female",
-                    avatar: data.avatar || "/easycheck/img/an.jpg",
-                    shift: data.shift || "",
+                    avatar: avatarPath,
+                    startTime: data.start_time ? data.start_time.substring(0, 5) : "--:--", 
+                    endTime: data.end_time ? data.end_time.substring(0, 5) : "--:--",
+                    shift: data.shift_name || "No Shift"
                 })
 
             } catch (error) {
@@ -87,6 +104,40 @@ const ApproveProfile = () => {
         setUser((oldUser) => ({ ...oldUser, [name]: value }))
     }
 
+    // อัพโหลดรูปภาพจริง ๆ ตรงนี้
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        const formData = new FormData() // new FormData() อันนี้สร้างขึ้นมารับ-ส่งไฟล์รูปภาพโดยเฉพาะ
+        // avatar ตรงนี้ต้องตรงกับใน userRouter
+        formData.append('avatar', file) // เอา file ไปเก็บไว้ใน avatar
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await Api.post('/users/upload-avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            if (response.status === 200) {
+                const newAvatarName = response.data.avatar //แบคเอนส่งชื่อไฟล์ใหม่มาว่า
+
+                // เปลี่ยนรูปตรงนี้ 🤍
+                setUser((old) => ({ 
+                    ...old, 
+                    avatar: `http://${HOST}:${PORT}/uploads/avatars/${newAvatarName}` 
+                }))
+                setShowModal(true)
+            }
+        } catch (error) {
+            console.error("Upload error:", error.response?.data?.message || error.message)
+            setErrorMessage(error.response?.data?.message || "Upload failed. Please try again.")
+            setShowErrorModal(true)
+        }
+    }
+
 
 
     // บันทึกข้อมูลที่แก้ไข
@@ -96,7 +147,8 @@ const ApproveProfile = () => {
             
             // สิ่งที่จะส่งกลับไปให้แบคเอน
             const bodyData = {
-                full_name: user.name,
+                firstname: user.firstname,
+                lastname: user.lastname,
                 phone: user.phone,
                 email: user.email,
                 branch: user.branch,
@@ -104,11 +156,7 @@ const ApproveProfile = () => {
             }
 
             // ใช้ axios.put ส่งของไปหลังบ้าน
-            const response = await axios.put(`http://${HOST}:${PORT}/users/profile`, bodyData, {
-                headers: { 
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+            const response = await Api.put('/users/profile', bodyData)
 
             // ถ้าฝั่งแบคโอนส่งกลับมาว่าโอเก
             if (response.status === 200) {
@@ -116,7 +164,8 @@ const ApproveProfile = () => {
             }
         } catch (error) {
             console.error("Save error:", error.response?.data?.message || error.message)
-            alert("บันทึกไม่สำเร็จ: " + (error.response?.data?.message || "เกิดข้อผิดพลาดจากระบบ"))
+            setErrorMessage(error.response?.data?.message || "Something went wrong. Please try again.")
+            setShowErrorModal(true)
         }
     }
     
@@ -124,11 +173,9 @@ const ApproveProfile = () => {
     return (
         <div className="app-container">
 
-
             {/* <div className="text-center text-white mt-16">
                 <h2 className="fw-bold">Edit Profile</h2>
             </div> */}
-
 
             {/* หัวข้อ */}
             <div className="d-flex justify-content-between text-white mt-16">
@@ -151,8 +198,6 @@ const ApproveProfile = () => {
                 <div className="me-4"></div>
             </div>
 
-
-
             {/* รูปโปรไฟล์ + icon */}
             {/* position-relative เป็นตัวแม่สำหรับ position-absolute ซึ่งคุณสมบัติคือจะให้ชีอยู่ตรงไหนก็ได้ */}
             <div className="mx-auto mt-6 position-relative"
@@ -162,27 +207,32 @@ const ApproveProfile = () => {
                 <img src={user.avatar} className="rounded-circle w-100 h-100" 
                 style={{width: "100%", height: "100%", objectFit: "cover"}}/>
 
-
                 {/* icon edit */}
-                <Button size='sm' className='position-absolute bottom-0 end-0 rounded-circle'
-                    // เป๊ะไม่พอ 25 คือแกน x 10 คือแกน y
-                    style={{ transform: "translate(25%, 10%)", backgroundColor: '#636CCB', border: 'none' }}>
-                    <i className="bi bi-pencil-fill"></i>
-                </Button>
+                <button className='position-absolute bottom-0 end-0 rounded-circle btn-sm btn'
+                    style={{ transform: "translate(25%, 10%)", backgroundColor: '#636CCB', border: 'none', color: 'white' }}
+                    onClick={() => fileInputRef.current.click()} // คลิกปุ่มดินสอแล้วเปิดหน้าต่างเลือกไฟล์
+                >
+                    <i className="bi bi-camera-fill"></i>
+                </button>
+
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    style={{ display: 'none' }} 
+                    accept="image/*"
+                    onChange={handleFileChange} 
+                />
             </div>
-
-
 
             {/* form ต่าง ๆ */}
             {/* พอใช้ d-flex แล้วก็กลายเป็น inline ต้องใช้ flex-column มา set ให้นางเป็นแนวตั้งอีกที */}
             <div className="d-flex flex-column align-items-center">
 
-
                 {/* ชื่อ */}
                 <div className='mt-4 mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Information</label>
                     <input className='fw-semibold form-control' type="text"
-                        name="name" value={user.name} onChange={handleChange} readOnly />
+                        name="fullname" value={`${user.firstname} ${user.lastname}`} readOnly />
                 </div>
 
                 {/* รหัสพนักงาน */}
@@ -217,9 +267,6 @@ const ApproveProfile = () => {
                             name="phone" value={user.phone} onChange={handleChange} />
                     </InputGroup>
                 </div>
-
-
-
 
                 {/* ข้อมูลการทำงาน */}
                 <div className='w-75'>
@@ -256,11 +303,11 @@ const ApproveProfile = () => {
                         </InputGroup.Text>
                         <Form.Select aria-label='Select branch' className='fw-semibold'
                             name='branch' value={user.branch} onChange={handleChange}>
-                            <option value="Bangkok">กรุงเทพมหานคร</option>
-                            <option value="ChiangMai">เชียงใหม่</option>
-                            <option value="Phuket">ภูเก็ต</option>
-                            <option value="Chonburi">ชลบุรี</option>
-                            <option value="Khonkaen">ขอนแก่น</option>
+                            <option value="Bangkok">Bangkok</option>
+                            <option value="ChiangMai">Chaing Mai</option>
+                            <option value="Phuket">Phuket</option>
+                            <option value="Chonburi">Chonburi</option>
+                            <option value="Khonkaen">Khon Kaen</option>
                         </Form.Select>
                     </InputGroup>
                 </div>
@@ -272,14 +319,11 @@ const ApproveProfile = () => {
                             <i className="bi bi-clock-fill"></i>
                         </InputGroup.Text>
                         <FormControl className='fw-semibold' type="text"
-                            name='shift' value={user.shift} onChange={handleChange} readOnly />
+                            name='shift' value={`${user.startTime} - ${user.endTime}`} readOnly />
                     </InputGroup>
                 </div>
 
             </div>
-
-
-
 
             {/* ข้อมูลส่วนตัว */}
             <div className='px-5 mt-2'>
@@ -303,14 +347,11 @@ const ApproveProfile = () => {
                     </InputGroup.Text>
                     <Form.Select aria-label="Select gender"
                         name='gender' value={user.gender} onChange={handleChange}>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                     </Form.Select>
                 </InputGroup>
             </div>
-
-
-
 
             {/* ปุ่ม */}
             <Link to="/changepassword" className='text-decoration-none'>
@@ -319,23 +360,29 @@ const ApproveProfile = () => {
                 </div>
             </Link>
 
-
             <div className='text-center mt-3 mb-5'>
                 <Button className='rounded-5 w-25 fw-semibold' style={{ backgroundColor: '#636CCB', border: 'none' }}
                     onClick={handleSave}>SAVE</Button>
             </div>
 
-
             {/* centered คือตัวที่กำหนดให้ modal มัน show ตรงกลางเว็บ */}
+            {/* Modal สำหรับ Success */}
             <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">Update complete</h5>
-                    {/* <p>Your information has been <br /> updated successfully.</p> */}
-
                 </Modal.Body>
             </Modal>
 
+            {/* Modal สำหรับ Error */}
+            <Modal size="sm" show={showErrorModal} onHide={() => setShowErrorModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-exclamation-circle-fill fs-1 text-danger"></i>
+                    <h5 className="fw-bold mt-2">Update Failed</h5>
+                    <p className="text-secondary small">{errorMessage}</p>
+                    <Button variant="secondary" size="sm" className="mt-2 rounded-pill px-4" onClick={() => setShowErrorModal(false)}>Close</Button>
+                </Modal.Body>
+            </Modal>
 
         </div>
     )

@@ -1,5 +1,5 @@
 # คำสั่งรัน: docker compose -f database/docker-compose-mysql-phpmyadmin.yaml up -d
-# คำสั่งปิด: docker compose -f database/docker-compose-mysql-phpmyadmin.yaml down
+# คำสั่งปิด: docker compose -f database/docker-compose-mysql-phpmyadmin.yaml down -v
 
 networks:
   mysql-network:
@@ -14,6 +14,7 @@ services:
       - 3309:3306       # ตัวกลางของเรากับ port มาตรฐาน
     volumes:
        - ./mysql-data:/var/lib/mysql # เก็บข้อมูลไว้ในเครื่องเป็น text
+       - ./easycheck.sql:/docker-entrypoint-initdb.d/init.sql # ดึงข้อมูล 3 ตารางเข้าอัตโนมัติ
     environment:
       MYSQL_ROOT_PASSWORD: root
 #      MYSQL_USER: user

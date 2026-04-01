@@ -156,9 +156,9 @@ const Sidebar = () => {
   </div>
 
   <div className={styles.brandInfo}>
-    <span className={styles.brandText}>
-      {user.fullName || 'Admin Panel'}
-    </span>
+ <span className={styles.brandText}>
+  {user.full_name || 'Admin Panel'}
+</span>
     <span className={styles.brandSubtext}>
       {user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
       {user.department && ` • ${user.department}`}
