@@ -131,7 +131,6 @@ export const forgotPassword = async (req, res) => {
                         <p>You requested to reset your password for <b>Easy Check</b>.</p>
                         <p>Click the button below to proceed. This link will expire in 15 minutes.</p>
                         
-                        // ปุ่มละ
                         <a href="http://localhost:5173/easycheck/resetpassword/${resetToken}" 
                         style="display: inline-block; background-color: #4A90E2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                             Reset Password
