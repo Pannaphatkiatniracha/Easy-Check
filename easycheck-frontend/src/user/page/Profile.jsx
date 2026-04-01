@@ -342,8 +342,8 @@ const Profile = ( {role} ) => {
                     </InputGroup.Text>
                     <Form.Select aria-label="Select gender"
                         name='gender' value={user.gender} onChange={handleChange}>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                     </Form.Select>
                 </InputGroup>
             </div>

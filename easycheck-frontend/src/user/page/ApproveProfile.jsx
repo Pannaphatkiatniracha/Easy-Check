@@ -303,11 +303,11 @@ const ApproveProfile = ({ role }) => {
                         </InputGroup.Text>
                         <Form.Select aria-label='Select branch' className='fw-semibold'
                             name='branch' value={user.branch} onChange={handleChange}>
-                            <option value="Bangkok">กรุงเทพมหานคร</option>
-                            <option value="ChiangMai">เชียงใหม่</option>
-                            <option value="Phuket">ภูเก็ต</option>
-                            <option value="Chonburi">ชลบุรี</option>
-                            <option value="Khonkaen">ขอนแก่น</option>
+                            <option value="Bangkok">Bangkok</option>
+                            <option value="ChiangMai">Chaing Mai</option>
+                            <option value="Phuket">Phuket</option>
+                            <option value="Chonburi">Chonburi</option>
+                            <option value="Khonkaen">Khon Kaen</option>
                         </Form.Select>
                     </InputGroup>
                 </div>
@@ -347,8 +347,8 @@ const ApproveProfile = ({ role }) => {
                     </InputGroup.Text>
                     <Form.Select aria-label="Select gender"
                         name='gender' value={user.gender} onChange={handleChange}>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                     </Form.Select>
                 </InputGroup>
             </div>
