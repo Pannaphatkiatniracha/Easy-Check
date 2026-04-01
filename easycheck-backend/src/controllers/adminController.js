@@ -8,12 +8,12 @@ export const loginAdmin = async (req, res) => {
     try {
 
         console.log("BODY:", req.body)
-        const { employee_id, password } = req.body
+        const { id_employee, password } = req.body
 
         // หา admin ใน db
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE employee_id = ? AND role IN ('admin','superadmin')",
-            [employee_id]
+            "SELECT * FROM users WHERE id_employee = ? AND role IN ('admin','superadmin')",
+            [id_employee]
         )
 
         if (rows.length === 0) {
@@ -109,3 +109,7 @@ export const forgotPassword = async (req, res) => {
     }
 
 }
+
+
+
+
