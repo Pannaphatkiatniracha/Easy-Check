@@ -66,9 +66,11 @@ const ApproveProfile = ({ role }) => {
                     : "/easycheck/img/an.jpg"
 
                 setUser({
-                    name: (data.firstname && data.lastname) 
-                        ? data.firstname + " " + data.lastname 
-                        : "",
+                    // name: (data.firstname && data.lastname) 
+                    //     ? data.firstname + " " + data.lastname 
+                    //     : "",
+                    firstname: data.firstname || "",
+                    lastname: data.lastname || "",
                     userid: data.id_employee || "",
                     email: data.email || "",
                     phone: data.phone || "",
@@ -230,7 +232,7 @@ const ApproveProfile = ({ role }) => {
                 <div className='mt-4 mb-3 w-75'>
                     <label className="text-white fw-light form-label" htmlFor="">Information</label>
                     <input className='fw-semibold form-control' type="text"
-                        name="name" value={user.name} onChange={handleChange} readOnly />
+                        name="fullname" value={`${user.firstname} ${user.lastname}`} readOnly />
                 </div>
 
                 {/* รหัสพนักงาน */}
