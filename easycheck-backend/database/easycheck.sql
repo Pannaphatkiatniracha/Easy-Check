@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Mar 31, 2026 at 02:50 PM
+-- Generation Time: Apr 01, 2026 at 09:59 AM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -24,23 +24,59 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `attendance`
+--
+
+CREATE TABLE `attendance` (
+  `id` int NOT NULL,
+  `user_idemployee` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `photo` longblob,
+  `approval_status` varchar(20) DEFAULT 'pending',
+  `reject_reason` text,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leave_requests`
+--
+
+CREATE TABLE `leave_requests` (
+  `id` int NOT NULL,
+  `user_id` varchar(50) NOT NULL,
+  `leave_start` date NOT NULL,
+  `leave_end` date NOT NULL,
+  `leave_reasons` text,
+  `other_reason` text,
+  `evidence_file` longblob,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `reject_reason` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Roles`
 --
 
 CREATE TABLE `Roles` (
   `role_id` int NOT NULL,
-  `level` varchar(50) NOT NULL
+  `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `Roles`
 --
 
-INSERT INTO `Roles` (`role_id`, `level`) VALUES
-(1, 'Admin'),
-(2, 'Executive Level'),
-(3, 'Management Level'),
-(4, 'Staff Level');
+INSERT INTO `Roles` (`role_id`, `role`) VALUES
+(1, 'user'),
+(2, 'approver'),
+(3, 'admin'),
+(4, 'super admin');
 
 -- --------------------------------------------------------
 
@@ -92,10 +128,11 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`id`, `id_employee`, `role_id`, `firstname`, `lastname`, `gender`, `birthdate`, `joindate`, `position`, `department`, `branch`, `email`, `password`, `phone`, `avatar`) VALUES
-(1, '101010', 1, 'Karina', 'Yuu', 'female', '1995-08-17', '2026-03-31', 'Approver', 'IT', 'Bangkok', 'pataraporn142548@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0652939090', 'https://f.ptcdn.info/205/085/000/m00b4dv5izYk0x2jQ0D-o.jpg'),
-(2, '101011', 2, 'Winter', 'Kim', 'female', '2001-01-01', '2026-03-31', 'Sales Coordinator', 'Sales', 'Chiang Mai', 'Thitichatphoto@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811235678', 'https://i.redd.it/4deveood0zwb1.jpg'),
-(3, '101012', 3, 'Bambi', 'Cute', 'other', '1996-03-25', '2026-03-31', 'Admin', 'IT', 'Phuket', 'mo.sarasinee@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0876564732', 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Ningning_Love_Your_W_2025_2.jpg'),
-(4, '101013', 4, 'Boobi', 'Cute', 'other', '1999-03-16', '2026-03-31', 'Motion Graphic Designer', 'Creative', 'Chonburi', 'compannaphat@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0976453421', 'https://image.starnewskorea.com/21/2026/03/2026030511341757500_1.jpg');
+(1, '101010', 1, 'Taro', 'Yu', 'female', '2005-02-14', '2026-03-31', 'Cybersecurity Specialist', 'IT', 'Bangkok', 'pataraporn142548@gmail.com', '$2b$10$kCnA9ItsPUbqvDnaAfQ2vez8wBLlyhXb9DFpeC7wj92Vwx8.X/UP.', '0652939090', 'https://i.pinimg.com/736x/67/de/76/67de7632379015a3dc7e080148bd5d8f.jpg'),
+(2, '202020', 1, 'Bambi', 'Kang', 'female', '2006-06-11', '2026-03-31', 'Sales Coordinator', 'Sales', 'Chiang Mai', 'thitichatphoto@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811235678', 'https://i.pinimg.com/736x/f5/f9/fb/f5f9fbdb8a74165249beda8b3de127c1.jpg'),
+(3, '303030', 2, 'Maemom', 'Young', 'female', '2006-02-08', '2026-03-31', 'Approver', 'Finance', 'Phuket', 'compannaphat@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0876564732', 'https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg'),
+(4, '404040', 3, 'Boobi', 'Bubu', 'male', '2005-02-13', '2026-03-31', 'Admin', 'Sales', 'Chonburi', 'thanik1265@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0976453421', 'https://i.pinimg.com/1200x/45/bf/0b/45bf0b9e7f509e025d61091f677189f3.jpg'),
+(5, '505050', 4, 'Meow', 'Whatislove', 'female', '2006-04-01', '2026-04-01', 'Super Admin', 'Creative', 'Khon Kaen', 'mo.sarasinee@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0894726153', 'https://i.pinimg.com/736x/8f/0d/1d/8f0d1ded2a11628c68891d1f268b5650.jpg');
 
 -- --------------------------------------------------------
 
@@ -112,6 +149,18 @@ CREATE TABLE `User_shifts` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `attendance`
+--
+ALTER TABLE `attendance`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `Roles`
@@ -141,6 +190,28 @@ ALTER TABLE `User_shifts`
   ADD KEY `role_id` (`role_id`,`shift_id`),
   ADD KEY `id` (`id`),
   ADD KEY `shift_id` (`shift_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `attendance`
+--
+ALTER TABLE `attendance`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `Users`
+--
+ALTER TABLE `Users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
