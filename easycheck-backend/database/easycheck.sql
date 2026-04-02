@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
+
 -- Generation Time: Apr 01, 2026 at 03:36 PM
+
+-- Generation Time: Apr 01, 2026 at 09:59 AM
+
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -20,6 +24,42 @@ SET time_zone = "+00:00";
 --
 -- Database: `easycheck`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `attendance`
+--
+
+CREATE TABLE `attendance` (
+  `id` int NOT NULL,
+  `user_idemployee` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `photo` longblob,
+  `approval_status` varchar(20) DEFAULT 'pending',
+  `reject_reason` text,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leave_requests`
+--
+
+CREATE TABLE `leave_requests` (
+  `id` int NOT NULL,
+  `user_id` varchar(50) NOT NULL,
+  `leave_start` date NOT NULL,
+  `leave_end` date NOT NULL,
+  `leave_reasons` text,
+  `other_reason` text,
+  `evidence_file` longblob,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `reject_reason` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -115,6 +155,18 @@ CREATE TABLE `User_shifts` (
 --
 
 --
+-- Indexes for table `attendance`
+--
+ALTER TABLE `attendance`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `Roles`
 --
 ALTER TABLE `Roles`
@@ -149,6 +201,28 @@ ALTER TABLE `User_shifts`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `Users`
+--
+ALTER TABLE `Users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `attendance`
+--
+ALTER TABLE `attendance`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `Users`
