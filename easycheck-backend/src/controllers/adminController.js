@@ -266,16 +266,15 @@ export const editShift = async (req, res) => {
 
 
 //-----------------------event tar ------------------------------//
-
 export const getAllEvent = async (req, res) => {
     try {
         const sql = `
-       SELECT 
-            Events.id,
+        SELECT 
+            Events.id AS event_id,
             Events.title,
             Events.date,
             Events.created_at,
-            Events.participants,
+            Events.description,
 
             Users.id_employee,
             Users.firstname,
@@ -283,15 +282,44 @@ export const getAllEvent = async (req, res) => {
 
         FROM Events
 
+        LEFT JOIN Event_participants
+            ON Events.id = Event_participants.event_id
+
         LEFT JOIN Users
-            ON Events.participants = Users.id_employee
+            ON Event_participants.id_employee = Users.id_employee
 
         ORDER BY Events.created_at DESC;
         `
 
         const [rows] = await pool.execute(sql)
 
-        res.status(200).json(rows)
+        // group data
+        const grouped = {}
+
+        rows.forEach(row => {
+            if (!grouped[row.event_id]) {
+                grouped[row.event_id] = {
+                    event_id: row.event_id,
+                    title: row.title,
+                    date: row.date,
+                    created_at: row.created_at,
+                    description: row.description,
+                    users: []
+                }
+            }
+
+            if (row.id_employee) {
+                grouped[row.event_id].users.push({
+                    id_employee: row.id_employee,
+                    firstname: row.firstname,
+                    lastname: row.lastname
+                })
+            }
+        })
+
+        const result = Object.values(grouped)
+
+        res.status(200).json(result)
 
     } catch (error) {
         console.error("DB ERROR:", error)
@@ -304,6 +332,8 @@ export const getAllEvent = async (req, res) => {
 }
 
 
+
+
 // export const CreateEvent = async (req , res) => {
 //     try {
 //         const {} = req.body ;
@@ -312,6 +342,12 @@ export const getAllEvent = async (req, res) => {
 
 
 // export const EditEvent = async (req , res) => {
+//     try {
+//         const {} = req.body ;
+//     }
+// }
+
+// export const EditTimeEvent = async (req , res) => {
 //     try {
 //         const {} = req.body ;
 //     }

@@ -1,0 +1,5 @@
+
+.custom-tableEvent tbody tr,
+.custom-tableEvent td {
+  background-color: #212529 !important;
+}
