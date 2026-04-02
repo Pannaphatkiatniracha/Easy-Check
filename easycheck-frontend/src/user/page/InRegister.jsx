@@ -3,35 +3,23 @@ import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import Api from '../../Api';
 
 const InRegister = ({ role }) => {
 
     const location = useLocation()  // รับข้อมูลจาก state
+    const navigate = useNavigate()  // สำหรับ redirect หลังจากลงทะเบียนสำเร็จ
     const selectedEvent = location.state?.event  //  ข้อมูล event ที่เลือก
     const registrationData = location.state?.registrationData // รับข้อมูลเพิ่มเติมสำหรับการลงทะเบียน
 
     const [showModal, setShowModal] = useState(false)
+    const [showErrorModal, setShowErrorModal] = useState(false) // สร้าง Modal สำหรับ Error แยกออกมา
+    const [errorMessage, setErrorMessage] = useState("") // เก็บข้อความ Error
     const [notes, setNotes] = useState("") // State สำหรับเก็บหมายเหตุเพิ่มเติม
     const [registrationDate, setRegistrationDate] = useState("") // State สำหรับวันที่ลงทะเบียน
-
-    // กำหนด API URL ตาม role
-    const getApiUrls = () => {
-        if (role === "approver") {
-            return {
-                profile: "https://6918ce1c21a9635948713999.mockapi.io/users/1",
-                register: "https://69037e5cd0f10a340b249323.mockapi.io/register/1"
-            }
-        } else {
-            return {
-                profile: "https://68fbd77794ec960660275293.mockapi.io/users/6",
-                register: "https://68fbd77794ec960660275293.mockapi.io/register/1"
-            }
-        }
-    }
-
-    const apiUrls = getApiUrls()
     
-    // setUser ใช้ตอนเปลี่ยนค่า user
     const [user, setUser] = useState({
         name: "", //ค่าตั้งต้น
         userid: "",
@@ -41,21 +29,28 @@ const InRegister = ({ role }) => {
         events: registrationData?.eventTitle || selectedEvent?.title || ""  // ใช้ข้อมูลจาก registrationData ก่อน
     })
 
-    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจาก Mock API
+    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลโปรไฟล์ผู้ใช้จาก Backend จริง
     useEffect(() => {
-        const loadData = async () => {
-            const res = await fetch(apiUrls.profile)
-            const data = await res.json()
-            setUser({
-                name: data.name || "",
-                userid: data.userid || "",
-                position: data.position || "",
-                department: data.department || "",
-                branch: data.branch || "",
-                events: registrationData?.eventTitle || selectedEvent?.title || ""
-            })
+        const loadUserProfile = async () => {
+            try {
+                const response = await Api.get('/users/profile')
+                const data = response.data
+                
+                setUser({
+                    name: `${data.firstname || ''} ${data.lastname || ''}`.trim() || data.name || "",
+                    userid: data.id_employee || "",
+                    position: data.position || "",
+                    department: data.department || "",
+                    branch: data.branch || "",
+                    events: registrationData?.eventTitle || selectedEvent?.title || ""
+                })
+            } catch (error) {
+                console.error("Error loading user profile:", error)
+                setErrorMessage(error.response?.data?.message || "Could not load profile data")
+                setShowErrorModal(true)
+            }
         }
-        loadData()
+        loadUserProfile()
 
         // ตั้งค่าวันที่ลงทะเบียนเป็นวันที่ปัจจุบัน
         if (registrationData?.currentDate) {
@@ -65,38 +60,40 @@ const InRegister = ({ role }) => {
         }
     }, [selectedEvent, registrationData])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
 
+
     // บันทึกข้อมูลที่แก้ไข
     const handleSave = async () => {
-        const registrationDataToSend = {
-            ...user,
-            notes: notes, // เพิ่มหมายเหตุในการลงทะเบียน
-            registrationDate: registrationDate, // วันที่ลงทะเบียน
-            eventTitle: registrationData?.eventTitle || selectedEvent?.title,
-            eventDate: registrationData?.eventDate || selectedEvent?.date,
-            eventTime: registrationData?.eventTime || selectedEvent?.time,
-            eventLocation: registrationData?.eventLocation || selectedEvent?.location,
-            eventIcon: registrationData?.eventIcon || selectedEvent?.icon
-        }
-
         try {
-            await fetch(apiUrls.register, {
-                method: "PUT", // อัปเดต
-                headers: { "Content-Type": "application/json" },  // ข้อมูลที่ส่งไปเป็น JSON
-                body: JSON.stringify(registrationDataToSend),  // แปลง state เป็นตัวหนังสือ JSON เพื่อส่งไปที่ API
+            const response = await Api.post(`/events/${selectedEvent.id}/register`, { 
+                notes: notes
             })
-            setShowModal(true)
+            
+            if (response.data.success) {
+                setShowModal(true)
+            }
         } catch (error) {
             console.error("Error saving registration:", error)
-            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล")
+            const errorMsg = error.response?.data?.message || "Failed to save data"
+            setErrorMessage(errorMsg)
+            setShowErrorModal(true)
         }
     }
 
+    // ปิด modal แล้วให้ redirect ไปหน้า internalevent
+    const handleCloseModal = () => {
+        setShowModal(false)
+        navigate('/internalevent')
+    }
+
+
     // ใช้ข้อมูลจาก registrationData ก่อน ถ้าไม่มีค่อยใช้ selectedEvent
     const eventTitle = registrationData?.eventTitle || selectedEvent?.title
-    const eventDate = registrationData?.eventDate || selectedEvent?.date
-    const eventTime = registrationData?.eventTime || selectedEvent?.time
+    const eventDate = registrationData?.eventDate || selectedEvent?.date_thai || selectedEvent?.event_date
+    const eventTime = registrationData?.eventTime || selectedEvent?.event_time
     const eventLocation = registrationData?.eventLocation || selectedEvent?.location
     const eventIcon = registrationData?.eventIcon || selectedEvent?.icon
+
+
 
     const UserPage = (
         <div className='app-container'>
@@ -132,7 +129,7 @@ const InRegister = ({ role }) => {
                             <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
                                 style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
 
-                                <i className={`bi ${eventIcon} fs-5 text-[#6D29F6]`}></i>
+                                <i className={`bi ${eventIcon || 'bi-calendar-event'} fs-5 text-[#6D29F6]`}></i>
 
                             </div>
 
@@ -224,12 +221,14 @@ const InRegister = ({ role }) => {
                 keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
              */}
 
-            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+
+            {/* Modal สำหรับ Success */}
+            <Modal size="sm" show={showModal} onHide={handleCloseModal} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
                     <p><i>{user.name}</i> registered for<br />{eventTitle}</p>
-                    {notes && (
+                    {/* {notes && (
                         <div className="mt-3 p-2 bg-light rounded">
                             <small className="text-muted">
                                 <strong>หมายเหตุ:</strong> {notes}
@@ -240,7 +239,17 @@ const InRegister = ({ role }) => {
                         <small className="text-muted">
                             <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
                         </small>
-                    </div>
+                    </div> */}
+                </Modal.Body>
+            </Modal>
+
+            {/* Modal สำหรับ Error */}
+            <Modal size="sm" show={showErrorModal} onHide={() => setShowErrorModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-exclamation-circle-fill fs-1 text-danger"></i>
+                    <h5 className="fw-bold mt-2">Registration Failed</h5>
+                    <p className="text-secondary small">{errorMessage}</p>
+                    <Button variant="secondary" size="sm" className="mt-2 rounded-pill px-4" onClick={() => setShowErrorModal(false)}>Close</Button>
                 </Modal.Body>
             </Modal>
 
@@ -282,7 +291,7 @@ const InRegister = ({ role }) => {
                             <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
                                 style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
 
-                                <i className={`bi ${eventIcon} fs-5 text-[#6D29F6]`}></i>
+                                <i className={`bi ${eventIcon || 'bi-calendar-event'} fs-5 text-[#6D29F6]`}></i>
 
                             </div>
 
@@ -374,12 +383,14 @@ const InRegister = ({ role }) => {
                 keyboard = กด esc ที่ปุ่มคีย์บอร์ดก็ปิดได้
              */}
 
-            <Modal size="sm" show={showModal} onHide={() => setShowModal(false)} centered backdrop={true} keyboard={true}>
+
+            {/* Modal สำหรับ Success */}
+            <Modal size="sm" show={showModal} onHide={handleCloseModal} centered backdrop={true} keyboard={true}>
                 <Modal.Body className="text-center py-5">
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
                     <p className='mt-3'><i>{user.name}</i> registered for<br />{eventTitle}</p>
-                    {notes && (
+                    {/* {notes && (
                         <div className="mt-3 p-2 bg-light rounded">
                             <small className="text-muted">
                                 <strong>หมายเหตุ:</strong> {notes}
@@ -390,7 +401,18 @@ const InRegister = ({ role }) => {
                         <small className="text-muted">
                             <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
                         </small>
-                    </div>
+                    </div> */}
+                </Modal.Body>
+            </Modal>
+
+
+            {/* Modal สำหรับ Error */}
+            <Modal size="sm" show={showErrorModal} onHide={() => setShowErrorModal(false)} centered backdrop={true} keyboard={true}>
+                <Modal.Body className="text-center py-5">
+                    <i className="bi bi-exclamation-circle-fill fs-1 text-danger"></i>
+                    <h5 className="fw-bold mt-2">Registration Failed</h5>
+                    <p className="text-secondary small">{errorMessage}</p>
+                    <Button variant="secondary" size="sm" className="mt-2 rounded-pill px-4" onClick={() => setShowErrorModal(false)}>Close</Button>
                 </Modal.Body>
             </Modal>
 

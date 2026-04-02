@@ -49,13 +49,13 @@ export const login = async (req, res) => {
 
         // สร้าง Token ให้พนักงาน
         const token = jwt.sign (
-            {id: user.id, role: user.role},
+            {id: user.id, id_employee: user.id_employee, role: user.role},
             JWT_SECRET, {expiresIn: '30m'})
 
 
         // สร้าง Refresh Token (ตั๋วใบยาว)
         const refreshToken = jwt.sign(
-            { id: user.id },
+            { id: user.id, id_employee: user.id_employee },
             JWT_SECRET,
             { expiresIn: '7d' }
         )
@@ -213,14 +213,14 @@ export const refreshToken = async (req, res) => {
 
         // สร้าง token ใหม่ (ระยะสั้น)
         const newAccessToken = jwt.sign( // jwt.sign(...) คือคำสั่งให้ JWT สร้างสตริงยาว ๆ มาชุดนึง โดยเอาข้อมูลที่เราส่งไปมาเข้ารหัสและประทับตราด้วย JWT_SECRET
-            { id: user.id, role: user.role },
+            { id: user.id, id_employee: user.id_employee, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '30m' }
         )
 
         // สร้าง token ต่ออายุ (ระยะยาว)
         const newRefreshToken = jwt.sign(
-            { id: user.id },
+            { id: user.id, id_employee: user.id_employee },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         )
