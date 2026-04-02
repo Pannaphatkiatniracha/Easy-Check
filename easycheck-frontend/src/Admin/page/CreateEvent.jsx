@@ -2,14 +2,28 @@ import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap'
+import axios from "axios";
 
 const CreateEvent = () => {
+
     const [flipped, setFlipped] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
     const [eventText, setEventText] = useState('')
     const [currentTime, setCurrentTime] = useState(new Date())
     const today = new Date()
     const todayDate = today.getDate().toString().padStart(2, '0')
+
+
+
+
+
+    const [events, setEvents] = useState([])
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+
+
+
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -36,18 +50,46 @@ const CreateEvent = () => {
         })
     }
 
+
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/admin/Event")
+                setEvents(res.data)
+                console.log(res.data)
+            } catch (err) {
+                console.error("Error fetching events:", err)
+            }
+        }
+
+        fetchEvents()
+    }, [])
+
+
+
+
     return (
         <div
             style={{
                 background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
                 minHeight: '100vh',
-                width: '100vw',
-                height: '110vh',
+                width: '99vw',
+                height: '200vh',
             }}
         >
             {/* Header */}
             <div className="d-flex justify-content-center align-items-center py-5 position-relative">
                 <h1 className="text-white m-0">Event Management</h1>
+            </div>
+
+            <div className='text-center text-white mt-5'>
+
+                <h2 className='mb-4'> How to Add an Event </h2>
+                <p> Select the date and time </p>
+                <p> Write the event details </p>
+                <p> Click Save to store the event or Dismiss to cancel </p>
+
             </div>
 
             {/* Card Centered */}
@@ -57,7 +99,7 @@ const CreateEvent = () => {
                         <Card
                             className="shadow-lg rounded-4 mt-5 mx-auto"
                             style={{
-                                width: '45vw',
+                                width: '50vw',
                                 height: '530px',
                                 background: 'linear-gradient(to bottom, #FFFFFF, #A4B7FC)',
                                 border: 'none',
@@ -175,14 +217,94 @@ const CreateEvent = () => {
 
             <br />
 
-            <div className='text-center text-white mt-5'>
 
-                <h2 className='mb-4'> How to Add an Event </h2>
-                <p> Select the date and time </p>
-                <p> Write the event details </p>
-                <p> Click Save to store the event or Dismiss to cancel </p>
+            {/* all event */}
 
+            <div className="d-flex justify-content-center mt-4">
+                <div style={{ width: '100%', maxWidth: '400px' }}>
+                    <div className="container">
+                        <h3 className="mb-3 text-center" style={{ color: 'white', marginTop: '20px' }}>
+                            All Events
+                        </h3>
+
+                        <div className="border rounded p-2" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                            <div className="list-group">
+
+                                {events.map((event) => (
+                                    <a
+                                        key={event.id}
+                                        className="list-group-item list-group-item-action"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#eventModal"
+                                        onClick={() => setSelectedEvent(event)}
+                                    >
+                                        {event.title}
+                                    </a>
+                                ))}
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
+
+            {/* MODAL (ตัวเดียวพอ) */}
+            <div className="modal fade" id="eventModal" tabIndex="-1">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+
+                        <div className="modal-header">
+                            <h5 className="modal-title">
+                                {selectedEvent?.title || "Event"}
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                            ></button>
+                        </div>
+
+                        <div className="modal-body">
+                            <p>
+                                <strong>วันที่:</strong>
+                                <input
+                                    type="date"
+                                    className="form-control mt-1"
+                                    value={selectedEvent?.date || ""}
+
+                                />
+                            </p>
+
+                            <p>
+                                <strong>ผู้สมัคร:</strong>{" "}
+                                <p>
+                                {selectedEvent
+                                    ? `${selectedEvent.firstname} ${selectedEvent.lastname}`
+                                    : "ไม่มีข้อมูล"}
+                                </p>
+                            </p>
+
+                            <textarea
+                                className="form-control"
+                                rows="3"
+                                value={selectedEvent?.detail || ""}
+                            />
+
+                            <button className="btn btn-primary mt-2">
+                                Save changes
+                            </button>
+                            &nbsp;
+                            <button className="btn btn-danger mt-2">
+                                Delete
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
 
 
         </div>

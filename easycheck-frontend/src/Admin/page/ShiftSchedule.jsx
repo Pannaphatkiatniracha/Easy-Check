@@ -75,18 +75,18 @@ const ShiftSchedule = () => {
     };
 
     const roleMap = {
-        "Admin": 1,
-        "Executive Level": 2,
-        "Management Level": 3,
-        "Staff Level": 4
+        "User": 1,
+        "Approver": 2,
+        "Admin": 3,
+        "Super Admin": 4
     };
 
     const roleLabel = (roleId) => {
         switch (roleId) {
-            case 1: return "Admin";
-            case 2: return "Executive Level";
-            case 3: return "Management Level";
-            case 4: return "Staff Level";
+            case 1: return "User";
+            case 2: return "Approver";
+            case 3: return "Admin";
+            case 4: return "Super Admin";
             default: return "";
         }
     };
@@ -391,10 +391,10 @@ const ShiftSchedule = () => {
                             className="mb-4 mt-4"
                             variant="light"
                         >
-                            <Dropdown.Item onClick={() => setNewRole(1)}>Admin</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setNewRole(2)}>Executive Level</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setNewRole(3)}>Management Level</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setNewRole(4)}>Staff Level</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setNewRole(1)}>User</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setNewRole(2)}>Approver</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setNewRole(3)}>Admin</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setNewRole(4)}>Super Admin</Dropdown.Item>
                         </DropdownButton>
 
 
@@ -435,10 +435,10 @@ const ShiftSchedule = () => {
                             className="mb-4 mt-4"
                             variant="light"
                         >
-                            <Dropdown.Item onClick={() => setEditRole(1)}>Admin</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setEditRole(2)}>Executive Level</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setEditRole(3)}>Management Level</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setEditRole(4)}>Staff Level</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setEditRole(1)}>User</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setEditRole(2)}>Approver</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setEditRole(3)}>Admin</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setEditRole(4)}>Super Admin</Dropdown.Item>
                         </DropdownButton>
 
                         <DropdownButton
