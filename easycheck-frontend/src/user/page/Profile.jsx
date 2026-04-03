@@ -344,6 +344,7 @@ const Profile = ( {role} ) => {
                         name='gender' value={user.gender} onChange={handleChange}>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
+                        <option value="other">Other</option>
                     </Form.Select>
                 </InputGroup>
             </div>

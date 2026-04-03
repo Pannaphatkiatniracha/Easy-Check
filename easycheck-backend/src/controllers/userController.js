@@ -160,3 +160,24 @@ export const uploadAvatar = async (req, res) => {
         res.status(500).json({ message: "Server error during upload" })
     }
 }
+
+// 🐰🐰 ดึงข้อมูลมาโชว์ (ทุกคน)
+export const getAllUsers = async (req, res) => {
+    try {
+        const [rows] = await pool.execute(
+            `SELECT Users.*, Roles.role
+             FROM Users 
+             JOIN Roles ON Users.role_id = Roles.role_id`
+        )
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "No users found" })
+        }
+
+        res.json(rows)
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: "Server Error" })
+    }
+}
