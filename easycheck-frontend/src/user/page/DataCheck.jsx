@@ -2,21 +2,51 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
 
+import Api from '../../Api'
+
 const DataCheck = () => {
     
     
-    const [data, setData] = useState([]) // เอาไว้เก็บข้อมูลจาก Mock API
+    const [data, setData] = useState([]) // เอาไว้เก็บข้อมูลจาก API
     const [loading, setLoading] = useState(true)
+    const [currentUser, setCurrentUser] = useState(null) // เพิ่ม state สำหรับเก็บข้อมูลคนที่ login
 
 
-    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจาก Mock API
+    // ดึงข้อมูลคนที่ login ก่อน
+    useEffect(() => {
+        const getCurrentUser = async () => {
+            try {
+                const res = await Api.get('/users/profile')
+                setCurrentUser(res.data)
+            } catch (err) {
+                console.error("Error getting current user:", err)
+            }
+        }
+        getCurrentUser()
+    }, [])
+
+
+    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจากแบคเอนมา
     useEffect(() => {
         const loadData = async () => {
+            if (!currentUser) return // ยังไม่รู้ว่าใคร login ให้รอ
+            
             try {
+                const allUsersRes = await Api.get('/users/all')
+                let employeesList = allUsersRes.data
+                
 
-                const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users")
-                const employees = await res.json()
-                setData(employees)
+                // ถ้าเป็น approver (role_id=2) ให้เอาเฉพาะ user ใน branch เดียวกัน
+                if (currentUser.role_id === 2) {
+                    employeesList = employeesList.filter(emp => 
+                        emp.role_id === 1 && emp.branch === currentUser.branch
+                    )
+                } else {
+                    // ถ้าเป็น admin หรือ super admin ให้เอา user ทุกคน
+                    employeesList = employeesList.filter(emp => emp.role_id === 1)
+                }
+                
+                setData(employeesList)
             } catch (error) {
                 console.error("Error loading employees:", error)
             } finally {
@@ -24,7 +54,7 @@ const DataCheck = () => {
             }
         }
         loadData()
-    }, [])
+    }, [currentUser]) // รันใหม่ทุกครั้งที่ currentUser เปลี่ยน
 
 
     return (
@@ -57,15 +87,15 @@ const DataCheck = () => {
                         transform hover:-translate-y-1 hover:shadow-[0_0_15px_#7f5cff] transition duration-300 flex items-center gap-3">
 
 
-                            {/* รูป profile - ใช้ avatar จาก MockAPI */}
+                            {/* รูป profile - ใช้ avatar จาก Backend */}
                             <img className="w-12 h-12 rounded-full border-2 border-[#7f5cff] object-cover"
-                            src={person.avatar} alt={person.name}/>
+                            src={person.avatar || '/easycheck/img/default.jpg'} alt={person.firstname || person.name}/>
 
 
                             {/* กล่องชื่อ + id + position + ปุ่ม */}
                             <div className="flex-1">
-                                <div className="font-bold text-gray-800 text-base">{person.name}</div>
-                                <div className="text-xs text-gray-500">ID: {person.userid}</div>
+                                <div className="font-bold text-gray-800 text-base">{person.firstname && person.lastname ? `${person.firstname} ${person.lastname}` : person.name}</div>
+                                <div className="text-xs text-gray-500">ID: {person.id_employee || person.userid}</div>
                                 <div className="text-xs text-gray-500 mt-1 fw-semibold">{person.position}</div>
                                 <div className="text-xs text-gray-500">by {person.department}</div>
 
@@ -75,9 +105,9 @@ const DataCheck = () => {
                                     <Link to="/attendancesummary" 
                                           state={{ 
                                             employeeData: {
-                                                name: person.name,
-                                                employeeId: person.userid,
-                                                profile: person.avatar,
+                                                name: (person.firstname && person.lastname) ? `${person.firstname} ${person.lastname}` : (person.name || ''),
+                                                employeeId: person.id_employee || person.userid,
+                                                profile: person.avatar || '/easycheck/img/default.jpg',
                                                 shift: person.shift,
                                                 department: person.department,
                                                 position: person.position

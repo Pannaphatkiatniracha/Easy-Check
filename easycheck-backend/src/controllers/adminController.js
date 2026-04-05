@@ -133,12 +133,12 @@ export const userShift = async (req, res) => {
         const [rows] = await pool.execute(sql);
         res.status(200).json(rows);
         console.log(rows);
-        
+
     } catch (error) {
         console.error("Error fetching user shifts:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-    
+
 };
 
 
@@ -188,7 +188,6 @@ export const addNewUserShift = async (req, res) => {
 
 
 // ลบเฉพาะ shift ของ user (ไม่ลบ user)
-// ลบ shift ของ user
 export const deleteUserShift = async (req, res) => {
     try {
         const { userId, shiftId } = req.body;
@@ -263,28 +262,102 @@ export const editShift = async (req, res) => {
     }
 };
 
-export const settingsAdmin = async (req, res) => {
-  try {
-    const { userId } = req.params;
 
-    const [rows] = await pool.execute(
-      "SELECT notification_enabled FROM User_settings WHERE user_id = ?",
-      [userId]
-    );
 
-    // ถ้ายังไม่มี rows เข้ามา ให้default = เปิด
-    if (rows.length === 0) {
-      return res.json({ notification_enabled: 1 });
+
+//-----------------------event tar ------------------------------//
+export const getAllEvent = async (req, res) => {
+    try {
+        const sql = `
+        SELECT 
+            Events.id AS event_id,
+            Events.title,
+            Events.date,
+            Events.created_at,
+            Events.description,
+
+            Users.id_employee,
+            Users.firstname,
+            Users.lastname
+
+        FROM Events
+
+        LEFT JOIN Event_participants
+            ON Events.id = Event_participants.event_id
+
+        LEFT JOIN Users
+            ON Event_participants.id_employee = Users.id_employee
+
+        ORDER BY Events.created_at DESC;
+        `
+
+        const [rows] = await pool.execute(sql)
+
+        // group data
+        const grouped = {}
+
+        rows.forEach(row => {
+            if (!grouped[row.event_id]) {
+                grouped[row.event_id] = {
+                    event_id: row.event_id,
+                    title: row.title,
+                    date: row.date,
+                    created_at: row.created_at,
+                    description: row.description,
+                    users: []
+                }
+            }
+
+            if (row.id_employee) {
+                grouped[row.event_id].users.push({
+                    id_employee: row.id_employee,
+                    firstname: row.firstname,
+                    lastname: row.lastname
+                })
+            }
+        })
+
+        const result = Object.values(grouped)
+
+        res.status(200).json(result)
+
+    } catch (error) {
+        console.error("DB ERROR:", error)
+
+        res.status(500).json({
+            message: 'Database error',
+            error: error.message
+        })
     }
+}
 
-    return res.json(rows[0]);
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Error fetching settings" });
-  }
-};
 
+
+// export const CreateEvent = async (req , res) => {
+//     try {
+//         const {} = req.body ;
+//     }
+// }
+
+
+// export const EditEvent = async (req , res) => {
+//     try {
+//         const {} = req.body ;
+//     }
+// }
+
+// export const EditTimeEvent = async (req , res) => {
+//     try {
+//         const {} = req.body ;
+//     }
+// }
+
+// export const DeleteEvent = async (req , res) => {
+//     try {
+//         const {} = req.body ;
+//     }
+// }
 
 
 
