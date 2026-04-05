@@ -1,5 +1,5 @@
 import express from "express";
-import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift , getAllEvent} from "../controllers/adminController.js";
+import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent } from "../controllers/adminController.js";
 // , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
@@ -140,7 +140,10 @@ router.get("/me", verifyToken, getAdmin)
 
 
 
-router.post("/forgot-password", forgotPassword)
+// Forgot Password Routes for Admin
+router.post("/forgot-password/verify-identity", verifyAdminIdentity);
+router.post("/forgot-password/verify-otp", verifyAdminOTP);
+router.post("/forgot-password/reset-password", resetAdminPassword);
 /**
  * @swagger
  * /admin/forgot-password:

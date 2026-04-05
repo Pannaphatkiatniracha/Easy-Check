@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { verifyEmployeeIdentity, verifyOTP, resetPassword } from '../data/mockUsers';
+import Api from '../../Api';
 import './AdminForgotPassword.css';
 
 const AdminForgotPassword = () => {
@@ -14,7 +14,6 @@ const AdminForgotPassword = () => {
   const [employeeCode, setEmployeeCode] = useState('');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const [correctOTP, setCorrectOTP] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,22 +40,27 @@ const AdminForgotPassword = () => {
       return;
     }
 
-    setTimeout(() => {
-      const result = verifyEmployeeIdentity(employeeCode, email);
-      
-      if (result.success) {
-        setCorrectOTP(result.otp);
-        showSuccess(result.message);
+    try {
+      const response = await Api.post('/admin/forgot-password/verify-identity', {
+        employeeCode,
+        email
+      });
+
+      if (response.data.success) {
+        showSuccess(response.data.message);
         setTimeout(() => {
           setStep(2);
           setSuccess('');
         }, 1500);
       } else {
-        showError(result.message);
+        showError(response.data.message);
       }
-      
-      setLoading(false);
-    }, 800);
+    } catch (error) {
+      const message = error.response?.data?.message || 'เกิดข้อผิดพลาดในการส่ง OTP';
+      showError(message);
+    }
+
+    setLoading(false);
   };
 
   // ขั้นตอนที่ 2: ตรวจสอบ OTP
@@ -71,21 +75,28 @@ const AdminForgotPassword = () => {
       return;
     }
 
-    setTimeout(() => {
-      const result = verifyOTP(employeeCode, otp, correctOTP);
-      
-      if (result.success) {
-        showSuccess(result.message);
+    try {
+      const response = await Api.post('/admin/forgot-password/verify-otp', {
+        employeeCode,
+        email,
+        otp
+      });
+
+      if (response.data.success) {
+        showSuccess(response.data.message);
         setTimeout(() => {
           setStep(3);
           setSuccess('');
         }, 1500);
       } else {
-        showError(result.message);
+        showError(response.data.message);
       }
-      
-      setLoading(false);
-    }, 800);
+    } catch (error) {
+      const message = error.response?.data?.message || 'เกิดข้อผิดพลาดในการตรวจสอบ OTP';
+      showError(message);
+    }
+
+    setLoading(false);
   };
 
   // ขั้นตอนที่ 3: ตั้งรหัสผ่านใหม่
@@ -112,20 +123,27 @@ const AdminForgotPassword = () => {
       return;
     }
 
-    setTimeout(() => {
-      const result = resetPassword(employeeCode, newPassword);
-      
-      if (result.success) {
-        showSuccess(result.message);
+    try {
+      const response = await Api.post('/admin/forgot-password/reset-password', {
+        employeeCode,
+        email,
+        newPassword
+      });
+
+      if (response.data.success) {
+        showSuccess(response.data.message);
         setTimeout(() => {
           navigate('/adminlogin');
         }, 2000);
       } else {
-        showError(result.message);
+        showError(response.data.message);
       }
-      
-      setLoading(false);
-    }, 800);
+    } catch (error) {
+      const message = error.response?.data?.message || 'เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน';
+      showError(message);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -254,7 +272,7 @@ const AdminForgotPassword = () => {
               <div className="otp-info">
                 <p>ส่งรหัส OTP ไปที่ <strong>{email}</strong> แล้ว</p>
                 <p className="otp-note">
-                  📱 ตรวจสอบรหัสใน Console (F12) หรือกด Resend เพื่อส่งอีกครั้ง
+                  กด Resend เพื่อส่งอีกครั้ง
                 </p>
               </div>
 
@@ -290,13 +308,7 @@ const AdminForgotPassword = () => {
               <button
                 type="button"
                 className="resend-button"
-                onClick={() => {
-                  const result = verifyEmployeeIdentity(employeeCode, email);
-                  if (result.success) {
-                    setCorrectOTP(result.otp);
-                    showSuccess('ส่งรหัส OTP ใหม่แล้ว');
-                  }
-                }}
+                onClick={() => handleVerifyIdentity({ preventDefault: () => {} })}
                 disabled={loading}
               >
                 ส่งรหัส OTP อีกครั้ง

@@ -1,6 +1,13 @@
 import pool from '../config/db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import nodemailer from 'nodemailer'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+// Map สำหรับเก็บ OTP ชั่วคราว (ใน production ควรใช้ Redis หรือ database)
+const otpStore = new Map();
 
 //admin login
 export const loginAdmin = async (req, res) => {
@@ -10,8 +17,7 @@ export const loginAdmin = async (req, res) => {
 
         // หา admin ใน db
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE id_employee = ? AND role IN ('admin','superadmin')",
-            "SELECT * FROM users WHERE id_employee = ? AND position IN ('admin','superadmin')",
+            "SELECT * FROM users WHERE id_employee = ? AND role_id IN ('3','4')",
             [id_employee]
         )
 
@@ -80,33 +86,150 @@ export const getAdmin = async (req, res) => {
 
 
 
-// forgot password
-export const forgotPassword = async (req, res) => {
-
+// forgot password - ขั้นตอนที่ 1: ตรวจสอบตัวตนและส่ง OTP
+export const verifyAdminIdentity = async (req, res) => {
     try {
+        const { employeeCode, email } = req.body;
 
-        const { email } = req.body
+        if (!employeeCode || !email) {
+            return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+        }
 
+        // ตรวจสอบว่ามี admin นี้หรือไม่ โดยใช้ id_employee และ email และ role_id 3 หรือ 4
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE email = ? AND position IN ('admin','superadmin')",
-            [email]
-        )
+            "SELECT * FROM users WHERE id_employee = ? AND email = ? AND role_id IN (3, 4)",
+            [employeeCode, email]
+        );
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: "Admin not found" })
+            return res.status(404).json({ message: "ไม่พบข้อมูลผู้ดูแลระบบ กรุณาตรวจสอบรหัสพนักงานและอีเมลอีกครั้ง" });
+        }
+
+        // สร้าง OTP 6 หลัก
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // เก็บ OTP ใน memory (มีอายุ 5 นาที)
+        const key = `${employeeCode}_${email}`;
+        otpStore.set(key, {
+            otp: otp,
+            expiresAt: Date.now() + 5 * 60 * 1000 // 5 นาที
+        });
+
+        // ส่ง OTP ทางอีเมล
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'OTP สำหรับรีเซ็ทรหัสผ่าน - Easy Check Admin',
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #4A90E2;">รีเซ็ทรหัสผ่านผู้ดูแลระบบ</h2>
+                    <p>คุณได้ขอรีเซ็ทรหัสผ่านสำหรับบัญชีผู้ดูแลระบบ <b>Easy Check</b>.</p>
+                    <p>รหัส OTP ของคุณคือ: <strong style="font-size: 24px; color: #e74c3c;">${otp}</strong></p>
+                    <p>รหัสนี้จะหมดอายุใน 5 นาที.</p>
+                    <p style="margin-top: 20px; font-size: 12px; color: #888;">
+                        หากคุณไม่ได้ขอรีเซ็ทรหัสผ่าน กรุณาละเว้นอีเมลนี้.
+                    </p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({
+            success: true,
+            message: `ส่งรหัส OTP ไปยัง ${email} เรียบร้อยแล้ว`
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในการส่ง OTP" });
+    }
+};
+
+// forgot password - ขั้นตอนที่ 2: ตรวจสอบ OTP
+export const verifyAdminOTP = async (req, res) => {
+    try {
+        const { employeeCode, email, otp } = req.body;
+
+        if (!employeeCode || !email || !otp) {
+            return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+        }
+
+        const key = `${employeeCode}_${email}`;
+        const storedData = otpStore.get(key);
+
+        if (!storedData) {
+            return res.status(400).json({ message: "รหัส OTP หมดอายุหรือไม่ถูกต้อง กรุณาขอรหัสใหม่" });
+        }
+
+        if (Date.now() > storedData.expiresAt) {
+            otpStore.delete(key);
+            return res.status(400).json({ message: "รหัส OTP หมดอายุ กรุณาขอรหัสใหม่" });
+        }
+
+        if (otp !== storedData.otp) {
+            return res.status(400).json({ message: "รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง" });
+        }
+
+        // OTP ถูกต้อง ลบออกจาก store และอนุญาตให้เปลี่ยนรหัสผ่าน
+        otpStore.delete(key);
+
+        res.json({
+            success: true,
+            message: "ยืนยัน OTP สำเร็จ"
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในการตรวจสอบ OTP" });
+    }
+};
+
+// forgot password - ขั้นตอนที่ 3: ตั้งรหัสผ่านใหม่
+export const resetAdminPassword = async (req, res) => {
+    try {
+        const { employeeCode, email, newPassword } = req.body;
+
+        if (!employeeCode || !email || !newPassword) {
+            return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร" });
+        }
+
+        // เข้ารหัสรหัสผ่านใหม่
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // อัพเดทรหัสผ่านในฐานข้อมูล
+        const [result] = await pool.execute(
+            "UPDATE users SET password = ? WHERE id_employee = ? AND email = ? AND role_id IN (3, 4)",
+            [hashedPassword, employeeCode, email]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "ไม่พบข้อมูลผู้ดูแลระบบ" });
         }
 
         res.json({
             success: true,
-            message: "Reset password feature coming soon"
-        })
+            message: "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่"
+        });
 
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: "Server Error" })
+        console.error(err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน" });
     }
-
-}
+};
 
 
 //---------------------------------tar----------------------------------------------//
