@@ -39,31 +39,7 @@ function SettingsAdmin() {
                     <Row className="justify-content-center">
                         <Col md={6} className="d-flex flex-column gap-3 ">
 
-                            {/* Notification */}
-
-                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', marginTop: '50px', borderRadius: '40px', width: '400px' }}>
-
-                                <div className="d-flex align-items-center gap-2 text-white">
-                                    <i className="bi bi-bell-fill fs-4"></i> &nbsp;&nbsp;
-                                    <span>Notification</span>
-                                </div>
-                                <Form.Check // prettier-ignore
-                                    type="switch"
-                                    id="custom-switch"
-                                    label=""
-                                />
-                            </div>
-
-                            {/* Dark Mode */}
-                            <div className="d-flex justify-content-between align-items-center shadow-sm px-3 py-2 mx-auto"
-                                style={{ backgroundColor: '#0A0043', marginBottom: '20px', borderRadius: '50px', width: '400px' }}>
-                                <div className="d-flex align-items-center gap-2 text-white">
-                                    <i className="bi bi-circle-half fs-4"></i> &nbsp;&nbsp;
-                                    <span>Dark Mode</span>
-                                </div>
-                                <Form.Check type="switch" id="dark-mode-switch" label="" />
-                            </div>
+        
 
                             {/* Edit Profile */}
                             <Button

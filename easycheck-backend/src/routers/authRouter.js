@@ -60,7 +60,7 @@ router.post('/login', login)
 
 
 
-
+// GET: http://localhost:5000/auth/home-data
 router.get('/home-data', verifyToken, (req,res) => {
     res.json({message: "Success"})
 })
@@ -94,7 +94,7 @@ router.post('/logout', verifyToken, logout)
  */
 
 
-
+// POST: http://localhost:5000/auth/forgot-password
 router.post('/forgot-password', forgotPassword)
 /**
  * @swagger
@@ -154,6 +154,8 @@ router.post('/forgot-password', forgotPassword)
  *                   example: "Error message here"
  */
 
+
+// PUT: http://localhost:5000/auth//reset-password/:token
 router.put('/reset-password/:token', resetPassword)
 /**
  * @swagger

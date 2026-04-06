@@ -1,5 +1,6 @@
 import express from "express";
 import {
+<<<<<<< HEAD
   checkIn,
   checkOut,
   getHistory,
@@ -8,6 +9,11 @@ import {
   rejectAttendance,
   getMyShift,
   upload,
+=======
+  checkIn, checkOut, getHistory,
+  approveAttendance, rejectAttendance, upload,
+  getAttendanceHistory, getWeeklyHours, getCurrentStatus
+>>>>>>> df39a59e5a96623cc97a146fd06a315e9c4a0a60
 } from "../controllers/attendanceController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
@@ -21,5 +27,12 @@ router.get("/history", verifyToken, getHistory);
 router.get("/pending", verifyToken, getPending);
 router.put("/:id/approve", verifyToken, approveAttendance);
 router.put("/:id/reject", verifyToken, rejectAttendance);
+
+// -----------------------------------------------------------
+router.get("/attendance-history", getAttendanceHistory)
+
+router.get('/weekly-hours', getWeeklyHours)
+
+router.get('/current-status', getCurrentStatus)
 
 export default router;

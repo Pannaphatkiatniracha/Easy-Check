@@ -25,7 +25,7 @@ const Personalsummary = () => {
             branch: user.branch || '',
             phone: user.phone || '',
             email: user.email || '',
-            supervisor: '',
+            avatar: user.avatar || '',
             startDate: user.joindate ? user.joindate.split('T')[0] : '',
             attendanceRate: 0,
             workStats: { present: 0, late: 0, absent: 0 },
@@ -51,7 +51,6 @@ const Personalsummary = () => {
     department: '',
     phone: '',
     email: '',
-    supervisor: '',
     startDate: '',
     attendanceRate: 0,
     workStats: { present: 0, late: 0, absent: 0 },
@@ -88,7 +87,6 @@ const Personalsummary = () => {
       email: employee.email,
       position: employee.position,
       department: employee.department,
-      supervisor: employee.supervisor
     });
     setIsEditing(false);
     setShowModal(true);
@@ -121,7 +119,6 @@ const Personalsummary = () => {
       email: selectedEmployee.email,
       position: selectedEmployee.position,
       department: selectedEmployee.department,
-      supervisor: selectedEmployee.supervisor
     });
     setIsEditing(false);
   };
@@ -146,7 +143,6 @@ const Personalsummary = () => {
       department: '',
       phone: '',
       email: '',
-      supervisor: '',
       startDate: '',
       attendanceRate: 0,
       workStats: { present: 0, late: 0, absent: 0 },
@@ -223,8 +219,11 @@ const Personalsummary = () => {
         {filteredEmployees.map(employee => (
           <div key={employee.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
             <div className="p-5 flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full text-white flex items-center justify-center text-xl font-bold shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105" style={{ backgroundColor: employee.avatarColor }}>
-                {getInitials(employee.firstName, employee.lastName)}
+              <div className="w-16 h-16 rounded-full shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105 overflow-hidden" style={{ backgroundColor: employee.avatarColor }}>
+                {employee.avatar
+                  ? <img src={employee.avatar} alt={employee.firstName} className="w-full h-full object-cover" />
+                  : <span className="w-full h-full flex items-center justify-center text-white text-xl font-bold">{getInitials(employee.firstName, employee.lastName)}</span>
+                }
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
@@ -274,8 +273,11 @@ const Personalsummary = () => {
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 p-10 text-white flex flex-col items-center text-center relative flex-shrink-0">
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full translate-y-1/3 -translate-x-1/4 blur-2xl"></div>
-              <div className="w-28 h-28 rounded-full border-4 border-white/30 flex items-center justify-center text-4xl font-bold shadow-lg mb-5 text-white z-10" style={{ backgroundColor: selectedEmployee.avatarColor }}>
-                {getInitials(selectedEmployee.firstName, selectedEmployee.lastName)}
+              <div className="w-28 h-28 rounded-full border-4 border-white/30 shadow-lg mb-5 z-10 overflow-hidden" style={{ backgroundColor: selectedEmployee.avatarColor }}>
+                {selectedEmployee.avatar
+                  ? <img src={selectedEmployee.avatar} alt={selectedEmployee.firstName} className="w-full h-full object-cover" />
+                  : <span className="w-full h-full flex items-center justify-center text-white text-4xl font-bold">{getInitials(selectedEmployee.firstName, selectedEmployee.lastName)}</span>
+                }
               </div>
               <h2 className="text-3xl font-extrabold m-0 z-10 relative">{selectedEmployee.firstName} {selectedEmployee.lastName}</h2>
               <span className="bg-white/20 px-4 py-1.5 rounded-full text-indigo-50 font-bold mt-3 z-10 relative backdrop-blur-sm border border-white/10">{selectedEmployee.empCode}</span>
@@ -335,19 +337,6 @@ const Personalsummary = () => {
                     />
                   ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.department}</span>
-                  )}
-                </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><User size={18} className="text-indigo-400"/> หัวหน้า:</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editData.supervisor}
-                      onChange={(e) => setEditData({ ...editData, supervisor: e.target.value })}
-                        className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  ) : (
-                      <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.supervisor}</span>
                   )}
                 </div>
                 </div>

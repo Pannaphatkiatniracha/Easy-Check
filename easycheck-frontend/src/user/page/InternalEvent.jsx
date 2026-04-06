@@ -3,8 +3,11 @@ import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import Api from '../../Api';
+
 const InternalEvent = () => {
-    const [currentDate, setCurrentDate] = useState(new Date())
+    const [currentDate, setCurrentDate] = useState(new Date()) // เก็บเวลาปัจจุบันมันจะได้รู้ว่าเลยเวลาลงทะเบียนยัง
+    const [inevents, setInevents] = useState([]) // สร้าง State ไว้เก็บข้อมูลจาก Database
 
     // อัพเดทวันให้เป็นวันปัจจุบันทุกวัน
     useEffect(() => {
@@ -15,131 +18,42 @@ const InternalEvent = () => {
         return () => clearInterval(timer)
     }, [])
 
-    const inevents = [
-        {
-            id: 1,
-            title: "อบรมความปลอดภัยในการทำงาน",
-            date: "30 พฤศจิกายน 2568", // เป็น string ธรรมดาเอาไว้โชว์หน้าเว็บเฉย ๆ
-            eventDate: new Date(2025, 10, 30), // อันนี้ใช้คำนวณได้จริงจย้าออนนี่ 🥰
-            time: "09:00 - 12:00",
-            location: "ห้องประชุมใหญ่ อาคาร A",
-            icon: "bi-shield-check",
-            registerStart: new Date(2025, 10, 1),
-            registerEnd: new Date(2025, 10, 25)
-        },
-        {
-            id: 2,
-            title: "บริจาคโลหิตประจำปี",
-            date: "1 ธันวาคม 2568",
-            eventDate: new Date(2025, 11, 1),
-            time: "08:30 - 16:00",
-            location: "ห้องประชุมกลาง ชั้น 3",
-            icon: "bi-droplet",
-            registerStart: new Date(2025, 10, 15),
-            registerEnd: new Date(2025, 11, 1)
-        },
-        {
-            id: 3,
-            title: "Workshop การทำงานเป็นทีม",
-            date: "5 ธันวาคม 2568",
-            eventDate: new Date(2025, 11, 5),
-            time: "13:00 - 17:00",
-            location: "ห้องอบรม อาคาร B",
-            icon: "bi-people",
-            registerStart: new Date(2025, 10, 20),
-            registerEnd: new Date(2025, 11, 3)
-        },
-        {
-            id: 4,
-            title: "อบรมการใช้ซอฟต์แวร์ใหม่",
-            date: "10 ธันวาคม 2568",
-            eventDate: new Date(2025, 11, 10),
-            time: "10:00 - 15:00",
-            location: "ห้องคอมพิวเตอร์ ชั้น 2",
-            icon: "bi-laptop",
-            registerStart: new Date(2025, 10, 25),
-            registerEnd: new Date(2025, 11, 8)
-        },
-        {
-            id: 5,
-            title: "กิจกรรมสร้างความสัมพันธ์พนักงาน",
-            date: "15 ธันวาคม 2568",
-            eventDate: new Date(2025, 11, 15),
-            time: "16:00 - 19:00",
-            location: "สวนหย่อม อาคาร A",
-            icon: "bi-heart",
-            registerStart: new Date(2025, 10, 1),
-            registerEnd: new Date(2025, 11, 10)
-        },
-        {
-            id: 6,
-            title: "งานเปิดตัวสินค้า",
-            date: "20 ธันวาคม 2568",
-            eventDate: new Date(2025, 11, 20),
-            time: "14:00 - 17:30",
-            location: "ห้องประชุม C",
-            icon: "bi-megaphone",
-            registerStart: new Date(2025, 10, 15),
-            registerEnd: new Date(2025, 11, 18)
-        },
-        {
-            id: 7,
-            title: "อบรมเทคนิคการสื่อสารภายในองค์กร",
-            date: "8 มกราคม 2569",
-            eventDate: new Date(2026, 0, 8),
-            time: "09:30 - 16:30",
-            location: "ห้องประชุมใหญ่ อาคาร A",
-            icon: "bi-chat-dots",
-            registerStart: new Date(2025, 11, 1),
-            registerEnd: new Date(2026, 0, 5)   // มกราคม = 0
-        },
-        {
-            id: 8,
-            title: "กิจกรรมกีฬาเพื่อสุขภาพ",
-            date: "12 มกราคม 2569",
-            eventDate: new Date(2026, 0, 12),
-            time: "08:00 - 11:00",
-            location: "สนามกีฬาในบริษัท",
-            icon: "bi-activity",
-            registerStart: new Date(2025, 11, 15),
-            registerEnd: new Date(2026, 0, 10)
-        },
-        {
-            id: 9,
-            title: "Workshop การแก้ไขปัญหาเชิงสร้างสรรค์",
-            date: "13 มกราคม 2569",
-            eventDate: new Date(2026, 0, 13),
-            time: "13:30 - 16:30",
-            location: "ห้องอบรม อาคาร B",
-            icon: "bi-lightbulb",
-            registerStart: new Date(2025, 11, 20),
-            registerEnd: new Date(2026, 0, 10)
-        },
-        {
-            id: 10,
-            title: "งานเลี้ยงบริษัท",
-            date: "14 มกราคม 2569",
-            eventDate: new Date(2026, 0, 14),
-            time: "18:00 - 21:00",
-            location: "ห้องประชุมใหญ่ อาคาร A",
-            icon: "bi-cup-straw",
-            registerStart: new Date(2025, 11, 1),
-            registerEnd: new Date(2026, 0, 12)
-        },
-    ]
+
+    
+    useEffect(() => {
+        const fetchInternalEvents = async () => {
+            try {
+                const response = await Api.get('/events/all')
+
+                // เอาแต่ internal
+                const internalOnly = response.data.filter(ev => ev.type === 'internal')
+                setInevents(internalOnly)
+            } catch (err) {
+                console.error("Error fetching internal events:", err)
+            }
+        }
+        fetchInternalEvents()
+    }, [])
+
 
     // เช็คว่าลงทะเบียนได้ไหม
     const canRegister = (registerStart, registerEnd) => {
         const today = currentDate
-        return today >= registerStart && today <= registerEnd
+        // แปลง string จาก db ให้เป็น Date Object ก่อนคำนวณ
+        const start = new Date(registerStart)
+        const end = new Date(registerEnd)
+        return today >= start && today <= end
     }
 
     // ฟังก์ชันนี้มันเช็คว่าอีเว้นมันผ่านไปรึยัง
     const isEventUpcoming = (eventDate) => {
-        return currentDate <= eventDate
+        return currentDate <= new Date(eventDate)
     }
 
-    const formatDate = (date) => {
+    const formatDate = (dateString) => {
+        if (!dateString) return "" // ถ้าไม่มีข้อมูลมาก็ไม่ต้องแสดงอะไร
+
+        const date = new Date(dateString)
         return date.toLocaleDateString('th-TH', {
             day: 'numeric', // ให้แสดงวันเป็นตัวเลข
             month: 'long', // ให้แสดงชื่อเดือนเต็ม
@@ -165,8 +79,9 @@ const InternalEvent = () => {
             {/* หัวข้อ + กล่องงาน event */}
             <div className="mt-4 px-3">
                 {inevents.map((inevent) => {
-                    const canRegisterNow = canRegister(inevent.registerStart, inevent.registerEnd)
-                    const isUpcoming = isEventUpcoming(inevent.eventDate)
+                    // เอาวันที่เปิดลงทะเบียนกับวันที่ปิดมาคำนวณใน canRegister
+                    const canRegisterNow = canRegister(inevent.register_start, inevent.register_end)
+                    const isUpcoming = isEventUpcoming(inevent.event_date)
 
                     return (
                         <Card key={inevent.id} className="mb-3 rounded-3 text-black hover:scale-105 transition-all duration-200 ease-in-out"
@@ -178,7 +93,7 @@ const InternalEvent = () => {
                                     {/* icon ใหญ่ */}
                                     <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
                                         style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
-                                        <i className={`bi ${inevent.icon} fs-5 text-[#6D29F6]`}></i>
+                                        <i className={`bi ${inevent.icon || 'bi-shield-check'} fs-5 text-[#6D29F6]`}></i>
                                     </div>
 
                                     {/* เนื้อหา */}
@@ -196,22 +111,22 @@ const InternalEvent = () => {
 
                                         {/* รายละเอียดอีเว้น */}
                                         <Card.Text className="small mb-2">
-                                            <i className="bi bi-calendar3 me-1"></i> วันที่: {inevent.date} <br />
-                                            <i className="bi bi-clock me-1"></i> เวลา: {inevent.time} <br />
+                                            <i className="bi bi-calendar3 me-1"></i> วันที่: {inevent.date_thai || formatDate(inevent.event_date)} <br />
+                                            <i className="bi bi-clock me-1"></i> เวลา: {inevent.event_time} <br />
                                             <i className="bi bi-geo-alt me-1"></i> สถานที่: {inevent.location}
                                         </Card.Text>
 
                                         {/* วันที่ลงทะเบียน */}
                                         <div className="small text-muted mb-2">
                                             <i className="bi bi-calendar-check me-1"></i>
-                                            ลงทะเบียนได้: {formatDate(inevent.registerStart)} - {formatDate(inevent.registerEnd)}
+                                            ลงทะเบียนได้: {formatDate(inevent.register_start)} - {formatDate(inevent.register_end)}
                                         </div>
 
                                         {/* สถานะการลงทะเบียน */}
                                         <div className="mb-2">
                                             {canRegisterNow ? (
                                                 <span className="badge bg-success">เปิดลงทะเบียน</span>
-                                            ) : currentDate < inevent.registerStart ? (
+                                            ) : currentDate < new Date(inevent.register_start) ? (
                                                 <span className="badge bg-warning text-dark">ยังไม่เปิดลงทะเบียน</span>
                                             ) : (
                                                 <span className="badge bg-danger">ปิดลงทะเบียนแล้ว</span>
@@ -225,15 +140,13 @@ const InternalEvent = () => {
                                                 className='text-decoration-none'
                                                 state={{ 
                                                     event: inevent,
-                                                    // เพิ่มข้อมูลที่จำเป็นสำหรับการลงทะเบียน
                                                     registrationData: {
                                                         eventTitle: inevent.title,
-                                                        eventDate: inevent.date,
-                                                        eventTime: inevent.time,
+                                                        eventDate: inevent.date_thai || formatDate(inevent.event_date),
+                                                        eventTime: inevent.event_time,
                                                         eventLocation: inevent.location,
                                                         eventIcon: inevent.icon,
-                                                        // เพิ่มข้อมูลวันที่สำหรับฟิลด์ Registration date
-                                                        currentDate: new Date().toISOString().split('T')[0] // วันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
+                                                        currentDate: new Date().toISOString().split('T')[0] 
                                                     }
                                                 }}
                                             >
