@@ -304,10 +304,10 @@ const ApproveProfile = ({ role }) => {
                         <Form.Select aria-label='Select branch' className='fw-semibold'
                             name='branch' value={user.branch} onChange={handleChange}>
                             <option value="Bangkok">Bangkok</option>
-                            <option value="ChiangMai">Chaing Mai</option>
+                            <option value="Chiang Mai">Chiang Mai</option>
                             <option value="Phuket">Phuket</option>
                             <option value="Chonburi">Chonburi</option>
-                            <option value="Khonkaen">Khon Kaen</option>
+                            <option value="Khon Kaen">Khon Kaen</option>
                         </Form.Select>
                     </InputGroup>
                 </div>

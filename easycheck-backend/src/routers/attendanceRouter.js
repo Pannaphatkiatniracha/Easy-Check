@@ -3,7 +3,8 @@ import express from "express";
 
 import {
   checkIn, checkOut, getHistory,
-  approveAttendance, rejectAttendance, upload
+  approveAttendance, rejectAttendance, upload,
+  getAttendanceHistory, getWeeklyHours, getCurrentStatus
 } from "../controllers/attendanceController.js";
 
 const router = express.Router();
@@ -19,5 +20,12 @@ router.get("/history", getHistory);
 router.put("/approve/:id", approveAttendance);
 
 router.put("/reject/:id", rejectAttendance);
+
+// -----------------------------------------------------------
+router.get("/attendance-history", getAttendanceHistory)
+
+router.get('/weekly-hours', getWeeklyHours)
+
+router.get('/current-status', getCurrentStatus)
 
 export default router;
