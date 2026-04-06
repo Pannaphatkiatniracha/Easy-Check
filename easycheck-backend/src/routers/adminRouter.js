@@ -1,6 +1,6 @@
 import express from "express";
-import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift , getAllEvent} from "../controllers/adminController.js";
-// , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
+import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift , getAllEvent , CreateEvent , DeleteEvent} from "../controllers/adminController.js";
+// EditEvent , CreateEvent  
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
 
@@ -417,9 +417,9 @@ router.get('/editShift', editShift)
 
 
 router.get('/Event', getAllEvent)
-// router.post('/CreateEvent', CreateEvent)
+router.post('/CreateEvent', CreateEvent)
 // router.put('/EditEvent', EditEvent)
-// router.delete('/DeleteEvent', DeleteEvent)
+router.delete('/DeleteEvent', DeleteEvent)
 
 
 

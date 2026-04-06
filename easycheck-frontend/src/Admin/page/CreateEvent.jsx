@@ -10,7 +10,15 @@ const CreateEvent = () => {
 
     const [flipped, setFlipped] = useState(false)
     const [selectedDate, setSelectedDate] = useState('')
-    const [eventText, setEventText] = useState('')
+
+
+    const [eventDescription, seteventDescription] = useState('')
+    const [eventTitle, seteventTitle] = useState('')
+    const [eventDate, seteventDate] = useState('')
+
+
+
+
     const [currentTime, setCurrentTime] = useState(new Date())
     const [currentDate, setCurrentDate] = useState(new Date())
 
@@ -20,7 +28,7 @@ const CreateEvent = () => {
     const [showTable, setShowTable] = useState(false)
 
     const [events, setEvents] = useState([])
-    const [selectedEvent, setSelectedEvent] = useState({ detail: "" })
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
 
 
@@ -169,6 +177,78 @@ const CreateEvent = () => {
 
 
 
+
+    const SaveEvent = async () => {
+
+        if (!eventTitle || !eventDate) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        try {
+            await axios.post("http://localhost:5000/admin/CreateEvent", {
+                title: eventTitle,
+                date: eventDate,
+                description: eventDescription
+            });
+
+            alert("Event created successfully");
+
+        } catch (err) {
+            return alert("Create failed");
+        }
+
+        try {
+            const res = await axios.get("http://localhost:5000/admin/Event");
+            setEvents(res.data);
+        } catch (err) {
+            console.error("GET ERROR:", err);
+        }
+
+        handleBack();
+
+        // เคลียร์ input
+        setEventTitle("");
+        setEventDate("");
+        setEventDescription("");
+
+    };
+
+
+
+
+
+
+
+    const DeleteEvent = async (id) => {
+        console.log("SEND ID:", id);
+
+        if (!id) return alert("NO event id");
+
+        try {
+            const res = await axios.delete(
+                "http://localhost:5000/admin/DeleteEvent",
+                { data: { id } }
+            );
+
+            alert(res.data.message);
+
+            setEvents(prev => prev.filter(e => e.event_id !== id));
+
+            setSelectedEvent(null);
+
+
+        } catch (error) {
+            console.error(error);
+            alert("Error deleting");
+        }
+
+
+    };
+
+
+
+
     return (
         <div
             style={{
@@ -254,16 +334,38 @@ const CreateEvent = () => {
                                 </Card.Body>
                             ) : (
                                 <Card.Body>
+
                                     <Form.Control
-                                        placeholder="Event detail"
-                                        value={eventText}
-                                        onChange={(e) => setEventText(e.target.value)}
+                                        placeholder="Title :"
+                                        value={eventTitle}
+                                        onChange={(e) => seteventTitle(e.target.value)}
                                     />
 
-                                    <p className="mt-3">Date: {selectedDate}</p>
+                                    &nbsp;
+
+                                    <Form.Control
+                                        placeholder="Event detail :"
+                                        value={eventDescription}
+                                        onChange={(e) => seteventDescription(e.target.value)}
+                                    />
+
+                                    &nbsp;
+
+
+
+                                    <input
+                                        type="date"
+                                        className="form-control mt-1"
+                                        value={eventDate}
+                                        onChange={(e) => seteventDate(e.target.value)}
+                                    />
+
+
+
 
                                     <div className="d-flex justify-content-center gap-3 mt-4">
-                                        <Button onClick={handleBack}>Save</Button>
+                                        {/* ตรงสร้าง event */}
+                                        <Button onClick={SaveEvent}>Save</Button>
                                         <Button variant="danger" onClick={handleBack}>Cancel</Button>
                                     </div>
                                 </Card.Body>
@@ -418,8 +520,10 @@ const CreateEvent = () => {
 
                             &nbsp;
 
-                            <button className="btn btn-danger mt-2"
-                            //   onClick={() => DeleteEvent()}
+                            <button
+                                className="btn btn-danger mt-2"
+                                data-bs-dismiss="modal"
+                                onClick={() => DeleteEvent(selectedEvent?.event_id)}
                             >
                                 Delete
                             </button>

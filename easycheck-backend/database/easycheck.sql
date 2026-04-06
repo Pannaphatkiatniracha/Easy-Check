@@ -3,11 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
-
--- Generation Time: Apr 01, 2026 at 03:36 PM
-
--- Generation Time: Apr 01, 2026 at 09:59 AM
-
+-- Generation Time: Apr 06, 2026 at 03:18 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -28,38 +24,47 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `attendance`
+-- Table structure for table `Events`
 --
 
-CREATE TABLE `attendance` (
+CREATE TABLE `Events` (
   `id` int NOT NULL,
-  `user_idemployee` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `type` varchar(20) NOT NULL,
-  `status` varchar(50) DEFAULT NULL,
-  `photo` longblob,
-  `approval_status` varchar(20) DEFAULT 'pending',
-  `reject_reason` text,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` date NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `Events`
+--
+
+INSERT INTO `Events` (`id`, `title`, `date`, `description`, `created_at`) VALUES
+(1, 'kater', '2026-04-15', 'katerkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkater', '2026-04-02 21:45:26'),
+(2, 'น่าหนาว', '2026-04-07', 'น่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาว', '2026-04-10 21:45:26');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `leave_requests`
+-- Table structure for table `Event_participants`
 --
 
-CREATE TABLE `leave_requests` (
+CREATE TABLE `Event_participants` (
   `id` int NOT NULL,
-  `user_id` varchar(50) NOT NULL,
-  `leave_start` date NOT NULL,
-  `leave_end` date NOT NULL,
-  `leave_reasons` text,
-  `other_reason` text,
-  `evidence_file` longblob,
-  `status` enum('pending','approved','rejected') DEFAULT 'pending',
-  `reject_reason` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+  `event_id` int NOT NULL,
+  `id_employee` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `Event_participants`
+--
+
+INSERT INTO `Event_participants` (`id`, `event_id`, `id_employee`) VALUES
+(1, 1, '101010'),
+(3, 1, '303030'),
+(4, 1, '404040'),
+(2, 2, '202020'),
+(5, 2, '505050');
 
 -- --------------------------------------------------------
 
@@ -151,20 +156,29 @@ CREATE TABLE `User_shifts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
+-- Dumping data for table `User_shifts`
+--
+
+INSERT INTO `User_shifts` (`role_id`, `shift_id`, `user_id`) VALUES
+(1, 1, '101010');
+
+--
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `attendance`
+-- Indexes for table `Events`
 --
-ALTER TABLE `attendance`
+ALTER TABLE `Events`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `leave_requests`
+-- Indexes for table `Event_participants`
 --
-ALTER TABLE `leave_requests`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `Event_participants`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`,`id_employee`),
+  ADD KEY `id_employee` (`id_employee`);
 
 --
 -- Indexes for table `Roles`
@@ -203,26 +217,10 @@ ALTER TABLE `User_shifts`
 --
 
 --
--- AUTO_INCREMENT for table `Users`
+-- AUTO_INCREMENT for table `Events`
 --
-ALTER TABLE `Users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `attendance`
---
-ALTER TABLE `attendance`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `leave_requests`
---
-ALTER TABLE `leave_requests`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+ALTER TABLE `Events`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `Users`
@@ -233,6 +231,13 @@ ALTER TABLE `Users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `Event_participants`
+--
+ALTER TABLE `Event_participants`
+  ADD CONSTRAINT `event_participants_ibfk_1` FOREIGN KEY (`id_employee`) REFERENCES `Users` (`id_employee`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `event_participants_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `Events` (`id`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Users`
