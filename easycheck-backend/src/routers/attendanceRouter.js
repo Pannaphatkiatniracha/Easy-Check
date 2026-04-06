@@ -1,23 +1,25 @@
 import express from "express";
-// attendanceRoutes.js
-
 import {
-  checkIn, checkOut, getHistory,
-  approveAttendance, rejectAttendance, upload
+  checkIn,
+  checkOut,
+  getHistory,
+  getPending,
+  approveAttendance,
+  rejectAttendance,
+  getMyShift,
+  upload,
 } from "../controllers/attendanceController.js";
+import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// เส้นทางสำหรับพนักงาน (User)
-router.post("/check-in", upload.single("photo"), checkIn);
+router.get("/shift/me", verifyToken, getMyShift);
+router.post("/check-in", verifyToken, upload.single("photo"), checkIn);
+router.post("/check-out", verifyToken, upload.single("photo"), checkOut);
+router.get("/history", verifyToken, getHistory);
 
-router.post("/check-out", upload.single("photo"), checkOut);
-
-router.get("/history", getHistory);
-
-// เส้นทางอนุมัติ / ปฏิเสธ
-router.put("/approve/:id", approveAttendance);
-
-router.put("/reject/:id", rejectAttendance);
+router.get("/pending", verifyToken, getPending);
+router.put("/:id/approve", verifyToken, approveAttendance);
+router.put("/:id/reject", verifyToken, rejectAttendance);
 
 export default router;
