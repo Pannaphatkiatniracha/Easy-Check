@@ -1,6 +1,6 @@
 import express from "express";
 import {
-<<<<<<< HEAD
+
   checkIn,
   checkOut,
   getHistory,
@@ -9,11 +9,11 @@ import {
   rejectAttendance,
   getMyShift,
   upload,
-=======
+
   checkIn, checkOut, getHistory,
   approveAttendance, rejectAttendance, upload,
   getAttendanceHistory, getWeeklyHours, getCurrentStatus
->>>>>>> df39a59e5a96623cc97a146fd06a315e9c4a0a60
+
 } from "../controllers/attendanceController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 

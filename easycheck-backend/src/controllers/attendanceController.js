@@ -1,11 +1,11 @@
 import multer from "multer";
-<<<<<<< HEAD
+
 import path from "path";
 import fs from "fs";
 import pool from "../config/db.js";
-=======
+
 import db from '../config/db.js'
->>>>>>> df39a59e5a96623cc97a146fd06a315e9c4a0a60
+
 
 // ─── Multer Setup ─────────────────────────────────────────────────────────────
 const storage = multer.diskStorage({
