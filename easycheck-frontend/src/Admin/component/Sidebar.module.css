@@ -1,22 +1,17 @@
 /*ย่อขยายได้ */
 .sidebar {
-  width: 70px; /* ความกว้างตอนย่อ (แสดงแค่ไอคอน) */
+  width: 260px; /* ความกว้างคงที่ */
   background: #6E8CFB;
   padding: 20px 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: width 0.3s ease;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   z-index: 100;
   overflow: hidden;
-}
-
-.sidebar:hover {
-  width: 260px; 
 }
 
 
@@ -53,12 +48,6 @@
   gap: 2px;
   overflow: hidden;
   white-space: nowrap;
-  opacity: 0;
-  width: 0;
-  transition: opacity 0.3s ease, width 0.3s ease;
-}
-
-.sidebar:hover .brandInfo {
   opacity: 1;
   width: auto;
 }
@@ -134,12 +123,6 @@
   font-weight: 500;
   overflow: hidden;
   white-space: nowrap;
-  opacity: 0;
-  width: 0;
-  transition: opacity 0.3s ease, width 0.3s ease;
-}
-
-.sidebar:hover .itemLabel {
   opacity: 1;
   width: auto;
 }

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
+import Api from '../../Api';
 
 const GroupNoti = () => {
   const [user, setUser] = useState(null);
+  const [departments, setDepartments] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [message, setMessage] = useState('');
   const [currentPage, setCurrentPage] = useState('main'); // 'main' or 'detail'
-  const [selectedDeptId, setSelectedDeptId] = useState(null);
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [loadingDepts, setLoadingDepts] = useState(true);
 
   // โหลดข้อมูลผู้ใช้
   useEffect(() => {
@@ -13,13 +16,21 @@ const GroupNoti = () => {
     setUser(userData);
   }, []);
 
-  const departments = [
-    { id: 1, name: 'แผนก A' },
-    { id: 2, name: 'แผนก B' },
-    { id: 3, name: 'แผนก C' },
-    { id: 4, name: 'แผนก D' },
-    { id: 5, name: 'แผนก E' }
-  ];
+  // โหลดข้อมูลแผนกจาก API
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        setLoadingDepts(true);
+        const res = await Api.get('/api/group-noti/departments');
+        setDepartments(res.data);
+      } catch (err) {
+        console.error('Failed to fetch departments:', err);
+      } finally {
+        setLoadingDepts(false);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const handleToggleDepartment = (id) => {
     if (selectedDepartments.includes(id)) {
@@ -29,12 +40,12 @@ const GroupNoti = () => {
     }
   };
 
-  const handleViewDetails = (departmentId) => {
-    setSelectedDeptId(departmentId);
+  const handleViewDetails = (dept) => {
+    setSelectedDept(dept);
     setCurrentPage('detail');
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (selectedDepartments.length === 0) {
       alert('กรุณาเลือกแผนกที่ต้องการส่งการแจ้งเตือน');
       return;
@@ -43,9 +54,18 @@ const GroupNoti = () => {
       alert('กรุณากรอกข้อความ');
       return;
     }
-    alert(`ส่งการแจ้งเตือนไปยัง ${selectedDepartments.length} แผนกเรียบร้อยแล้ว`);
-    setMessage('');
-    setSelectedDepartments([]);
+    try {
+      await Api.post('/api/group-noti/notifications', {
+        departmentIds: selectedDepartments,
+        message,
+      });
+      alert(`ส่งการแจ้งเตือนไปยัง ${selectedDepartments.length} แผนกเรียบร้อยแล้ว`);
+      setMessage('');
+      setSelectedDepartments([]);
+    } catch (err) {
+      console.error('Failed to send notification:', err);
+      alert('เกิดข้อผิดพลาดในการส่งการแจ้งเตือน');
+    }
   };
 
   if (!user) {
@@ -54,7 +74,7 @@ const GroupNoti = () => {
 
   // แสดงหน้า GroupNoti2 เมื่อกดปุ่ม Details
   if (currentPage === 'detail') {
-    return <GroupNoti2 departmentId={selectedDeptId} onBack={() => setCurrentPage('main')} />;
+    return <GroupNoti2 department={selectedDept} onBack={() => setCurrentPage('main')} />;
   }
 
   return (
@@ -84,36 +104,40 @@ const GroupNoti = () => {
           </div>
 
           {/* Department List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-9">
-            {departments.map((dept) => (
-              <div 
-                key={dept.id} 
-                className={`flex items-center px-6 py-5 rounded-xl transition-all min-h-16 ${
-                  selectedDepartments.includes(dept.id) 
-                    ? 'bg-blue-200' 
-                    : 'bg-blue-100 hover:bg-blue-200'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  className="w-6 h-6 mr-5 cursor-pointer flex-shrink-0"
-                  style={{ accentColor: '#3d4f7d' }}
-                  checked={selectedDepartments.includes(dept.id)}
-                  onChange={() => handleToggleDepartment(dept.id)}
-                />
-                <span className="flex-1 text-lg font-semibold text-gray-800 mr-5">
-                  {dept.name}
-                </span>
-                <button 
-                  className="px-8 py-3 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg"
-                  style={{ backgroundColor: '#3C467B' }}
-                  onClick={() => handleViewDetails(dept.id)}
+          {loadingDepts ? (
+            <div className="flex items-center justify-center py-10 text-gray-500">กำลังโหลดข้อมูลแผนก...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-9">
+              {departments.map((dept) => (
+                <div 
+                  key={dept.id} 
+                  className={`flex items-center px-6 py-5 rounded-xl transition-all min-h-16 ${
+                    selectedDepartments.includes(dept.id) 
+                      ? 'bg-blue-200' 
+                      : 'bg-blue-100 hover:bg-blue-200'
+                  }`}
                 >
-                  Details
-                </button>
-              </div>
-            ))}
-          </div>
+                  <input
+                    type="checkbox"
+                    className="w-6 h-6 mr-5 cursor-pointer flex-shrink-0"
+                    style={{ accentColor: '#3d4f7d' }}
+                    checked={selectedDepartments.includes(dept.id)}
+                    onChange={() => handleToggleDepartment(dept.id)}
+                  />
+                  <span className="flex-1 text-lg font-semibold text-gray-800 mr-5">
+                    {dept.name}
+                  </span>
+                  <button 
+                    className="px-8 py-3 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg"
+                    style={{ backgroundColor: '#3C467B' }}
+                    onClick={() => handleViewDetails(dept)}
+                  >
+                    Details
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Message Box */}
           <div className="mb-9">
@@ -144,33 +168,30 @@ const GroupNoti = () => {
 };
 
 // Component GroupNoti2 สำหรับแสดงรายละเอียดพนักงานในแผนก
-const GroupNoti2 = ({ departmentId, onBack }) => {
-  const [selectedEmployees, setSelectedEmployees] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+const GroupNoti2 = ({ department, onBack }) => {
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  const [loadingEmps, setLoadingEmps] = useState(true);
 
-  const departments = [
-    { id: 1, name: 'แผนก A' },
-    { id: 2, name: 'แผนก B' },
-    { id: 3, name: 'แผนก C' },
-    { id: 4, name: 'แผนก D' },
-    { id: 5, name: 'แผนก E' }
-  ];
-
-  const employees = [
-    { id: 1, code: 'นายสมชาย ใจดี' },
-    { id: 2, code: 'นางสาวมาลี วงศ์ดี' },
-    { id: 3, code: 'นายวิชัย ศรีสุข' },
-    { id: 4, code: 'นางสมใจ รักดี' },
-    { id: 5, code: 'นายธนากร มั่นคง' },
-    { id: 6, code: 'นางสาวพิมพ์ใจ สวยงาม' },
-    { id: 7, code: 'นายประสิทธิ์ เก่งดี' },
-    { id: 8, code: 'นายอนุชา ทรงธรรม' },
-    { id: 9, code: 'นายสุรชัย ดีเลิศ' },
-    { id: 10, code: 'นางวรรณา แก้วใส' },
-    { id: 11, code: 'นายชัยวัฒน์ สมบูรณ์' },
-    { id: 12, code: 'นางสาวนิภา ใจงาม' }
-  ];
-
-  const departmentName = departments.find(d => d.id === departmentId)?.name || 'แผนก';
+  // โหลดข้อมูลพนักงานจาก API ตามแผนกที่เลือก
+  useEffect(() => {
+    if (!department) return;
+    const fetchEmployees = async () => {
+      try {
+        setLoadingEmps(true);
+        const res = await Api.get('/api/group-noti/employees', {
+          params: { department: department.name },
+        });
+        setEmployees(res.data);
+        setSelectedEmployees(res.data.map((emp) => emp.id));
+      } catch (err) {
+        console.error('Failed to fetch employees:', err);
+      } finally {
+        setLoadingEmps(false);
+      }
+    };
+    fetchEmployees();
+  }, [department]);
 
   const handleToggleEmployee = (id) => {
     if (selectedEmployees.includes(id)) {
@@ -196,7 +217,7 @@ const GroupNoti2 = ({ departmentId, onBack }) => {
                 <polyline points="12 19 5 12 12 5"></polyline>
               </svg>
             </button>
-            <h1 className="text-4xl font-bold text-gray-800 m-0">{departmentName}</h1>
+            <h1 className="text-4xl font-bold text-gray-800 m-0">{department?.name}</h1>
           </div>
 
           {/* Select Dropdown */}
@@ -219,41 +240,45 @@ const GroupNoti2 = ({ departmentId, onBack }) => {
           </div>
 
           {/* Employee Grid (2 columns) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {employees.map((employee) => (
-              <div 
-                key={employee.id} 
-                className={`flex items-center px-5 py-4 rounded-lg transition-all gap-3 ${
-                  selectedEmployees.includes(employee.id) 
-                    ? 'shadow-md' 
-                    : ''
-                }`}
-                style={{ 
-                  backgroundColor: selectedEmployees.includes(employee.id) ? '#a8bfdf' : '#c5d5ed'
-                }}
-              >
-                <input
-                  type="checkbox"
-                  className="w-5 h-5 cursor-pointer flex-shrink-0"
-                  style={{ accentColor: '#3d4f7d' }}
-                  checked={selectedEmployees.includes(employee.id)}
-                  onChange={() => handleToggleEmployee(employee.id)}
-                />
+          {loadingEmps ? (
+            <div className="flex items-center justify-center py-10 text-gray-500">กำลังโหลดข้อมูลพนักงาน...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {employees.map((employee) => (
                 <div 
-                  className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" 
-                  style={{ backgroundColor: '#5b7bb4' }}
+                  key={employee.id} 
+                  className={`flex items-center px-5 py-4 rounded-lg transition-all gap-3 ${
+                    selectedEmployees.includes(employee.id) 
+                      ? 'shadow-md' 
+                      : ''
+                  }`}
+                  style={{ 
+                    backgroundColor: selectedEmployees.includes(employee.id) ? '#a8bfdf' : '#c5d5ed'
+                  }}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-6 h-6">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 cursor-pointer flex-shrink-0"
+                    style={{ accentColor: '#3d4f7d' }}
+                    checked={selectedEmployees.includes(employee.id)}
+                    onChange={() => handleToggleEmployee(employee.id)}
+                  />
+                  <div 
+                    className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" 
+                    style={{ backgroundColor: '#5b7bb4' }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-6 h-6">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </div>
+                  <span className="flex-1 text-base font-semibold text-gray-800">
+                    {employee.name}
+                  </span>
                 </div>
-                <span className="flex-1 text-base font-semibold text-gray-800">
-                  {employee.code}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         </div>
       </div>

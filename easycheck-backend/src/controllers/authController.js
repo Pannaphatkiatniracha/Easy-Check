@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import db from '../config/db.js'
-import pool from '../config/db.js'
 import nodemailer from 'nodemailer'
 
 dotenv.config() // พอสั่ง config() ปุ๊บ ทุกอย่างที่เขียนในไฟล์ .env จะถูกเก็บใส่ process.env
@@ -49,13 +48,13 @@ export const login = async (req, res) => {
 
         // สร้าง Token ให้พนักงาน
         const token = jwt.sign (
-            {id: user.id, role: user.role},
+            {id: user.id, id_employee: user.id_employee, role: user.role},
             JWT_SECRET, {expiresIn: '30m'})
 
 
         // สร้าง Refresh Token (ตั๋วใบยาว)
         const refreshToken = jwt.sign(
-            { id: user.id },
+            { id: user.id, id_employee: user.id_employee },
             JWT_SECRET,
             { expiresIn: '7d' }
         )
@@ -93,7 +92,7 @@ export const forgotPassword = async (req, res) => {
 
     try {
         // เช็คว่ามี email นี้จริงไหม
-        const [users] = await pool.execute('SELECT id FROM users WHERE email = ?', [email])
+        const [users] = await db.query('SELECT id FROM users WHERE email = ?', [email])
         if (users.length === 0) {
             return res.status(404).json({ message: 'Email not found' })
         }
@@ -178,6 +177,7 @@ export const resetPassword = async (req, res) => {
         res.status(200).json({ message: 'Password reset successful' })
 
     } catch (err) {
+        // ถ้า token พังหรือหมดอายุจริง ๆ ก็ให้นางไป login ใหม่
         res.status(400).json({ message: 'Invalid or expired token', error: err.message })
     }
 }
@@ -213,14 +213,14 @@ export const refreshToken = async (req, res) => {
 
         // สร้าง token ใหม่ (ระยะสั้น)
         const newAccessToken = jwt.sign( // jwt.sign(...) คือคำสั่งให้ JWT สร้างสตริงยาว ๆ มาชุดนึง โดยเอาข้อมูลที่เราส่งไปมาเข้ารหัสและประทับตราด้วย JWT_SECRET
-            { id: user.id, role: user.role },
+            { id: user.id, id_employee: user.id_employee, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '30m' }
         )
 
         // สร้าง token ต่ออายุ (ระยะยาว)
         const newRefreshToken = jwt.sign(
-            { id: user.id },
+            { id: user.id, id_employee: user.id_employee },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         )

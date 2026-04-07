@@ -2,18 +2,50 @@ import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
 
+import Api from '../../Api'
+
 const DataToCheck = () => {
     
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
+    const [currentUser, setCurrentUser] = useState(null) // เพิ่ม state สำหรับเก็บข้อมูลคนที่ login
 
-    
+
+    // ดึงข้อมูลคนที่ login ก่อน
+    useEffect(() => {
+        const getCurrentUser = async () => {
+            try {
+                const res = await Api.get('/users/profile')
+                setCurrentUser(res.data)
+            } catch (err) {
+                console.error("Error getting current user:", err)
+            }
+        }
+        getCurrentUser()
+    }, [])
+
+
+    // ตอนรันเว็บครั้งแรกให้ไปดึงข้อมูลจากแบคเอนมา
     useEffect(() => {
         const loadData = async () => {
+            if (!currentUser) return // ยังไม่รู้ว่าใคร login ให้รอ
+            
             try {
-                const res = await fetch("https://68fbd77794ec960660275293.mockapi.io/users")
-                const employees = await res.json()
-                setData(employees)
+                const allUsersRes = await Api.get('/users/all')
+                let employeesList = allUsersRes.data
+                
+                
+                // ถ้าเป็น approver (role_id=2) ให้เอาเฉพาะ user ใน branch เดียวกัน
+                if (currentUser.role_id === 2) {
+                    employeesList = employeesList.filter(emp => 
+                        emp.role_id === 1 && emp.branch === currentUser.branch
+                    )
+                } else {
+                    // ถ้าเป็น admin หรือ super admin ให้เอา user ทุกคน
+                    employeesList = employeesList.filter(emp => emp.role_id === 1)
+                }
+                
+                setData(employeesList)
             } catch (error) {
                 console.error("Error loading employees:", error)
             } finally {
@@ -21,8 +53,7 @@ const DataToCheck = () => {
             }
         }
         loadData()
-    }, [])   //ทำครั้งเดียวตอนหน้าเว็บโหลด
-
+    }, [currentUser]) // รันใหม่ทุกครั้งที่ currentUser เปลี่ยน
 
 
     return (
@@ -53,14 +84,14 @@ const DataToCheck = () => {
                         className="relative bg-[#ffffff]/90 backdrop-blur-xl p-3 rounded-2xl shadow-2xl border border-[#7f5cff]/40 
                         transform hover:-translate-y-1 hover:shadow-[0_0_15px_#7f5cff] transition duration-300 flex items-center gap-3">
 
-                            {/* รูป profile - ใช้ avatar จาก MockAPI */}
+                            {/* รูป profile - ใช้ avatar จาก Backend */}
                             <img className="w-12 h-12 rounded-full border-2 border-[#7f5cff] object-cover"
-                            src={person.avatar} alt={person.name}/>
+                            src={person.avatar || '/easycheck/img/default.jpg'} alt={person.firstname || person.name}/>
 
                             {/* กล่องชื่อ + id + position + department + ปุ่ม */}
                             <div className="flex-1">
-                                <div className="font-bold text-gray-800 text-base">{person.name}</div>
-                                <div className="text-xs text-gray-500">ID: {person.userid}</div>
+                                <div className="font-bold text-gray-800 text-base">{person.firstname && person.lastname ? `${person.firstname} ${person.lastname}` : person.name}</div>
+                                <div className="text-xs text-gray-500">ID: {person.id_employee || person.userid}</div>
                                 <div className="text-xs text-gray-500 mt-1 fw-semibold">{person.position}</div>
                                 <div className="text-xs text-gray-500">by {person.department}</div>
 
@@ -69,10 +100,12 @@ const DataToCheck = () => {
                                     <Link to="/workhourstracker"
                                           state={{ 
                                             employeeData: {
-                                                name: person.name,
-                                                employeeId: person.userid,
-                                                profile: person.avatar,
-                                                shift: person.shift
+                                                name: (person.firstname && person.lastname) ? `${person.firstname} ${person.lastname}` : (person.name || ''),
+                                                employeeId: person.id_employee || person.userid,
+                                                profile: person.avatar || '/easycheck/img/default.jpg',
+                                                shift: person.shift,
+                                                department: person.department,
+                                                position: person.position
                                             }}}
                                           className="flex-1">
                                         <button className="w-full py-1 rounded-full bg-gradient-to-r from-[#6D29F6] to-[#4c1ca3] text-white font-semibold text-xs shadow hover:shadow-[0_0_10px_#6D29F6] transition">

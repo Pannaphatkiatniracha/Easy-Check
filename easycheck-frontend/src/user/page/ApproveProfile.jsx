@@ -304,10 +304,10 @@ const ApproveProfile = ({ role }) => {
                         <Form.Select aria-label='Select branch' className='fw-semibold'
                             name='branch' value={user.branch} onChange={handleChange}>
                             <option value="Bangkok">Bangkok</option>
-                            <option value="ChiangMai">Chaing Mai</option>
+                            <option value="Chiang Mai">Chiang Mai</option>
                             <option value="Phuket">Phuket</option>
                             <option value="Chonburi">Chonburi</option>
-                            <option value="Khonkaen">Khon Kaen</option>
+                            <option value="Khon Kaen">Khon Kaen</option>
                         </Form.Select>
                     </InputGroup>
                 </div>
@@ -349,6 +349,7 @@ const ApproveProfile = ({ role }) => {
                         name='gender' value={user.gender} onChange={handleChange}>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
+                        <option value="other">Other</option>
                     </Form.Select>
                 </InputGroup>
             </div>

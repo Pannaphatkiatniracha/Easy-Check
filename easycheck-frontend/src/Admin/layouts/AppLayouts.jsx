@@ -12,7 +12,7 @@ const AppLayouts = () => {
             </div>  
 
 
-            <main>
+            <main style={{ marginLeft: '260px' }}>
                 <Outlet /> 
             </main>
 

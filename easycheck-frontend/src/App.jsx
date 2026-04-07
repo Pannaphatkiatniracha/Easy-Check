@@ -11,7 +11,7 @@ import Home from "./user/page/Home";
 import LeaveRequest from "./user/page/LeaveRequest";
 import CheckIn from "./user/page/CheckIn";
 import InRegister from "./user/page/InRegister";
-import DelegateCheckin from "./user/page/DelegateCheckin";
+import CheckOut from "./user/page/CheckOut";
 import Support from "./user/page/Support";
 import ForgotPassword from "./user/page/ForgotPassword";
 import ChangePassword from "./user/page/ChangePassword";
@@ -21,7 +21,7 @@ import ExRegister from "./user/page/ExRegister";
 import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
-import CheckApporve from "./user/page/CheckApprove";
+import CheckApporve from "./user/page/RequestApprove";
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
@@ -49,7 +49,7 @@ import MyProfile from "./Admin/page/MyProfile";
 import Manageusers from "./Admin/page/Manageusers";
 import Personalsummary from "./Admin/page/Personalsummary";
 
-import CheckApprove from "./user/page/CheckApprove";
+import RequestApprove from "./user/page/RequestApprove";
 import EditProfile from "./Admin/page/EditProfile";
 import ForgotToChange from "./user/page/ForgotToChange";
 
@@ -94,7 +94,7 @@ function App() {
                 <Route path="exregister" element={<ExRegister role={role} />} />
                 <Route path="leaverequest" element={<LeaveRequest />} />
                 <Route path="checkin" element={<CheckIn />} />
-                <Route path="delegateCheckin" element={<DelegateCheckin />} />
+                <Route path="checkout" element={<CheckOut />} />
                 <Route path="support" element={<Support />} />
                 <Route path="changepassword" element={<ChangePassword />} />
                 <Route path="internalevent" element={<InternalEvent />} />
@@ -104,7 +104,7 @@ function App() {
                 <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
                 <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
                 
-                <Route path="checkapprove" element={<CheckApprove role={role} />} />
+                <Route path="requestapprove" element={<RequestApprove role={role} />} />
 
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
