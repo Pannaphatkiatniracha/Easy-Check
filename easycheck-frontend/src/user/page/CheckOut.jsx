@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-function CheckIn() {
+function CheckOut() {
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -13,6 +13,9 @@ function CheckIn() {
 
   const [userShift, setUserShift] = useState(null);
   const [shiftLoading, setShiftLoading] = useState(true);
+
+  const [showEarlyModal, setShowEarlyModal] = useState(false);
+  const [earlyReason, setEarlyReason] = useState("");
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -122,14 +125,28 @@ function CheckIn() {
         setError("");
       },
       () => {
-        setError("ไม่สามารถดึงตำแหน่งได้ แต่ยังเช็คอินได้");
+        setError("ไม่สามารถดึงตำแหน่งได้ แต่ยังเช็คเอาท์ได้");
       }
     );
   };
 
-  const handleCheckIn = async () => {
+  const isCheckoutEarly = () => {
+    if (!userShift) return false;
+
+    const now = new Date();
+    const [h, m] = userShift.end_time.split(":").map(Number);
+
+    return now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+  };
+
+  const submitCheckOut = async (overrideReason = null) => {
     if (!userShift) return setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
     if (!photo) return setError("กรุณาถ่ายรูปก่อน");
+
+    if (isCheckoutEarly() && overrideReason === null) {
+      setShowEarlyModal(true);
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -143,8 +160,12 @@ function CheckIn() {
       formData.append("lng", location.lng);
     }
 
+    if (overrideReason) {
+      formData.append("reason", overrideReason);
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/attendance/check-in", {
+      const res = await fetch("http://localhost:5000/attendance/check-out", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -157,9 +178,9 @@ function CheckIn() {
       }
 
       setMessage(
-        data.status === "late"
-          ? "⚠️ เช็คอินสำเร็จ (มาสาย)\nระบบบันทึกเวลาเรียบร้อยแล้ว"
-          : "✅ เช็คอินสำเร็จ (ตรงเวลา)"
+        data.status === "early"
+          ? `⚠️ เช็คเอาท์สำเร็จ (ออกก่อนเวลา)\n${data.note || ""}`
+          : "✅ เช็คเอาท์สำเร็จ (ปกติ)"
       );
 
       setPhoto(null);
@@ -173,11 +194,21 @@ function CheckIn() {
     }
   };
 
+  const handleEarlySubmit = () => {
+    if (!earlyReason.trim()) {
+      return alert("กรุณาระบุเหตุผล");
+    }
+
+    setShowEarlyModal(false);
+    submitCheckOut(earlyReason);
+  };
+
   const resetForm = () => {
     setMessage("");
     setError("");
     setPhoto(null);
     setPhotoPreview(null);
+    setEarlyReason("");
     setLocation(null);
     stopCamera();
   };
@@ -195,7 +226,7 @@ function CheckIn() {
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl shadow-2xl space-y-5">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold tracking-wide text-white drop-shadow-md">
-            🟢 Check-In
+            🔴 Check-Out
           </h2>
 
           {userShift ? (
@@ -274,11 +305,11 @@ function CheckIn() {
 
         {userShift && (
           <button
-            onClick={handleCheckIn}
+            onClick={() => submitCheckOut(null)}
             disabled={loading}
-            className="w-full py-4 bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full py-4 bg-gradient-to-r from-rose-400 to-red-500 hover:from-rose-500 hover:to-red-600 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-IN"}
+            {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-OUT"}
           </button>
         )}
 
@@ -303,8 +334,51 @@ function CheckIn() {
           </div>
         )}
       </div>
+
+      {showEarlyModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="bg-orange-500 p-5 text-center">
+              <i className="bi bi-clock-history text-5xl text-white" />
+              <h3 className="font-bold text-xl text-white mt-2">ออกก่อนเวลา!</h3>
+              <p className="text-orange-100 text-sm mt-1">
+                กะของคุณเลิก {userShift?.end_time.slice(0, 5)} น.
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4 text-gray-800">
+              <p className="text-sm text-gray-500 text-center">
+                ระบบจะ<b>บันทึกเวลาออกทันที</b> และส่งเหตุผลให้หัวหน้าตรวจสอบ
+              </p>
+
+              <textarea
+                value={earlyReason}
+                onChange={(e) => setEarlyReason(e.target.value)}
+                className="w-full border-2 border-gray-200 focus:border-orange-500 outline-none p-3 rounded-xl resize-none h-24 transition-colors text-sm"
+                placeholder="เช่น ไปพบแพทย์, ลากิจด่วน, ไปรับบุตรหลาน..."
+              />
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowEarlyModal(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors"
+                >
+                  ยกเลิก
+                </button>
+
+                <button
+                  onClick={handleEarlySubmit}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition-colors"
+                >
+                  ส่งและเช็คเอาท์
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default CheckIn;
+export default CheckOut;
