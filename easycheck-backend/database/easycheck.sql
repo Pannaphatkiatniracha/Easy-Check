@@ -3,10 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 03, 2026 at 02:51 AM
-
--- Generation Time: Apr 03, 2026 at 02:48 AM
-
+-- Generation Time: Apr 06, 2026 at 02:37 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -32,13 +29,13 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `attendance` (
   `id` int NOT NULL,
-  `user_idemployee` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `id_employee` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `type` varchar(20) NOT NULL,
   `status` varchar(50) DEFAULT NULL,
   `photo` longblob,
   `approval_status` varchar(20) DEFAULT 'pending',
   `reject_reason` text,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -198,15 +195,15 @@ INSERT INTO `Users` (`id`, `id_employee`, `role_id`, `firstname`, `lastname`, `g
 (3, '303030', 2, 'Maemom', 'Young', 'female', '2006-02-08', '2026-03-31', 'Approver', 'Finance', 'Phuket', 'compannaphat@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0876564732', 'https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg'),
 (4, '404040', 3, 'Boobi', 'Bubu', 'male', '2005-02-13', '2026-03-31', 'Admin', 'Sales', 'Chonburi', 'thanik1265@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0976453421', 'https://i.pinimg.com/1200x/45/bf/0b/45bf0b9e7f509e025d61091f677189f3.jpg'),
 (5, '505050', 4, 'Meow', 'Whatislove', 'female', '2006-04-01', '2026-04-01', 'Super Admin', 'Creative', 'Khon Kaen', 'mo.sarasinee@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0894726153', 'https://i.pinimg.com/736x/8f/0d/1d/8f0d1ded2a11628c68891d1f268b5650.jpg'),
-(6, '060606', 2, 'Nayeon', 'Im', 'female', '1995-09-22', '2020-01-10', 'Approver', 'IT', 'Bangkok', 'imnayeon@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811111111', 'https://i.pinimg.com/736x/37/4d/65/374d659f5ac5ede493283cf3f7a43e04.jpg'),
-(7, '070707', 2, 'Wonyoung', 'Jang', 'female', '2004-08-31', '2020-02-15', 'Approver', 'Sales', 'Chiang Mai', 'jangwonyoung@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0822222222', 'https://i.pinimg.com/1200x/5d/b4/6e/5db46e4fc276d47db0cf2940c866aa35.jpg'),
-(8, '080808', 2, 'Hoseok', 'Jung', 'male', '1994-02-18', '2020-03-20', 'Approver', 'Finance', 'Khon Kaen', 'imuourhope@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0833333333', 'https://i.pinimg.com/736x/e6/26/63/e62663463f107dd9cb1c17e44f18d703.jpg'),
-(9, '090909', 2, 'Asa', 'Enami', 'female', '2006-04-17', '2020-04-25', 'Approver', 'Creative', 'Chonburi', 'enamiasa@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0844444444', 'https://i.pinimg.com/736x/bc/d7/f0/bcd7f05c5b3e1a0dec4bb1a3d77da181.jpg'),
+(6, '606060', 2, 'Nayeon', 'Im', 'female', '1995-09-22', '2020-01-10', 'Approver', 'IT', 'Bangkok', 'imnayeon@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811111111', 'https://i.pinimg.com/736x/37/4d/65/374d659f5ac5ede493283cf3f7a43e04.jpg'),
+(7, '707070', 2, 'Wonyoung', 'Jang', 'female', '2004-08-31', '2020-02-15', 'Approver', 'Sales', 'Chiang Mai', 'jangwonyoung@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0822222222', 'https://i.pinimg.com/1200x/5d/b4/6e/5db46e4fc276d47db0cf2940c866aa35.jpg'),
+(8, '808080', 2, 'Hoseok', 'Jung', 'male', '1994-02-18', '2020-03-20', 'Approver', 'Finance', 'Khon Kaen', 'imuourhope@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0833333333', 'https://i.pinimg.com/736x/e6/26/63/e62663463f107dd9cb1c17e44f18d703.jpg'),
+(9, '909090', 2, 'Asa', 'Enami', 'female', '2006-04-17', '2020-04-25', 'Approver', 'Creative', 'Chonburi', 'enamiasa@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0844444444', 'https://i.pinimg.com/736x/bc/d7/f0/bcd7f05c5b3e1a0dec4bb1a3d77da181.jpg'),
 (10, '101011', 1, 'Jimin', 'Yu', 'female', '2000-04-11', '2022-06-01', 'Sales Coordinator', 'Sales', 'Bangkok', 'katarina@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111111', 'https://i.pinimg.com/736x/8a/a7/df/8aa7df488e02318d04300141a7b67d74.jpg'),
 (11, '111111', 1, 'Minjeong', 'Kin', 'female', '2001-01-01', '2022-06-15', 'Customer Experience Analyst', 'Sales', 'Bangkok', 'imwinter@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111112', 'https://i.pinimg.com/736x/d1/57/50/d15750df7ab3fe280de046678aeb856e.jpg'),
 (12, '121212', 1, 'Aeri', 'Uchinaga', 'female', '1994-03-20', '2022-07-01', 'Content Creator', 'Creative', 'Bangkok', 'aerichandesu@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111113', 'https://i.pinimg.com/736x/79/ee/78/79ee78b5ffae707c7eaa69003caa94f8.jpg'),
-(13, '131313', 1, 'Ning', 'Yizhuo', 'other', '2002-10-23', '2022-07-15', 'Payroll Specialist', 'Finance', 'Bangkok', 'imnotningning@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111114', 'https://i.pinimg.com/736x/18/0f/5f/180f5f5668badf8c617a66e122cf221c.jpg'),
-(14, '141414', 1, 'MInji', 'Kim', 'other', '2004-05-07', '2022-08-01', 'Key Account Manager', 'Sales', 'Bangkok', 'kimminji@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111115', 'https://i.pinimg.com/736x/49/d5/75/49d575becbd7b91cb8da9368a3159b49.jpg'),
+(13, '131313', 1, 'Yizhuo', 'Ning', 'other', '2002-10-23', '2022-07-15', 'Payroll Specialist', 'Finance', 'Bangkok', 'imnotningning@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111114', 'https://i.pinimg.com/736x/9a/53/5b/9a535b976efaff03c645547544675bcf.jpg'),
+(14, '141414', 1, 'MInji', 'Kim', 'other', '2004-05-07', '2022-08-01', 'Key Account Manager', 'Sales', 'Chiang Mai', 'kimminji@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111115', 'https://i.pinimg.com/736x/49/d5/75/49d575becbd7b91cb8da9368a3159b49.jpg'),
 (15, '151515', 1, 'Hanni', 'Pham', 'female', '2004-10-06', '2022-08-15', 'Motion Graphic Designer', 'Creative', 'Chiang Mai', 'phamhanni@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111116', 'https://i.pinimg.com/736x/a5/3d/90/a53d90569754484b38090a9a9f1276e6.jpg'),
 (16, '161616', 1, 'Danielle', 'Marsh', 'female', '2005-04-11', '2022-09-01', 'Cybersecurity Specialist', 'IT', 'Chiang Mai', 'daniellemarsh@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0901111117', 'https://i.pinimg.com/736x/e0/38/df/e038df6f013e1d17998c268365798761.jpg'),
 (17, '171717', 1, 'Haerin', 'Kang', 'female', '2006-05-15', '2022-06-01', 'Sales Coordinator', 'Sales', 'Chiang Mai', 'kanghaerin@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0902222221', 'https://i.pinimg.com/1200x/21/b5/6d/21b56d80000c6d466687a849beeaeb53.jpg'),
@@ -223,7 +220,12 @@ INSERT INTO `Users` (`id`, `id_employee`, `role_id`, `firstname`, `lastname`, `g
 (28, '282828', 1, 'Sohee', 'Lee', 'male', '2003-11-21', '2022-08-01', 'Key Account Manager', 'Sales', 'Chonburi', 'sorakkaohom@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0903333335', 'https://i.pinimg.com/736x/3d/e2/c3/3de2c301e6b2c7ce472047ebc7935442.jpg'),
 (29, '292929', 1, 'Chanyoung', 'Lee', 'male', '2004-03-21', '2022-08-15', 'Motion Graphic Designer', 'Creative', 'Chonburi', 'antonylee@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0903333336', 'https://i.pinimg.com/736x/a5/a4/13/a5a4133fe4c389e91fc8465fd6647975.jpg'),
 (30, '303031', 1, 'Anatchaya', 'Suputhipong', 'other', '2002-05-30', '2022-09-01', 'Cybersecurity Specialist', 'IT', 'Khon Kaen', 'natty@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0903333337', 'https://i.pinimg.com/736x/d2/6e/18/d26e181d2da7f8eb6dcab16dadbbd9b2.jpg'),
-(31, '313131', 1, 'Julie', 'Han', 'female', '1995-01-10', '2022-06-01', 'Sales Coordinator', 'Sales', 'Khon Kaen', 'juliehan@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0904444441', 'https://i.pinimg.com/736x/e1/35/90/e1359059825038a8e55239f9d80a39ec.jpg');
+(31, '313131', 1, 'Julie', 'Han', 'female', '1995-01-10', '2022-06-01', 'Sales Coordinator', 'Sales', 'Khon Kaen', 'juliehan@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0904444441', 'https://i.pinimg.com/1200x/0a/a1/56/0aa1563ba34a413d6bf8b8a4ef309eac.jpg'),
+(104, '010101', 1, 'Evangeline', 'Rose', 'female', '2005-09-16', '2026-04-02', 'Content Marketing Executive', 'Sales', 'Khon Kaen', 'Evangeline875@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0955842525', 'https://i.pinimg.com/1200x/e2/f4/09/e2f409f9d3c9c7c4dc190d407f1fe1c1.jpg'),
+(105, '020202', 2, 'Sienna', 'Davenport', 'female', '2005-03-22', '2026-03-31', 'Approver', 'Creative', 'Chonburi', 'Sienna832@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0654859722', 'https://i.pinimg.com/736x/d3/c0/30/d3c0309c9803371481123563bad5a99a.jpg'),
+(106, '030303', 2, 'Valentin', 'Sinclair', 'male', '2005-01-19', '2026-04-02', 'Approver', 'Finance', 'Khon Kaen', 'Valentin741@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0368794456', 'https://i.pinimg.com/736x/ad/e3/0c/ade30c662d92b862c67a9902384f9e98.jpg'),
+(109, '323232', 1, 'Hyewon', 'Shim', 'other', '2004-03-20', '2026-04-06', 'Budgeting & Planning Officer', 'Finance', 'Khon Kaen', 'princessbell@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0812345678', 'https://i.pinimg.com/736x/a1/f8/e9/a1f8e96f6bb7fde4f7e730381032574b.jpg'),
+(110, '333333', 1, 'Haneul', 'Won', 'other', '2005-05-25', '2026-04-03', 'Content Creator', 'Creative', 'Khon Kaen', 'bobsky@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0857486793', 'https://i.pinimg.com/736x/ac/2d/5f/ac2d5f458f05bcf8593d952f193b6c00.jpg');
 
 -- --------------------------------------------------------
 
@@ -305,7 +307,7 @@ ALTER TABLE `User_shifts`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -329,7 +331,7 @@ ALTER TABLE `leave_requests`
 -- AUTO_INCREMENT for table `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- Constraints for dumped tables
