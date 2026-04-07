@@ -1,30 +1,49 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { clearAuthStorage, getUserFromStorage, fetchCurrentUser } from '../data/userApi';
 import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // โหลดข้อมูลผู้ใช้
+  // โหลดข้อมูลผู้ใช้จาก storage แล้วรีเฟรชจาก backend
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+    let mounted = true;
+
+    const initializeUser = async () => {
+      const storedUser = getUserFromStorage();
+      if (storedUser) {
+        setUser(storedUser);
+      } else {
         setUser({});
       }
-    } else {
-      setUser({});
-    }
+
+      try {
+        const profile = await fetchCurrentUser();
+        if (mounted) {
+          setUser(profile);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initializeUser();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    clearAuthStorage();
     navigate('/adminlogin');
   };
 
@@ -134,7 +153,7 @@ const Sidebar = () => {
     },
   ];
 
-  if (!user) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
@@ -156,11 +175,11 @@ const Sidebar = () => {
   </div>
 
   <div className={styles.brandInfo}>
- <span className={styles.brandText}>
-  {user.full_name || 'Admin Panel'}
-</span>
+    <span className={styles.brandText}>
+      {user.fullName || 'Admin Panel'}
+    </span>
     <span className={styles.brandSubtext}>
-      {user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
+      {user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : user.role || 'User'}
       {user.department && ` • ${user.department}`}
     </span>
   </div>

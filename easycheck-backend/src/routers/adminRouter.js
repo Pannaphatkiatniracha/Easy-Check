@@ -1,5 +1,5 @@
 import express from "express";
-import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent } from "../controllers/adminController.js";
+import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent, getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
 // , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
 import { verifyToken } from "../middlewares/authMiddleware.js";
 

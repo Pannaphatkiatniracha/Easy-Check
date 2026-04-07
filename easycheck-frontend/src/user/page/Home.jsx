@@ -100,7 +100,11 @@ const Home = ({ role }) => {
                         hover:scale-105 transition-all duration-200 ease-in-out"
                         style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
+
                         CHECK IN 
+
+                        CHECK IN <br />
+
                     </div>
                 </Link>
 
@@ -109,7 +113,11 @@ const Home = ({ role }) => {
                         hover:scale-105 transition-all duration-200 ease-in-out"
                         style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
                         <i className="bi bi-calendar-check-fill fs-2"></i> <br />
-                        CHECK OUT
+
+
+                        CHECK OUT<br />
+                        &nbsp;
+
                     </div>
                 </Link>
 

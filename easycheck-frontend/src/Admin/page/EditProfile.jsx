@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Lock, Briefcase, UserRound, Save, Camera } from 'lucide-react';
+import { getUserFromStorage, fetchCurrentUser } from '../data/userApi';
 import './EditProfile.css';
 
 function EditProfile() {
@@ -19,28 +20,36 @@ function EditProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
 
-  // โหลดข้อมูลจาก localStorage เมื่อ component mount
+  const normalizeAdminData = (user) => ({
+    fullName: user.fullName || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    username: user.username || "",
+    department: user.department || "",
+    position: user.position || "",
+    employeeCode: user.id_employee || "",
+    joinDate: user.joinDate || "",
+    role: user.role || "",
+    avatarUrl: user.profileImage || null
+  });
+
+  // โหลดข้อมูลจาก storage และรีเฟรชจาก backend เมื่อ component mount
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        setAdminData({
-          fullName: user.fullName || "",
-          email: user.email || "",
-          phone: user.phone || "",
-          username: user.username || "",
-          department: user.department || "",
-          position: user.position || "",
-          employeeCode: user.employeeCode || "",
-          joinDate: user.joinDate || "",
-          role: user.role || "",
-          avatarUrl: user.profileImage || null
-        });
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
+    const storedUser = getUserFromStorage();
+    if (storedUser) {
+      setAdminData(normalizeAdminData(storedUser));
     }
+
+    const loadProfile = async () => {
+      try {
+        const profile = await fetchCurrentUser();
+        setAdminData(normalizeAdminData(profile));
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+      }
+    };
+
+    loadProfile();
   }, []);
 
   // ฟังก์ชันจัดการการเปลี่ยนแปลงข้อมูล

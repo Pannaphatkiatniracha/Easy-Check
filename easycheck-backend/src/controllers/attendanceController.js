@@ -267,6 +267,7 @@ export const getMyShift = async (req, res) => {
 export const getAttendanceHistory = async (req, res) => {
   const { userId } = req.query; // userId จาก query คือ id_employee
   if (!userId) return res.status(400).json({ message: "userId is required" });
+  
   try {
     const [rows] = await db.query(
       `SELECT status, DATE_FORMAT(created_at, '%Y-%m-%d') as date FROM attendance WHERE id_employee = ? ORDER BY created_at DESC`,
