@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { saveTokenToStorage, saveUserToStorage, fetchCurrentUser, normalizeUser } from '../data/userApi';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ id: '', password: '' });
@@ -46,11 +47,18 @@ const handleSubmit = async (e) => {
     const data = await res.json();
 
     if (data.success) {
+      saveTokenToStorage(data.token)
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      try {
+        await fetchCurrentUser()
+      } catch (fetchError) {
+        console.error('Unable to fetch profile after login:', fetchError)
+        if (data.user) {
+          saveUserToStorage(normalizeUser(data.user))
+        }
+      }
 
-      navigate('/dashboard');
+      navigate('/dashboard')
 
     } else {
 
