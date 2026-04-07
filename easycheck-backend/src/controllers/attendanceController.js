@@ -368,7 +368,7 @@ export const getAttendanceHistory = async (req, res) => {
         )
 
         const attendanceData = {
-            onTimes: rows.filter(r => r.status === 'on-time').map(r => r.date), // ดึงเฉพาะแถวที่ตรงกับ status แล้วเอาออกมาแค่ date
+            onTimes: rows.filter(r => r.status === 'ontime').map(r => r.date), // ดึงเฉพาะแถวที่ตรงกับ status แล้วเอาออกมาแค่ date
             lates: rows.filter(r => r.status === 'late').map(r => r.date),
             leaves: rows.filter(r => r.status === 'leave').map(r => r.date)
         }

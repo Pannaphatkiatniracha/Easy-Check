@@ -1,4 +1,4 @@
-import pool from '../config/db.js'
+import db from '../config/db.js'
 
 
 // 🐷🐷 GET ALL-EVENT
@@ -7,7 +7,7 @@ export const getAllEvents = async (req, res) => {
 
         // ใช้ LEFT JOIN เพราะต่อให้ event_registrations จะยังไม่ข้อมูลในที่นี้ก็คือไม่มีคนลงทะเบียนอะ แต่ events ก็จะมาหมด
         // COUNT(event_registrations.id) คือการนับจำนวน โดยเราสั่งให้นับ id ของคนที่ลงทะเบียนในตาราง event_registrations
-        const [rows] = await pool.query(
+        const [rows] = await db.query(
             `SELECT events.*, 
              COUNT(event_registrations.id) AS current_participants 
              FROM events
@@ -40,7 +40,7 @@ export const registerEvent = async (req, res) => {
 
         // ตรงนี้มันคือการเช็คว่าอีเว้นนี้มันมีจริงนะแล้วก็ยังไม่เต็ม
         // SELECT COUNT(*) = นับจำนวนแถวทั้งหมด
-        const [eventCheck] = await pool.execute(
+        const [eventCheck] = await db.execute(
             `SELECT max_participants, 
                 (SELECT COUNT(*) 
                 FROM event_registrations 
@@ -63,7 +63,7 @@ export const registerEvent = async (req, res) => {
         }
         
         // check ว่า user คนนี้นางลงทะเบียนไปรึยัง
-        const [dupCheck] = await pool.execute(
+        const [dupCheck] = await db.execute(
             `SELECT id 
             FROM event_registrations 
             WHERE event_id = ? AND id_employee = ? AND status = 'registered'`,
@@ -78,11 +78,11 @@ export const registerEvent = async (req, res) => {
         const insertSql = 
         `INSERT INTO event_registrations (event_id, id_employee, notes, registration_date, status) 
         VALUES (?, ?, ?, ?, 'registered')`
-        await pool.execute(insertSql, [event_id, id_employee, notes, registration_date])
+        await db.execute(insertSql, [event_id, id_employee, notes, registration_date])
         
 
         // อัพเดตจำนวนคนที่ลงทะเบียน
-        await pool.execute(
+        await db.execute(
             `UPDATE events 
             SET current_participants = (
                 SELECT COUNT(*) FROM event_registrations 
@@ -113,7 +113,7 @@ export const getEventById = async (req, res) => {
 
     try {
         
-        const [rows] = await pool.execute(
+        const [rows] = await db.execute(
             `SELECT events.*, 
              COUNT(event_registrations.id) AS current_participants 
              FROM events
