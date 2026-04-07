@@ -12,6 +12,9 @@ import personalSummaryRouter from "./routers/personalSummaryRouter.js";
 import adminRouter from "./routers/adminRouter.js";
 import requestRoutes from "./routers/requestRoutes.js";
 import shiftRoutes from "./routers/shiftRoutes.js";
+import groupNotiRouter from "./routers/group-notiRouter.js";
+
+
 
 import pool from "./config/db.js";
 
@@ -39,6 +42,7 @@ app.use("/events", eventRouter);
 app.use("/leave-approve", leaveRouter);
 app.use("/personal-summary", personalSummaryRouter);
 app.use("/admin", adminRouter);
+app.use("/api/group-noti", groupNotiRouter);
 app.use("/checkin-approve", requestRoutes);
 app.use("/approver", shiftRoutes);
 
