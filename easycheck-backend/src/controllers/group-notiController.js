@@ -7,7 +7,7 @@ export const getDepartments = async (req, res) => {
         const [rows] = await pool.execute(
             `SELECT DISTINCT department FROM Users WHERE department IS NOT NULL ORDER BY department`
         )
-        res.json(rows.map(row => ({ name: row.department })))
+        res.json(rows.map(row => ({ id: row.department, name: row.department })))
     } catch (err) {
         console.error(err)
         res.status(500).json({ message: "Server Error" })
@@ -17,7 +17,7 @@ export const getDepartments = async (req, res) => {
 export const getEmployees = async (req, res) => {
     const { department } = req.query
     try {
-        let query = `SELECT id, id_employee, firstname, lastname, position, department, avatar FROM Users WHERE role_id = 1`
+        let query = `SELECT id, id_employee, firstname, lastname, position, department, avatar FROM Users WHERE role_id IN (1, 2)`
         let params = []
         if (department) {
             query += ` AND department = ?`

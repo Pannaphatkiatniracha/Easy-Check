@@ -3,10 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
-
--- Generation Time: Apr 06, 2026 at 03:18 PM
-
--- Generation Time: Apr 06, 2026 at 06:53 PM
+-- Generation Time: Apr 08, 2026 at 05:54 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -27,25 +24,11 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Events`
+-- Table structure for table `attendance`
 --
 
-CREATE TABLE `Events` (
+CREATE TABLE `attendance` (
   `id` int NOT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` date NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `Events`
---
-
-INSERT INTO `Events` (
-( `id`, `title`, `date`, `description`, `created_at`) VALUES
-(1, 'kater', '2026-04-15', 'katerkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkaterkater', '2026-04-02 21:45:26'),
-(2, 'น่าหนาว', '2026-04-07', 'น่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาวน่าหนาว', '2026-04-10 21:45:26');
   `id_employee` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(20) NOT NULL,
   `status` varchar(50) DEFAULT NULL,
@@ -72,18 +55,18 @@ CREATE TABLE `events` (
   `id` int NOT NULL,
   `title` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci,
-  `date_thai` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `date_thai` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `event_date` datetime NOT NULL,
-  `event_time` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  `location` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  `icon` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'bi-calendar-event',
+  `event_time` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `icon` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'bi-calendar-event',
   `register_start` datetime NOT NULL,
   `register_end` datetime NOT NULL,
   `type` enum('internal','external') CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'internal',
-  `max_participants` int DEFAULT '0',
-  `current_participants` int DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `max_participants` int NOT NULL DEFAULT '0',
+  `current_participants` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
@@ -92,7 +75,7 @@ CREATE TABLE `events` (
 
 INSERT INTO `events` (`id`, `title`, `description`, `date_thai`, `event_date`, `event_time`, `location`, `icon`, `register_start`, `register_end`, `type`, `max_participants`, `current_participants`, `created_at`, `updated_at`) VALUES
 (1, 'งานวิ่งการกุศลประจำปี', 'ร่วมกิจกรรมวิ่งการกุศลเพื่อสังคม', '20 เมษายน 2569', '2026-04-20 06:00:00', '06:00 - 10:00', 'สวนสาธารณะเมือง', 'bi-activity', '2026-04-01 00:00:00', '2026-04-19 23:59:59', 'external', 100, 1, '2026-04-01 20:30:22', '2026-04-02 22:26:03'),
-(2, 'สัมมนาเทรนด์ธุรกิจปี 2026', 'สัมมนาแนวโน้มธุรกิจและการตลาด', '25 เมษายน 2569', '2026-04-25 09:00:00', '09:00 - 17:00', 'โรงแรม Grand Palace', 'bi-graph-up', '2026-04-05 00:00:00', '2026-04-24 23:59:59', 'external', 50, 0, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(2, 'สัมมนาเทรนด์ธุรกิจปี 2026', 'สัมมนาแนวโน้มธุรกิจและการตลาด', '25 เมษายน 2569', '2026-04-25 09:00:00', '09:00 - 17:00', 'โรงแรม Grand Palace', 'bi-graph-up', '2026-04-05 00:00:00', '2026-04-24 23:59:59', 'external', 50, 1, '2026-04-01 20:30:22', '2026-04-08 17:34:14'),
 (3, 'กิจกรรม CSR ร่วมกับชุมชน', 'ทำกิจกรรมเพื่อสังคมร่วมกับชุมชน', '30 เมษายน 2569', '2026-04-30 08:30:00', '08:30 - 15:30', 'โรงเรียนบ้านหนองบัว', 'bi-heart', '2026-04-10 00:00:00', '2026-04-29 23:59:59', 'external', 30, 0, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
 (4, 'ประชุมผู้ถือหุ้นประจำปี', 'ประชุมใหญ่สามัญประจำปี', '5 พฤษภาคม 2569', '2026-05-05 13:00:00', '13:00 - 16:30', 'โรงแรม The Plaza', 'bi-people', '2026-04-15 00:00:00', '2026-05-04 23:59:59', 'external', 200, 0, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
 (5, 'อบรมเทคนิคการตลาดดิจิทัล', 'อบรมเชิงปฏิบัติการการตลาดออนไลน์', '10 พฤษภาคม 2569', '2026-05-10 10:00:00', '10:00 - 16:00', 'ศูนย์ฝึกอบรม AIA Tower', 'bi-laptop', '2026-04-20 00:00:00', '2026-05-09 23:59:59', 'external', 40, 0, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
@@ -120,40 +103,68 @@ CREATE TABLE `event_registrations` (
   `id_employee` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `notes` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci,
   `registration_date` date NOT NULL,
-  `registered_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` enum('registered','cancelled') CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT 'registered'
+  `registered_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('registered','cancelled') CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'registered'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
->>>>>>> a7e11610c57c0e799961f7d9c014c935b2872662
+
+--
+-- Dumping data for table `event_registrations`
+--
+
+INSERT INTO `event_registrations` (`id`, `event_id`, `id_employee`, `notes`, `registration_date`, `registered_at`, `status`) VALUES
+(28, 1, '101010', 'แพ้กุ้ง', '2026-04-08', '2026-04-08 17:33:46', 'registered'),
+(29, 2, '101010', 'อยากกลับบ้าน', '2026-04-08', '2026-04-08 17:34:14', 'registered');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Event_participants`
+-- Table structure for table `leave_policy`
 --
 
-CREATE TABLE `Event_participants` (
+CREATE TABLE `leave_policy` (
   `id` int NOT NULL,
-  `event_id` int NOT NULL,
-  `id_employee` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `leave_code` varchar(50) NOT NULL,
+  `leave_name` varchar(100) NOT NULL,
+  `max_days_per_year` int DEFAULT NULL,
+  `require_evidence` tinyint(1) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
-
--- Dumping data for table `Event_participants`
+-- Dumping data for table `leave_policy`
 --
 
-INSERT INTO `Event_participants` (`id`, `event_id`, `id_employee`) VALUES
-(1, 1, '101010'),
-(3, 1, '303030'),
-(4, 1, '404040'),
-(2, 2, '202020'),
-(5, 2, '505050');
+INSERT INTO `leave_policy` (`id`, `leave_code`, `leave_name`, `max_days_per_year`, `require_evidence`, `active`) VALUES
+(1, 'SICK', 'Sick Leave', 30, 1, 1),
+(2, 'PERSONAL', 'Personal Leave', 3, 0, 1),
+(3, 'VACATION', 'Vacation Leave', 6, 0, 1),
+(4, 'MATERNITY', 'Maternity Leave', 120, 0, 1),
+(5, 'WEDDING', 'Wedding Leave', 3, 0, 1),
+(6, 'RELIGIOUS', 'Religious Leave', 3, 0, 1),
+(7, 'OTHER', 'Other', 3, 0, 1);
 
--- Dumping data for table `leave_requests`
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leave_requests`
 --
 
-INSERT INTO `leave_requests` (`id`, `user_id`, `leave_start`, `leave_end`, `leave_reasons`, `other_reason`, `evidence_file`, `status`, `reject_reason`, `created_at`) VALUES
-(1, '061004', '2026-04-07', '2026-04-10', '[\"Sick Leave\"]', NULL, 0xffd8ffe000104a46494600010100000100010000ffdb0084000906071010121210121210121010101510151015100f0f1015101515161615111515181d2820181a251d151521312125292b2e2e2e171f3538332c37282d2e2b010a0a0a0e0d0e1b1010182d1d1d1d2d2b2b2b2d2b2d2d2d2b2d2d2d2d2b2b2d2d2d2d2d2d2d2d2d2d2b2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d372d2d2d372d2b2bffc000110800e100e103012200021101031101ffc4001c0000010501010100000000000000000000050002030406010708ffc4004510000102030405080608050305000000000100020304110512213141516171910613223281a1b1c1425272b2d1f007142333627382c2637492a2e12443b315163453f1ffc4001a010002030101000000000000000000000002030001040506ffc40026110002020202020105000300000000000000010211033104213241121314225161052371ffda000c03010002110311003f00d54f2071b3ed47279038bd6ed58e61c406feb1f68f8a21647de0f9d050e399f68f8a2763fdef1f029d8fd152344875ac7a2ef60f884450db63aaef67f705ade8cc8cfb51bb13d1fce67bf0879a0ad46ec21d28635c767fcb05261b1b2d1ea69af4e40396dca587674b3a3388311d5642864e2f894d5a8667fca7dd18f6ca3cade58cad9e28f25f18b6a203297e8722e39346fd58557915b5f49b3f189e6ded80cd0d86017536bdd9f65166a726624c39f1623dcf8b15c5ee27124ebf9c8510c8aca253c8d9aa18525df61d99e55cfc46dd7cd47734e8bc0778c50974d3c9c5ce3bc92a202addcbb2f128766eaa0639245f64dbd82b7dcd39820907882b49c9dfa4098834645a46875271a3628a9a921fa771e2b2b342ada8c3b69dca9b4905526d689249ecf7193b5614d379c86ea8d20e0e69d44685725c62bc6ec5b56240787c3342302d3d5737d5217ac727ed264cb1b119a702dd2d769694f8caf62250a3552f9056e1aa90342b90d6a466648d5e73cac3feae36f6ff00c6d5e8c179b72a0d66e3fb60706b424f23c4661f22ac8f5bb5bef05b2e4d0ff4d5d715e7c16364b3ed1e2b69c9effc587ed3cff724e0d8ecda14c9c540a599cd42d4f7b10823243144d886c92270c26474048b3721fac782ea868922afe9466e77240e367da8e4ee48145cd712674a00471c4ef3e288d8df79f3a90c6a276375c6ff0024ec6548d1a1b6cf54fb23de0889436d8ea9dc3de0b5bd1996c02d472c01d383fcc33fe585f040c23bc9ff00bc97fe619ef03e4930d8d968f4c9a986c263e23cd190da5ee3a9ad1527805f3172bb941127e65f30f24824b61b09c190abd1601a36eb355edff4a96b365ecf8c2f86c48c3996330abefd03c01b1b535d8be738910b4a6647e85618fb2c12e06f65f049c5afcf03f38a861bce9f4bc1284003afc128d48888a1a28cba8ac4569bc15e99817ba400029906aab27c4a70630a68aed3e4b861fceb0b9cd1ae5dcac476d294c34eed8aacba2bd48c4538235c94b7624b476baf7d9bdcd6c46e8bb5a5ede2a8212940eb0deaec16acfa5a55d50372bd0d79ff00d1bdbce8cdfabc4357c36d5a4e6580d29d950bd061add8e5f25661c91f8ba246af31e503ab331cff0015ddc69e4bd3dabcb6d935988ff9d13de28391e21e0f21b25af68f02b6b608ff004b0b6df3fdc562654e07b7dd2b71638a4ac1dce3fdee4ac1b199b441319a898a48f9a643cd35ec484a49148610d92089c34e8e8090fa249c92bb04cbcea031b347a78a031f32b8933a5001b115b1474c6ff24299a117b13adf3a93f1eca907ca176c1e89ecf1289a176ce5fd3e25697a33ad8111de4f8fb497fcf69ef77c10208dd8730d86f84f7101ac7de24e0301112a1b1b2d1e6dcb8e50bed09b8910d44369e6a0c3f5580eaf59c713d8342cdcdc12d750f156a7660f3b1228342e8ae702283324d40ed55cc5bd86a5527d8705484d341e6b97e89af56acb91746780061a4a161a45eb1e45d18d48a34695b091b21a07c5724a4ee34002802292b824b958f51a00dabc9f1d66d01d828164e7213812d70a3b41d057a5c735c107b4aca6c514231d074853e45b479eb9a42ec0e89076d079a3d3962bdb5381a20262dea614bb82646562251a37df46d10fd758d1e9427d760001af82f6586bc93e88641ee8b12648e8359cd03adce2d710370038af5c8616de3afc4c7c87f912357955a86b1a31fe344f7caf56685e4d3a7ed227e63fde2a727c50383c87cb754ee77bab75668a4b41f609e2e72c2cb647d97792deca0a40823f84defa9f34bc1b199b4518f9a6c238a747cd32084d7b12169244e1a1b2289c34e8e8091224924ac132b3c8145cd1b9e72091735c499d38811a116b13ac379f04259a116b0fac3b7c13f1ec19683a85db597f4fee454a116d1c3b5be0e5a5e8cf1d81c2a1cad980c9402a439ce01b4c34bc93c02be167797b1bece0375de3df4f349438c55eae3994da1cc2eb703885d86711aaaa068eb0d4af42e4fca3590da40c48cd649d653d84923002b5d1ad6d6c1c60b772549a63a31687cddab0a16043c9d8c3e699079492d95e2d3f89a42ad6b4acc17001d76193d270179e06c0809b3a298cfc5d701e8d487878ae1a30a8e050a561dd1b48738c78bcd208d6153b4ed764119171d43e29965c91048cb0aaaf316607de2f15c1c06c76201a5286883d84c1cdb5a24c3aeb4c2603adc0959d7c93b9d7340a9be453b569ac9e4f063817806ee20814c76aa2d962678d05473e30d951826aa5a132baecf63e48c8b604bc28400ab5a2f529d7389c466b470d0db3615c606ea1444a1ae9e35513973772256e6bc8a60d5ee3adee3de57ae82bc7de713bd2793a43306d96a57271fc0ef16adfc31485087f059ee858197eabbd83ef357a0c4146306a84c1fda10e00f302a3669424a2e694246f6282f239222c43e4b244589f1d01224a24bab8a02642d10833f346ad140a21c5716674e20766845ec1eb0de7c1076e4118b073e3e09f8f60cb41c2845b397ea1e0e45ca0d6c9c3f50f74ad32d19e3b04accf2e611b905da2a471c7c8ad38570f2745a0d6cbdeb8e22ad7d2b4706c4cc691a1252b1d75d9e3b318e3afc542d2bd066fe8c6d161743e6e1383728a23503b51baec45562e6249f01ee645610f6e05a7020edd889c5ad84a49e83d256d4212d7623898ad2181b424b998d0eac30d2118e4e4c000007a24546e2b0246e0b4fc9b8a6e534b4d3b12271aecd1095f46e490e51fd59a3154e0cca99f3048a04ab1d45c94843adad4008bc46d5132d686da34d5a40a748103b0e45577cd8792e6f547a5a09d4151545d76606b57393bc9f870e23a33ba711cebd539024d6807ce4a9d8ec2f7de39331ed3979ad4d9c315a7042fb664e4e4afc5072005721aa9015b62e9239ac7bce0771f05e3ebd7660f41fec3bc0af220b3f27487f1f6cbb2dd477b1fbc2f439b14a0d4d03805e792dd477b23de2bd0e77328707b2f37a03c55d84b911760a3f62c33259220c43e4b244189f1d0b64954971250a3151a65af187039a1510e2ab4d467b48d5502ad0e710e39175320aec684482ea659f0cd715a6d59d44a8040a336067c5056a376067d8e4fc7b172d065c506b63f70f7519720d6c7eefdab44b4263b05b56b3919f7f0bd877b8ef8aca356b79163ede16c86f3fdacf8a5c361cfc4dec484d702d700e045082011459bb6391125326f4565f232bee73a835678f6ad3a6bd68464ba3292bc9492961721408403b33cdb4d762f39e5e4bc39799a42635ad870db79ad6868abaae2683616af4cb7f9512f2d56d4448c3fda69181fc6ec9be3b1795dab32e9888f8b1285d10d4ead400d80003b12b9138fc3e3ecd5c58c9cfe4f456978a1c2a3229d30e8ad179974d3d120d4ee283c66be59d518c32786c4564a7d910678ead2b9e74d328c6b5223853ec7716b89e0558b35af895739c48ad1ad0035b5d8066aeba4e09c4804ed56ecb9986c880dda86621a30c7207b112efa199324147a8f61f9294e6981be91c5ded1d1d9922b67e687b261b13169ecc8a2167e6ba10495247166db6db0e4056d8a9c05718b5233b239cfbb89f96ff74af255eb33f8428bf94ff74af2659b93e87f1f6cbb2dd576e6fbce5e873f995e7d263a27f48ef72f40b4732a60d32f37a03c429d0947113e022161a92c910621f279220c4f5a16c9125c5d5003cba6c569b1cd3df4ff003d8ae427f851558c2a3fcd31ae0bb2acbb4ba4904171073a9a1c350c4e1b57151d8074dc1b8f2dd198dc7245793fe47c42ab69349687ea711afa24e1f3b55be4ff00ed3e2b463d8996830e416d83ef9f742365676df990d377375e269b28054a7cdd213056ca6d2b57c9098870e331cf7b180427e2e7068eac2d27b56218e71f9a27b5834acab324cd2f036bb3d52d2e5a49c1a86b8c67fab0c5476bcf4785562edbe584d4cd5ad3cc433e8309be47e28981e14419d2c29504a80c276820aa9e793d745c38d08efb23ba986112a76dff005548d27d5493424550d0e05ae151951039eb31cc37a1d69ab485a76c1ccd3348c10a823210a2c4c89777a3766407121c7014a6f4484a0ce83829441568a7d93b5d40ad4adad11870a3b611e6a9737ad74262c8d685bc69ecd0c2e555deb42e0fa788572072c209eb3223775d779858b8b52570434c5ca9a14f8b067a444b4e0c6811b9b782799886ee4e1d03a0e2bccc2b2ca84d98863ac32c88d451cb3fd4a0160fa7da2d480c3f5356f6d238b9612ccd1f98df25bab40e253f06999b36d01a2669f013222925c2300352792210d5094c82bec4f5a15224a24924a02795409a6bef8d30cdd3aabb1492649208eaf4ab8ed2294f9c944f66379b417bad850914c0ef52cac5c06d6d7b752e2ad9d82624446bdb423368de323c427f27ff0069f7945021d1d5d1ab4549a93bd5bb2d81af70190069baf27e2772153548b93930d84c2f7643893a005888d305ef744766e35a6803405a8e541fb03edb7cd6402be43f46bff1f82334e4cbb0e6da3369ec20a93eb50ceb1bc7c10ec7577a5f3a166a3a6f8b06136cc372bc38d175846820a158a54ddc54a16f88bd30fb5c9121010ef9aa708d10754f61c8fc14a01f125e986ea12c10f64e388c5b8ef5c8b3ae1932a778f35542fede7fa0838ae5ea210e9b8a7d177639a144e8afd0ced2415286478b27b61a7476eb1e2a174c8dbe08636f1ccd3629405743570e3ed96b9fd8b9ce9f90a00bb552835c782f44d7ceb2a461388ad415583959977555a24f146b411b1db52c1ae2b07bab6d686958bb0cf4e17e737f6ada4f695d0c1a6798cfe40888a59751c452c0462c3328afb15094c82bec4f5a1521e92492809e490a23ee92fbb78686e00d6b5ed52427bae02e147532cfa4a28c034dda1c5d4d1aea54d11a4d0034350758a039517162efb6766557d1332ad00d6a337035ee3f1442cc71bce0697834569954e268a90880690adc88a44da5b4af03f14cc4ea42f22e8afcab8cd109adaf49cf040d3400d4f78597011de58305613b4f4876744a0611667f91d2ff001abfd77fd39776a419bd3d7524e90d10c2edc1a82780a08b1e983454f70de5421290028cc5da3c556e6deeeb38ee1805d32cdd22bbeaef150b267cdb4691c4284cf8a8c47118a9604bb73a01d802514570a546ad0a8b2481143868ad68427b9bbf7a1f1251a0de6f4768f0234a960462d3479a6a27aa7b741deaca6890b627ac3b5abad73c674e0558a2e10a12c60889e0a69869b768a884c1a9d0df4237a8e1b94ae83556809f41ab1474e17f30df16ad9cf6958db07ef207e7b7c5ab633da57430f8b3ca72554ebfe82dea5839a85ca79746283328300afb152950af313d68531d4493971404f2388ebee19e25cece980c01ef0936332aec4102a0e34c4663b144fe8baf1f4b0181a0ae38ecc14d01ad6b80a5e2057200508353dddeb8a7609db2edc4e34200c72a63a3b559968c39c1be9b31c3350bba235d07c85c82ea39972952f65e341ac5ef12a47654b43795dd587ed9f0ff000b3e11ee57ba8c87acc4a01acdd3f04120c9970a97b86c6dd007106bf3826e77f91b7819231c5dfec618a0667b333c0285f3669d16e6680bb0a9d8063c689d125dcc7004b5cd71c1f4a383b301c38e2a3891435c09c9ad27e3fb528e9426a4ad1239d740e75e493935b560dc00c78953882001414045699669b2326e71e722605de8e90dd0dae81e6aec56a8115431739b52d13a8a8b18451421b5561c98c508321b34149f001c14d448a84b2acbcb35980141b0903864b91e24469a865f6ec21af1d8703c42b9752b8a1456969964406e9c466d38381d441c4294843ad594f4d9d188060e04b4f109d66fd64b417f36fdb8b1de143dcac07914765d2d56209c14343a411bfe23052c25112524e3d06ec3fbc97fcf1ef356c27563ec3fbd96fcf1ef356c27325d1c3e2cf2bc877305bf3534b289d9a9e595fb161a95c95e62a52d92bac4f5a14c7249d4494251e48c7d5ad3b2877d02ecc476c36dea55c7a2d1a493a3769552d788d86c0d2e0dcdc0d32a018edcc21f67df75223dc4ba94682055add7b095c691d78ab2f3e65cee8d69802e34a5350ef3d8117b2a1068249146fa470ffe20d021b5a7000694f75a5473e1de000c08c3114ad71deae15b654e2f48b9ca788c7321d0b5c445ae041205d757c90e977502965e34271a3684f156c306a0a6497c9d8cc51f82a074e343da5b515391d4e1883c68b3531345af05ed22e906ee142fd1d9a6ab68f9669d01509cb16145a5e15a646a411da102669c795c0ec8c72e68245091966a58a545064dd0c506206bcd3a2b5da8abb3763cb17ec8eabb550972ede507d9210928ef2e5e50125aae55477d2bca1096a9e1401c9e1ca0457b406055f9287468dc86cd3eb41adc3c51696382a660e43242140e87a4607b8ab2a17e6a44c96d6823629fb596fcf1e2d5ae9b88b1365c6a4496fe600ee0b491a3d574b13fc4e4e6f21e4ab12ea931caecb224006e595d86a94b2bac4e42d8f497525651e336c74d85a69a0d346041f254e5cab73501e6a4d28a1810a8571a4a8ebe27689a1b4a867a00738b481d2033dc89426a1f6abba74fc23cd5c51790ecb87c3142d6d3f09f2c15a1301508324f06a6382df54b057faabe4a76b9a33a14235171b1aaa46baaa85f6eb0bbf59034aa2042e84c2c0aa36799eb8e214f0e61bac2ba2589f2cd3980abc4901a090ae5e4af2a0d6492d30599270d3dc98659c8bde0bb40a0d5c99a013e5dfa8a6963c7a27823d742e18614b0beee5fa33ce7b8683c0aeb63a3a6084c74b0d414b0feeff86645e110038b6b5051d977e09ce946ea1c027320d3250464c9f364c0aaf30ea5772982a73a4d30049c32d55571d8893e88aedfa56b469a8a1a63957b91264ec5a75cf686b90982e70cc1e055b8711694da3134984605a719be935dbc11e0adc0e50466e6d638703c6be483f3895f56a6c17046b25f962075a044ded21c88c1e5b4a7a5ce337b560c382ededa78a62cd240bc313d0ffef291ff00da7fa1ff0004979e5e4917d7657d140f9088f25c097500a52a48aee44613554650c47d0505ea6ac4607bd1086173edbd9be09244a1d40a909a84eeb675d2304ad098bad2069c10763369e2894fe204d7c8231a5613de295cbd1739b8d7480b8fb359ade3f5bbcd72cfcf1c5117350ca49f68663e950222c8ea7c41b6a0f88406d4645654738f734ec008e0b62e875519951a8214e869e7d0acf310d6a40d75445965c7878c38dd8ea8f8ad6ba45a740513ecb61f451fcc62943da02cbda5370f08908bc7acc21c7822302de86ec09baef55c0b0f029efb15a7d61fa8f9a645b29c452f5e1a9ed6bc2ab446b1bd3a2f326c1d2a66c7da809b19c3abd03f80b9a3fa4d424d8734cd0d8837dd77c1500e0bd3342232773c81c39f78eb4388dfd351c4542b50679aed2140026232773aa9363029c5ea165ba85dc15131e89cd990a8a2c45340a83e66e1aa922c5aa1d11f528e1b0327885e0cf039d382b2d88c39b5bc10782adc36ad1f2325174c18474537263e4e1e77a836914508075a707394b2a87fd40e870298e9378d47b5384529c239daa5a27641f577eaef092b3f58494e8beca128d271399353daad4589742e426d021f3d1ea68b3ff4d4fa2acd452f3954289b4d2d2375427dc07427b61ea711dfe294dd804b2510070c4ee28a08c84861cfa27b2e94f74cab8b190615e702697a182706b4f134158c0807a736221fcf6d5d130559412e7522f087fd6174465081184dbc68d6971d401278049cd1911423020e041d4b96790d1cf138b0bc81852f35a2e57697b9b41a9ae3a14e224ae97b8e231fb4adc05a034619dd0ed82f0a658dd156572d6a8df2b09dd66b4ef02aadb1f2b9dec7a2727b837eeaf36847489ac5cf0c02e5a1330e20bf7818a5cebc5a1c1aea90ec88180a96d73e8e58e128bb29ff00d2e11ea9737738f8155e349446f55e0ec70a778f82b50e2aec489ad55100d19d18670ebb5ae69f1a2a2665e3fdb89fd251f7450a3bc14a2582a14e179bb88af6952c582594ad31deafd06741555e106c72ec0f40ddf8f82386e85655d59c80e57a1950b6ce232254ad9678da9d4ccd689c2ea87a4330ba22efe0a164abaa311827870544124bb549421c8b92ce4c7de149249968d12d93b14a1249241256aa33f9f6249288b40ed2adc24924c1a8b50d4c924a167548d5c49421d19aebd249420c4d0ba928424819f6ab333a124959454d298735d49510b015491fbc7fb652491e3f2032f8b0f314ad5d496a309139568a924a9868ab11760a4925844a92492843ffd9, 'approved', NULL, '2026-04-06 18:47:14');
+CREATE TABLE `leave_requests` (
+  `id` int NOT NULL,
+  `id_employee` char(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `leave_start` date NOT NULL,
+  `leave_end` date NOT NULL,
+  `leave_days` int NOT NULL,
+  `leave_reasons` json NOT NULL,
+  `other_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `evidence_file` longblob,
+  `evidence_mime` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `approved_at` datetime DEFAULT NULL,
+  `rejected_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -209,16 +220,16 @@ CREATE TABLE `Users` (
   `role_id` int NOT NULL,
   `firstname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `lastname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `gender` enum('male','female','other') NOT NULL,
+  `gender` enum('male','female','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `birthdate` date DEFAULT NULL,
-  `joindate` date DEFAULT NULL,
+  `joindate` date NOT NULL,
   `position` enum('Budgeting & Planning Officer','Cybersecurity Specialist','Payroll Specialist','Content Marketing Executive','Customer Experience Analyst','Sales Coordinator','Key Account Manager','Content Creator','Motion Graphic Designer','Approver','Admin','Super Admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `department` enum('Finance','IT','Sales','Creative') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `branch` enum('Bangkok','Chiang Mai','Phuket','Chonburi','Khon Kaen') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `avatar` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '/img/default.jpg'
+  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `avatar` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '/img/default.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -282,9 +293,6 @@ CREATE TABLE `User_shifts` (
 -- Dumping data for table `User_shifts`
 --
 
-INSERT INTO `User_shifts` (`role_id`, `shift_id`, `user_id`) VALUES
-(1, 1, '101010');
-=======
 INSERT INTO `User_shifts` (`role_id`, `shift_id`, `id`) VALUES
 (1, 1, 1),
 (1, 1, 2),
@@ -296,15 +304,8 @@ INSERT INTO `User_shifts` (`role_id`, `shift_id`, `id`) VALUES
 --
 
 --
--- Indexes for table `Events`
+-- Indexes for table `attendance`
 --
-
-ALTER TABLE `Events`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `Event_participants`
-
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_employee` (`id_employee`);
@@ -324,12 +325,18 @@ ALTER TABLE `event_registrations`
   ADD KEY `id_employee_2` (`id_employee`);
 
 --
+-- Indexes for table `leave_policy`
+--
+ALTER TABLE `leave_policy`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `leave_code` (`leave_code`);
+
+--
 -- Indexes for table `leave_requests`
 --
-ALTER TABLE `Event_participants`
+ALTER TABLE `leave_requests`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `event_id` (`event_id`,`id_employee`),
-  ADD KEY `id_employee` (`id_employee`);
+  ADD KEY `idx_employee` (`id_employee`);
 
 --
 -- Indexes for table `Roles`
@@ -358,9 +365,6 @@ ALTER TABLE `Users`
 --
 ALTER TABLE `User_shifts`
   ADD KEY `role_id` (`role_id`,`shift_id`),
-  ADD KEY `id` (`user_id`),
-  ADD KEY `shift_id` (`shift_id`),
-  ADD KEY `user_id` (`user_id`);
   ADD KEY `id` (`id`),
   ADD KEY `shift_id` (`shift_id`);
 
@@ -369,11 +373,6 @@ ALTER TABLE `User_shifts`
 --
 
 --
-
--- AUTO_INCREMENT for table `Events`
---
-ALTER TABLE `Events`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
@@ -389,14 +388,19 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `event_registrations`
 --
 ALTER TABLE `event_registrations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT for table `leave_policy`
+--
+ALTER TABLE `leave_policy`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
->>>>>>> a7e11610c57c0e799961f7d9c014c935b2872662
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `Users`
@@ -409,13 +413,6 @@ ALTER TABLE `Users`
 --
 
 --
-
--- Constraints for table `Event_participants`
---
-ALTER TABLE `Event_participants`
-  ADD CONSTRAINT `event_participants_ibfk_1` FOREIGN KEY (`id_employee`) REFERENCES `Users` (`id_employee`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `event_participants_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `Events` (`id`) ON UPDATE CASCADE;
-
 -- Constraints for table `attendance`
 --
 ALTER TABLE `attendance`

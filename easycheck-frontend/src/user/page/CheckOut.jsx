@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 function CheckOut() {
+  const navigate = useNavigate();
+
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -72,7 +75,11 @@ function CheckOut() {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" },
       });
-      videoRef.current.srcObject = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+
       setError("");
     } catch (err) {
       setError("เปิดกล้องไม่ได้: " + err.message);
@@ -89,7 +96,10 @@ function CheckOut() {
 
   const capturePhoto = () => {
     const video = videoRef.current;
-    if (!video?.srcObject) return setError("กรุณาเปิดกล้องก่อน");
+    if (!video?.srcObject) {
+      setError("กรุณาเปิดกล้องก่อน");
+      return;
+    }
 
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
@@ -104,6 +114,7 @@ function CheckOut() {
           const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
           setPhoto(file);
           setPhotoPreview(URL.createObjectURL(blob));
+          setError("");
         }
       },
       "image/jpeg",
@@ -113,7 +124,8 @@ function CheckOut() {
 
   const handleLocation = () => {
     if (!navigator.geolocation) {
-      return setError("เบราว์เซอร์ไม่รองรับ GPS");
+      setError("เบราว์เซอร์ไม่รองรับ GPS");
+      return;
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -131,7 +143,7 @@ function CheckOut() {
   };
 
   const isCheckoutEarly = () => {
-    if (!userShift) return false;
+    if (!userShift?.end_time) return false;
 
     const now = new Date();
     const [h, m] = userShift.end_time.split(":").map(Number);
@@ -140,8 +152,15 @@ function CheckOut() {
   };
 
   const submitCheckOut = async (overrideReason = null) => {
-    if (!userShift) return setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
-    if (!photo) return setError("กรุณาถ่ายรูปก่อน");
+    if (!userShift) {
+      setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
+      return;
+    }
+
+    if (!photo) {
+      setError("กรุณาถ่ายรูปก่อน");
+      return;
+    }
 
     if (isCheckoutEarly() && overrideReason === null) {
       setShowEarlyModal(true);
@@ -174,7 +193,8 @@ function CheckOut() {
       const data = await res.json();
 
       if (!res.ok) {
-        return setError(data.message || "เกิดข้อผิดพลาด");
+        setError(data.message || "เกิดข้อผิดพลาด");
+        return;
       }
 
       setMessage(
@@ -185,6 +205,8 @@ function CheckOut() {
 
       setPhoto(null);
       setPhotoPreview(null);
+      setLocation(null);
+      setEarlyReason("");
       stopCamera();
     } catch (err) {
       console.error(err);
@@ -196,7 +218,8 @@ function CheckOut() {
 
   const handleEarlySubmit = () => {
     if (!earlyReason.trim()) {
-      return alert("กรุณาระบุเหตุผล");
+      alert("กรุณาระบุเหตุผล");
+      return;
     }
 
     setShowEarlyModal(false);
@@ -210,127 +233,194 @@ function CheckOut() {
     setPhotoPreview(null);
     setEarlyReason("");
     setLocation(null);
+    setShowEarlyModal(false);
     stopCamera();
   };
 
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
   if (shiftLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex items-center justify-center">
-        <p className="text-white text-lg animate-pulse">กำลังโหลดกะงาน...</p>
+      <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
+        <div className="max-w-md w-full">
+          <div className="flex items-center justify-center relative mb-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="absolute left-0 text-white text-3xl bg-transparent border-0"
+              style={{ lineHeight: 1 }}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+
+            <h2 className="text-xl font-bold text-white text-center">
+              CHECK OUT
+            </h2>
+          </div>
+
+          <div className="bg-white/10 rounded-2xl p-6 text-white border border-white/20 text-center">
+            <p className="text-white text-lg animate-pulse">กำลังโหลดกะงาน...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex justify-center items-center px-4 font-sans text-gray-100">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl shadow-2xl space-y-5">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold tracking-wide text-white drop-shadow-md">
-            🔴 Check-Out
+    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
+      <div className="max-w-md w-full space-y-6">
+        <div className="flex items-center justify-center relative mb-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute left-0 text-white text-3xl bg-transparent border-0"
+            style={{ lineHeight: 1 }}
+          >
+            <i className="bi bi-chevron-left"></i>
+          </button>
+
+          <h2 className="text-xl font-bold text-white text-center">
+            CHECK OUT
           </h2>
-
-          {userShift ? (
-            <p className="text-sm text-indigo-200 mt-1">
-              กะงาน: {userShift.start_time.slice(0, 5)} – {userShift.end_time.slice(0, 5)} น.
-            </p>
-          ) : (
-            <p className="text-sm text-red-300 mt-1">
-              ⚠️ ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า
-            </p>
-          )}
         </div>
 
-        <div className="flex gap-3">
-          <div className="bg-white/20 border border-white/10 w-full text-center rounded-xl py-3 backdrop-blur-sm">
-            <span className="block text-[10px] text-indigo-200 uppercase tracking-widest">
-              เวลา
-            </span>
-            <span className="text-xl font-bold">{time}</span>
-          </div>
-
-          <div className="bg-white/20 border border-white/10 w-full text-center rounded-xl py-3 backdrop-blur-sm">
-            <span className="block text-[10px] text-indigo-200 uppercase tracking-widest">
-              วันที่
-            </span>
-            <span className="text-sm font-semibold">{date}</span>
+        <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">
+          <div className="text-sm">
+            <div className="font-semibold">ข้อมูลกะงาน</div>
+            {userShift ? (
+              <div className="mt-2 space-y-1 text-white/90">
+                <div>เวลาเข้า: {userShift.start_time?.slice(0, 5)} น.</div>
+                <div>เวลาออก: {userShift.end_time?.slice(0, 5)} น.</div>
+              </div>
+            ) : (
+              <div className="mt-2 text-red-300">
+                ⚠️ ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="bg-black/20 p-3 rounded-2xl shadow-inner">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            className="rounded-xl w-full bg-black aspect-video object-cover"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20 text-center">
+            <div className="text-xs text-white/70 mb-1">TIME</div>
+            <div className="text-lg font-bold">{time}</div>
+          </div>
+
+          <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20 text-center">
+            <div className="text-xs text-white/70 mb-1">DATE</div>
+            <div className="text-sm font-semibold">{date}</div>
+          </div>
+        </div>
+
+        <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">
+          <label className="block font-semibold mb-3 text-[#FFFFFF]">
+            Camera
+          </label>
+
+          <div className="w-full rounded-2xl overflow-hidden border border-white/20 bg-black/30">
+            <div className="aspect-video w-full">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover bg-black"
+              />
+            </div>
+          </div>
+
           <canvas ref={canvasRef} className="hidden" />
 
-          <div className="flex gap-2 mt-3">
+          <div className="grid grid-cols-2 gap-3 mt-4">
             <button
+              type="button"
               onClick={startCamera}
-              className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-2.5 rounded-xl font-medium shadow-md flex justify-center items-center gap-2 transition-colors"
+              className="w-full py-3 rounded-xl text-white text-base font-bold shadow-lg bg-[#636CCB] hover:scale-105 transform transition-all border-0"
             >
-              <i className="bi bi-camera-video-fill" /> เปิดกล้อง
+              <i className="bi bi-camera-video-fill"></i> เปิดกล้อง
             </button>
 
             <button
+              type="button"
               onClick={capturePhoto}
-              className="flex-1 bg-white hover:bg-gray-100 text-indigo-900 py-2.5 rounded-xl font-medium shadow-md flex justify-center items-center gap-2 transition-colors"
+              className="w-full py-3 rounded-xl text-[#3C467B] text-base font-bold shadow-lg bg-white hover:scale-105 transform transition-all border-0"
             >
-              <i className="bi bi-camera-fill" /> ถ่ายรูป
+              <i className="bi bi-camera-fill"></i> ถ่ายรูป
             </button>
           </div>
         </div>
 
         {photoPreview && (
-          <div className="relative rounded-2xl overflow-hidden border-2 border-green-400 shadow-lg">
-            <img src={photoPreview} alt="Captured" className="w-full h-auto" />
-            <div className="absolute bottom-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-              <i className="bi bi-check-circle-fill" /> รูปพร้อมแล้ว
+          <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">
+            <label className="block font-semibold mb-3 text-[#FFFFFF]">
+              Preview
+            </label>
+
+            <img
+              src={photoPreview}
+              alt="Captured"
+              className="w-full rounded-2xl border border-white/20"
+            />
+
+            <div className="mt-3 text-sm text-green-300 font-medium">
+              <i className="bi bi-check-circle-fill"></i> รูปพร้อมสำหรับเช็คเอาท์แล้ว
             </div>
           </div>
         )}
 
-        <button
-          onClick={handleLocation}
-          className={`w-full py-3 rounded-xl font-bold shadow-md flex justify-center items-center gap-2 transition-all ${
-            location
-              ? "bg-green-500 hover:bg-green-600 text-white"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-          }`}
-        >
-          <i className="bi bi-geo-alt-fill" />
-          {location ? "✔ ได้ตำแหน่งแล้ว" : "ดึงตำแหน่ง GPS (ไม่บังคับ)"}
-        </button>
-
-        {userShift && (
+        <div className="flex flex-col gap-4">
           <button
-            onClick={() => submitCheckOut(null)}
-            disabled={loading}
-            className="w-full py-4 bg-gradient-to-r from-rose-400 to-red-500 hover:from-rose-500 hover:to-red-600 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            type="button"
+            onClick={handleLocation}
+            className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all border-0 ${
+              location ? "bg-green-500" : "bg-[#636CCB]"
+            }`}
           >
-            {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-OUT"}
+            <i className="bi bi-geo-alt-fill"></i>{" "}
+            {location ? "ได้ตำแหน่ง GPS แล้ว" : "ดึงตำแหน่ง GPS (ไม่บังคับ)"}
           </button>
-        )}
 
-        <button
-          onClick={resetForm}
-          className="w-full bg-white/10 hover:bg-white/20 border border-white/30 text-white py-3 rounded-xl transition-all"
-        >
-          ล้างข้อมูล
-        </button>
+          {userShift && (
+            <button
+              type="button"
+              onClick={() => submitCheckOut(null)}
+              disabled={loading}
+              className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all border-0 ${
+                loading ? "bg-gray-500" : "bg-red-500"
+              }`}
+            >
+              {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-OUT"}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={resetForm}
+            className="w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg bg-white/20 hover:scale-105 transform transition-all border border-white/20"
+          >
+            ล้างข้อมูล
+          </button>
+        </div>
 
         {message && (
-          <div className="bg-green-500/20 border border-green-500/50 text-green-100 p-4 rounded-xl flex items-start gap-3 whitespace-pre-line">
-            <i className="bi bi-check-circle text-xl" />
-            <span>{message}</span>
+          <div className="bg-green-500/20 border border-green-500/50 text-green-100 p-4 rounded-2xl whitespace-pre-line">
+            <div className="flex items-start gap-3">
+              <i className="bi bi-check-circle-fill text-xl"></i>
+              <span>{message}</span>
+            </div>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500/50 text-red-100 p-4 rounded-xl flex items-start gap-3 whitespace-pre-line">
-            <i className="bi bi-exclamation-triangle text-xl" />
-            <span>{error}</span>
+          <div className="bg-red-500/20 border border-red-500/50 text-red-100 p-4 rounded-2xl whitespace-pre-line">
+            <div className="flex items-start gap-3">
+              <i className="bi bi-exclamation-triangle-fill text-xl"></i>
+              <span>{error}</span>
+            </div>
           </div>
         )}
       </div>
@@ -342,7 +432,7 @@ function CheckOut() {
               <i className="bi bi-clock-history text-5xl text-white" />
               <h3 className="font-bold text-xl text-white mt-2">ออกก่อนเวลา!</h3>
               <p className="text-orange-100 text-sm mt-1">
-                กะของคุณเลิก {userShift?.end_time.slice(0, 5)} น.
+                กะของคุณเลิก {userShift?.end_time?.slice(0, 5)} น.
               </p>
             </div>
 
@@ -360,15 +450,17 @@ function CheckOut() {
 
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowEarlyModal(false)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors"
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors border-0"
                 >
                   ยกเลิก
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleEarlySubmit}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition-colors"
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition-colors border-0"
                 >
                   ส่งและเช็คเอาท์
                 </button>

@@ -6,287 +6,61 @@ import express from "express";
 import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent , CreateEvent , DeleteEvent , EditEvent ,getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
 // , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
 
-import { verifyToken } from "../middlewares/authMiddleware.js";
 
+import {
+  loginAdmin,
+  getAdmin,
+  verifyAdminIdentity,
+  verifyAdminOTP,
+  resetAdminPassword,
+  addNewUserShift,
+  userShift,
+  deleteUserShift,
+  editShift,
+  getAllEvent,
+  CreateEvent,
+  DeleteEvent,
+  getDepartments,
+  getEmployees,
+  sendNotification
+} from "../controllers/adminController.js";
+
+import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-
 // -----------------------------------------
-
-router.post("/login", loginAdmin)
-/**
- * @swagger
- * /admin/login:
- *   post:
- *     summary: Admin login
- *     description: Authenticate an admin or superadmin using employee ID and password.
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - employee_id
- *               - password
- *             properties:
- *               employee_id:
- *                 type: string
- *                 description: Employee ID of the admin
- *                 example: "A12345"
- *               password:
- *                 type: string
- *                 format: password
- *                 description: Admin password
- *                 example: "mypassword123"
- *     responses:
- *       200:
- *         description: Successful login
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 token:
- *                   type: string
- *                   description: JWT token valid for 1 day
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     full_name:
- *                       type: string
- *                       example: "tatar"
- *                     role:
- *                       type: string
- *                       example: "admin"
- *       401:
- *         description: Unauthorized - admin not found or password incorrect
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Password incorrect"
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Server Error"
- */
-
-
-
-router.get("/me", verifyToken, getAdmin)
-/**
- * @swagger
- * /admin/me:
- *   get:
- *     summary: Get admin profile
- *     description: Retrieve the currently authenticated admin's information by their ID.
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []   # Requires JWT token in Authorization header
- *     responses:
- *       200:
- *         description: Admin profile retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 employee_id:
- *                   type: string
- *                   example: "A12345"
- *                 full_name:
- *                   type: string
- *                   example: "John Doe"
- *                 role:
- *                   type: string
- *                   example: "admin"
- *       404:
- *         description: Admin not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Admin not found"
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Server Error"
- */
-
-
+// Admin auth
+// -----------------------------------------
+router.post("/login", loginAdmin);
+router.get("/me", verifyToken, getAdmin);
 
 // Forgot Password Routes for Admin
 router.post("/forgot-password/verify-identity", verifyAdminIdentity);
 router.post("/forgot-password/verify-otp", verifyAdminOTP);
 router.post("/forgot-password/reset-password", resetAdminPassword);
-/**
- * @swagger
- * /admin/forgot-password:
- *   post:
- *     summary: Forgot password (Admin)
- *     description: Request a password reset for an admin or superadmin account.
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Admin email address
- *                 example: "admin@example.com"
- *     responses:
- *       200:
- *         description: Reset password placeholder response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Reset password feature coming soon"
- *       404:
- *         description: Admin not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Admin not found"
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Server Error"
- */
 
+// -----------------------------------------
+// Shift Management
+// -----------------------------------------
+router.post("/newUserShift", addNewUserShift);
+router.get("/userShift", userShift);
+router.delete("/deleteUserShift", deleteUserShift);
+router.put("/editShift", editShift);
 
-// -----------------------------------------tar-----------------------------//
-router.post('/newUserShift', addNewUserShift);
-/**
- * @swagger
- * /users/newUserShift:
- *   post:
- *     summary: Assign a new shift to a user
- *     description: Add a new shift assignment for a user. Validates user existence and prevents duplicate assignments.
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - idemployee
- *               - shiftId
- *             properties:
- *               idemployee:
- *                 type: integer
- *                 description: Employee ID ของผู้ใช้
- *                 example: 1001
- *               shiftId:
- *                 type: integer
- *                 description: ID ของกะงานที่จะ assign ให้พนักงาน
- *                 example: 3
- *     responses:
- *       200:
- *         description: Shift assigned successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 idemployee:
- *                   type: integer
- *                   example: 1001
- *                 Firstname:
- *                   type: string
- *                   example: "Somchai"
- *                 Lastname:
- *                   type: string
- *                   example: "Prasert"
- *                 level:
- *                   type: string
- *                   example: "staff"
- *                 start_time:
- *                   type: string
- *                   format: time
- *                   example: "08:00:00"
- *                 end_time:
- *                   type: string
- *                   format: time
- *                   example: "17:00:00"
- *                 shift_id:
- *                   type: integer
- *                   example: 3
- *       400:
- *         description: Missing required fields or user not found / already assigned
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "User does not exist"
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Server error"
- */
+// -----------------------------------------
+// Event Management
+// -----------------------------------------
+router.get("/Event", getAllEvent);
+router.post("/CreateEvent", CreateEvent);
+router.delete("/DeleteEvent", DeleteEvent);
 
+// -----------------------------------------
+// Notification / Employee / Department
+// -----------------------------------------
+router.get("/departments", getDepartments);
+router.get("/employees", getEmployees);
+router.post("/send-notification", sendNotification);
 
 
 
@@ -475,6 +249,8 @@ router.delete('/DeleteEvent', DeleteEvent)
 
 //-----------------------------------------------tar----------------------------------------//
 
+
+// -----------------------------------------
 router.get("/", (req, res) => {
   res.send("admin route working");
 });
