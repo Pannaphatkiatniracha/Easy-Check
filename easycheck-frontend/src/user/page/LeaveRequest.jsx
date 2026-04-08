@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import axios from "axios";
+
+const API = "http://localhost:5000/leave-approve";
 
 const LeaveRequest = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    userId: "",
     leaveStart: "",
     leaveEnd: "",
     leaveReasons: [],
@@ -15,9 +18,9 @@ const LeaveRequest = () => {
     evidencePreview: null,
   });
 
-  const [rejectPopup, setRejectPopup] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [balance, setBalance] = useState([]);
+  const [balanceLoading, setBalanceLoading] = useState(false);
 
   const leaveOptions = [
     "Sick Leave",
@@ -29,23 +32,113 @@ const LeaveRequest = () => {
     "Other",
   ];
 
+  const today = useMemo(() => {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - tzOffset).toISOString().split("T")[0];
+  }, []);
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem("user");
+    let storedUser = {};
+
+    try {
+      storedUser = JSON.parse(rawUser || "null") || {};
+    } catch (error) {
+      console.error("อ่าน localStorage.user ไม่สำเร็จ:", error);
+      storedUser = {};
+    }
+
+    const employeeId =
+      storedUser?.id_employee ||
+      storedUser?.employeeId ||
+      storedUser?.idEmployee ||
+      storedUser?.userId ||
+      localStorage.getItem("id_employee") ||
+      localStorage.getItem("employeeId") ||
+      localStorage.getItem("userId") ||
+      "";
+
+    console.log("rawUser from localStorage =", rawUser);
+    console.log("storedUser =", storedUser);
+    console.log("resolved employeeId =", employeeId);
+
+    setFormData((prev) => ({
+      ...prev,
+      userId: employeeId,
+      leaveStart: today,
+      leaveEnd: today,
+    }));
+  }, [today]);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!formData.userId) return;
+
+      try {
+        setBalanceLoading(true);
+        const res = await axios.get(`${API}/balance`, {
+          params: { userId: formData.userId },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        });
+        setBalance(res.data.balance || []);
+      } catch (error) {
+        console.error("โหลด leave balance ไม่สำเร็จ:", error);
+      } finally {
+        setBalanceLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, [formData.userId]);
+
   const handleDateChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+
+      if (name === "leaveStart" && newData.leaveEnd && value > newData.leaveEnd) {
+        newData.leaveEnd = value;
+      }
+
+      return newData;
+    });
   };
 
   const handleReasonChange = (reason) => {
     let updated = [...formData.leaveReasons];
+
     if (updated.includes(reason)) {
       updated = updated.filter((r) => r !== reason);
+
       if (reason === "Other") {
-        setFormData({ ...formData, leaveReasons: updated, otherReasonText: "" });
+        setFormData((prev) => ({
+          ...prev,
+          leaveReasons: updated,
+          otherReasonText: "",
+        }));
       } else {
-        setFormData({ ...formData, leaveReasons: updated });
+        setFormData((prev) => ({
+          ...prev,
+          leaveReasons: updated,
+        }));
       }
     } else {
-      updated.push(reason);
-      setFormData({ ...formData, leaveReasons: updated });
+      const withoutMainReasons = updated.filter((r) => r === "Other");
+
+      if (reason === "Other") {
+        updated = [...updated, reason];
+      } else {
+        updated = [...withoutMainReasons, reason];
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        leaveReasons: updated,
+      }));
     }
   };
 
@@ -53,97 +146,127 @@ const LeaveRequest = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file.");
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "application/pdf",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("กรุณาอัปโหลดไฟล์ JPG, JPEG, PNG หรือ PDF");
       return;
     }
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       evidenceFile: file,
-      evidencePreview: URL.createObjectURL(file),
-    });
+      evidencePreview: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
+    }));
   };
 
- const handleFileLeave = async () => {
-  // 1. validate
-  if (!formData.leaveStart || !formData.leaveEnd) {
-    alert("Please select start and end dates.");
-    return;
-  }
-
-  if (formData.leaveReasons.length === 0) {
-    alert("Please select at least one leave reason.");
-    return;
-  }
-
-  if (formData.leaveReasons.includes("Other") && !formData.otherReasonText.trim()) {
-    alert("Please provide a reason for 'Other'.");
-    return;
-  }
-
-  if (formData.leaveReasons.includes("Sick Leave") && !formData.evidenceFile) {
-    alert("Please attach a medical certificate.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const data = new FormData();
-
-   
-    const empId = "061004";
-
-    data.append("userId", empId);
-    data.append("leaveStart", formData.leaveStart);
-    data.append("leaveEnd", formData.leaveEnd);
-    data.append("leaveReasons", JSON.stringify(formData.leaveReasons));
-    data.append("otherReasonText", formData.otherReasonText);
-
-
-    if (formData.evidenceFile) {
-      data.append("evidence", formData.evidenceFile); 
-    }
-
-    
-    const response = await axios.post(
-      "http://localhost:5000/leave-approve/request",
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`, // เผื่อมี token
-        },
-      }
+  const selectedMainReason = useMemo(() => {
+    return (
+      formData.leaveReasons.find((r) => r !== "Other") ||
+      formData.leaveReasons[0]
     );
+  }, [formData.leaveReasons]);
 
-    alert("ยื่นคำขอลางานสำเร็จ!");
-    navigate(-1);
+  const selectedPolicy = useMemo(() => {
+    const reasonToCode = {
+      "Sick Leave": "SICK",
+      "Personal Leave": "PERSONAL",
+      "Vacation Leave": "VACATION",
+      "Maternity Leave": "MATERNITY",
+      "Wedding Leave": "WEDDING",
+      "Religious Leave": "RELIGIOUS",
+      Other: "OTHER",
+    };
 
-  } catch (err) {
-    console.error(err);
-    alert(
-      "เกิดข้อผิดพลาด: " +
-        (err.response?.data?.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้")
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-  const handleRejectSubmit = () => {
-    if (!rejectReason.trim()) {
-      alert("กรุณากรอกเหตุผลที่ไม่อนุมัติ");
+    const code = reasonToCode[selectedMainReason];
+    return balance.find((item) => item.leaveCode === code);
+  }, [selectedMainReason, balance]);
+
+  const handleFileLeave = async () => {
+    if (!formData.userId) {
+      alert("ไม่พบ employee id ของผู้ใช้ กรุณา login ใหม่");
+      console.log("localStorage user =", localStorage.getItem("user"));
+      console.log("localStorage id_employee =", localStorage.getItem("id_employee"));
+      console.log("localStorage employeeId =", localStorage.getItem("employeeId"));
       return;
     }
-    alert("ไม่อนุมัติคำขอ: " + rejectReason);
-    setRejectPopup(false);
+
+    if (!formData.leaveStart || !formData.leaveEnd) {
+      alert("กรุณาเลือกวันเริ่มลาและวันสิ้นสุดลา");
+      return;
+    }
+
+    if (formData.leaveStart < today || formData.leaveEnd < today) {
+      alert("ไม่สามารถเลือกวันลาย้อนหลังได้");
+      return;
+    }
+
+    if (formData.leaveStart > formData.leaveEnd) {
+      alert("วันเริ่มลาต้องไม่เกินวันสิ้นสุดลา");
+      return;
+    }
+
+    if (formData.leaveReasons.length === 0) {
+      alert("กรุณาเลือกประเภทการลา");
+      return;
+    }
+
+    if (
+      formData.leaveReasons.includes("Other") &&
+      !formData.otherReasonText.trim()
+    ) {
+      alert("กรุณาระบุเหตุผลเพิ่มเติมสำหรับ Other");
+      return;
+    }
+
+    if (selectedPolicy?.requireEvidence && !formData.evidenceFile) {
+      alert(`การลา ${selectedPolicy.leaveName} ต้องแนบหลักฐาน`);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const data = new FormData();
+      data.append("userId", formData.userId);
+      data.append("leaveStart", formData.leaveStart);
+      data.append("leaveEnd", formData.leaveEnd);
+      data.append("leaveReasons", JSON.stringify(formData.leaveReasons));
+      data.append("otherReasonText", formData.otherReasonText || "");
+
+      if (formData.evidenceFile) {
+        data.append("evidence", formData.evidenceFile);
+      }
+
+      const response = await axios.post(`${API}/request`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      });
+
+      alert(response.data?.message || "ยื่นคำขอลางานสำเร็จ");
+      navigate(-1);
+    } catch (err) {
+      console.error("submit leave error =", err);
+      alert(
+        "เกิดข้อผิดพลาด: " +
+          (err.response?.data?.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้")
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
-
-        {/* Header + Title */}
         <div className="flex items-center justify-center relative mb-2">
           <Link to="/home" className="absolute left-0 text-white text-2xl">
             <i className="bi bi-chevron-left"></i>
@@ -153,7 +276,42 @@ const LeaveRequest = () => {
           </h2>
         </div>
 
-        {/* Leave Dates */}
+        <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">
+          <div className="text-sm">
+            <div>
+              <span className="font-semibold">Employee ID:</span>{" "}
+              {formData.userId || "-"}
+            </div>
+            <div className="mt-2 font-semibold">สิทธิ์ลาประจำปี</div>
+
+            {balanceLoading ? (
+              <div className="text-white/70 text-sm mt-2">กำลังโหลด...</div>
+            ) : balance.length === 0 ? (
+              <div className="text-white/70 text-sm mt-2">
+                ไม่พบข้อมูลสิทธิ์ลา
+              </div>
+            ) : (
+              <div className="mt-2 space-y-2 text-sm">
+                {balance.map((item) => (
+                  <div
+                    key={item.leaveCode}
+                    className="bg-white/10 rounded-xl p-3 border border-white/10"
+                  >
+                    <div className="font-semibold">{item.leaveName}</div>
+                    <div>สิทธิ์ต่อปี: {item.maxDays} วัน</div>
+                    <div>ใช้ไปแล้ว: {item.usedDays} วัน</div>
+                    <div>คงเหลือ: {item.remainingDays} วัน</div>
+                    <div>ยื่นแล้วปีนี้: {item.usedTimesThisYear} ครั้ง</div>
+                    <div>
+                      แนบหลักฐาน: {item.requireEvidence ? "ต้องแนบ" : "ไม่บังคับ"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-6">
           <div>
             <label className="block font-semibold text-[#FFFFFF] mb-1">
@@ -162,6 +320,7 @@ const LeaveRequest = () => {
             <input
               type="date"
               name="leaveStart"
+              min={today}
               value={formData.leaveStart}
               onChange={handleDateChange}
               className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white"
@@ -175,6 +334,7 @@ const LeaveRequest = () => {
             <input
               type="date"
               name="leaveEnd"
+              min={formData.leaveStart || today}
               value={formData.leaveEnd}
               onChange={handleDateChange}
               className="w-full border-2 border-white rounded-xl p-3 shadow-inner focus:outline-none focus:border-[#636CCB] bg-white/20 text-white"
@@ -182,7 +342,6 @@ const LeaveRequest = () => {
           </div>
         </div>
 
-        {/* Leave Reasons */}
         <div>
           <label className="block font-semibold mb-3 text-[#FFFFFF]">
             Leave Reason <span className="text-red-400">*</span>
@@ -201,11 +360,13 @@ const LeaveRequest = () => {
                 <span className="font-medium">{reason}</span>
                 <input
                   type="checkbox"
-                  className="hidden" 
+                  className="hidden"
                   checked={formData.leaveReasons.includes(reason)}
                   onChange={() => handleReasonChange(reason)}
                 />
-                {formData.leaveReasons.includes(reason) && <i className="bi bi-check-circle-fill text-[#3C467B]"></i>}
+                {formData.leaveReasons.includes(reason) && (
+                  <i className="bi bi-check-circle-fill text-[#3C467B]"></i>
+                )}
               </label>
             ))}
           </div>
@@ -219,7 +380,10 @@ const LeaveRequest = () => {
                 type="text"
                 value={formData.otherReasonText}
                 onChange={(e) =>
-                  setFormData({ ...formData, otherReasonText: e.target.value })
+                  setFormData((prev) => ({
+                    ...prev,
+                    otherReasonText: e.target.value,
+                  }))
                 }
                 className="w-full border-2 border-white rounded-xl p-3 shadow-inner bg-white/10 text-white"
                 placeholder="Enter your reason"
@@ -228,22 +392,30 @@ const LeaveRequest = () => {
           )}
         </div>
 
-        {/* Evidence Upload */}
         <div>
           <label className="block font-semibold mb-2 text-white">
-            Attach Evidence (if any)
+            Attach Evidence
+            {selectedPolicy?.requireEvidence ? " *" : " (if any)"}
           </label>
 
           <div className="relative border-2 border-dashed border-white/50 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:border-[#636CCB] transition-all max-w-sm">
             <input
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.pdf,image/*,application/pdf"
               onChange={handleEvidenceUpload}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
             <i className="bi bi-cloud-arrow-up text-2xl text-white"></i>
-            <p className="text-white/80 text-sm">Click to upload evidence</p>
+            <p className="text-white/80 text-sm">
+              คลิกเพื่ออัปโหลดหลักฐาน (JPG, PNG, PDF)
+            </p>
           </div>
+
+          {formData.evidenceFile && (
+            <div className="mt-3 text-white text-sm">
+              ไฟล์ที่เลือก: {formData.evidenceFile.name}
+            </div>
+          )}
 
           {formData.evidencePreview && (
             <div className="mt-3 flex justify-start gap-2">
@@ -256,7 +428,6 @@ const LeaveRequest = () => {
           )}
         </div>
 
-        {/* Submit Buttons */}
         <div className="flex flex-col gap-4">
           <button
             onClick={handleFileLeave}
@@ -269,41 +440,6 @@ const LeaveRequest = () => {
           </button>
         </div>
       </div>
-
-      {/* Reject Popup */}
-      {rejectPopup && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 z-[999]">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
-            <h3 className="text-lg font-bold text-[#3C467B] text-center mb-4">
-              กรุณากรอกเหตุผลที่ไม่อนุมัติ
-            </h3>
-
-            <textarea
-              rows={3}
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-red-300"
-              placeholder="ระบุเหตุผล..."
-            />
-
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={() => setRejectPopup(false)}
-                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
-              >
-                ยกเลิก
-              </button>
-
-              <button
-                onClick={handleRejectSubmit}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-              >
-                ยืนยัน
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

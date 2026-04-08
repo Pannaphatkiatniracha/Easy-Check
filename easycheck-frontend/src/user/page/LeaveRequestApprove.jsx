@@ -1,60 +1,78 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const API = "http://localhost:5000/leave-approve"; // ✅ แก้ตรงนี้ครั้งเดียวจบ
+const API = "http://localhost:5000/leave-approve";
 
 function LeaveRequestApprove() {
   const [requests, setRequests] = useState([]);
-  const [approved, setApproved] = useState([]);
-  const [rejected, setRejected] = useState([]);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ โหลดข้อมูล pending
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API}/pending`); // ✅ FIX แล้ว
-        setRequests(res.data);
-      } catch (error) {
-        console.error("Error loading leave requests:", error);
-        alert("ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบว่า Backend ทำงานอยู่หรือไม่");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  // ✅ อนุมัติ
-  const handleApprove = async (req) => {
+  const loadData = async () => {
     try {
-      await axios.put(`${API}/${req.id}/approve`); // ✅ FIX แล้ว
-
-      setApproved((prev) => [...prev, req]);
-      setRequests((prev) => prev.filter((r) => r.id !== req.id));
+      setLoading(true);
+      const res = await axios.get(`${API}/pending`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      });
+      setRequests(res.data || []);
     } catch (error) {
-      console.error("Error approving:", error);
-      alert("เกิดข้อผิดพลาดในการอนุมัติ");
+      console.error("Error loading leave requests:", error);
+      alert("ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบว่า Backend ทำงานอยู่หรือไม่");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ ไม่อนุมัติ
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleApprove = async (req) => {
+    try {
+      await axios.put(
+        `${API}/${req.id}/approve`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        }
+      );
+
+      alert("อนุมัติการลาสำเร็จ");
+      loadData();
+    } catch (error) {
+      console.error("Error approving:", error);
+      alert(error.response?.data?.message || "เกิดข้อผิดพลาดในการอนุมัติ");
+    }
+  };
+
   const handleReject = async (req) => {
-    const reason = window.prompt(`ระบุเหตุผลที่ไม่อนุมัติการลาของ ${req.name}:`, "ไม่ระบุ");
+    const reason = window.prompt(
+      `ระบุเหตุผลที่ไม่อนุมัติการลาของ ${req.name}:`,
+      "ไม่ระบุ"
+    );
     if (reason === null) return;
 
     try {
-      await axios.put(`${API}/${req.id}/reject`, { reason }); // ✅ FIX แล้ว
+      await axios.put(
+        `${API}/${req.id}/reject`,
+        { reason },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        }
+      );
 
-      setRejected((prev) => [...prev, { ...req, rejectReason: reason }]);
-      setRequests((prev) => prev.filter((r) => r.id !== req.id));
+      alert("ปฏิเสธคำขอลาสำเร็จ");
+      loadData();
     } catch (error) {
       console.error("Error rejecting:", error);
-      alert("เกิดข้อผิดพลาดในการปฏิเสธคำขอ");
+      alert(error.response?.data?.message || "เกิดข้อผิดพลาดในการปฏิเสธคำขอ");
     }
   };
 
@@ -75,54 +93,69 @@ function LeaveRequestApprove() {
 
         {!loading && requests.length === 0 && (
           <div className="text-white/70 text-center">
-            ไม่มีคำขอลางานที่รออนุมัติ
+            ไม่มีคำขอลางานที่รอ approver อนุมัติ
           </div>
         )}
 
         {requests.map((req) => (
           <div key={req.id} className="bg-white p-4 rounded-2xl shadow flex gap-3">
             <img
-              src={req.profile || `https://ui-avatars.com/api/?name=${req.name}`}
+              src={req.profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(req.name)}`}
               alt={req.name}
-              className="w-14 h-14 rounded-full"
+              className="w-14 h-14 rounded-full object-cover"
             />
 
             <div className="flex-1">
               <div className="font-semibold">{req.name}</div>
               <div className="text-xs text-gray-500">ID: {req.employeeId}</div>
 
+              {req.department && (
+                <div className="text-xs text-gray-500">
+                  {req.department}
+                  {req.position ? ` • ${req.position}` : ""}
+                </div>
+              )}
+
               <div className="text-xs mt-1">
                 {req.reasons?.includes("Other")
-                  ? `Other: ${req.otherReason}`
+                  ? `Other: ${req.otherReason || "-"}`
                   : req.reasons?.join(", ")}
               </div>
 
-              <div className="text-xs">
-                {new Date(req.leaveStart).toLocaleDateString("th-TH")} →
+              <div className="text-xs mt-1">
+                {new Date(req.leaveStart).toLocaleDateString("th-TH")} →{" "}
                 {new Date(req.leaveEnd).toLocaleDateString("th-TH")}
               </div>
 
-              {req.evidencePreview && (
+              <div className="text-xs mt-1">จำนวนวันลา: {req.leaveDays} วัน</div>
+
+              {req.hasEvidence && req.evidencePreview && (
                 <button
                   onClick={() => setSelectedEvidence(req.evidencePreview)}
-                  className="text-blue-500 text-xs underline"
+                  className="text-blue-500 text-xs underline mt-1"
                 >
                   ดูรูปแนบ
                 </button>
+              )}
+
+              {req.hasEvidence && !req.evidencePreview && (
+                <div className="text-xs text-gray-600 mt-1">
+                  มีไฟล์แนบ ({req.evidenceMime || "unknown"})
+                </div>
               )}
             </div>
 
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => handleApprove(req)}
-                className="px-2 py-1 bg-green-400 rounded text-xs"
+                className="px-3 py-1 bg-green-500 text-white rounded text-xs"
               >
                 อนุมัติ
               </button>
 
               <button
                 onClick={() => handleReject(req)}
-                className="px-2 py-1 bg-red-500 text-white rounded text-xs"
+                className="px-3 py-1 bg-red-500 text-white rounded text-xs"
               >
                 ไม่อนุมัติ
               </button>
@@ -131,27 +164,16 @@ function LeaveRequestApprove() {
         ))}
       </div>
 
-      {/* popup รูป */}
       {selectedEvidence && (
         <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
           onClick={() => setSelectedEvidence(null)}
         >
-          <img src={selectedEvidence} alt="evidence" className="max-w-lg" />
-        </div>
-      )}
-
-      {/* Approved */}
-      {approved.length > 0 && (
-        <div className="mt-6 text-green-300">
-          อนุมัติแล้ว {approved.length} รายการ
-        </div>
-      )}
-
-      {/* Rejected */}
-      {rejected.length > 0 && (
-        <div className="mt-2 text-red-300">
-          ไม่อนุมัติ {rejected.length} รายการ
+          <img
+            src={selectedEvidence}
+            alt="evidence"
+            className="max-w-lg max-h-[80vh] rounded-xl"
+          />
         </div>
       )}
     </div>

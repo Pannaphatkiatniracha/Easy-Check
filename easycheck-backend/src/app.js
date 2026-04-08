@@ -14,8 +14,6 @@ import requestRoutes from "./routers/requestRoutes.js";
 import shiftRoutes from "./routers/shiftRoutes.js";
 import groupNotiRouter from "./routers/group-notiRouter.js";
 
-
-
 import pool from "./config/db.js";
 
 dotenv.config();
@@ -63,6 +61,11 @@ app.get("/", (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error("💥 ERROR:", err);
+
+  if (err?.message?.includes("รองรับเฉพาะไฟล์")) {
+    return res.status(400).json({ message: err.message });
+  }
+
   res.status(500).json({
     message: "Server Error",
     error: err.message,
