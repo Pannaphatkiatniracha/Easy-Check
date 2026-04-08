@@ -15,6 +15,8 @@ const CreateEvent = () => {
     const [eventDescription, seteventDescription] = useState('')
     const [eventTitle, seteventTitle] = useState('')
     const [eventDate, seteventDate] = useState('')
+    const [eventTime, seteventTime] = useState('')
+
 
 
 
@@ -29,6 +31,11 @@ const CreateEvent = () => {
 
     const [events, setEvents] = useState([])
     const [selectedEvent, setSelectedEvent] = useState(null);
+
+
+    // const [SelectedEditDate , setSelectedEditDate] = useState('')
+    // const [SelectedEditTitle , setSelectedEditTitle] = useState('')
+    // const [SelectedEditDescription , setSelectedEditDescription] = useState('')
 
 
 
@@ -180,21 +187,26 @@ const CreateEvent = () => {
 
     const SaveEvent = async () => {
 
-        if (!eventTitle || !eventDate) {
+        if (!eventTitle || !eventDate || !eventTime) {
             alert("Please fill in all required fields.");
             return;
         }
 
         try {
-            await axios.post("http://localhost:5000/admin/CreateEvent", {
+            const res = await axios.post("http://localhost:5000/admin/CreateEvent", {
                 title: eventTitle,
+                //ใช้ formatDate ให้รูปแบบถูกต้องเพื่อส่งไป backend
                 date: eventDate,
-                description: eventDescription
+                description: eventDescription,
+                time: eventTime + ":00"
             });
+
+            console.log("RESPONSE:", res.data);
 
             alert("Event created successfully");
 
         } catch (err) {
+            console.error("ERROR:", err.response?.data || err);
             return alert("Create failed");
         }
 
@@ -245,6 +257,30 @@ const CreateEvent = () => {
 
 
     };
+
+    const SaveEditEvent = async () => {
+
+        try {
+            const res = await axios.patch("http://localhost:5000/admin/EditEvent",
+                {
+                    event_id: selectedEvent.event_id,
+                    title: selectedEvent.title,
+                    date: selectedEvent.date,
+                    description: selectedEvent.description,
+                    time: selectedEvent.time + ":00"
+                }
+            );
+
+            console.log(res.data);
+
+            window.location.reload();
+
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
 
 
 
@@ -360,6 +396,13 @@ const CreateEvent = () => {
                                         onChange={(e) => seteventDate(e.target.value)}
                                     />
 
+                                    <input
+                                        type="time"
+                                        className="form-control mt-1"
+                                        value={eventTime}
+                                        onChange={(e) => seteventTime(e.target.value)}
+                                    />
+
 
 
 
@@ -401,7 +444,13 @@ const CreateEvent = () => {
                                         className="list-group-item list-group-item-action"
                                         data-bs-toggle="modal"
                                         data-bs-target="#eventModal"
-                                        onClick={() => setSelectedEvent(event)}
+                                        onClick={() =>
+                                            setSelectedEvent({
+                                                ...event,
+                                                date: event.date.split("T")[0],
+                                                time: event.time ? event.time.slice(0, 5) : ""
+                                            })
+                                        }
                                     >
                                         {event.title}
                                     </a>
@@ -415,7 +464,14 @@ const CreateEvent = () => {
 
             {/* MODAL (ตัวเดียวพอ) */}
             <div className="modal fade" id="eventModal" tabIndex="-1">
-                <div className="modal-dialog" style={{ maxWidth: '600px' }}>
+                <div
+                    className="modal-dialog"
+                    style={{
+                        maxWidth: '650px',
+                        marginTop: '50px',
+                        marginBottom: '50px'
+                    }}
+                >
                     <div className="modal-content">
 
                         <div className="modal-header">
@@ -430,18 +486,45 @@ const CreateEvent = () => {
                         </div>
 
                         <div className="modal-body">
-                            <div>
-                                <strong>วันที่:</strong>
+                            <div className="mb-3">
+                                <strong>วันที่ :</strong>
                                 <input
                                     type="date"
                                     className="form-control mt-1"
-                                    value={selectedEvent?.date?.split("T")[0] || ""}
-                                // onClick={() => EditTimeEvent}
+                                    value={
+                                        selectedEvent?.date
+                                            ? selectedEvent.date.split("T")[0]
+                                            : ""
+                                    }
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            //กระจาย event ออกมา แล้วเปลี่ยนเฉพาะ date
+                                            ...selectedEvent,
+                                            date: e.target.value
+                                        })
+                                    }
                                 />
                             </div>
 
-                            <div>
-                                <strong>ผู้สมัคร:</strong>{" "}
+                            <div className="mb-3" >
+
+                                <strong>เวลา : </strong>
+                                <input
+                                    type="time"
+                                    className="form-control mt-1"
+                                    value={selectedEvent?.time || ""}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            time: e.target.value
+                                        })
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mb-3">
+                                <strong>ผู้สมัคร :</strong>{" "}
                                 <Button
                                     variant="warning"
                                     onClick={() => setShowTable(!showTable)}
@@ -513,7 +596,7 @@ const CreateEvent = () => {
 
                             <button
                                 className="btn btn-primary mt-2"
-                            //   onClick={() => CreateEvent()}
+                                onClick={SaveEditEvent}
                             >
                                 Save changes
                             </button>

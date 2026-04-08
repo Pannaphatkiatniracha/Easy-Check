@@ -1,9 +1,9 @@
 import express from "express";
 
-import { loginAdmin, getAdmin, forgotPassword , addNewUserShift , userShift , deleteUserShift , editShift , getAllEvent , CreateEvent , DeleteEvent} from "../controllers/adminController.js";
+// import {  forgotPassword } from "../controllers/adminController.js";
 // EditEvent , CreateEvent  
 
-import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent, getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
+import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent , CreateEvent , DeleteEvent , EditEvent ,getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
 // , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -426,7 +426,7 @@ router.get('/editShift', editShift)
 
 router.get('/Event', getAllEvent)
 router.post('/CreateEvent', CreateEvent)
-// router.put('/EditEvent', EditEvent)
+router.patch('/EditEvent', EditEvent)
 router.delete('/DeleteEvent', DeleteEvent)
 
 

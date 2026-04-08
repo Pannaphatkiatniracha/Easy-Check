@@ -438,6 +438,7 @@ export const getAllEvent = async (req, res) => {
             Events.date,
             Events.created_at,
             Events.description,
+            Events.time,
 
             Users.id_employee,
             Users.firstname,
@@ -465,6 +466,7 @@ export const getAllEvent = async (req, res) => {
                     event_id: row.event_id,
                     title: row.title,
                     date: row.date,
+                    time: row.time,
                     created_at: row.created_at,
                     description: row.description,
                     users: []
@@ -499,15 +501,15 @@ export const getAllEvent = async (req, res) => {
 
 export const CreateEvent = async (req, res) => {
     try {
-        const { title, date, description } = req.body;
+        const { title, date, description, time } = req.body;
 
-        if (!title || !date) {
+        if (!title || !date || !time) {
             return res.status(400).json({ message: "Title and Date are required" });
         }
 
         const [EventResult] = await pool.query(
-            "INSERT INTO EVENTS (title , date , description) VALUES(?,?,?)",
-            [title, date, description]
+            "INSERT INTO EVENTS (title , date , description , time) VALUES(?,?,?,?)",
+            [title, date, description, time]
         )
 
         res.status(200).json({
@@ -521,17 +523,64 @@ export const CreateEvent = async (req, res) => {
 }
 
 
-// export const EditEvent = async (req , res) => {
-//     try {
-//         const {} = req.body ;
-//     }
-// }
+export const EditEvent = async (req, res) => {
 
-// export const EditTimeEvent = async (req , res) => {
-//     try {
-//         const {} = req.body ;
-//     }
-// }
+    try {
+        const { event_id, title, date, description, time } = req.body;
+
+        const updates = [];
+        // เก็บเป็น array
+        const values = [];
+
+        if (title !== undefined) {
+            updates.push("title = ?")
+            values.push(title);
+        }
+
+        if (date !== undefined) {
+            const formattedDate = date.includes("T") ? date.split("T")[0] : date;
+            updates.push("date = ?");
+            values.push(formattedDate);
+        }
+
+        if (description !== undefined) {
+            updates.push("description = ?")
+            values.push(description);
+        }
+
+        if (time !== undefined) {
+            updates.push("time = ?")
+            values.push(time);
+        }
+
+        if (updates.length === 0) {
+            return res.status(400).json({
+                message: "No data to update"
+            });
+        }
+
+
+        // sql
+        const sql = `
+        UPDATE Events
+        SET ${updates.join(" , ")}
+        WHERE event_id = ?
+
+        `;
+
+        values.push(event_id);
+
+        //ยิง query
+        await pool.query(sql, values);
+
+        res.json({ message: "Update Success" })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" })
+    }
+}
+
 
 export const DeleteEvent = async (req, res) => {
     try {
