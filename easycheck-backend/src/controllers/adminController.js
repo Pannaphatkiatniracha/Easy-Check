@@ -380,7 +380,6 @@ export const deleteUserShift = async (req, res) => {
 
 
 // edit Shift
-// edit shift
 export const editShift = async (req, res) => {
     try {
         const { userId, shiftId, newShiftId, roleId } = req.body;
@@ -434,7 +433,7 @@ export const getAllEvent = async (req, res) => {
     try {
         const sql = `
         SELECT 
-            Events.id AS event_id,
+            Events.event_id,
             Events.title,
             Events.date,
             Events.created_at,
@@ -447,7 +446,7 @@ export const getAllEvent = async (req, res) => {
         FROM Events
 
         LEFT JOIN Event_participants
-            ON Events.id = Event_participants.event_id
+            ON Events.event_id = Event_participants.event_id
 
         LEFT JOIN Users
             ON Event_participants.id_employee = Users.id_employee
@@ -498,11 +497,28 @@ export const getAllEvent = async (req, res) => {
 
 
 
-// export const CreateEvent = async (req , res) => {
-//     try {
-//         const {} = req.body ;
-//     }
-// }
+export const CreateEvent = async (req, res) => {
+    try {
+        const { title, date, description } = req.body;
+
+        if (!title || !date) {
+            return res.status(400).json({ message: "Title and Date are required" });
+        }
+
+        const [EventResult] = await pool.query(
+            "INSERT INTO EVENTS (title , date , description) VALUES(?,?,?)",
+            [title, date, description]
+        )
+
+        res.status(200).json({
+            message: "event created successfully",
+            eventId: EventResult.insertId
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error creating event" });
+    }
+}
 
 
 // export const EditEvent = async (req , res) => {
@@ -517,11 +533,41 @@ export const getAllEvent = async (req, res) => {
 //     }
 // }
 
-// export const DeleteEvent = async (req , res) => {
-//     try {
-//         const {} = req.body ;
-//     }
-// }
+export const DeleteEvent = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        console.log("DELETE ID:", id);
+
+        if (!id) {
+            return res.status(400).json({ message: "Event ID is required" });
+        }
+
+        // ลบ event_participants ก่อน
+        await pool.query(
+            "DELETE FROM event_participants WHERE event_id = ?",
+            [id]
+        );
+
+        // แล้วค่อยลบ event
+        const [DeleteResult] = await pool.query(
+            "DELETE FROM EVENTS WHERE event_id = ?",
+            [id]
+        );
+
+        console.log("RESULT:", DeleteResult);
+
+        if (DeleteResult.affectedRows === 0) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        res.status(200).json({ message: "Event deleted successfully" });
+
+    } catch (error) {
+        console.error("DELETE ERROR:", error);
+        res.status(500).json({ message: "Error deleting event" });
+    }
+};
 
 
 

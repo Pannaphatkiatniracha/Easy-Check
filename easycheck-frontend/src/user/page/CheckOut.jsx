@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-function CheckIn() {
+function CheckOut() {
+  const navigate = useNavigate();
+
   const [location, setLocation] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -14,6 +16,9 @@ function CheckIn() {
 
   const [userShift, setUserShift] = useState(null);
   const [shiftLoading, setShiftLoading] = useState(true);
+
+  const [showEarlyModal, setShowEarlyModal] = useState(false);
+  const [earlyReason, setEarlyReason] = useState("");
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -132,12 +137,21 @@ function CheckIn() {
         setError("");
       },
       () => {
-        setError("ไม่สามารถดึงตำแหน่งได้ แต่ยังเช็คอินได้");
+        setError("ไม่สามารถดึงตำแหน่งได้ แต่ยังเช็คเอาท์ได้");
       }
     );
   };
 
-  const handleCheckIn = async () => {
+  const isCheckoutEarly = () => {
+    if (!userShift?.end_time) return false;
+
+    const now = new Date();
+    const [h, m] = userShift.end_time.split(":").map(Number);
+
+    return now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+  };
+
+  const submitCheckOut = async (overrideReason = null) => {
     if (!userShift) {
       setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
       return;
@@ -145,6 +159,11 @@ function CheckIn() {
 
     if (!photo) {
       setError("กรุณาถ่ายรูปก่อน");
+      return;
+    }
+
+    if (isCheckoutEarly() && overrideReason === null) {
+      setShowEarlyModal(true);
       return;
     }
 
@@ -160,8 +179,12 @@ function CheckIn() {
       formData.append("lng", location.lng);
     }
 
+    if (overrideReason) {
+      formData.append("reason", overrideReason);
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/attendance/check-in", {
+      const res = await fetch("http://localhost:5000/attendance/check-out", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -175,14 +198,15 @@ function CheckIn() {
       }
 
       setMessage(
-        data.status === "late"
-          ? "⚠️ เช็คอินสำเร็จ (มาสาย)\nระบบบันทึกเวลาเรียบร้อยแล้ว"
-          : "✅ เช็คอินสำเร็จ (ตรงเวลา)"
+        data.status === "early"
+          ? `⚠️ เช็คเอาท์สำเร็จ (ออกก่อนเวลา)\n${data.note || ""}`
+          : "✅ เช็คเอาท์สำเร็จ (ปกติ)"
       );
 
       setPhoto(null);
       setPhotoPreview(null);
       setLocation(null);
+      setEarlyReason("");
       stopCamera();
     } catch (err) {
       console.error(err);
@@ -192,12 +216,24 @@ function CheckIn() {
     }
   };
 
+  const handleEarlySubmit = () => {
+    if (!earlyReason.trim()) {
+      alert("กรุณาระบุเหตุผล");
+      return;
+    }
+
+    setShowEarlyModal(false);
+    submitCheckOut(earlyReason);
+  };
+
   const resetForm = () => {
     setMessage("");
     setError("");
     setPhoto(null);
     setPhotoPreview(null);
+    setEarlyReason("");
     setLocation(null);
+    setShowEarlyModal(false);
     stopCamera();
   };
 
@@ -209,8 +245,23 @@ function CheckIn() {
 
   if (shiftLoading) {
     return (
-      <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center justify-center px-4">
+      <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
         <div className="max-w-md w-full">
+          <div className="flex items-center justify-center relative mb-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="absolute left-0 text-white text-3xl bg-transparent border-0"
+              style={{ lineHeight: 1 }}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+
+            <h2 className="text-xl font-bold text-white text-center">
+              CHECK OUT
+            </h2>
+          </div>
+
           <div className="bg-white/10 rounded-2xl p-6 text-white border border-white/20 text-center">
             <p className="text-white text-lg animate-pulse">กำลังโหลดกะงาน...</p>
           </div>
@@ -222,31 +273,28 @@ function CheckIn() {
   return (
     <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center py-10 px-4 sm:px-6 md:px-8">
       <div className="max-w-md w-full space-y-6">
-       <div className="flex items-center justify-between mb-2">
-  <Link to="/home" className="text-decoration-none">
-    <button className="p-0 bg-transparent border-0">
-      <i className="bi bi-chevron-left ms-3 text-white"></i>
-    </button>
-  </Link>
+        <div className="flex items-center justify-center relative mb-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute left-0 text-white text-3xl bg-transparent border-0"
+            style={{ lineHeight: 1 }}
+          >
+            <i className="bi bi-chevron-left"></i>
+          </button>
 
-  <h2 className="text-xl font-bold text-white text-center flex-1">
-    CHECK IN
-  </h2>
-
-  <div className="me-4"></div>
-</div>
+          <h2 className="text-xl font-bold text-white text-center">
+            CHECK OUT
+          </h2>
+        </div>
 
         <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">
           <div className="text-sm">
             <div className="font-semibold">ข้อมูลกะงาน</div>
             {userShift ? (
               <div className="mt-2 space-y-1 text-white/90">
-                <div>
-                  เวลาเข้า: {userShift.start_time?.slice(0, 5)} น.
-                </div>
-                <div>
-                  เวลาออก: {userShift.end_time?.slice(0, 5)} น.
-                </div>
+                <div>เวลาเข้า: {userShift.start_time?.slice(0, 5)} น.</div>
+                <div>เวลาออก: {userShift.end_time?.slice(0, 5)} น.</div>
               </div>
             ) : (
               <div className="mt-2 text-red-300">
@@ -289,17 +337,19 @@ function CheckIn() {
 
           <div className="grid grid-cols-2 gap-3 mt-4">
             <button
+              type="button"
               onClick={startCamera}
-              className="w-full py-3 rounded-xl text-white text-base font-bold shadow-lg bg-[#636CCB] hover:scale-105 transform transition-all"
+              className="w-full py-3 rounded-xl text-white text-base font-bold shadow-lg bg-[#636CCB] hover:scale-105 transform transition-all border-0"
             >
-              <i className="bi bi-camera-video-fill mr-2"></i> เปิดกล้อง
+              <i className="bi bi-camera-video-fill"></i> เปิดกล้อง
             </button>
 
             <button
+              type="button"
               onClick={capturePhoto}
-              className="w-full py-3 rounded-xl text-[#3C467B] text-base font-bold shadow-lg bg-white hover:scale-105 transform transition-all"
+              className="w-full py-3 rounded-xl text-[#3C467B] text-base font-bold shadow-lg bg-white hover:scale-105 transform transition-all border-0"
             >
-              <i className="bi bi-camera-fill mr-2"></i> ถ่ายรูป
+              <i className="bi bi-camera-fill"></i> ถ่ายรูป
             </button>
           </div>
         </div>
@@ -317,38 +367,40 @@ function CheckIn() {
             />
 
             <div className="mt-3 text-sm text-green-300 font-medium">
-              <i className="bi bi-check-circle-fill mr-2"></i>
-              รูปพร้อมสำหรับเช็คอินแล้ว
+              <i className="bi bi-check-circle-fill"></i> รูปพร้อมสำหรับเช็คเอาท์แล้ว
             </div>
           </div>
         )}
 
         <div className="flex flex-col gap-4">
           <button
+            type="button"
             onClick={handleLocation}
-            className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all ${
+            className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all border-0 ${
               location ? "bg-green-500" : "bg-[#636CCB]"
             }`}
           >
-            <i className="bi bi-geo-alt-fill mr-2"></i>
+            <i className="bi bi-geo-alt-fill"></i>{" "}
             {location ? "ได้ตำแหน่ง GPS แล้ว" : "ดึงตำแหน่ง GPS (ไม่บังคับ)"}
           </button>
 
           {userShift && (
             <button
-              onClick={handleCheckIn}
+              type="button"
+              onClick={() => submitCheckOut(null)}
               disabled={loading}
-              className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all ${
-                loading ? "bg-gray-500" : "bg-green-500"
+              className={`w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg hover:scale-105 transform transition-all border-0 ${
+                loading ? "bg-gray-500" : "bg-red-500"
               }`}
             >
-              {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-IN"}
+              {loading ? "กำลังบันทึก..." : "CONFIRM CHECK-OUT"}
             </button>
           )}
 
           <button
+            type="button"
             onClick={resetForm}
-            className="w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg bg-white/20 hover:scale-105 transform transition-all"
+            className="w-full py-3 rounded-xl text-[#FFFFFF] text-lg font-bold shadow-lg bg-white/20 hover:scale-105 transform transition-all border border-white/20"
           >
             ล้างข้อมูล
           </button>
@@ -372,8 +424,53 @@ function CheckIn() {
           </div>
         )}
       </div>
+
+      {showEarlyModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="bg-orange-500 p-5 text-center">
+              <i className="bi bi-clock-history text-5xl text-white" />
+              <h3 className="font-bold text-xl text-white mt-2">ออกก่อนเวลา!</h3>
+              <p className="text-orange-100 text-sm mt-1">
+                กะของคุณเลิก {userShift?.end_time?.slice(0, 5)} น.
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4 text-gray-800">
+              <p className="text-sm text-gray-500 text-center">
+                ระบบจะ<b>บันทึกเวลาออกทันที</b> และส่งเหตุผลให้หัวหน้าตรวจสอบ
+              </p>
+
+              <textarea
+                value={earlyReason}
+                onChange={(e) => setEarlyReason(e.target.value)}
+                className="w-full border-2 border-gray-200 focus:border-orange-500 outline-none p-3 rounded-xl resize-none h-24 transition-colors text-sm"
+                placeholder="เช่น ไปพบแพทย์, ลากิจด่วน, ไปรับบุตรหลาน..."
+              />
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEarlyModal(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-medium transition-colors border-0"
+                >
+                  ยกเลิก
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleEarlySubmit}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition-colors border-0"
+                >
+                  ส่งและเช็คเอาท์
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default CheckIn;
+export default CheckOut;

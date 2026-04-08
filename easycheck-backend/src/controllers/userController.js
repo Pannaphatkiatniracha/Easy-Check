@@ -1,4 +1,4 @@
-import pool from '../config/db.js' // ท่อที่เชื่อมไป db
+import db from '../config/db.js' // ท่อที่เชื่อมไป db
 import bcrypt from 'bcrypt'
 
 
@@ -9,7 +9,7 @@ export const getProfile = async (req, res) => {
         const userId = req.user.id
 
         // ดึง db
-        const [rows] = await pool.execute(
+        const [rows] = await db.execute(
             `SELECT Users.*, Roles.role
             FROM Users 
             JOIN Roles ON Users.role_id = Roles.role_id 
@@ -48,8 +48,8 @@ export const updateProfile = async (req, res) => {
             WHERE id = ?
         `
         
-        // ตรงนี้คือสั่งรันคำสั่ง sql ด้วย pool.execute
-        const [result] = await pool.execute(sql, [
+        // ตรงนี้คือสั่งรันคำสั่ง sql ด้วย db.execute
+        const [result] = await db.execute(sql, [
             firstname, // '?' จับคู่เรียงกันตามข้อมูล
             lastname,
             phone, 
@@ -86,7 +86,7 @@ export const changePassword = async (req, res) => {
         const { currentPassword, newPassword } = req.body // รับรหัส current,new
 
         // ไปเอา hashpass ของ id คนนี้มา
-        const [users] = await pool.execute('SELECT password FROM users WHERE id = ?'
+        const [users] = await db.execute('SELECT password FROM users WHERE id = ?'
             , [userId])
         
 
@@ -109,7 +109,7 @@ export const changePassword = async (req, res) => {
         const hashedNewPassword = await bcrypt.hash(newPassword, salt) // รหัสผ่านใหม่ที่ hash แล้ว
 
         // อัพเดตข้อมูลลง db
-        const [result] = await pool.execute(
+        const [result] = await db.execute(
             'UPDATE users SET password = ? WHERE id = ?',
             [hashedNewPassword, userId]
         )
@@ -148,7 +148,7 @@ export const uploadAvatar = async (req, res) => {
 
         // อัพเดตชื่อไฟล์ลง db คือเราเก็บแค่ชื่อไฟล์ แล้วอาไปต่อเป็น URL ในหน้าบ้าน
         const sql = "UPDATE users SET avatar = ? WHERE id = ?"
-        await pool.query(sql, [fileName, userId]) // await pool.query(...) เป็นคำสั่งให้มันไปทำงานใน mysql จริง ๆ
+        await db.query(sql, [fileName, userId]) // await db.query(...) เป็นคำสั่งให้มันไปทำงานใน mysql จริง ๆ
 
         res.status(200).json({
             message: "Avatar updated successfully",
@@ -164,7 +164,7 @@ export const uploadAvatar = async (req, res) => {
 // 🐰🐰 ดึงข้อมูลมาโชว์ (ทุกคน)
 export const getAllUsers = async (req, res) => {
     try {
-        const [rows] = await pool.execute(
+        const [rows] = await db.execute(
             `SELECT Users.*, Roles.role
              FROM Users 
              JOIN Roles ON Users.role_id = Roles.role_id`

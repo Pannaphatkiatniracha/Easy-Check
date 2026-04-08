@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Phone, Mail, Briefcase, MapPin, Calendar, Plus, X, User, TrendingUp, Clock, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, Phone, Mail, Briefcase, MapPin, Calendar, X, User, TrendingUp, Clock, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 const AVATAR_COLORS = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
 
@@ -40,23 +40,8 @@ const Personalsummary = () => {
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [newEmployee, setNewEmployee] = useState({
-    firstName: '',
-    lastName: '',
-    empCode: '',
-    position: '',
-    department: '',
-    phone: '',
-    email: '',
-    startDate: '',
-    attendanceRate: 0,
-    workStats: { present: 0, late: 0, absent: 0 },
-    leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
-    avatarColor: '#3C4678'
-  });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
   const [filterPosition, setFilterPosition] = useState('');
@@ -102,15 +87,22 @@ const Personalsummary = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    const updatedEmployees = employees.map(emp => 
-      emp.id === selectedEmployee.id 
-        ? { ...emp, ...editData }
-        : emp
-    );
-    setEmployees(updatedEmployees);
-    setSelectedEmployee({ ...selectedEmployee, ...editData });
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/personal-summary/${selectedEmployee.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData)
+      });
+      const json = await res.json();
+      if (json.success) {
+        setEmployees(employees.map(emp => emp.id === selectedEmployee.id ? { ...emp, ...editData } : emp));
+        setSelectedEmployee({ ...selectedEmployee, ...editData });
+        setIsEditing(false);
+      }
+    } catch (err) {
+      console.error('Update failed:', err);
+    }
   };
 
   const handleCancel = () => {
@@ -123,38 +115,18 @@ const Personalsummary = () => {
     setIsEditing(false);
   };
 
-  const handleAddEmployee = () => {
-    const colors = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    const newEmp = {
-      ...newEmployee,
-      id: employees.length + 1,
-      avatarColor: randomColor
-    };
-    
-    setEmployees([...employees, newEmp]);
-    setShowAddModal(false);
-    setNewEmployee({
-      firstName: '',
-      lastName: '',
-      empCode: '',
-      position: '',
-      department: '',
-      phone: '',
-      email: '',
-      startDate: '',
-      attendanceRate: 0,
-      workStats: { present: 0, late: 0, absent: 0 },
-      leaveBalance: { personal: 0, sick: 0, vacation: 0, maternity: 0 },
-      avatarColor: '#3C4678'
-    });
-  };
-
-  const handleDeleteEmployee = (employeeId) => {
+const handleDeleteEmployee = async (employeeId) => {
     if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบพนักงานคนนี้?')) {
-      setEmployees(employees.filter(emp => emp.id !== employeeId));
-      closeModal();
+      try {
+        const res = await fetch(`http://localhost:5000/personal-summary/${employeeId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          setEmployees(employees.filter(emp => emp.id !== employeeId));
+          closeModal();
+        }
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
     }
   };
 
@@ -179,9 +151,6 @@ const Personalsummary = () => {
           <h1 className="text-3xl font-extrabold text-gray-900 m-0 tracking-tight">ระบบสรุปข้อมูลรายบุคคล</h1>
           <p className="text-gray-500 mt-2 font-medium">จัดการและดูสถิติการทำงานของพนักงานทั้งหมด</p>
         </div>
-        <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2 border-none cursor-pointer" onClick={() => setShowAddModal(true)}>
-          <Plus size={20} /> เพิ่มพนักงานใหม่
-        </button>
       </header>
 
       <div className="flex flex-col md:flex-row gap-4 mb-8 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -316,12 +285,15 @@ const Personalsummary = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
                     <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Briefcase size={18} className="text-indigo-400"/> ตำแหน่ง:</span>
                   {isEditing ? (
-                    <input
-                      type="text"
+                    <select
                       value={editData.position}
                       onChange={(e) => setEditData({ ...editData, position: e.target.value })}
-                        className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
+                      className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {['Budgeting & Planning Officer','Cybersecurity Specialist','Payroll Specialist','Content Marketing Executive','Customer Experience Analyst','Sales Coordinator','Key Account Manager','Content Creator','Motion Graphic Designer','Approver','Admin','Super Admin'].map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
                   ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.position}</span>
                   )}
@@ -329,12 +301,15 @@ const Personalsummary = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
                     <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><MapPin size={18} className="text-indigo-400"/> แผนก:</span>
                   {isEditing ? (
-                    <input
-                      type="text"
+                    <select
                       value={editData.department}
                       onChange={(e) => setEditData({ ...editData, department: e.target.value })}
-                        className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
+                      className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {['Finance','IT','Sales','Creative'].map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
                   ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.department}</span>
                   )}
@@ -417,109 +392,6 @@ const Personalsummary = () => {
         </div>
       )}
 
-      {showAddModal && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6 transition-all duration-200" onClick={() => setShowAddModal(false)}>
-          <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <button className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 rounded-full transition-colors z-20 bg-transparent border-none text-2xl cursor-pointer" onClick={() => setShowAddModal(false)}><X size={24}/></button>
-            
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 p-8 text-white relative flex-shrink-0">
-              <h2 className="text-2xl font-extrabold m-0 z-10 relative flex items-center gap-3"><UserPlus size={28}/> เพิ่มพนักงานใหม่</h2>
-              <p className="text-indigo-100 mt-2 font-medium">กรอกข้อมูลพนักงานเพื่อเข้าสู่ระบบ</p>
-            </div>
-
-            <div className="p-6 sm:p-10 overflow-y-auto flex-1 bg-slate-50">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">ชื่อ:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.firstName}
-                    onChange={(e) => setNewEmployee({...newEmployee, firstName: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">นามสกุล:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.lastName}
-                    onChange={(e) => setNewEmployee({...newEmployee, lastName: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">รหัสพนักงาน:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.empCode}
-                    onChange={(e) => setNewEmployee({...newEmployee, empCode: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">ตำแหน่ง:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.position}
-                    onChange={(e) => setNewEmployee({...newEmployee, position: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">แผนก:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.department}
-                    onChange={(e) => setNewEmployee({...newEmployee, department: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">เบอร์โทรศัพท์:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.phone}
-                    onChange={(e) => setNewEmployee({...newEmployee, phone: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">อีเมล:</label>
-                  <input 
-                    type="email" 
-                    value={newEmployee.email}
-                    onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700">หัวหน้า:</label>
-                  <input 
-                    type="text" 
-                    value={newEmployee.supervisor}
-                    onChange={(e) => setNewEmployee({...newEmployee, supervisor: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <label className="text-sm font-semibold text-gray-700">วันเริ่มงาน:</label>
-                  <input 
-                    type="date" 
-                    value={newEmployee.startDate}
-                    onChange={(e) => setNewEmployee({...newEmployee, startDate: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white hover:bg-gray-50 transition-colors shadow-sm w-full md:w-1/2"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end pt-8 border-t border-gray-200">
-                <button className="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-all border-none cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5" onClick={handleAddEmployee}>บันทึกข้อมูล</button>
-                <button className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-bold transition-all border border-gray-200 cursor-pointer shadow-sm" onClick={() => setShowAddModal(false)}>ยกเลิก</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
