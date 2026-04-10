@@ -432,27 +432,41 @@ export const editShift = async (req, res) => {
 export const getAllEvent = async (req, res) => {
     try {
         const sql = `
-        SELECT 
-            Events.event_id,
-            Events.title,
-            Events.date,
-            Events.created_at,
-            Events.description,
-            Events.time,
+        
+         SELECT 
+            events.id,
+            events.title,
+            events.event_date,
+            events.created_at,
+            events.description,
+            events.event_time,
+            events.location,
+            events.register_start,
+            events.register_end,
+            events.type,
+            events.max_participants,
+
+            (
+                SELECT COUNT(*)
+                FROM event_registrations
+                WHERE event_registrations.event_id = events.id
+                AND event_registrations.status = 'registered'
+            ) AS current_participants,
 
             Users.id_employee,
             Users.firstname,
             Users.lastname
 
-        FROM Events
+        FROM events
 
-        LEFT JOIN Event_participants
-            ON Events.event_id = Event_participants.event_id
+        LEFT JOIN event_registrations
+            ON events.id = event_registrations.event_id
 
         LEFT JOIN Users
-            ON Event_participants.id_employee = Users.id_employee
+            ON event_registrations.id_employee = Users.id_employee
 
-        ORDER BY Events.created_at DESC;
+        ORDER BY events.created_at DESC;
+
         `
 
         const [rows] = await pool.execute(sql)
@@ -461,20 +475,26 @@ export const getAllEvent = async (req, res) => {
         const grouped = {}
 
         rows.forEach(row => {
-            if (!grouped[row.event_id]) {
-                grouped[row.event_id] = {
-                    event_id: row.event_id,
+            if (!grouped[row.id]) {
+                grouped[row.id] = {
+                    id: row.id,
                     title: row.title,
-                    date: row.date,
-                    time: row.time,
+                    event_date: row.event_date,
+                    event_time: row.event_time,
                     created_at: row.created_at,
                     description: row.description,
+                    location: row.location,
+                    register_start: row.register_start,
+                    register_end: row.register_end,
+                    type: row.type,
+                    max_participants: row.max_participants,
+                    current_participants: row.current_participants,
                     users: []
                 }
             }
 
             if (row.id_employee) {
-                grouped[row.event_id].users.push({
+                grouped[row.id].users.push({
                     id_employee: row.id_employee,
                     firstname: row.firstname,
                     lastname: row.lastname
@@ -501,15 +521,15 @@ export const getAllEvent = async (req, res) => {
 
 export const CreateEvent = async (req, res) => {
     try {
-        const { title, date, description, time } = req.body;
+        const { title, event_date, description, event_time, location, register_start, register_end, type, max_participants } = req.body;
 
-        if (!title || !date || !time) {
-            return res.status(400).json({ message: "Title and Date are required" });
+        if (!title || !event_date || !event_time || !location || !register_start || !register_end || !type || !max_participants) {
+            return res.status(400).json({ message: "Title and Date and Location are required" });
         }
 
         const [EventResult] = await pool.query(
-            "INSERT INTO EVENTS (title , date , description , time) VALUES(?,?,?,?)",
-            [title, date, description, time]
+            "INSERT INTO events (title , event_date , description , event_time , location , register_start , register_end , type , max_participants) VALUES(?,?,?,?,?,?,?,?,?)",
+            [title, event_date, description, event_time, location, register_start, register_end, type, max_participants]
         )
 
         res.status(200).json({
@@ -526,20 +546,26 @@ export const CreateEvent = async (req, res) => {
 export const EditEvent = async (req, res) => {
 
     try {
-        const { event_id, title, date, description, time } = req.body;
+        const { id, title, event_date, description, event_time, location, register_start, register_end, type, max_participants } = req.body;
 
         const updates = [];
         // เก็บเป็น array
         const values = [];
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Event id is required"
+            });
+        }
 
         if (title !== undefined) {
             updates.push("title = ?")
             values.push(title);
         }
 
-        if (date !== undefined) {
-            const formattedDate = date.includes("T") ? date.split("T")[0] : date;
-            updates.push("date = ?");
+        if (event_date !== undefined) {
+            const formattedDate = event_date.includes("T") ? event_date.split("T")[0] : event_date;
+            updates.push("event_date = ?");
             values.push(formattedDate);
         }
 
@@ -548,9 +574,64 @@ export const EditEvent = async (req, res) => {
             values.push(description);
         }
 
-        if (time !== undefined) {
-            updates.push("time = ?")
-            values.push(time);
+        if (event_time !== undefined) {
+            updates.push("event_time = ?")
+            values.push(event_time);
+        }
+
+        if (location !== undefined) {
+            updates.push("location = ?")
+            values.push(location);
+        }
+
+        if (register_start) {
+            let formatted = register_start;
+
+            if (formatted.includes("T")) {
+                formatted = formatted.replace("T", " ");
+            }
+
+            
+            if (formatted.includes(".")) {
+                formatted = formatted.split(".")[0];
+            }
+
+           
+            if (formatted.length === 16) {
+                formatted += ":00";
+            }
+
+            updates.push("register_start = ?");
+            values.push(formatted);
+        }
+
+        if (register_end) {
+            let formatted = register_end;
+
+            if (formatted.includes("T")) {
+                formatted = formatted.replace("T", " ");
+            }
+
+            if (formatted.includes(".")) {
+                formatted = formatted.split(".")[0];
+            }
+
+            if (formatted.length === 16) {
+                formatted += ":00";
+            }
+
+            updates.push("register_end = ?");
+            values.push(formatted);
+        }
+
+        if (type !== undefined) {
+            updates.push("type = ?")
+            values.push(type);
+        }
+
+        if (max_participants !== undefined) {
+            updates.push("max_participants = ?")
+            values.push(max_participants);
         }
 
         if (updates.length === 0) {
@@ -562,13 +643,13 @@ export const EditEvent = async (req, res) => {
 
         // sql
         const sql = `
-        UPDATE Events
+        UPDATE events
         SET ${updates.join(" , ")}
-        WHERE event_id = ?
+        WHERE id = ?
 
         `;
 
-        values.push(event_id);
+        values.push(id);
 
         //ยิง query
         await pool.query(sql, values);
@@ -594,13 +675,13 @@ export const DeleteEvent = async (req, res) => {
 
         // ลบ event_participants ก่อน
         await pool.query(
-            "DELETE FROM event_participants WHERE event_id = ?",
+            "DELETE FROM event_registrations WHERE id = ?",
             [id]
         );
 
         // แล้วค่อยลบ event
         const [DeleteResult] = await pool.query(
-            "DELETE FROM EVENTS WHERE event_id = ?",
+            "DELETE FROM events WHERE id = ?",
             [id]
         );
 

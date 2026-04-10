@@ -16,6 +16,15 @@ const CreateEvent = () => {
     const [eventTitle, seteventTitle] = useState('')
     const [eventDate, seteventDate] = useState('')
     const [eventTime, seteventTime] = useState('')
+    const [eventLocation, seteventLocation] = useState('')
+    const [eventRegister_start, seteventRegister_start] = useState('')
+    const [eventRegister_end, seteventRegister_end] = useState('')
+    const [eventType, seteventType] = useState('')
+    const [eventMax_Participants, seteventMax_Participants] = useState('')
+    const [eventCurrent_Participants, seteventCurrent_Participants] = useState('')
+
+
+
 
 
 
@@ -57,20 +66,6 @@ const CreateEvent = () => {
     }, [])
 
 
-
-
-
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date())
-        }, 1000)
-        return () => clearInterval(timer)
-    }, [])
-
-
-
-
     const handleDayClick = (dayObj) => {
         const day = Number(dayObj.day)
 
@@ -87,9 +82,6 @@ const CreateEvent = () => {
         setSelectedDate(formatDateTime(date))
         setFlipped(true)
     }
-
-
-
 
 
     // calendar generator
@@ -183,11 +175,33 @@ const CreateEvent = () => {
 
 
 
+    const formatDateTimeSQL_FULL = (dateTime) => {
+        if (!dateTime) return null;
+
+        return dateTime
+            .replace("T", " ")
+            .replace("Z", "")
+            .split(".")[0];
+    };
+
+
+    const formatToInputDateTime = (dateTime) => {
+        if (!dateTime) return "";
+
+        const d = new Date(dateTime);
+
+        const pad = (n) => n.toString().padStart(2, "0");
+
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+
+
 
 
     const SaveEvent = async () => {
 
-        if (!eventTitle || !eventDate || !eventTime) {
+        if (!eventTitle || !eventDate || !eventTime || !eventLocation || !eventMax_Participants) {
             alert("Please fill in all required fields.");
             return;
         }
@@ -196,9 +210,14 @@ const CreateEvent = () => {
             const res = await axios.post("http://localhost:5000/admin/CreateEvent", {
                 title: eventTitle,
                 //ใช้ formatDate ให้รูปแบบถูกต้องเพื่อส่งไป backend
-                date: eventDate,
+                event_date: eventDate,
                 description: eventDescription,
-                time: eventTime + ":00"
+                event_time: eventTime + ":00",
+                location: eventLocation,
+                register_start: formatDateTimeSQL_FULL(eventRegister_start),
+                register_end: formatDateTimeSQL_FULL(eventRegister_end),
+                type: eventType,
+                max_participants: eventMax_Participants
             });
 
             console.log("RESPONSE:", res.data);
@@ -220,9 +239,22 @@ const CreateEvent = () => {
         handleBack();
 
         // เคลียร์ input
+
         setEventTitle("");
         setEventDate("");
         setEventDescription("");
+        seteventTime("");
+        seteventLocation("");
+        seteventType("");
+        seteventRegister_start("");
+        seteventRegister_end("");
+        seteventMax_Participants("");
+
+
+
+        window.location.reload();
+
+
 
     };
 
@@ -245,7 +277,7 @@ const CreateEvent = () => {
 
             alert(res.data.message);
 
-            setEvents(prev => prev.filter(e => e.event_id !== id));
+            setEvents(prev => prev.filter(e => e.id !== id));
 
             setSelectedEvent(null);
 
@@ -258,30 +290,54 @@ const CreateEvent = () => {
 
     };
 
+
+
+
+
+
+
+    const formatDateTimeSQL = (dateTime) => {
+        if (!dateTime) return null;
+
+        return dateTime.replace("T", " ") + ":00";
+    };
+
+
     const SaveEditEvent = async () => {
 
         try {
-            const res = await axios.patch("http://localhost:5000/admin/EditEvent",
-                {
-                    event_id: selectedEvent.event_id,
-                    title: selectedEvent.title,
-                    date: selectedEvent.date,
-                    description: selectedEvent.description,
-                    time: selectedEvent.time + ":00"
-                }
+            const payload = {
+                id: selectedEvent.id,
+                title: selectedEvent.title,
+                event_date: selectedEvent.event_date,
+                description: selectedEvent.description,
+
+                event_time: selectedEvent.event_time + ":00",
+
+                location: selectedEvent.location,
+
+                register_start: formatDateTimeSQL(selectedEvent.register_start),
+                register_end: formatDateTimeSQL(selectedEvent.register_end),
+
+                type: selectedEvent.type,
+                max_participants: selectedEvent.max_participants
+            };
+
+            console.log("SEND DATA:", payload); // 🔥 debug
+
+            const res = await axios.patch(
+                "http://localhost:5000/admin/EditEvent",
+                payload
             );
 
             console.log(res.data);
-
             window.location.reload();
 
-
         } catch (error) {
-            console.error(error);
+            console.error("ERROR FULL:", error.response?.data || error);
         }
 
     }
-
 
 
 
@@ -316,7 +372,7 @@ const CreateEvent = () => {
                             className="shadow-lg rounded-4 mt-5 mx-auto"
                             style={{
                                 width: '50vw',
-                                height: '530px',
+                                minHeight: '500px',
                                 background: 'linear-gradient(to bottom, #FFFFFF, #A4B7FC)',
                                 border: 'none',
                                 overflow: 'hidden',
@@ -369,7 +425,15 @@ const CreateEvent = () => {
 
                                 </Card.Body>
                             ) : (
-                                <Card.Body>
+                                <Card.Body
+                                    style={{
+                                        maxHeight: '570px',
+                                        overflowY: 'auto'
+                                    }}
+                                >
+
+                                    <strong> Detail Event :</strong>
+                                    &nbsp;
 
                                     <Form.Control
                                         placeholder="Title :"
@@ -389,19 +453,108 @@ const CreateEvent = () => {
 
 
 
-                                    <input
-                                        type="date"
-                                        className="form-control mt-1"
-                                        value={eventDate}
-                                        onChange={(e) => seteventDate(e.target.value)}
+                                    <Form.Control
+                                        placeholder="Location detail :"
+                                        value={eventLocation}
+                                        onChange={(e) => seteventLocation(e.target.value)}
                                     />
 
-                                    <input
-                                        type="time"
-                                        className="form-control mt-1"
-                                        value={eventTime}
-                                        onChange={(e) => seteventTime(e.target.value)}
-                                    />
+                                    &nbsp;
+
+                                    <div>
+
+                                        <strong> Event Date :</strong>
+                                        &nbsp;
+                                        <input
+                                            type="date"
+                                            className="form-control mt-1"
+                                            value={eventDate}
+                                            onChange={(e) => seteventDate(e.target.value)}
+                                        />
+
+                                        <input
+                                            type="time"
+                                            className="form-control mt-1"
+                                            value={eventTime}
+                                            onChange={(e) => seteventTime(e.target.value)}
+                                        />
+                                    </div>
+
+                                    &nbsp;
+
+                                    <div>
+
+                                        <strong> Max Participants :</strong>
+                                        &nbsp;
+                                        <input
+                                            className="form-control mt-1"
+                                            value={eventMax_Participants}
+                                            onChange={(e) => seteventMax_Participants(e.target.value)}
+                                        />
+
+
+                                    </div>
+
+
+
+                                    &nbsp;
+
+                                    <div>
+
+                                        <strong> Register DateTime :</strong>
+                                        &nbsp;
+
+
+                                        <div>
+                                            <p style={{ marginBottom: '4px' }}>Start</p>
+                                            <input
+                                                type="datetime-local"
+                                                className="form-control mt-1"
+                                                value={eventRegister_start}
+                                                onChange={(e) => seteventRegister_start(e.target.value)}
+
+                                            />
+
+                                            <p style={{ marginBottom: '4px' }}>End</p>
+                                            <input
+                                                type="datetime-local"
+                                                className="form-control mt-1"
+                                                value={eventRegister_end}
+                                                onChange={(e) => seteventRegister_end(e.target.value)}
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+
+                                    &nbsp;
+
+                                    <div style={{ position: "relative" }}>
+
+                                        <strong> Select Event Type : </strong>
+
+                                        <select
+                                            className="form-control mt-1"
+                                            value={eventType}
+                                            onChange={(e) => seteventType(e.target.value)}
+                                        >
+                                            <option value="">Type Event</option>
+                                            <option value="internal">internal</option>
+                                            <option value="external">external</option>
+                                        </select>
+
+                                        <i
+                                            className="bi bi-caret-down-fill"
+                                            style={{
+                                                position: "absolute",
+                                                right: "10px",
+                                                top: "75%",
+                                                transform: "translateY(-50%)",
+                                                pointerEvents: "none"
+                                            }}
+                                        ></i>
+                                    </div>
 
 
 
@@ -440,15 +593,24 @@ const CreateEvent = () => {
                             <div className="list-group">
                                 {Array.isArray(events) && events.map((event) => (
                                     <a
-                                        key={event.event_id}
+                                        key={event.id}
                                         className="list-group-item list-group-item-action"
                                         data-bs-toggle="modal"
                                         data-bs-target="#eventModal"
                                         onClick={() =>
                                             setSelectedEvent({
                                                 ...event,
-                                                date: event.date.split("T")[0],
-                                                time: event.time ? event.time.slice(0, 5) : ""
+                                                event_date: event.event_date
+                                                    ? event.event_date.split("T")[0]
+                                                    : "",
+
+                                                event_time: event.event_time
+                                                    ? event.event_time.slice(0, 5)
+                                                    : "",
+
+                                                
+                                                register_start: event.register_start || "",
+                                                register_end: event.register_end || ""
                                             })
                                         }
                                     >
@@ -487,20 +649,20 @@ const CreateEvent = () => {
 
                         <div className="modal-body">
                             <div className="mb-3">
-                                <strong>วันที่ :</strong>
+                                <strong> Event Date :</strong>
                                 <input
                                     type="date"
                                     className="form-control mt-1"
                                     value={
-                                        selectedEvent?.date
-                                            ? selectedEvent.date.split("T")[0]
+                                        selectedEvent?.event_date
+                                            ? selectedEvent.event_date.split("T")[0]
                                             : ""
                                     }
                                     onChange={(e) =>
                                         setSelectedEvent({
                                             //กระจาย event ออกมา แล้วเปลี่ยนเฉพาะ date
                                             ...selectedEvent,
-                                            date: e.target.value
+                                            event_date: e.target.value
                                         })
                                     }
                                 />
@@ -508,20 +670,113 @@ const CreateEvent = () => {
 
                             <div className="mb-3" >
 
-                                <strong>เวลา : </strong>
+                                <strong> Event Time : </strong>
                                 <input
                                     type="time"
                                     className="form-control mt-1"
-                                    value={selectedEvent?.time || ""}
+                                    value={selectedEvent?.event_time || ""}
                                     onChange={(e) =>
                                         setSelectedEvent({
                                             ...selectedEvent,
-                                            time: e.target.value
+                                            event_time: e.target.value
                                         })
                                     }
                                 />
 
                             </div>
+
+                            <div className="mb-3" >
+
+                                <strong>Location Detail : </strong>
+                                <input
+                                    className="form-control mt-1"
+                                    value={selectedEvent?.location || ""}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            location: e.target.value
+                                        })
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mb-3" >
+
+                                <strong> Max Participants : </strong>
+                                <input
+                                    className="form-control mt-1"
+                                    value={selectedEvent?.max_participants || ""}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            max_participants: e.target.value
+                                        })
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mb-3" >
+
+                                <strong> Current Participants : </strong>
+                                <input
+                                    className="form-control mt-1"
+                                    value={selectedEvent?.current_participants || ""}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            current_participants: e.target.value
+
+                                        })
+                                    }
+                                    readOnly
+                                />
+
+                            </div>
+
+
+
+
+
+                            <div className="mb-3" >
+
+                                <strong>Registration Start Time : </strong>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control mt-1"
+                                    value={formatToInputDateTime(selectedEvent?.register_start)}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            register_start: e.target.value
+                                        })
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mb-3" >
+
+                                <strong>Registration End Time : </strong>
+                                <input
+                                    type="datetime-local"
+                                    className="form-control mt-1"
+                                    value={formatToInputDateTime(selectedEvent?.register_end)}
+                                    onChange={(e) =>
+                                        setSelectedEvent({
+                                            ...selectedEvent,
+                                            register_end: e.target.value
+                                        })
+                                    }
+                                />
+
+                            </div>
+
+
+
+
+
 
                             <div className="mb-3">
                                 <strong>ผู้สมัคร :</strong>{" "}
@@ -542,7 +797,6 @@ const CreateEvent = () => {
                                             <th>Last Name</th>
                                             <th>ID Employee</th>
                                             <th></th>
-                                            <th></th>
                                         </tr>
                                     </thead>
 
@@ -553,11 +807,6 @@ const CreateEvent = () => {
                                                     <td>{user.firstname}</td>
                                                     <td>{user.lastname}</td>
                                                     <td>{user.id_employee}</td>
-                                                    <td>
-                                                        <Button variant="warning">
-                                                            <i className="bi bi-pen"></i>
-                                                        </Button>
-                                                    </td>
                                                     <td>
                                                         <Button variant="danger">
                                                             Delete
@@ -606,8 +855,9 @@ const CreateEvent = () => {
                             <button
                                 className="btn btn-danger mt-2"
                                 data-bs-dismiss="modal"
-                                onClick={() => DeleteEvent(selectedEvent?.event_id)}
-                            >
+                                onClick={() => {
+                                    DeleteEvent(selectedEvent?.id)
+                                }}                            >
                                 Delete
                             </button>
 

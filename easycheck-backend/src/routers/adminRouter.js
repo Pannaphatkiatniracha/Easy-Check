@@ -3,7 +3,7 @@ import express from "express";
 // import {  forgotPassword } from "../controllers/adminController.js";
 // EditEvent , CreateEvent  
 
-import { loginAdmin, getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent , CreateEvent , DeleteEvent , EditEvent ,getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
+// import {  getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent , CreateEvent , DeleteEvent , EditEvent ,getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
 // , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
 
 
@@ -19,6 +19,7 @@ import {
   editShift,
   getAllEvent,
   CreateEvent,
+  EditEvent ,
   DeleteEvent,
   getDepartments,
   getEmployees,
