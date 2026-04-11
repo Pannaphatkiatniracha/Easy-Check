@@ -46,7 +46,7 @@ export const registerEvent = async (req, res) => {
                 FROM event_registrations 
                 WHERE event_id = ? AND status = 'registered') as current_count 
             FROM events WHERE id = ?`,
-            [event_id, event_id] // ไปแทนที่ '?' ในคิวรี่
+            [event_id, event_id] // มี '?' สองอันก็ต้องใส่สองอันนะสาว
         )
         
         // ถ้าอีเว้นนี้มันไม่มีจริงหรือไม่มีแล้ว
@@ -80,17 +80,18 @@ export const registerEvent = async (req, res) => {
         VALUES (?, ?, ?, ?, 'registered')`
         await db.execute(insertSql, [event_id, id_employee, notes, registration_date])
         
+        // 🐷🐷 ไม่ใช้แล้วแต่ไม่อยากลบเสียดาย t-t
 
         // อัพเดตจำนวนคนที่ลงทะเบียน
-        await db.execute(
-            `UPDATE events 
-            SET current_participants = (
-                SELECT COUNT(*) FROM event_registrations 
-                 WHERE event_id = ? AND status = 'registered'
-                 )
-                 WHERE id = ?`, // ก็คืออัพเดต current_participants ตาม id ของ event นั้น
-            [event_id, event_id]
-        )
+        // await db.execute(
+        //     `UPDATE events 
+        //     SET current_participants = (
+        //         SELECT COUNT(*) FROM event_registrations 
+        //          WHERE event_id = ? AND status = 'registered'
+        //          )
+        //          WHERE id = ?`, // ก็คืออัพเดต current_participants ตาม id ของ event นั้น
+        //     [event_id, event_id]
+        // )
         
         console.log(`✅ Employee ID: ${id_employee} ลงทะเบียน Event ID: ${event_id} สำเร็จ`)
         
