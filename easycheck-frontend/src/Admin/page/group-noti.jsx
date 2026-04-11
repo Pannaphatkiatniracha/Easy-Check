@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import Api from '../../Api';
 
+const AVATAR_COLORS = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
+
 const GroupNoti = () => {
   const [user, setUser] = useState(null);
   const [departments, setDepartments] = useState([]);
@@ -108,34 +110,37 @@ const GroupNoti = () => {
             <div className="flex items-center justify-center py-10 text-gray-500">กำลังโหลดข้อมูลแผนก...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-9">
-              {departments.map((dept) => (
-                <div 
-                  key={dept.id} 
-                  className={`flex items-center px-6 py-5 rounded-xl transition-all min-h-16 ${
-                    selectedDepartments.includes(dept.id) 
-                      ? 'bg-blue-200' 
-                      : 'bg-blue-100 hover:bg-blue-200'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="w-6 h-6 mr-5 cursor-pointer flex-shrink-0"
-                    style={{ accentColor: '#3d4f7d' }}
-                    checked={selectedDepartments.includes(dept.id)}
-                    onChange={() => handleToggleDepartment(dept.id)}
-                  />
-                  <span className="flex-1 text-lg font-semibold text-gray-800 mr-5">
-                    {dept.name}
-                  </span>
-                  <button 
-                    className="px-8 py-3 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg"
-                    style={{ backgroundColor: '#3C467B' }}
-                    onClick={() => handleViewDetails(dept)}
+              {departments.map((dept) => {
+                const deptId = dept.id ?? dept.name
+                return (
+                  <div 
+                    key={deptId} 
+                    className={`flex items-center px-6 py-5 rounded-xl transition-all min-h-16 ${
+                      selectedDepartments.includes(deptId) 
+                        ? 'bg-blue-200' 
+                        : 'bg-blue-100 hover:bg-blue-200'
+                    }`}
                   >
-                    Details
-                  </button>
-                </div>
-              ))}
+                    <input
+                      type="checkbox"
+                      className="w-6 h-6 mr-5 cursor-pointer flex-shrink-0"
+                      style={{ accentColor: '#3d4f7d' }}
+                      checked={selectedDepartments.includes(deptId)}
+                      onChange={() => handleToggleDepartment(deptId)}
+                    />
+                    <span className="flex-1 text-lg font-semibold text-gray-800 mr-5">
+                      {dept.name}
+                    </span>
+                    <button 
+                      className="px-8 py-3 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg"
+                      style={{ backgroundColor: '#3C467B' }}
+                      onClick={() => handleViewDetails(dept)}
+                    >
+                      Details
+                    </button>
+                  </div>
+                )
+              })}
             </div>
           )}
 
@@ -182,8 +187,15 @@ const GroupNoti2 = ({ department, onBack }) => {
         const res = await Api.get('/api/group-noti/employees', {
           params: { department: department.name },
         });
-        setEmployees(res.data);
-        setSelectedEmployees(res.data.map((emp) => emp.id));
+        const mapped = res.data.map((emp, index) => ({
+          id: emp.id,
+          name: `${emp.firstname} ${emp.lastname}`,
+          position: emp.position || '',
+          avatar: emp.avatar || '',
+          avatarColor: AVATAR_COLORS[index % AVATAR_COLORS.length],
+        }));
+        setEmployees(mapped);
+        setSelectedEmployees(mapped.map((emp) => emp.id));
       } catch (err) {
         console.error('Failed to fetch employees:', err);
       } finally {
@@ -263,18 +275,33 @@ const GroupNoti2 = ({ department, onBack }) => {
                     checked={selectedEmployees.includes(employee.id)}
                     onChange={() => handleToggleEmployee(employee.id)}
                   />
-                  <div 
-                    className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" 
-                    style={{ backgroundColor: '#5b7bb4' }}
+                  <div
+                    className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+                    style={{ backgroundColor: employee.avatarColor }}
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-6 h-6">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
+                    {employee.avatar ? (
+                      <img
+                        src={employee.avatar}
+                        alt={employee.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-6 h-6">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                    )}
                   </div>
-                  <span className="flex-1 text-base font-semibold text-gray-800">
-                    {employee.name}
-                  </span>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="text-base font-semibold text-gray-800 truncate">
+                      {employee.name}
+                    </span>
+                    {employee.position ? (
+                      <span className="text-sm text-gray-500 truncate">
+                        {employee.position}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               ))}
             </div>

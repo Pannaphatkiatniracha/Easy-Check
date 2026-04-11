@@ -2,12 +2,13 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { InputGroup, FormControl, Button, Spinner, Modal } from 'react-bootstrap'; // เพิ่ม Spinner ตรงนี้
 import { useState, useEffect } from 'react';
 
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
 const HOST = 'localhost'
 const PORT = '5000'
 
-const ForgotToChange = () => {
+const ResetPassword = () => {
 
 
     const { token } = useParams() // ดึง token จาก URL
@@ -82,9 +83,8 @@ const ForgotToChange = () => {
 
         try {
             // อันนี้ต้องส่ง token ไปด้วยเพราะว่าใน token จะมี id ด้วยก็จะได้รู้ว่าเออคนนี้คือใคร
-            const response = await axios.put(`http://${HOST}:${PORT}/auth/reset-password/${token}`, {
+            const response = await Api.put(`http://${HOST}:${PORT}/auth/reset-password/${token}`, {
                 newPassword: user.newpass,
-                confirmPassword: user.confirmpass
             })
 
             
@@ -248,4 +248,4 @@ const ForgotToChange = () => {
     )
 }
 
-export default ForgotToChange
+export default ResetPassword

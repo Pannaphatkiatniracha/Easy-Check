@@ -1,7 +1,8 @@
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
 
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
 const HOST = 'localhost'
 const PORT = '5000'
@@ -17,7 +18,7 @@ const Setting = ({ role, setToken, setRole }) => {
         try {
             const token = localStorage.getItem('token') 
 
-            await axios.post(`http://${HOST}:${PORT}/auth/login`, {}, {
+            await Api.post(`http://${HOST}:${PORT}/auth/logout`, {}, {
             headers: {
                 Authorization: `Bearer ${token}` // ต้องส่ง token ไปด้วยเพราะว่าใน authRouter API มัน (for ต่อท่อ)
             }
