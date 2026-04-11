@@ -112,7 +112,7 @@ const Profile = ( {role} ) => {
     const handleChange = (e) => {
         const { name, value } = e.target
         
-        // ถ้าเป็นการเปลี่ยนสาขา ให้แปลงชื่อสาขาเป็น branch_id ด้วย
+        // ถ้าเป็นการเปลี่ยนสาขา ให้เปลี่ยนตาม logic นี้
         if (name === "branch") {
             let branch_id = 1
             if (value === "Bangkok") branch_id = 1

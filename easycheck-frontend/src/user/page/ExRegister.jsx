@@ -36,12 +36,20 @@ const ExRegister = ({ role }) => {
                 const response = await Api.get('/users/profile')
                 const data = response.data
                 
+                // เช็คก่อนว่าแบคเอนส่งชื่อสาขามามั้ย ถ้าส่งมาเป็นเลขก็ฟีลเหมือนแปลงมาให้
+                const branchName = data.name || 
+                    (data.branch_id === 1 ? "Bangkok" 
+                        : data.branch_id === 2 ? "Chiang Mai" 
+                        : data.branch_id === 3 ? "Phuket" 
+                        : data.branch_id === 4 ? "Chonburi" 
+                        : "Khon Kaen")
+                
                 setUser({
                     name: `${data.firstname || ''} ${data.lastname || ''}`.trim() || "",
                     userid: data.id_employee || "",
                     position: data.position || "",
                     department: data.department || "",
-                    branch: data.branch || "",
+                    branch: branchName,
                     events: selectedEvent?.title || ""
                 })
             } catch (error) {
@@ -92,6 +100,7 @@ const ExRegister = ({ role }) => {
     const eventTime = registrationData?.eventTime || selectedEvent?.event_time
     const eventLocation = registrationData?.eventLocation || selectedEvent?.location
     const eventIcon = registrationData?.eventIcon || selectedEvent?.icon
+    const eventDescription = selectedEvent?.description || "" // ดึงคำอธิบาย event
 
 
 
@@ -143,12 +152,13 @@ const ExRegister = ({ role }) => {
                                 <div className="small mb-2">
                                     <i className="bi bi-calendar3 me-1"></i> วันที่: {eventDate} <br />
                                     <i className="bi bi-clock me-1"></i> เวลา: {eventTime} <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation}
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation} <br />
+                                    <i className="bi bi-info-circle me-1"></i> รายละเอียด: {eventDescription}
                                 </div>
 
-                                <div className="small text-success">
+                                {/* <div className="small text-success">
                                     <i className="bi bi-globe me-1"></i> External Event
-                                </div>
+                                </div> */}
 
                             </div>
 
@@ -222,18 +232,6 @@ const ExRegister = ({ role }) => {
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
                     <p><i>{user.name}</i> registered for<br />{eventTitle}</p>
-                    {/* {notes && (
-                        <div className="mt-3 p-2 bg-light rounded">
-                            <small className="text-muted">
-                                <strong>หมายเหตุ:</strong> {notes}
-                            </small>
-                        </div>
-                    )}
-                    <div className="mt-2 p-2 bg-light rounded">
-                        <small className="text-muted">
-                            <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
-                        </small>
-                    </div> */}
                 </Modal.Body>
             </Modal>
 
@@ -300,12 +298,13 @@ const ExRegister = ({ role }) => {
                                 <div className="small mb-2">
                                     <i className="bi bi-calendar3 me-1"></i> วันที่: {eventDate} <br />
                                     <i className="bi bi-clock me-1"></i> เวลา: {eventTime} <br />
-                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation}
+                                    <i className="bi bi-geo-alt me-1"></i> สถานที่: {eventLocation} <br />
+                                    <i className="bi bi-info-circle me-1"></i> รายละเอียด: {eventDescription}
                                 </div>
 
-                                <div className="small text-success">
+                                {/* <div className="small text-success">
                                     <i className="bi bi-globe me-1"></i> External Event
-                                </div>
+                                </div> */}
 
                             </div>
 
@@ -318,8 +317,6 @@ const ExRegister = ({ role }) => {
             <div className="d-flex flex-column align-items-center mt-6">
 
                 <div className="mb-3 w-75">
-                    {/* form-label มาจาก bootstrap ไว้จัดเลเอ้าระหว่าง label กับ input ให้เริ่ด
-                    ส่วน form-control ก็จุดประสงค์เดิมแต่ไว้ใช้กับ input */}
                     <label className="text-white fw-light form-label" htmlFor="">Employee ID</label>
                     <input className="rounded-1 form-control fw-semibold" type="text"
                         name='userid' value={user.userid} readOnly />
@@ -379,18 +376,6 @@ const ExRegister = ({ role }) => {
                     <i className="bi bi-check-circle-fill fs-1 text-[#50AE67]"></i>
                     <h5 className="fw-bold mt-2">You're registered!</h5>
                     <p className='mt-3'><i>{user.name}</i> registered for<br />{eventTitle}</p>
-                    {/* {notes && (
-                        <div className="mt-3 p-2 bg-light rounded">
-                            <small className="text-muted">
-                                <strong>หมายเหตุ:</strong> {notes}
-                            </small>
-                        </div>
-                    )}
-                    <div className="mt-2 p-2 bg-light rounded">
-                        <small className="text-muted">
-                            <strong>วันที่ลงทะเบียน:</strong> {registrationDate}
-                        </small>
-                    </div> */}
                 </Modal.Body>
             </Modal>
 
