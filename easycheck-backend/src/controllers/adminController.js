@@ -455,7 +455,8 @@ export const getAllEvent = async (req, res) => {
 
             Users.id_employee,
             Users.firstname,
-            Users.lastname
+            Users.lastname,
+            event_registrations.notes  
 
         FROM events
 
@@ -464,8 +465,6 @@ export const getAllEvent = async (req, res) => {
 
         LEFT JOIN Users
             ON event_registrations.id_employee = Users.id_employee
-
-        ORDER BY events.created_at DESC;
 
         `
 
@@ -497,7 +496,8 @@ export const getAllEvent = async (req, res) => {
                 grouped[row.id].users.push({
                     id_employee: row.id_employee,
                     firstname: row.firstname,
-                    lastname: row.lastname
+                    lastname: row.lastname,
+                    notes: row.notes
                 })
             }
         })
@@ -591,12 +591,12 @@ export const EditEvent = async (req, res) => {
                 formatted = formatted.replace("T", " ");
             }
 
-            
+
             if (formatted.includes(".")) {
                 formatted = formatted.split(".")[0];
             }
 
-           
+
             if (formatted.length === 16) {
                 formatted += ":00";
             }
@@ -698,7 +698,3 @@ export const DeleteEvent = async (req, res) => {
         res.status(500).json({ message: "Error deleting event" });
     }
 };
-
-
-
-
