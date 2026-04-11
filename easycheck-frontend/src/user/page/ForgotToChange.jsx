@@ -8,7 +8,7 @@ import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 const HOST = 'localhost'
 const PORT = '5000'
 
-const ForgotToChange = () => {
+const ResetPassword = () => {
 
 
     const { token } = useParams() // ดึง token จาก URL
@@ -248,4 +248,4 @@ const ForgotToChange = () => {
     )
 }
 
-export default ForgotToChange
+export default ResetPassword
