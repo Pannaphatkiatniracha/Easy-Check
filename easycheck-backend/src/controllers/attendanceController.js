@@ -35,7 +35,7 @@ const calcTimeStatus = (currentTimeStr, shiftTimeStr, type) => {
   const currentMins = ch * 60 + cm;
   const shiftMins = sh * 60 + sm;
 
-  //  แก้ไขค่า ENUM ให้ตรงกับตาราง attendance 100%
+  // ✅ แก้ไขค่า ENUM ให้ตรงกับตาราง attendance 100%
   if (type === "checkin") return currentMins > shiftMins ? "late" : "on_time";
   if (type === "checkout") return currentMins < shiftMins ? "early" : "normal";
   return "normal";
@@ -90,7 +90,7 @@ export const checkIn = async (req, res) => {
     
     let result;
     
-    //  บันทึก shift.shift_id ลงไปในฐานข้อมูลตอนเช็คอินด้วย
+    // ✅ บันทึก shift.shift_id ลงไปในฐานข้อมูลตอนเช็คอินด้วย
     if (canSaveLatLng) {
       const [insertResult] = await pool.query(
         `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_lat, check_in_lng, check_in_time)
@@ -276,14 +276,7 @@ export const getMyShift = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-
-
 //  ATTENDANCE-SUMMARY
-
-// -------------------------------------------------------------------
-
-// 🐸🐸 ATTENDANCE-SUMMARY
-
 export const getAttendanceHistory = async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(400).json({ message: "userId is required" });
@@ -356,8 +349,3 @@ export const getCurrentStatus = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
-// 🐸🐸 WORK-HOURS TRACKER
-
-
-// 🐸🐸 GET CURRENT STATUS
-
