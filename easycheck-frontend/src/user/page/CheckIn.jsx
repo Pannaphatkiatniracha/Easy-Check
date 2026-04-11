@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 //  กำหนดพิกัดบริษัท และรัศมีที่อนุญาต (เมตร)
-const COMPANY_LAT = 13.756215; // บ้านเวีย
-const COMPANY_LNG = 100.418927;
+const COMPANY_LAT = 13.756215; // บ้านวอวอคนสวยเคะมาก
+const COMPANY_LNG = 100.418927; // บ้านวอวอคนสวยเคะมาก
 const ALLOWED_RADIUS_METERS = 100; // อนุญาตในระยะ 100 เมตร
 
 // สูตรคำนวณระยะห่าง 2 จุด GPS (Haversine formula)
