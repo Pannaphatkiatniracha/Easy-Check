@@ -38,7 +38,7 @@ const DataToCheck = () => {
                 // ถ้าเป็น approver (role_id=2) ให้เอาเฉพาะ user ใน branch เดียวกัน
                 if (currentUser.role_id === 2) {
                     employeesList = employeesList.filter(emp => 
-                        emp.role_id === 1 && emp.branch === currentUser.branch
+                        emp.role_id === 1 && emp.branch_id === currentUser.branch_id
                     )
                 } else {
                     // ถ้าเป็น admin หรือ super admin ให้เอา user ทุกคน

@@ -276,76 +276,107 @@ export const getMyShift = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-//  ATTENDANCE-SUMMARY
+
+
+// 🐱🐱 ATTENDANCE-SUMMARY
 export const getAttendanceHistory = async (req, res) => {
-  const { userId } = req.query;
-  if (!userId) return res.status(400).json({ message: "userId is required" });
+  const { userId } = req.query
+  const empId = userId || req.user?.id_employee
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" })
   
   try {
-    const [rows] = await pool.query(
+    // ดึงข้อมูลการเข้า-ออกงาน
+    const [attendanceRows] = await pool.query(
       `SELECT check_in_status AS status, DATE_FORMAT(work_date, '%Y-%m-%d') as date 
        FROM attendance WHERE id_employee = ? ORDER BY work_date DESC`,
-      [userId]
-    );
+      [empId]
+    )
+    
+    // ดึงข้อมูลการลา
+    const [leaveRows] = await pool.query(
+      `SELECT DISTINCT DATE_FORMAT(leave_start, '%Y-%m-%d') as date 
+       FROM leave_requests 
+       WHERE id_employee = ? AND status = 'approved' 
+       UNION 
+       SELECT DISTINCT DATE_FORMAT(leave_end, '%Y-%m-%d') as date 
+       FROM leave_requests 
+       WHERE id_employee = ? AND status = 'approved'`,
+      [empId, empId]
+    )
 
     const attendanceData = {
-      onTimes: rows.filter(r => r.status === 'on_time').map(r => r.date),
-      lates: rows.filter(r => r.status === 'late').map(r => r.date),
-      leaves: rows.filter(r => r.status === 'leave').map(r => r.date)
-    };
-    res.json(attendanceData);
+      onTimes: attendanceRows.filter(r => r.status === 'on_time').map(r => r.date), // มาปกติ
+      lates: attendanceRows.filter(r => r.status === 'late').map(r => r.date), // มาสาย
+      leaves: leaveRows.map(r => r.date)  // ดึงวันลา
+    }
+    
+    res.json(attendanceData)
+
   } catch (err) {
-    res.status(500).json({ message: "Database Error", error: err.message });
+    console.error("Error in getAttendanceHistory:", err)
+    res.status(500).json({ message: "Database Error", error: err.message })
   }
 }
 
-//  WORK-HOURS TRACKER
+// 🐱🐱  WORK-HOURS TRACKER
 export const getWeeklyHours = async (req, res) => {
-  const { userId } = req.query;
-  if (!userId) return res.status(400).json({ message: "userId is required" });
+  const { userId } = req.query
+  const empId = userId || req.user?.id_employee
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" })
+  
   try {
     const [rows] = await pool.query(
       `SELECT check_in_time, check_out_time, DAYNAME(work_date) as day 
        FROM attendance WHERE id_employee = ? 
        AND YEARWEEK(work_date, 1) = YEARWEEK(CURDATE(), 1) ORDER BY work_date ASC`,
-      [userId]
-    );
+      [empId]
+    )
 
-    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 };
+    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 }
     rows.forEach(row => {
       const day = row.day;
       if (row.check_in_time && row.check_out_time && hoursData.hasOwnProperty(day)) {
-        const diffMs = new Date(row.check_out_time) - new Date(row.check_in_time);
-        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1));
+        const diffMs = new Date(row.check_out_time) - new Date(row.check_in_time)
+        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1))
       }
-    });
-    res.json(hoursData);
+    })
+    res.json(hoursData)
   } catch (err) {
-    res.status(500).json({ message: "Error calculating hours", error: err.message });
+    res.status(500).json({ message: "Error calculating hours", error: err.message })
   }
 }
 
-//  GET CURRENT STATUS
+// 🐱🐱  GET CURRENT STATUS
 export const getCurrentStatus = async (req, res) => {
   const { userId } = req.query;
+  const empId = userId || req.user?.id_employee
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" })
+  
   try {
     const [rows] = await pool.query(
       `SELECT check_in_time, check_out_time, check_in_status, check_out_status 
        FROM attendance WHERE id_employee = ? AND work_date = CURDATE() LIMIT 1`,
-      [userId]
-    );
+      [empId]
+    )
 
-    let result = { message: "no-activity" };
+    let result = { message: "no-activity" }
+
     if (rows.length > 0) {
       const row = rows[0];
       if (row.check_out_time) {
-        result = { type: 'checkout', status: row.check_out_status, created_at: row.check_out_time };
-      } else if (row.check_in_time) {
-        result = { type: 'checkin', status: row.check_in_status, created_at: row.check_in_time };
+        result = { type: 'checkout', status: row.check_out_status, created_at: row.check_out_time }
+      } 
+      else if (row.check_in_time) {
+        result = { type: 'checkin', status: row.check_in_status, created_at: row.check_in_time }
       }
     }
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    res.json(result)
+  } 
+  catch (err) {
+    res.status(500).json({ message: err.message })
   }
 }
