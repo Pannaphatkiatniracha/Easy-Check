@@ -76,24 +76,25 @@ function RequestApprove() {
   };
 
   const handleAssignShift = async (userId, shiftId) => {
-    if (!shiftId) return;
-
+    // เอา if (!shiftId) return; ออก เพื่อให้สามารถเลือก "เลือกกะ" (ค่าว่าง) เพื่อยกเลิกกะได้
     setSavingShift(userId);
     try {
+      const parsedShiftId = shiftId ? Number(shiftId) : null;
+
       await axios.post(
         "http://localhost:5000/approver/assign-shift",
-        { userId, shiftId },
+        { userId, shiftId: parsedShiftId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setUsers((prev) =>
         prev.map((u) =>
-          u.id === userId ? { ...u, shift_id: Number(shiftId) } : u
+          u.id === userId ? { ...u, shift_id: parsedShiftId } : u
         )
       );
     } catch (err) {
       console.error(err);
-      alert("กำหนดกะไม่สำเร็จ");
+      alert(err.response?.data?.message || "กำหนดกะไม่สำเร็จ");
     } finally {
       setSavingShift(null);
     }
@@ -160,14 +161,15 @@ function RequestApprove() {
           <div className="text-xs text-gray-500">{user.id_employee}</div>
 
           <select
-            value={user.shift_id || ""}
+            // บังคับแปลงเป็น String เพื่อให้ตรงกับ value ของ <option> 
+            value={user.shift_id ? String(user.shift_id) : ""}
             onChange={(e) => handleAssignShift(user.id, e.target.value)}
             className="mt-2 w-full border rounded p-1 text-xs"
             disabled={savingShift === user.id}
           >
             <option value="">เลือกกะ</option>
             {shifts.map((s) => (
-              <option key={s.shift_id} value={s.shift_id}>
+              <option key={s.shift_id} value={String(s.shift_id)}>
                 {String(s.start_time).slice(0, 5)} - {String(s.end_time).slice(0, 5)}
               </option>
             ))}

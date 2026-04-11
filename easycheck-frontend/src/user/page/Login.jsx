@@ -68,6 +68,13 @@ const Login = ({ setToken, setRole }) => {
         }
     };
 
+    // ให้มันแทนการกดปุ่มล้อคอินด้วยปุ่ม enter
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
     return (
         <div className='app-container'>
             <div className="w-25 mx-auto mt-28">
@@ -89,6 +96,7 @@ const Login = ({ setToken, setRole }) => {
                                 enter = enter.slice(0, 6);
                                 setUsername(enter);
                             }}
+                            onKeyDown={handleKeyPress}
                         />
                     </InputGroup>
                 </div>
@@ -103,11 +111,7 @@ const Login = ({ setToken, setRole }) => {
                             placeholder='Password'
                             value={password}
                             onChange={e => setPassword(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleLogin();
-                                }
-                            }}
+                            onKeyDown={handleKeyPress}
                         />
                     </InputGroup>
 

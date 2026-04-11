@@ -31,11 +31,13 @@ const ApproveProfile = ({ role }) => {
             position: "",
             department: "",
             branch: "",
+            branch_id: "",
             gender: "Female",
             avatar: "/easycheck/img/who.webp",
             shift: "",
             startTime: "",
-            endTime: ""
+            endTime: "",
+            shift_id: ""
         }
     )
 
@@ -65,6 +67,14 @@ const ApproveProfile = ({ role }) => {
                         : `${Api.defaults.baseURL}/uploads/avatars/${data.avatar}`) // ถ้าไม่ใช่ให้เติมชื่อ server เราไปมันจะได้ใช้ได้ซึ่งตรงนี้นี่แหละคือรูปที่ user อัพเอง
                     : "/easycheck/img/an.jpg"
 
+                // เช็คก่อนว่าแบคเอนส่งชื่อสาขามามั้ย ถ้าส่งมาเป็นเลขก็ฟีลเหมือนแปลงมาให้
+                const branchName = data.name || 
+                (data.branch_id === 1 ? "Bangkok" 
+                    : data.branch_id === 2 ? "Chiang Mai" 
+                    : data.branch_id === 3 ? "Phuket" 
+                    : data.branch_id === 4 ? "Chonburi" 
+                    : "Khon Kaen")
+
                 setUser({
                     // name: (data.firstname && data.lastname) 
                     //     ? data.firstname + " " + data.lastname 
@@ -77,12 +87,14 @@ const ApproveProfile = ({ role }) => {
                     joinDate: data.joindate ? data.joindate.substring(0, 10) : "", // ตัดเหลือแค่ 10 ตัวแรก
                     position: data.position || "",
                     department: data.department || "",
-                    branch: data.branch || "Bangkok",
+                    branch: branchName, // เก็บชื่อสาขาไว้แสดงผล
+                    branch_id: data.branch_id || 1,
                     gender: data.gender || "Female",
                     avatar: avatarPath,
                     startTime: data.start_time ? data.start_time.substring(0, 5) : "--:--", 
                     endTime: data.end_time ? data.end_time.substring(0, 5) : "--:--",
-                    shift: data.shift_name || "No Shift"
+                    shift: data.shift_name || "No Shift",
+                    shift_id: data.shift_id || 1
                 })
 
             } catch (error) {
@@ -99,9 +111,26 @@ const ApproveProfile = ({ role }) => {
     // เวลามีเปลี่ยนแปลงที่ input จะส่งค่ามาที่ e
     const handleChange = (e) => {
         const { name, value } = e.target
-        // ...oldUser  คือเหมือนก็อปสำเนาเก็บไว้ เพราะเราจะเปลี่ยนค่า user โดยใช้ setUser เพื่อเปลี่ยนข้อความในกล่อง input
-        // แต่เพราะว่าอาจจะไม่ใช่ input ทุกตัวที่โดนเปลี่ยนเลยต้องสำเนาตัวเดิมไว้ แล้วแก้เฉพาะ [name]: value นั้น ส่วนตัวอื่นจะยังเหมือนเดิม
-        setUser((oldUser) => ({ ...oldUser, [name]: value }))
+        
+        // ถ้าเป็นการเปลี่ยนสาขา ให้แปลงชื่อสาขาเป็น branch_id ด้วย
+        if (name === "branch") {
+            let branch_id = 1
+            if (value === "Bangkok") branch_id = 1
+            else if (value === "Chiang Mai") branch_id = 2
+            else if (value === "Phuket") branch_id = 3
+            else if (value === "Chonburi") branch_id = 4
+            else if (value === "Khon Kaen") branch_id = 5
+            
+            setUser((oldUser) => ({ 
+                ...oldUser, 
+                [name]: value,
+                branch_id: branch_id
+            }))
+        } else {
+            // ...oldUser  คือเหมือนก็อปสำเนาเก็บไว้ เพราะเราจะเปลี่ยนค่า user โดยใช้ setUser เพื่อเปลี่ยนข้อความในกล่อง input
+            // แต่เพราะว่าอาจจะไม่ใช่ input ทุกตัวที่โดนเปลี่ยนเลยต้องสำเนาตัวเดิมไว้ แล้วแก้เฉพาะ [name]: value นั้น ส่วนตัวอื่นจะยังเหมือนเดิม
+            setUser((oldUser) => ({ ...oldUser, [name]: value }))
+        }
     }
 
     // อัพโหลดรูปภาพจริง ๆ ตรงนี้
@@ -117,6 +146,7 @@ const ApproveProfile = ({ role }) => {
             const token = localStorage.getItem('token');
             const response = await Api.post('/users/upload-avatar', formData, {
                 headers: {
+                    // ลบ authorization เพราะ api ส่งไปให้แล้ว
                     'Content-Type': 'multipart/form-data'
                 }
             })
@@ -151,9 +181,12 @@ const ApproveProfile = ({ role }) => {
                 lastname: user.lastname,
                 phone: user.phone,
                 email: user.email,
-                branch: user.branch,
+                branch_id: user.branch_id,
+                shift_id: user.shift_id,
                 gender: user.gender
             }
+
+            console.log("Saving data:", bodyData) // log ดูข้อมูลที่ส่ง
 
             // ใช้ axios.put ส่งของไปหลังบ้าน
             const response = await Api.put('/users/profile', bodyData)
