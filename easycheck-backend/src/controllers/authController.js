@@ -75,7 +75,9 @@ export const login = async (req, res) => {
                 email: user.email,
                 department: user.department,
                 position: user.position,
-                avatar: user.avatar
+                avatar: user.avatar,
+                shift_id: user.shift_id,
+                branch_id: user.branch_id
             }
         })
 
@@ -210,7 +212,20 @@ export const refreshToken = async (req, res) => {
 
         return res.status(200).json({
             accessToken: newAccessToken,
-            refreshToken: newRefreshToken
+            refreshToken: newRefreshToken,
+            user: {
+                id: user.id,
+                id_employee: user.id_employee,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                role_id: user.role_id,
+                email: user.email,
+                department: user.department,
+                position: user.position,
+                avatar: user.avatar,
+                shift_id: user.shift_id,
+                branch_id: user.branch_id
+            }
         })
 
     } catch (error) {

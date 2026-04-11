@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { InputGroup, FormControl, Button, Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
 const HOST = 'localhost'
 const PORT = '5000'
@@ -62,7 +63,7 @@ const ChangePassword = () => {
             // รับ token
             const token = localStorage.getItem('token')
 
-            const response = await axios.put(`http://${HOST}:${PORT}/users/change-password`, 
+            const response = await Api.put(`http://${HOST}:${PORT}/users/change-password`, 
                 {
                     currentPassword: user.current, // รหัสปัจจุบัน
                     newPassword: user.new // รหัสใหม่

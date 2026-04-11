@@ -287,44 +287,6 @@ export const getAttendanceHistory = async (req, res) => {
 }
 
 // 🐸🐸 WORK-HOURS TRACKER
-export const getWeeklyHours = async (req, res) => {
-  const { userId } = req.query;
-  if (!userId) return res.status(400).json({ message: "userId is required" });
-  try {
-    const [rows] = await db.query(
-      `SELECT type, created_at, DAYNAME(created_at) as day FROM attendance WHERE id_employee = ? 
-       AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1) ORDER BY created_at ASC`,
-      [userId]
-    );
-    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 };
-    const tempLog = {};
-    rows.forEach(row => {
-      const day = row.day;
-      if (!tempLog[day]) tempLog[day] = { in: null, out: null };
-      if (row.type === 'checkin') tempLog[day].in = new Date(row.created_at);
-      else if (row.type === 'checkout') tempLog[day].out = new Date(row.created_at);
-      if (tempLog[day].in && tempLog[day].out) {
-        const diffMs = tempLog[day].out - tempLog[day].in;
-        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1));
-      }
-    });
-    res.json(hoursData);
-  } catch (err) {
-    res.status(500).json({ message: "Error calculating hours", error: err.message });
-  }
-}
+
 
 // 🐸🐸 GET CURRENT STATUS
-export const getCurrentStatus = async (req, res) => {
-  const { userId } = req.query;
-  try {
-    const [rows] = await db.query(
-      `SELECT type, status, created_at FROM attendance WHERE id_employee = ? AND DATE(created_at) = CURDATE() 
-       ORDER BY created_at DESC LIMIT 1`,
-      [userId]
-    );
-    res.json(rows[0] || { message: "no-activity" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-}

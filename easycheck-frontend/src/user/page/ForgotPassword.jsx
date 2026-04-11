@@ -2,7 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { InputGroup, FormControl, Button, Spinner, Modal } from "react-bootstrap";
 import { useState, useEffect } from 'react';
 
-import axios from 'axios';
+// import axios from 'axios';
+
+import Api from '../../Api'; // ตรงนี้ใช้แทน axios
 
 const HOST = 'localhost'
 const PORT = '5000'
@@ -47,7 +49,7 @@ const ForgotPassword = () => {
         setLoading(true) // เปลี่ยนสถานะเป็น "กำลังส่ง"
 
         try {
-            const response = await axios.post(`http://${HOST}:${PORT}/auth/forgot-password`, {
+            const response = await Api.post(`http://${HOST}:${PORT}/auth/forgot-password`, {
                 email: email
             })
 
