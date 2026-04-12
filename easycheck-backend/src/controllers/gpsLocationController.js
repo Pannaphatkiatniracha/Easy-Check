@@ -17,19 +17,30 @@ export const getAllLocations = async (req, res) => {
   }
 }
 
-// ---------- ดึงสถานที่ที่เปิดใช้งาน ตามสาขา (สำหรับ Check-in) ----------
+// ---------- ดึงสถานที่ที่เปิดใช้งาน ตามสาขา หรือ ตาม Role (สำหรับ Check-in) ----------
 export const getActiveLocationsByBranch = async (req, res) => {
   try {
-    // รับค่า branch_id จาก query string เช่น /gps-locations/active?branch_id=1
-    const { branch_id } = req.query
+    // รับค่า branch_id และ role_id จาก query string
+    const { branch_id, role_id } = req.query;
 
-    // ถ้าไม่ส่ง branch_id มา → ตอบกลับ error
+    //  เช็คเงื่อนไขตาม Role: 
+    // สมมติว่า role_id = '1' คือ Admin หรือผู้บริหารที่เช็คอินได้ทุกสาขา
+    // (สามารถเปลี่ยนเลข 1 เป็นเลข Role ของ Admin ในระบบคุณได้เลย)
+    if (role_id === '1') {
+      const [rows] = await pool.execute(
+        `SELECT id, name, address, lat, lng, radius
+         FROM gps_locations
+         WHERE active = 1`
+      );
+      return res.json(rows); // ส่งกลับทุกสาขาที่เปิดใช้งาน
+    }
+
+    //  ถ้าไม่ใช่ Admin (เช่น พนักงานทั่วไป หรือ Approver) ต้องบังคับเช็ค branch_id
     if (!branch_id) {
       return res.status(400).json({ message: 'กรุณาระบุ branch_id' })
     }
 
-    // ดึงเฉพาะสถานที่ที่ active = 1 (เปิดใช้งาน) ของสาขานั้น
-    // ส่งแค่ข้อมูลที่จำเป็นสำหรับ validate GPS (id, name, lat, lng, radius)
+    // ดึงเฉพาะสถานที่ที่ active = 1 ของสาขานั้น
     const [rows] = await pool.execute(
       `SELECT id, name, address, lat, lng, radius
        FROM gps_locations
@@ -45,22 +56,18 @@ export const getActiveLocationsByBranch = async (req, res) => {
 // ---------- เพิ่มสถานที่ใหม่ ----------
 export const createLocation = async (req, res) => {
   try {
-    // รับข้อมูลจาก request body ที่ Admin กรอกใน SetGPS
     const { name, address, lat, lng, radius, branch_id } = req.body
 
-    // ตรวจสอบว่าข้อมูลจำเป็นครบหรือไม่ (address ไม่บังคับ)
     if (!name || !lat || !lng || !radius || !branch_id) {
       return res.status(400).json({ message: 'ข้อมูลไม่ครบ' })
     }
 
-    // บันทึกลง DB → active จะเป็น 1 (เปิด) อัตโนมัติตาม default ของตาราง
     const [result] = await pool.execute(
       `INSERT INTO gps_locations (name, address, lat, lng, radius, branch_id)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [name, address || null, lat, lng, radius, branch_id]
     )
 
-    // ส่ง id ของแถวที่เพิ่งสร้างกลับไปให้ frontend
     res.status(201).json({
       message: 'เพิ่มสถานที่สำเร็จ',
       id: result.insertId
@@ -73,16 +80,13 @@ export const createLocation = async (req, res) => {
 // ---------- แก้ไขสถานที่ ----------
 export const updateLocation = async (req, res) => {
   try {
-    // รับ id ของสถานที่ที่จะแก้จาก URL เช่น PUT /gps-locations/3
     const { id } = req.params
     const { name, address, lat, lng, radius, branch_id } = req.body
 
-    // ตรวจสอบข้อมูลจำเป็น
     if (!name || !lat || !lng || !radius || !branch_id) {
       return res.status(400).json({ message: 'ข้อมูลไม่ครบ' })
     }
 
-    // อัปเดตแถวที่มี id ตรงกัน
     const [result] = await pool.execute(
       `UPDATE gps_locations
        SET name = ?, address = ?, lat = ?, lng = ?, radius = ?, branch_id = ?
@@ -90,7 +94,6 @@ export const updateLocation = async (req, res) => {
       [name, address || null, lat, lng, radius, branch_id, id]
     )
 
-    // affectedRows = 0 หมายความว่าไม่มีแถวที่ id ตรงกัน → ไม่พบสถานที่
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'ไม่พบสถานที่' })
     }
@@ -104,7 +107,6 @@ export const updateLocation = async (req, res) => {
 // ---------- ลบสถานที่ ----------
 export const deleteLocation = async (req, res) => {
   try {
-    // รับ id จาก URL เช่น DELETE /gps-locations/3
     const { id } = req.params
 
     const [result] = await pool.execute(
@@ -112,7 +114,6 @@ export const deleteLocation = async (req, res) => {
       [id]
     )
 
-    // ถ้าไม่มีแถวที่ถูกลบ → แสดงว่าไม่พบ id นั้น
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'ไม่พบสถานที่' })
     }
@@ -128,7 +129,6 @@ export const toggleLocation = async (req, res) => {
   try {
     const { id } = req.params
 
-    // ดึงค่า active ปัจจุบันของสถานที่นั้นก่อน
     const [rows] = await pool.execute(
       'SELECT active FROM gps_locations WHERE id = ?',
       [id]
@@ -138,7 +138,6 @@ export const toggleLocation = async (req, res) => {
       return res.status(404).json({ message: 'ไม่พบสถานที่' })
     }
 
-    // สลับค่า: ถ้าปัจจุบัน active=1 (เปิด) → เปลี่ยนเป็น 0 (ปิด) และกลับกัน
     const newActive = rows[0].active === 1 ? 0 : 1
 
     await pool.execute(
@@ -148,7 +147,7 @@ export const toggleLocation = async (req, res) => {
 
     res.json({
       message: newActive === 1 ? 'เปิดใช้งานสำเร็จ' : 'ปิดใช้งานสำเร็จ',
-      active: newActive  // ส่งค่า active ใหม่กลับไปให้ frontend อัปเดต UI ได้ทันที
+      active: newActive
     })
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -158,7 +157,6 @@ export const toggleLocation = async (req, res) => {
 // ---------- ดึงสาขาทั้งหมด (สำหรับ dropdown ใน SetGPS) ----------
 export const getAllBranches = async (req, res) => {
   try {
-    // ดึงแค่ id กับ name เพื่อใช้สร้าง dropdown เลือกสาขาใน SetGPS
     const [rows] = await pool.execute(
       'SELECT id, name FROM branch ORDER BY id'
     )

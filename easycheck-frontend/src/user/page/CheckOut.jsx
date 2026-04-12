@@ -67,22 +67,19 @@ function CheckOut() {
           setUserShift(shiftData);
         }
 
+        // ดึง branch_id และ role_id ของ User
         const branchId = user?.branch_id || "";
-        const locationRes = await fetch(`http://localhost:5000/gps-locations/active?branch_id=${branchId}`, {
+        const roleId = user?.role_id || ""; 
+        
+        // แนบทั้ง branch_id และ role_id ไปให้ Backend ตรวจสอบ
+        const locationRes = await fetch(`http://localhost:5000/gps-locations/active?branch_id=${branchId}&role_id=${roleId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         
         if (locationRes.ok) {
           const locationsData = await locationRes.json();
-          //  จุดที่แก้ไข กรองเอาเฉพาะสาขา "ขอนแก่น" แทนกรุงเทพ 
-          const targetLocations = locationsData.filter(loc => 
-            loc.name.includes("ขอนแก่น") || 
-            loc.name.toLowerCase().includes("khon kaen")
-          );
-
-          if (targetLocations.length > 0) {
-            setActiveLocations(targetLocations);
-          } else if (locationsData.length > 0) {
+          
+          if (locationsData.length > 0) {
             setActiveLocations(locationsData);
           } else {
             setError("ไม่พบพิกัดจุดเช็คเอาท์สำหรับสาขาของคุณ");
@@ -95,7 +92,7 @@ function CheckOut() {
       }
     };
     fetchData();
-  }, [token, user?.branch_id]);
+  }, [token, user?.branch_id, user?.role_id]); // เพิ่ม user?.role_id ใน dependency array
 
   const startCamera = async () => {
     try {
@@ -165,7 +162,7 @@ function CheckOut() {
           setMessage(` อยู่ในพื้นที่: ${closestLocation.name}\n(ห่าง ${finalDistance} เมตร)`);
         } else {
           setIsWithinRadius(false);
-          setError(` อยู่นอกพื้นที่\n(จุดใกล้สุด: ${closestLocation.name} ห่าง ${finalDistance} เมตร)`);
+          setError(`อยู่นอกพื้นที่\n(จุดใกล้สุด: ${closestLocation.name} ห่าง ${finalDistance} เมตร)`);
           setMessage("");
         }
       },
