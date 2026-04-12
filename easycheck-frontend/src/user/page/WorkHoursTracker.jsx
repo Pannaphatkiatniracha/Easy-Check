@@ -39,7 +39,7 @@ const WorkHoursTracker = ({ role }) => {
                     name: `${data.firstname} ${data.lastname}`,
                     userid: data.id_employee || "",
                     avatar: avatarPath,
-                    shift: data.shift_name || "Normal Shift"
+                    shift: data.start_time && data.end_time ? `${data.start_time.substring(0,5)} - ${data.end_time.substring(0,5)}` : "No Shift"
                 })
             } 
             catch (error) {
