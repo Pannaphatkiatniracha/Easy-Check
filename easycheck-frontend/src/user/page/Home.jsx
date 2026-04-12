@@ -20,7 +20,7 @@ const Home = ({ role }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mt-12">
-        <Link to="/requestapprove" className="text-decoration-none">
+        {/* <Link to="/requestapprove" className="text-decoration-none">
           <div
             className="p-4 text-center fw-semibold rounded-3 text-dark
                         hover:scale-105 transition-all duration-200 ease-in-out"
@@ -31,7 +31,7 @@ const Home = ({ role }) => {
             <i className="bi bi-calendar-check-fill fs-2"></i> <br />
             REQUEST APPROVE
           </div>
-        </Link>
+        </Link> */}
 
         <Link to="/leaveRequestApprove" className="text-decoration-none">
           <div
