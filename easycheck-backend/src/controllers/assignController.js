@@ -25,7 +25,7 @@ export const getCandidates = async (req, res) => {
 
     // กรองตามสาขาและแผนกที่หน้าเว็บส่งมา
     if (branch) {
-      query += ` AND branch_id = ?`; // ✅ แก้เป็น branch_id ให้ตรงกับ DB
+      query += ` AND branch_id = ?`; //  แก้เป็น branch_id ให้ตรงกับ DB
       params.push(branch);
     }
     if (department) {
@@ -47,7 +47,7 @@ export const getApprovers = async (req, res) => {
     const [rows] = await db.execute(`
       SELECT u.id, u.id_employee, u.firstname, u.lastname, u.position, u.department, b.name AS branch_name 
       FROM Users u 
-      LEFT JOIN branch b ON u.branch_id = b.id  -- ✅ แก้เป็น u.branch_id ให้ตรงกับ DB
+      LEFT JOIN branch b ON u.branch_id = b.id  --  แก้เป็น u.branch_id ให้ตรงกับ DB
       WHERE u.role_id = 2
       ORDER BY b.id ASC, u.department ASC
     `);
