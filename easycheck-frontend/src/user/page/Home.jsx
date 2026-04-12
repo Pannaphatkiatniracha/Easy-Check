@@ -46,7 +46,7 @@ const Home = ({ role }) => {
           </div>
         </Link>
 
-        <Link to="/paymentrequest" className="text-decoration-none">
+        {/* <Link to="/paymentrequest" className="text-decoration-none">
           <div
             className="p-4 text-center fw-semibold rounded-3 text-dark
                         hover:scale-105 transition-all duration-200 ease-in-out"
@@ -57,7 +57,7 @@ const Home = ({ role }) => {
             <i className="bi bi-file-earmark-text-fill fs-2"></i> <br />
             PAYMENT REQUEST
           </div>
-        </Link>
+        </Link> */}
 
         <Link to="/approvermanagement" className="text-decoration-none">
           <div
