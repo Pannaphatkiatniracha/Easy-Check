@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 11, 2026 at 09:01 PM
+-- Generation Time: Apr 12, 2026 at 08:34 AM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -51,7 +51,7 @@ CREATE TABLE `attendance` (
 
 CREATE TABLE `branch` (
   `id` int NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -61,9 +61,9 @@ CREATE TABLE `branch` (
 INSERT INTO `branch` (`id`, `name`) VALUES
 (1, 'Bangkok'),
 (2, 'Chiang Mai'),
-(3, 'Phuket'),
 (4, 'Chonburi'),
-(5, 'Khon Kaen');
+(5, 'Khon Kaen'),
+(3, 'Phuket');
 
 -- --------------------------------------------------------
 
@@ -363,7 +363,8 @@ ALTER TABLE `attendance`
 -- Indexes for table `branch`
 --
 ALTER TABLE `branch`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `events`
@@ -493,7 +494,7 @@ ALTER TABLE `Users`
 --
 ALTER TABLE `attendance`
   ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`id_employee`) REFERENCES `Users` (`id_employee`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `gps_locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `gps_locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `event_registrations`
