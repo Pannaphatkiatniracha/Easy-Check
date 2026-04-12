@@ -2,30 +2,25 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-//  กำหนดพิกัดบริษัท และรัศมีที่อนุญาต (เมตร)
-const COMPANY_LAT = 13.756215; // บ้านวอวอคนสวยเคะมาก
-const COMPANY_LNG = 100.418927; // บ้านวอวอคนสวยเคะมาก
-const ALLOWED_RADIUS_METERS = 100; // อนุญาตในระยะ 100 เมตร
-
-// สูตรคำนวณระยะห่าง 2 จุด GPS (Haversine formula)
+// สูตรคำนวณระยะห่าง 2 จุด GPS
 const getDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371e3; // รัศมีโลก (เมตร)
+  const R = 6371e3; 
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
   const Δφ = ((lat2 - lat1) * Math.PI) / 180;
   const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-  const a =
-    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // คืนค่าเป็นเมตร
+  return R * c; 
 };
 
 function CheckIn() {
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState(null);
   const [isWithinRadius, setIsWithinRadius] = useState(false);
+  const [activeLocations, setActiveLocations] = useState([]);
+  const [nearestLocation, setNearestLocation] = useState(null);
   
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -40,7 +35,10 @@ function CheckIn() {
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user?.id_employee || user?.id || localStorage.getItem("userId");
 
   useEffect(() => {
     const tick = () => {
@@ -54,26 +52,44 @@ function CheckIn() {
   }, []);
 
   useEffect(() => {
-    const fetchShift = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/attendance/shift/me", {
+        const shiftRes = await fetch("http://localhost:5000/attendance/shift/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        if (!res.ok) {
-          setUserShift(null);
-          setError(data.message || "ไม่สามารถโหลดกะงานได้");
-          return;
+        const shiftData = await shiftRes.json();
+        if (!shiftRes.ok) {
+          setError(shiftData.message || "ไม่สามารถโหลดกะงานได้");
+        } else {
+          setUserShift(shiftData);
         }
-        setUserShift(data);
+
+        // ดึง branch_id และ role_id ของ User ที่ล็อกอินอยู่
+        const branchId = user?.branch_id || "";
+        const roleId = user?.role_id || ""; // <-- เพิ่มตรงนี้
+        
+        // ส่งทั้ง branch_id และ role_id ไปให้ Backend จัดการ
+        const locationRes = await fetch(`http://localhost:5000/gps-locations/active?branch_id=${branchId}&role_id=${roleId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (locationRes.ok) {
+          const locationsData = await locationRes.json();
+          
+          if (locationsData.length > 0) {
+            setActiveLocations(locationsData);
+          } else {
+            setError("ไม่พบพิกัดจุดเช็คอินสำหรับสาขาของคุณ");
+          }
+        }
       } catch (err) {
         setError("เชื่อมต่อ server ไม่ได้");
       } finally {
         setShiftLoading(false);
       }
     };
-    fetchShift();
-  }, [token]);
+    fetchData();
+  }, [token, user?.branch_id, user?.role_id]); // <-- อัปเดต dependency array
 
   const startCamera = async () => {
     try {
@@ -100,8 +116,7 @@ function CheckIn() {
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
+    canvas.getContext("2d").drawImage(video, 0, 0);
 
     canvas.toBlob((blob) => {
       if (blob) {
@@ -114,6 +129,7 @@ function CheckIn() {
 
   const handleLocation = () => {
     if (!navigator.geolocation) return setError("เบราว์เซอร์ไม่รองรับ GPS");
+    if (activeLocations.length === 0) return setError("ข้อมูลพิกัดยังไม่พร้อม หรือ ไม่มีสิทธิ์เช็คอินที่สาขานี้");
 
     setMessage("กำลังค้นหาพิกัด...");
     navigator.geolocation.getCurrentPosition(
@@ -122,17 +138,30 @@ function CheckIn() {
         const lng = pos.coords.longitude;
         setLocation({ lat, lng });
         
-        // คำนวณระยะห่าง
-        const dist = getDistance(lat, lng, COMPANY_LAT, COMPANY_LNG);
-        setDistance(Math.round(dist));
+        let minDistance = Infinity;
+        let closestLocation = null;
+
+        activeLocations.forEach((loc) => {
+          const dist = getDistance(lat, lng, loc.lat, loc.lng);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestLocation = loc;
+          }
+        });
+
+        const finalDistance = Math.round(minDistance);
+        setDistance(finalDistance);
+        setNearestLocation(closestLocation);
         
-        if (dist <= ALLOWED_RADIUS_METERS) {
+        const allowedRadius = closestLocation.radius || 100;
+
+        if (finalDistance <= allowedRadius) {
           setIsWithinRadius(true);
           setError("");
-          setMessage(` อยู่ในพื้นที่บริษัท (ห่าง ${Math.round(dist)} เมตร)`);
+          setMessage(` อยู่ในพื้นที่: ${closestLocation.name}\n(ห่าง ${finalDistance} เมตร)`);
         } else {
           setIsWithinRadius(false);
-          setError(` อยู่นอกพื้นที่บริษัท (ห่าง ${Math.round(dist)} เมตร)\nกรุณาเข้าใกล้บริษัทอีกนิด`);
+          setError(`อยู่นอกพื้นที่\n(จุดใกล้สุด: ${closestLocation.name} ห่าง ${finalDistance} เมตร)`);
           setMessage("");
         }
       },
@@ -140,22 +169,33 @@ function CheckIn() {
         setError("ไม่สามารถดึงตำแหน่งได้ กรุณาเปิด GPS และอนุญาตสิทธิ์");
         setMessage("");
       },
-      { enableHighAccuracy: true } // บังคับให้พิกัดแม่นยำที่สุด
+      { enableHighAccuracy: true }
     );
+  };
+
+  const isCheckInTooEarly = () => {
+    if (!userShift?.start_time) return false;
+    const now = new Date();
+    const [h, m] = userShift.start_time.split(":").map(Number);
+    const shiftMins = h * 60 + m;
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+    return (shiftMins - currentMins > 60); 
   };
 
   const handleCheckIn = async () => {
     if (!userShift) return setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
+    if (isCheckInTooEarly()) return setError("ยังไม่ถึงเวลาเช็คอิน (ล่วงหน้าได้ไม่เกิน 1 ชม.)");
     if (!photo) return setError("กรุณาถ่ายรูปก่อน");
-    if (!location || !isWithinRadius) return setError("กรุณายืนยันพิกัด และต้องอยู่ในบริษัทเท่านั้น");
+    if (!location || !isWithinRadius) return setError("กรุณายืนยันพิกัดให้อยู่ในพื้นที่");
 
     setLoading(true);
     setError("");
 
     const formData = new FormData();
     formData.append("photo", photo);
-    formData.append("lat", location.lat);
-    formData.append("lng", location.lng);
+    
+    if (userId) formData.append("userId", userId);
+    if (nearestLocation) formData.append("location_id", nearestLocation.id);
 
     try {
       const res = await fetch("http://localhost:5000/attendance/check-in", {
@@ -195,8 +235,8 @@ function CheckIn() {
   useEffect(() => () => stopCamera(), []);
 
   if (shiftLoading) return (
-    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex flex-col items-center justify-center px-4">
-      <div className="text-white text-lg animate-pulse">กำลังโหลดข้อมูลกะงาน...</div>
+    <div className="app-container min-h-screen bg-gradient-to-b from-[#3C467B] to-[#1F224F] flex items-center justify-center">
+      <div className="text-white text-lg animate-pulse">กำลังโหลดข้อมูล...</div>
     </div>
   );
 
@@ -205,10 +245,10 @@ function CheckIn() {
       <div className="max-w-md w-full space-y-6">
         <div className="flex items-center justify-between mb-2">
           <Link to="/home" className="text-decoration-none">
-            <button className="p-0 bg-transparent border-0"><i className="bi bi-chevron-left ms-3 text-white"></i></button>
+            <button className="p-0 bg-transparent border-0"><i className="bi bi-chevron-left ms-3 text-white text-2xl"></i></button>
           </Link>
           <h2 className="text-xl font-bold text-white text-center flex-1">CHECK IN</h2>
-          <div className="me-4"></div>
+          <div className="me-4 w-8"></div>
         </div>
 
         <div className="bg-white/10 rounded-2xl p-4 text-white border border-white/20">

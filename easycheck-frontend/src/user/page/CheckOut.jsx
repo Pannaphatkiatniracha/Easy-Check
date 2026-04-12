@@ -2,11 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-//  กำหนดพิกัดบริษัทแบบเดียวกัน
-const COMPANY_LAT = 13.756215; //บ้านวอวอคนสวยเคะมาก
-const COMPANY_LNG = 100.418927; //บ้านวอวอคนสวยเคะมาก
-const ALLOWED_RADIUS_METERS = 100;
-
 const getDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371e3; 
   const φ1 = (lat1 * Math.PI) / 180;
@@ -24,6 +19,8 @@ function CheckOut() {
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState(null);
   const [isWithinRadius, setIsWithinRadius] = useState(false);
+  const [activeLocations, setActiveLocations] = useState([]);
+  const [nearestLocation, setNearestLocation] = useState(null);
   
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -41,7 +38,10 @@ function CheckOut() {
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user?.id_employee || user?.id || localStorage.getItem("userId"); 
 
   useEffect(() => {
     const tick = () => {
@@ -55,22 +55,44 @@ function CheckOut() {
   }, []);
 
   useEffect(() => {
-    const fetchShift = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/attendance/shift/me", {
+        const shiftRes = await fetch("http://localhost:5000/attendance/shift/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        if (!res.ok) return setError("ไม่สามารถโหลดกะงานได้");
-        setUserShift(data);
+        const shiftData = await shiftRes.json();
+        if (!shiftRes.ok) {
+          setError(shiftData.message || "ไม่สามารถโหลดกะงานได้");
+        } else {
+          setUserShift(shiftData);
+        }
+
+        // ดึง branch_id และ role_id ของ User
+        const branchId = user?.branch_id || "";
+        const roleId = user?.role_id || ""; 
+        
+        // แนบทั้ง branch_id และ role_id ไปให้ Backend ตรวจสอบ
+        const locationRes = await fetch(`http://localhost:5000/gps-locations/active?branch_id=${branchId}&role_id=${roleId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (locationRes.ok) {
+          const locationsData = await locationRes.json();
+          
+          if (locationsData.length > 0) {
+            setActiveLocations(locationsData);
+          } else {
+            setError("ไม่พบพิกัดจุดเช็คเอาท์สำหรับสาขาของคุณ");
+          }
+        }
       } catch (err) {
         setError("เชื่อมต่อ server ไม่ได้");
       } finally {
         setShiftLoading(false);
       }
     };
-    fetchShift();
-  }, [token]);
+    fetchData();
+  }, [token, user?.branch_id, user?.role_id]); // เพิ่ม user?.role_id ใน dependency array
 
   const startCamera = async () => {
     try {
@@ -108,24 +130,39 @@ function CheckOut() {
 
   const handleLocation = () => {
     if (!navigator.geolocation) return setError("เบราว์เซอร์ไม่รองรับ GPS");
+    if (activeLocations.length === 0) return setError("ไม่พบข้อมูลจุดเช็คเอาท์");
+
     setMessage("กำลังค้นหาพิกัด...");
-    
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         setLocation({ lat, lng });
         
-        const dist = getDistance(lat, lng, COMPANY_LAT, COMPANY_LNG);
-        setDistance(Math.round(dist));
+        let minDistance = Infinity;
+        let closestLocation = null;
+
+        activeLocations.forEach((loc) => {
+          const dist = getDistance(lat, lng, loc.lat, loc.lng);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestLocation = loc;
+          }
+        });
+
+        const finalDistance = Math.round(minDistance);
+        setDistance(finalDistance);
+        setNearestLocation(closestLocation);
         
-        if (dist <= ALLOWED_RADIUS_METERS) {
+        const allowedRadius = closestLocation.radius || 100;
+
+        if (finalDistance <= allowedRadius) {
           setIsWithinRadius(true);
           setError("");
-          setMessage(` อยู่ในพื้นที่บริษัท (ห่าง ${Math.round(dist)} เมตร)`);
+          setMessage(` อยู่ในพื้นที่: ${closestLocation.name}\n(ห่าง ${finalDistance} เมตร)`);
         } else {
           setIsWithinRadius(false);
-          setError(` อยู่นอกพื้นที่บริษัท (ห่าง ${Math.round(dist)} เมตร)`);
+          setError(`อยู่นอกพื้นที่\n(จุดใกล้สุด: ${closestLocation.name} ห่าง ${finalDistance} เมตร)`);
           setMessage("");
         }
       },
@@ -141,13 +178,15 @@ function CheckOut() {
     if (!userShift?.end_time) return false;
     const now = new Date();
     const [h, m] = userShift.end_time.split(":").map(Number);
-    return now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+    const shiftMins = h * 60 + m;
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+    return currentMins < shiftMins; 
   };
 
   const submitCheckOut = async (overrideReason = null) => {
     if (!userShift) return setError("ยังไม่มีกะงาน กรุณาติดต่อหัวหน้า");
     if (!photo) return setError("กรุณาถ่ายรูปก่อน");
-    if (!location || !isWithinRadius) return setError("กรุณายืนยันพิกัด และต้องอยู่ในบริษัท");
+    if (!location || !isWithinRadius) return setError("กรุณายืนยันพิกัดให้อยู่ในพื้นที่ที่กำหนด");
 
     if (isCheckoutEarly() && overrideReason === null) {
       setShowEarlyModal(true);
@@ -159,9 +198,10 @@ function CheckOut() {
 
     const formData = new FormData();
     formData.append("photo", photo);
-    formData.append("lat", location.lat);
-    formData.append("lng", location.lng);
+    
+    if (userId) formData.append("userId", userId);
     if (overrideReason) formData.append("reason", overrideReason);
+    if (nearestLocation) formData.append("location_id", nearestLocation.id);
 
     try {
       const res = await fetch("http://localhost:5000/attendance/check-out", {
@@ -254,8 +294,8 @@ function CheckOut() {
           )}
         </div>
 
-        {message && <div className="bg-green-500/20 text-green-100 p-4 rounded-2xl"><i className="bi bi-check-circle-fill mr-2"></i>{message}</div>}
-        {error && <div className="bg-red-500/20 text-red-100 p-4 rounded-2xl"><i className="bi bi-exclamation-triangle-fill mr-2"></i>{error}</div>}
+        {message && <div className="bg-green-500/20 text-green-100 p-4 rounded-2xl whitespace-pre-line"><i className="bi bi-check-circle-fill mr-2"></i>{message}</div>}
+        {error && <div className="bg-red-500/20 text-red-100 p-4 rounded-2xl whitespace-pre-line"><i className="bi bi-exclamation-triangle-fill mr-2"></i>{error}</div>}
       </div>
 
       {showEarlyModal && (
@@ -269,11 +309,11 @@ function CheckOut() {
               <textarea
                 value={earlyReason}
                 onChange={(e) => setEarlyReason(e.target.value)}
-                className="w-full border-2 border-gray-200 p-3 rounded-xl h-24"
+                className="w-full border-2 border-gray-200 p-3 rounded-xl h-24 text-black"
                 placeholder="ระบุเหตุผล เช่น ไปพบแพทย์..."
               />
               <div className="flex gap-2">
-                <button onClick={() => setShowEarlyModal(false)} className="flex-1 bg-gray-100 py-3 rounded-xl font-medium">ยกเลิก</button>
+                <button onClick={() => setShowEarlyModal(false)} className="flex-1 bg-gray-100 py-3 rounded-xl font-medium text-black">ยกเลิก</button>
                 <button onClick={handleEarlySubmit} className="flex-1 bg-orange-500 text-white py-3 rounded-xl font-bold">ส่งและเช็คเอาท์</button>
               </div>
             </div>

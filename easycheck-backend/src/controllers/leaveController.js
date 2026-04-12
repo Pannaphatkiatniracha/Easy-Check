@@ -31,7 +31,20 @@ export const upload = multer({
 
 const bufferToBase64 = (buffer, mime = "image/jpeg") => {
   if (!buffer) return null;
-  return `data:${mime};base64,${buffer.toString("base64")}`;
+  const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+  return `data:${mime};base64,${buf.toString("base64")}`;
+};
+
+// ✅ เพิ่มฟังก์ชันแก้ปัญหา JSON Array ที่ถูกดึงมาจาก DB
+const safeParseJSON = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data; // ถ้าเป็น Array อยู่แล้ว ไม่ต้อง parse ซ้ำ
+  if (typeof data === "object") return Object.values(data);
+  try {
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
 };
 
 // =========================
@@ -63,25 +76,12 @@ const normalizeDateString = (dateValue) => {
 };
 
 const parseLeaveReasons = (leaveReasons) => {
-  let reasons = [];
-
-  if (Array.isArray(leaveReasons)) {
-    reasons = leaveReasons;
-  } else {
-    try {
-      reasons = JSON.parse(leaveReasons);
-    } catch (err) {
-      reasons = leaveReasons ? [leaveReasons] : [];
-    }
-  }
-
-  return reasons.filter(Boolean);
+  return safeParseJSON(leaveReasons).filter(Boolean);
 };
 
 const getLeaveCodeFromReasons = (reasons = []) => {
   if (!Array.isArray(reasons) || reasons.length === 0) return null;
 
-  // ใช้เหตุผลหลักตัวแรกที่ไม่ใช่ Other
   const mainReason = reasons.find((r) => r !== "Other") || reasons[0];
   return LEAVE_REASON_TO_CODE[mainReason] || null;
 };
@@ -132,7 +132,7 @@ const getUserByEmployeeId = async (employeeId) => {
         joindate,
         position,
         department,
-        branch,
+        branch_id, 
         email,
         password,
         phone,
@@ -216,12 +216,8 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
 
     if (reasonLabel) {
       for (const req of requests) {
-        let reasons = [];
-        try {
-          reasons = JSON.parse(req.leave_reasons || "[]");
-        } catch {
-          reasons = [];
-        }
+        // ✅ ใช้ safeParseJSON ตรงนี้เพื่อไม่ให้มัน Error ข้ามการบวกเลขไป
+        const reasons = safeParseJSON(req.leave_reasons);
 
         if (reasons.includes(reasonLabel)) {
           usedDays += Number(req.leave_days || 0);
@@ -294,7 +290,6 @@ export const createLeaveRequest = async (req, res) => {
       });
     }
 
-    // ✅ ห้ามลาย้อนหลัง
     if (normalizedStart < today || normalizedEnd < today) {
       return res.status(400).json({
         message: "ไม่สามารถยื่นลาย้อนหลังได้ กรุณาเลือกวันที่วันนี้หรือวันถัดไป",
@@ -303,7 +298,7 @@ export const createLeaveRequest = async (req, res) => {
 
     const reasons = parseLeaveReasons(leaveReasons);
 
-    if (!Array.isArray(reasons) || reasons.length === 0) {
+    if (reasons.length === 0) {
       return res.status(400).json({ message: "กรุณาเลือกประเภทการลา" });
     }
 
@@ -338,7 +333,6 @@ export const createLeaveRequest = async (req, res) => {
       });
     }
 
-    // Vacation Leave: ต้องทำงานครบ 1 ปี
     if (leaveCode === "VACATION") {
       if (!user.joindate) {
         return res.status(400).json({
@@ -357,14 +351,12 @@ export const createLeaveRequest = async (req, res) => {
       }
     }
 
-    // Maternity Leave: ให้เฉพาะ female
     if (leaveCode === "MATERNITY" && user.gender !== "female") {
       return res.status(400).json({
         message: "ลาคลอดใช้ได้เฉพาะพนักงานหญิง",
       });
     }
 
-    // require_evidence จาก policy
     if (Number(policy.require_evidence) === 1 && !file) {
       return res.status(400).json({
         message: `การลา ${policy.leave_name} ต้องแนบหลักฐาน`,
@@ -501,16 +493,9 @@ export const getLeaveHistory = async (req, res) => {
     );
 
     const formatted = rows.map((row) => {
-      let reasons = [];
-      try {
-        reasons = JSON.parse(row.leave_reasons || "[]");
-      } catch {
-        reasons = [];
-      }
-
       return {
         ...row,
-        leave_reasons: reasons,
+        leave_reasons: safeParseJSON(row.leave_reasons), // ✅ แก้ตรงนี้ด้วย
       };
     });
 
@@ -526,55 +511,48 @@ export const getLeaveHistory = async (req, res) => {
 ========================= */
 export const getPendingLeaves = async (req, res) => {
   try {
-    const [leaves] = await db.execute(`
-      SELECT *
-      FROM leave_requests
-      WHERE status = 'pending'
-      ORDER BY created_at DESC
+    const [rows] = await db.execute(`
+      SELECT 
+        lr.*, 
+        u.firstname, 
+        u.lastname, 
+        u.avatar, 
+        u.department, 
+        u.position
+      FROM leave_requests lr
+      LEFT JOIN Users u ON lr.id_employee = u.id_employee
+      WHERE lr.status = 'pending'
+      ORDER BY lr.created_at DESC
     `);
 
-    const [users] = await db.execute(`
-      SELECT id_employee, firstname, lastname, avatar, department, position
-      FROM Users
-    `);
-
-    const formatted = leaves.map((l) => {
-      const user = users.find((u) => u.id_employee === l.id_employee) || {};
-
-      let fullName = l.id_employee;
-      if (user.firstname && user.lastname) {
-        fullName = `${user.firstname} ${user.lastname}`;
-      } else if (user.firstname) {
-        fullName = user.firstname;
-      }
-
-      let reasons = [];
-      try {
-        reasons = l.leave_reasons ? JSON.parse(l.leave_reasons) : [];
-      } catch {
-        reasons = [];
+    const formatted = rows.map((row) => {
+      let fullName = row.id_employee;
+      if (row.firstname && row.lastname) {
+        fullName = `${row.firstname} ${row.lastname}`;
+      } else if (row.firstname) {
+        fullName = row.firstname;
       }
 
       return {
-        id: l.id,
+        id: row.id,
         name: fullName,
-        employeeId: l.id_employee,
-        department: user.department || null,
-        position: user.position || null,
-        profile: user.avatar || null,
-        leaveStart: l.leave_start,
-        leaveEnd: l.leave_end,
-        leaveDays: l.leave_days,
-        reasons,
-        otherReason: l.other_reason,
+        employeeId: row.id_employee,
+        department: row.department || null,
+        position: row.position || null,
+        profile: row.avatar || null,
+        leaveStart: row.leave_start,
+        leaveEnd: row.leave_end,
+        leaveDays: row.leave_days,
+        reasons: safeParseJSON(row.leave_reasons), // ✅ แก้ตรงนี้เพื่อให้อ่านเหตุผลในฝั่งหัวหน้าได้ออก
+        otherReason: row.other_reason,
         evidencePreview:
-          l.evidence_mime && l.evidence_mime.startsWith("image/")
-            ? bufferToBase64(l.evidence_file, l.evidence_mime)
+          row.evidence_mime && row.evidence_mime.startsWith("image/") && row.evidence_file
+            ? bufferToBase64(row.evidence_file, row.evidence_mime)
             : null,
-        evidenceMime: l.evidence_mime || null,
-        hasEvidence: !!l.evidence_file,
-        status: l.status,
-        createdAt: l.created_at,
+        evidenceMime: row.evidence_mime || null,
+        hasEvidence: !!row.evidence_file,
+        status: row.status,
+        createdAt: row.created_at,
       };
     });
 

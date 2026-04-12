@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 const getStatusThai = (status) => {
   if (status === "late") return "สาย";
-  if (status === "ontime") return "ตรงเวลา";
+  if (status === "on_time" || status === "ontime") return "ตรงเวลา";
   if (status === "early") return "ออกก่อนเวลา";
   return "ปกติ";
 };
@@ -31,11 +31,16 @@ function RequestApprove() {
     try {
       setLoading(true);
 
+      // ดึงข้อมูล User จาก LocalStorage เพื่อหาว่า Approver คนนี้อยู่สาขาอะไร
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const branchId = user?.branch_id || "";
+
+      // ส่ง branch_id แนบไปกับ API ด้วย
       const [reqRes, usersRes, shiftRes] = await Promise.all([
-        axios.get("http://localhost:5000/attendance/pending", {
+        axios.get(`http://localhost:5000/attendance/pending?branch_id=${branchId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:5000/approver/users-with-shifts", {
+        axios.get(`http://localhost:5000/approver/users-with-shifts?branch_id=${branchId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         axios.get("http://localhost:5000/approver/shifts", {
@@ -43,11 +48,12 @@ function RequestApprove() {
         }),
       ]);
 
-      setRequests(reqRes.data);
-      setUsers(usersRes.data);
-      setShifts(shiftRes.data);
+      setRequests(reqRes.data || []);
+      setUsers(usersRes.data || []);
+      setShifts(shiftRes.data || []);
     } catch (err) {
-      console.error(err);
+      console.error("Error loading data:", err);
+      alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาลองใหม่");
     } finally {
       setLoading(false);
     }
@@ -76,7 +82,6 @@ function RequestApprove() {
   };
 
   const handleAssignShift = async (userId, shiftId) => {
-    // เอา if (!shiftId) return; ออก เพื่อให้สามารถเลือก "เลือกกะ" (ค่าว่าง) เพื่อยกเลิกกะได้
     setSavingShift(userId);
     try {
       const parsedShiftId = shiftId ? Number(shiftId) : null;
@@ -161,7 +166,6 @@ function RequestApprove() {
           <div className="text-xs text-gray-500">{user.id_employee}</div>
 
           <select
-            // บังคับแปลงเป็น String เพื่อให้ตรงกับ value ของ <option> 
             value={user.shift_id ? String(user.shift_id) : ""}
             onChange={(e) => handleAssignShift(user.id, e.target.value)}
             className="mt-2 w-full border rounded p-1 text-xs"

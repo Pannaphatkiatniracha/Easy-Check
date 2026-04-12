@@ -15,6 +15,9 @@ import requestRoutes from "./routers/requestRoutes.js";
 import shiftRoutes from "./routers/shiftRoutes.js";
 import groupNotiRouter from "./routers/group-notiRouter.js";
 
+//เพิ่มการ Import ไฟล์ assignRoutes ที่เราสร้างใหม่
+import assignRoutes from "./routers/assignRoutes.js";
+
 import pool from "./config/db.js";
 
 dotenv.config();
@@ -28,8 +31,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
 });
 
 app.use("/uploads", express.static("uploads"));
@@ -46,34 +49,37 @@ app.use("/api/group-noti", groupNotiRouter);
 app.use("/checkin-approve", requestRoutes);
 app.use("/approver", shiftRoutes);
 
+//   เพิ่ม Route สำหรับระบบแต่งตั้ง Approver
+app.use("/api/assign", assignRoutes);
+
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
-  res.send("EasyCheck API is running 🚀");
+res.send("EasyCheck API is running ");
 });
 
 (async () => {
-  try {
-    await pool.execute("SELECT 1");
-    console.log("✅ Database Connected");
-  } catch (err) {
-    console.error("❌ Database Error:", err.message);
-  }
+ try {
+await pool.execute("SELECT 1");
+console.log(" Database Connected");
+} catch (err) {
+console.error(" Database Error:", err.message);
+}
 })();
 
 app.use((err, req, res, next) => {
-  console.error("💥 ERROR:", err);
+console.error(" ERROR:", err);
 
-  if (err?.message?.includes("รองรับเฉพาะไฟล์")) {
-    return res.status(400).json({ message: err.message });
-  }
+if (err?.message?.includes("รองรับเฉพาะไฟล์")) {
+return res.status(400).json({ message: err.message });
+}
 
-  res.status(500).json({
-    message: "Server Error",
-    error: err.message,
-  });
+ res.status(500).json({
+ message: "Server Error",
+ error: err.message,
+ });
 });
 
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running on http://${HOST}:${PORT}`);
+console.log(` Server running on http://${HOST}:${PORT}`);
 });

@@ -7,16 +7,17 @@ import {
   getPendingLeaves,
   approveLeave,
   rejectLeave,
-} from "../controllers/leaveController.js";
+} from "../controllers/leaveController.js"; // เช็ค path ตรงนี้ให้ตรงกับโฟลเดอร์ของคุณด้วยนะ
 
 const router = express.Router();
 
-/* 👤 USER */
+/* USER */
+// ใช้ upload.single("evidence") เพื่อดักรับไฟล์จาก FormData 
 router.post("/request", upload.single("evidence"), createLeaveRequest);
 router.get("/history", getLeaveHistory);
 router.get("/balance", getLeaveBalance);
 
-/* 👨‍💼 APPROVER */
+/* APPROVER */
 router.get("/pending", getPendingLeaves);
 router.put("/:id/approve", approveLeave);
 router.put("/:id/reject", rejectLeave);
