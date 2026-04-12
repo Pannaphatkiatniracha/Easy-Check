@@ -10,9 +10,12 @@ export const getProfile = async (req, res) => {
 
         // ดึง db
         const [rows] = await db.execute(
-            `SELECT Users.*, Roles.role
+            `SELECT Users.*, Roles.role, branch.name, 
+                    Shifts.start_time, Shifts.end_time
             FROM Users 
             JOIN Roles ON Users.role_id = Roles.role_id 
+            LEFT JOIN branch ON Users.branch_id = branch.id
+            LEFT JOIN Shifts ON Users.shift_id = Shifts.shift_id
             WHERE Users.id = ?`, 
             [userId] // userId ก็คือ '?'
         )
@@ -39,12 +42,12 @@ export const updateProfile = async (req, res) => {
         const userId = req.user.id
 
         // รับข้อมูลจากฟ้อนเอนที่ axios.put มา (bodyData)
-        const { firstname, lastname, phone, email, gender, branch } = req.body
+        const { firstname, lastname, phone, email, gender, branch_id, shift_id } = req.body
 
         // เขียนคำสั่ง sql ให้ไปอัพเดตค่าที่ db
         const sql = `
             UPDATE users 
-            SET firstname = ?, lastname = ?, phone = ?, email = ?, gender = ?, branch = ? 
+            SET firstname = ?, lastname = ?, phone = ?, email = ?, gender = ?, branch_id = ?, shift_id = ?
             WHERE id = ?
         `
         
@@ -55,7 +58,8 @@ export const updateProfile = async (req, res) => {
             phone, 
             email, 
             gender, 
-            branch,
+            branch_id,
+            shift_id,
             userId
         ])
 
@@ -165,9 +169,12 @@ export const uploadAvatar = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     try {
         const [rows] = await db.execute(
-            `SELECT Users.*, Roles.role
-             FROM Users 
-             JOIN Roles ON Users.role_id = Roles.role_id`
+            `SELECT Users.*, Roles.role, branch.name,
+                    Shifts.start_time, Shifts.end_time
+            FROM Users 
+            JOIN Roles ON Users.role_id = Roles.role_id
+            LEFT JOIN branch ON Users.branch_id = branch.id
+            LEFT JOIN Shifts ON Users.shift_id = Shifts.shift_id`
         )
 
         if (rows.length === 0) {

@@ -5,8 +5,9 @@ import pool from '../config/db.js'
 export const getAllEmployees = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT id, id_employee, firstname, lastname, email, phone, position, department, branch, joindate, avatar
-       FROM Users`
+      `SELECT u.id, u.id_employee, u.firstname, u.lastname, u.email, u.phone, u.position, u.department, b.name AS branch, u.joindate, u.avatar
+       FROM Users u
+       LEFT JOIN branch b ON u.branch_id = b.id`
     )
     res.json({ success: true, data: rows })
   } catch (err) {

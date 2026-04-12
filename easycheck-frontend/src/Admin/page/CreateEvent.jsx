@@ -22,6 +22,7 @@ const CreateEvent = () => {
     const [eventType, seteventType] = useState('')
     const [eventMax_Participants, seteventMax_Participants] = useState('')
     const [eventCurrent_Participants, seteventCurrent_Participants] = useState('')
+    const [eventNote, seteventNote] = useState('')
 
 
 
@@ -289,8 +290,6 @@ const CreateEvent = () => {
 
 
     };
-
-
 
 
 
@@ -608,7 +607,7 @@ const CreateEvent = () => {
                                                     ? event.event_time.slice(0, 5)
                                                     : "",
 
-                                                
+
                                                 register_start: event.register_start || "",
                                                 register_end: event.register_end || ""
                                             })
@@ -796,22 +795,18 @@ const CreateEvent = () => {
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>ID Employee</th>
-                                            <th></th>
+                                            <th>Note</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         {selectedEvent?.users?.length > 0 ? (
                                             selectedEvent.users.map((user, index) => (
-                                                <tr>
+                                                <tr key={user.id_employee}>
                                                     <td>{user.firstname}</td>
                                                     <td>{user.lastname}</td>
                                                     <td>{user.id_employee}</td>
-                                                    <td>
-                                                        <Button variant="danger">
-                                                            Delete
-                                                        </Button>
-                                                    </td>
+                                                    <td>{user.notes || " - "}</td>
                                                 </tr>
                                             ))
                                         ) : (
