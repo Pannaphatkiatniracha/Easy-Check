@@ -116,6 +116,19 @@ const ExternalEvent = () => {
                                             <i className="bi bi-geo-alt me-1"></i> สถานที่: {exevent.location}
                                         </Card.Text>
 
+                                        {/* แสดงจำนวนผู้เข้าร่วมสูงสุด */}
+                                        {exevent.max_participants > 0 && (
+                                            <div className="small text-muted mb-1">
+                                                <i className="bi bi-people-fill me-1"></i>
+                                                รับจำนวน: {exevent.max_participants} คน
+                                                {exevent.current_participants !== undefined && (
+                                                    <span className="ms-2">
+                                                        (ลงทะเบียนแล้ว {exevent.current_participants} คน)
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
                                         {/* วันที่ลงทะเบียน */}
                                         <div className="small text-muted mb-2">
                                             <i className="bi bi-calendar-check me-1"></i>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 11, 2026 at 12:56 PM
+-- Generation Time: Apr 12, 2026 at 08:34 AM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -34,16 +34,13 @@ CREATE TABLE `attendance` (
   `work_date` date NOT NULL COMMENT 'วันที่ทำงาน',
   `check_in_time` datetime DEFAULT NULL COMMENT 'เวลาเข้างาน',
   `check_in_photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'พาร์ทไฟล์รูปตอนเข้างาน',
-  `check_in_lat` decimal(10,8) DEFAULT NULL COMMENT 'ละติจูดตอนเข้า',
-  `check_in_lng` decimal(11,8) DEFAULT NULL COMMENT 'ลองติจูดตอนเข้า',
   `check_in_status` enum('on_time','late') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'สถานะเข้างาน',
   `check_out_time` datetime DEFAULT NULL COMMENT 'เวลาออกงาน',
   `check_out_photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'พาร์ทไฟล์รูปตอนออกงาน',
-  `check_out_lat` decimal(10,8) DEFAULT NULL COMMENT 'ละติจูดตอนออก',
-  `check_out_lng` decimal(11,8) DEFAULT NULL COMMENT 'ลองติจูดตอนออก',
   `check_out_status` enum('normal','early') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'สถานะออกงาน',
   `early_leave_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'เหตุผลกรณีออกก่อนเวลา',
-  `approval_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'approved'
+  `approval_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'approved',
+  `location_id` int DEFAULT NULL COMMENT 'อ้างอิง gps_locations.id (ไม่ใช่ FK)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -54,7 +51,7 @@ CREATE TABLE `attendance` (
 
 CREATE TABLE `branch` (
   `id` int NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -64,9 +61,9 @@ CREATE TABLE `branch` (
 INSERT INTO `branch` (`id`, `name`) VALUES
 (1, 'Bangkok'),
 (2, 'Chiang Mai'),
-(3, 'Phuket'),
 (4, 'Chonburi'),
-(5, 'Khon Kaen');
+(5, 'Khon Kaen'),
+(3, 'Phuket');
 
 -- --------------------------------------------------------
 
@@ -96,8 +93,22 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `title`, `description`, `date_thai`, `event_date`, `event_time`, `location`, `icon`, `register_start`, `register_end`, `type`, `max_participants`, `created_at`, `updated_at`) VALUES
-(33, 'Kater', '<3 !', NULL, '2026-04-23', '16:26:00', 'SM', 'bi-calendar-event', '2026-04-03 21:01:00', '2026-04-09 23:59:00', 'external', 10, '2026-04-09 09:24:31', '2026-04-09 14:59:59'),
-(34, 'tar', 'tar <3', NULL, '2026-04-07', '22:08:00', 'tar', 'bi-calendar-event', '2026-04-08 09:06:00', '2026-04-22 06:10:00', 'internal', 2, '2026-04-09 15:06:24', '2026-04-09 15:21:34');
+(1, 'งานวิ่งการกุศลประจำปี', 'ร่วมกิจกรรมวิ่งการกุศลเพื่อสังคม', '20 เมษายน 2569', '2026-04-20', '06:00:00', 'สวนสาธารณะเมือง', 'bi-activity', '2026-04-01 00:00:00', '2026-04-19 23:59:59', 'external', 100, '2026-04-01 20:30:22', '2026-04-02 22:26:03'),
+(2, 'สัมมนาเทรนด์ธุรกิจปี 2026', 'สัมมนาแนวโน้มธุรกิจและการตลาด', '25 เมษายน 2569', '2026-04-25', '09:00:00', 'โรงแรม Grand Palace', 'bi-graph-up', '2026-04-05 00:00:00', '2026-04-24 23:59:59', 'external', 50, '2026-04-01 20:30:22', '2026-04-08 17:34:14'),
+(3, 'กิจกรรม CSR ร่วมกับชุมชน', 'ทำกิจกรรมเพื่อสังคมร่วมกับชุมชน', '30 เมษายน 2569', '2026-04-30', '08:30:00', 'โรงเรียนบ้านหนองบัว', 'bi-heart', '2026-04-10 00:00:00', '2026-04-29 23:59:59', 'external', 30, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(4, 'ประชุมผู้ถือหุ้นประจำปี', 'ประชุมใหญ่สามัญประจำปี', '5 พฤษภาคม 2569', '2026-05-05', '13:00:00', 'โรงแรม The Plaza', 'bi-people', '2026-04-15 00:00:00', '2026-05-04 23:59:59', 'external', 200, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(5, 'อบรมเทคนิคการตลาดดิจิทัล', 'อบรมเชิงปฏิบัติการการตลาดออนไลน์', '10 พฤษภาคม 2569', '2026-05-10', '10:00:00', 'ศูนย์ฝึกอบรม AIA Tower', 'bi-laptop', '2026-04-20 00:00:00', '2026-05-09 23:59:59', 'external', 40, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(6, 'งานแสดงสินค้าและนวัตกรรม', 'แสดงสินค้าและนวัตกรรมใหม่', '15 พฤษภาคม 2569', '2026-05-15', '10:00:00', 'ศูนย์ประชุมแห่งชาติสิริกิติ์', 'bi-lightbulb', '2026-04-25 00:00:00', '2026-05-14 23:59:59', 'external', 500, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(7, 'อบรมความปลอดภัยในการทำงาน', 'อบรมมาตรการความปลอดภัยในสถานประกอบการ', '20 พฤษภาคม 2569', '2026-05-20', '09:00:00', 'ห้องประชุมใหญ่ อาคาร A', 'bi-shield-check', '2026-05-01 00:00:00', '2026-05-19 23:59:59', 'internal', 50, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(8, 'บริจาคโลหิตประจำปี', 'ร่วมบริจาคโลหิตเพื่อช่วยเหลือผู้อื่น', '25 พฤษภาคม 2569', '2026-05-25', '08:30:00', 'ห้องประชุมกลาง ชั้น 3', 'bi-droplet', '2026-05-05 00:00:00', '2026-05-24 23:59:59', 'internal', 30, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(9, 'Workshop การทำงานเป็นทีม', 'พัฒนาทักษะการทำงานร่วมกันเป็นทีม', '30 พฤษภาคม 2569', '2026-05-30', '13:00:00', 'ห้องอบรม อาคาร B', 'bi-people', '2026-05-10 00:00:00', '2026-05-29 23:59:59', 'internal', 40, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(10, 'อบรมการใช้ซอฟต์แวร์ใหม่', 'อบรมการใช้งานโปรแกรมระบบใหม่', '5 มิถุนายน 2569', '2026-06-05', '10:00:00', 'ห้องคอมพิวเตอร์ ชั้น 2', 'bi-laptop', '2026-05-15 00:00:00', '2026-06-04 23:59:59', 'internal', 25, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(11, 'กิจกรรมสร้างความสัมพันธ์พนักงาน', 'กิจกรรม Team Building ภายในบริษัท', '10 มิถุนายน 2569', '2026-06-10', '16:00:00', 'สวนหย่อม อาคาร A', 'bi-heart', '2026-05-20 00:00:00', '2026-06-09 23:59:59', 'internal', 60, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(12, 'งานเปิดตัวสินค้า', 'เปิดตัวสินค้าตัวใหม่ประจำปี', '15 มิถุนายน 2569', '2026-06-15', '14:00:00', 'ห้องประชุม C', 'bi-megaphone', '2026-05-25 00:00:00', '2026-06-14 23:59:59', 'internal', 80, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(13, 'อบรมเทคนิคการสื่อสารภายในองค์กร', 'พัฒนาทักษะการสื่อสารในที่ทำงาน', '20 มิถุนายน 2569', '2026-06-20', '09:30:00', 'ห้องประชุมใหญ่ อาคาร A', 'bi-chat-dots', '2026-06-01 00:00:00', '2026-06-19 23:59:59', 'internal', 45, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(14, 'กิจกรรมกีฬาเพื่อสุขภาพ', 'กิจกรรมกีฬาสานสัมพันธ์พนักงาน', '25 มิถุนายน 2569', '2026-06-25', '08:00:00', 'สนามกีฬาในบริษัท', 'bi-activity', '2026-06-05 00:00:00', '2026-06-24 23:59:59', 'internal', 100, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(15, 'Workshop การแก้ไขปัญหาเชิงสร้างสรรค์', 'เรียนรู้เทคนิคการแก้ปัญหาอย่างสร้างสรรค์', '28 มิถุนายน 2569', '2026-06-28', '13:30:00', 'ห้องอบรม อาคาร B', 'bi-lightbulb', '2026-06-08 00:00:00', '2026-06-27 23:59:59', 'internal', 35, '2026-04-01 20:30:22', '2026-04-01 20:30:22'),
+(16, 'งานเลี้ยงบริษัท', 'งานเลี้ยงส่งท้ายไตรมาส', '30 มิถุนายน 2569', '2026-06-30', '18:00:00', 'ห้องประชุมใหญ่ อาคาร A', 'bi-cup-straw', '2026-06-10 00:00:00', '2026-06-29 23:59:59', 'internal', 150, '2026-04-01 20:30:22', '2026-04-01 20:30:22');
 
 -- --------------------------------------------------------
 
@@ -120,7 +131,36 @@ CREATE TABLE `event_registrations` (
 --
 
 INSERT INTO `event_registrations` (`id`, `event_id`, `id_employee`, `notes`, `registration_date`, `registered_at`, `status`) VALUES
-(1, 33, '101010', '><', '2026-04-09', '2026-04-09 09:24:58', 'registered');
+(31, 1, '202020', 'ไม่ทานผัก', '2026-04-11', '2026-04-11 20:01:47', 'registered');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gps_locations`
+--
+
+CREATE TABLE `gps_locations` (
+  `id` int NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ชื่อสถานที่',
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'ที่อยู่',
+  `lat` decimal(10,7) NOT NULL COMMENT 'ละติจูด',
+  `lng` decimal(10,7) NOT NULL COMMENT 'ลองจิจูด',
+  `radius` int NOT NULL DEFAULT '100' COMMENT 'รัศมี (เมตร)',
+  `branch_id` int NOT NULL COMMENT 'สาขา',
+  `active` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1=เปิด, 0=ปิด',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `gps_locations`
+--
+
+INSERT INTO `gps_locations` (`id`, `name`, `address`, `lat`, `lng`, `radius`, `branch_id`, `active`, `created_at`) VALUES
+(1, 'บริษัท ศรีปทุม จำกัด (สำนักงานใหญ่ กรุงเทพฯ)\r\nSripatum Co., Ltd. (Head Office - Bangkok)', '2410 2 Phahonyothin Rd, Sena Nikhom, Chatuchak, Bangkok 10900', 13.8558796, 100.5855061, 100, 1, 1, '2026-04-11 19:55:49'),
+(2, 'บริษัท ศรีปทุม จำกัด (สาขาเชียงใหม่)\r\nSripatum Co., Ltd. (Chiang Mai Branch)', '99 9 Huay Kaew Rd, Chang Phueak, Mueang Chiang Mai, Chiang Mai 50300', 13.8728345, 100.6226486, 100, 2, 1, '2026-04-11 20:28:45'),
+(3, 'บริษัท ศรีปทุม จำกัด (สาขาภูเก็ต)\r\nSripatum Co., Ltd. (Phuket Branch)', '128 3 Rat-U-Thit 200 Pee Rd, Patong, Kathu, Phuket 83150', 13.7562150, 100.4189270, 100, 3, 1, '2026-04-11 20:28:45'),
+(4, 'บริษัท ศรีปทุม จำกัด (สาขาชลบุรี)\r\nSripatum Co., Ltd. (Chonburi Branch)', '88 88 Sukhumvit Rd, Bang Lamung, Chonburi 20150', 13.0005000, 100.9155000, 100, 4, 1, '2026-04-11 20:30:31'),
+(5, 'บริษัท ศรีปทุม จำกัด (สาขาขอนแก่น)\r\nSripatum Co., Ltd. (Khon Kaen Branch)', '555 5 Mittraphap Rd, Nai Mueang, Mueang Khon Kaen, Khon Kaen 40000', 16.4322000, 102.8236000, 100, 5, 1, '2026-04-11 20:30:31');
 
 -- --------------------------------------------------------
 
@@ -246,7 +286,7 @@ CREATE TABLE `Users` (
 
 INSERT INTO `Users` (`id`, `id_employee`, `role_id`, `firstname`, `lastname`, `gender`, `birthdate`, `joindate`, `position`, `department`, `email`, `password`, `phone`, `avatar`, `shift_id`, `branch_id`) VALUES
 (1, '101010', 1, 'Taro', 'Yu', 'female', '2005-02-14', '2026-03-31', 'Cybersecurity Specialist', 'IT', 'pataraporn142548@gmail.com', '$2b$10$kCnA9ItsPUbqvDnaAfQ2vez8wBLlyhXb9DFpeC7wj92Vwx8.X/UP.', '0652939090', 'https://i.pinimg.com/736x/67/de/76/67de7632379015a3dc7e080148bd5d8f.jpg', 1, 1),
-(2, '202020', 1, 'Bambi', 'Kang', 'female', '2006-06-11', '2026-03-31', 'Sales Coordinator', 'Sales', 'thitichatphoto@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811235678', 'https://i.pinimg.com/736x/f5/f9/fb/f5f9fbdb8a74165249beda8b3de127c1.jpg', 2, 2),
+(2, '202020', 1, 'Bambi', 'Pham', 'female', '2006-06-11', '2026-03-31', 'Sales Coordinator', 'Sales', 'thitichatphoto@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0811235678', 'https://i.pinimg.com/736x/bf/9d/7f/bf9d7f2534ee13daa8a2e89b2597cce1.jpg', 2, 2),
 (3, '303030', 2, 'Maemom', 'Young', 'female', '2006-02-08', '2026-03-31', 'Approver', 'Finance', 'compannaphat@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0876564732', 'https://i.pinimg.com/736x/fa/cd/a2/facda288a9633aade66c84642a8fcb6a.jpg', 3, 3),
 (4, '404040', 3, 'Boobi', 'Bubu', 'male', '2005-02-13', '2026-03-31', 'Admin', 'Sales', 'thanik1265@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0976453421', 'https://i.pinimg.com/1200x/45/bf/0b/45bf0b9e7f509e025d61091f677189f3.jpg', 2, 4),
 (5, '505050', 4, 'Meow', 'Whatislove', 'female', '2006-04-01', '2026-04-01', 'Admin', 'Creative', 'mo.sarasinee@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0894726153', 'https://i.pinimg.com/736x/8f/0d/1d/8f0d1ded2a11628c68891d1f268b5650.jpg', 3, 5),
@@ -316,13 +356,15 @@ INSERT INTO `User_shifts` (`role_id`, `shift_id`, `id`) VALUES
 --
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_user_date` (`id_employee`,`work_date`);
+  ADD UNIQUE KEY `unique_user_date` (`id_employee`,`work_date`),
+  ADD KEY `location_id` (`location_id`);
 
 --
 -- Indexes for table `branch`
 --
 ALTER TABLE `branch`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `events`
@@ -337,6 +379,13 @@ ALTER TABLE `event_registrations`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_registration` (`event_id`,`id_employee`),
   ADD KEY `id_employee_2` (`id_employee`);
+
+--
+-- Indexes for table `gps_locations`
+--
+ALTER TABLE `gps_locations`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `branch_id` (`branch_id`);
 
 --
 -- Indexes for table `leave_policy`
@@ -410,7 +459,13 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `event_registrations`
 --
 ALTER TABLE `event_registrations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `gps_locations`
+--
+ALTER TABLE `gps_locations`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `leave_policy`
@@ -435,11 +490,24 @@ ALTER TABLE `Users`
 --
 
 --
+-- Constraints for table `attendance`
+--
+ALTER TABLE `attendance`
+  ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`id_employee`) REFERENCES `Users` (`id_employee`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `gps_locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
 -- Constraints for table `event_registrations`
 --
 ALTER TABLE `event_registrations`
   ADD CONSTRAINT `event_registrations_ibfk_2` FOREIGN KEY (`id_employee`) REFERENCES `Users` (`id_employee`) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_event_registrations_events` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `gps_locations`
+--
+ALTER TABLE `gps_locations`
+  ADD CONSTRAINT `fk_gps_branch` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Users`

@@ -35,7 +35,7 @@ const calcTimeStatus = (currentTimeStr, shiftTimeStr, type) => {
   const currentMins = ch * 60 + cm;
   const shiftMins = sh * 60 + sm;
 
-  // ✅ แก้ไขค่า ENUM ให้ตรงกับตาราง attendance 100%
+  // แก้ไขค่า ENUM ให้ตรงกับตาราง attendance 100%
   if (type === "checkin") return currentMins > shiftMins ? "late" : "on_time";
   if (type === "checkout") return currentMins < shiftMins ? "early" : "normal";
   return "normal";
@@ -53,22 +53,13 @@ const getUserShift = async (primaryId) => {
   return rows[0] || null;
 };
 
-const hasLatLngColumns = async () => {
-  try {
-    const [columns] = await pool.query(`SHOW COLUMNS FROM attendance`);
-    const names = columns.map((c) => c.Field);
-    return names.includes("check_in_lat"); 
-  } catch {
-    return false;
-  }
-};
-
 // ─── POST /attendance/check-in ────────────────────────────────────────────────
 export const checkIn = async (req, res) => {
   try {
-    const empId = req.user.id_employee; 
-    const primaryId = req.user.id;      
-    const { lat, lng } = req.body;
+    const empId = req.user.id_employee;
+    const primaryId = req.user.id;
+    //แก้ตรงนี้💕 รับพิกัด GPS และ location_id ที่ frontend validate แล้วส่งมา
+    const { lat, lng, location_id } = req.body;
 
     if (!req.file) return res.status(400).json({ message: "กรุณาถ่ายรูปก่อนเช็คอิน" });
 
@@ -86,31 +77,18 @@ export const checkIn = async (req, res) => {
     const currentTimeStr = now.toTimeString().split(" ")[0];
     const status = calcTimeStatus(currentTimeStr, shift.start_time, "checkin");
     const photoPath = req.file.path;
-    const canSaveLatLng = await hasLatLngColumns();
     
-    let result;
-    
-    // ✅ บันทึก shift.shift_id ลงไปในฐานข้อมูลตอนเช็คอินด้วย
-    if (canSaveLatLng) {
-      const [insertResult] = await pool.query(
-        `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_lat, check_in_lng, check_in_time)
-         VALUES (?, ?, CURDATE(), ?, ?, 'approved', ?, ?, NOW())`,
-        [empId, shift.shift_id, status, photoPath, lat || null, lng || null]
-      );
-      result = insertResult;
-    } else {
-      const [insertResult] = await pool.query(
-        `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_time)
-         VALUES (?, ?, CURDATE(), ?, ?, 'approved', NOW())`,
-        [empId, shift.shift_id, status, photoPath]
-      );
-      result = insertResult;
-    }
+    // 😊บันทึกข้อมูลการเช็คอิน พร้อม lat/lng และ location_id ของจุดที่เช็คอิน
+    const [insertResult] = await pool.query(
+      `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_lat, check_in_lng, location_id, check_in_time)
+       VALUES (?, ?, CURDATE(), ?, ?, 'approved', ?, ?, ?, NOW())`,
+      [empId, shift.shift_id, status, photoPath, lat || null, lng || null, location_id || null]
+    );
 
     return res.json({
       message: "เช็คอินสำเร็จ",
       status,
-      attendanceId: result.insertId,
+      attendanceId: insertResult.insertId,
       shift: { start: shift.start_time.slice(0, 5), end: shift.end_time.slice(0, 5) },
     });
   } catch (err) {
@@ -124,6 +102,7 @@ export const checkOut = async (req, res) => {
   try {
     const empId = req.user.id_employee;
     const primaryId = req.user.id;
+    // ❤️รับพิกัด GPS ที่ frontend validate แล้ว และเหตุผลกรณีออกก่อนเวลา
     const { reason, lat, lng } = req.body;
 
     if (!req.file) return res.status(400).json({ message: "กรุณาถ่ายรูปก่อนเช็คเอาท์" });
@@ -143,23 +122,14 @@ export const checkOut = async (req, res) => {
     const status = calcTimeStatus(currentTimeStr, shift.end_time, "checkout");
     const photoPath = req.file.path;
     const approvalStatus = status === "early" ? "pending" : "approved";
-    const canSaveLatLng = await hasLatLngColumns();
 
-    if (canSaveLatLng) {
-      await pool.query(
-        `UPDATE attendance 
-         SET check_out_status = ?, check_out_photo = ?, approval_status = ?, early_leave_reason = ?, check_out_lat = ?, check_out_lng = ?, check_out_time = NOW()
-         WHERE id = ?`,
-        [status, photoPath, approvalStatus, reason || null, lat || null, lng || null, todayRecord[0].id]
-      );
-    } else {
-      await pool.query(
-        `UPDATE attendance 
-         SET check_out_status = ?, check_out_photo = ?, approval_status = ?, early_leave_reason = ?, check_out_time = NOW()
-         WHERE id = ?`,
-        [status, photoPath, approvalStatus, reason || null, todayRecord[0].id]
-      );
-    }
+    // ❤️อัปเดตข้อมูลการเช็คเอาท์ พร้อม lat/lng ของตำแหน่งที่เช็คเอาท์
+    await pool.query(
+      `UPDATE attendance
+       SET check_out_status = ?, check_out_photo = ?, approval_status = ?, early_leave_reason = ?, check_out_lat = ?, check_out_lng = ?, check_out_time = NOW()
+       WHERE id = ?`,
+      [status, photoPath, approvalStatus, reason || null, lat || null, lng || null, todayRecord[0].id]
+    );
 
     return res.json({
       message: "เช็คเอาท์สำเร็จ",
@@ -257,7 +227,7 @@ export const rejectAttendance = async (req, res) => {
     const { id } = req.params;
     const { reason } = req.body;
     if (!reason?.trim()) return res.status(400).json({ message: "กรุณาระบุเหตุผล" });
-    await pool.query("UPDATE attendance SET approval_status = 'rejected' WHERE id = ?", [id]); // เหตุผลปฏิเสธควรบันทึกเพิ่ม แต่ในตารางคุณไม่มีช่อง reject_reason สำหรับหัวหน้าปฏิเสธ จึงเปลี่ยนแค่สถานะ
+    await pool.query("UPDATE attendance SET approval_status = 'rejected' WHERE id = ?", [id]); 
     return res.json({ message: "ปฏิเสธเรียบร้อย" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -276,39 +246,62 @@ export const getMyShift = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-//  ATTENDANCE-SUMMARY
+
+
+// 🐱🐱 ATTENDANCE-SUMMARY
 export const getAttendanceHistory = async (req, res) => {
   const { userId } = req.query;
-  if (!userId) return res.status(400).json({ message: "userId is required" });
+  const empId = userId || req.user?.id_employee;
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" });
   
   try {
-    const [rows] = await pool.query(
+    // ดึงข้อมูลการเข้า-ออกงาน
+    const [attendanceRows] = await pool.query(
       `SELECT check_in_status AS status, DATE_FORMAT(work_date, '%Y-%m-%d') as date 
        FROM attendance WHERE id_employee = ? ORDER BY work_date DESC`,
-      [userId]
+      [empId]
+    );
+    
+    // ดึงข้อมูลการลา
+    const [leaveRows] = await pool.query(
+      `SELECT DISTINCT DATE_FORMAT(leave_start, '%Y-%m-%d') as date 
+       FROM leave_requests 
+       WHERE id_employee = ? AND status = 'approved' 
+       UNION 
+       SELECT DISTINCT DATE_FORMAT(leave_end, '%Y-%m-%d') as date 
+       FROM leave_requests 
+       WHERE id_employee = ? AND status = 'approved'`,
+      [empId, empId]
     );
 
     const attendanceData = {
-      onTimes: rows.filter(r => r.status === 'on_time').map(r => r.date),
-      lates: rows.filter(r => r.status === 'late').map(r => r.date),
-      leaves: rows.filter(r => r.status === 'leave').map(r => r.date)
+      onTimes: attendanceRows.filter(r => r.status === 'on_time').map(r => r.date), // มาปกติ
+      lates: attendanceRows.filter(r => r.status === 'late').map(r => r.date), // มาสาย
+      leaves: leaveRows.map(r => r.date)  // ดึงวันลา
     };
+    
     res.json(attendanceData);
+
   } catch (err) {
+    console.error("Error in getAttendanceHistory:", err);
     res.status(500).json({ message: "Database Error", error: err.message });
   }
 }
 
-//  WORK-HOURS TRACKER
+// 🐱🐱  WORK-HOURS TRACKER
 export const getWeeklyHours = async (req, res) => {
   const { userId } = req.query;
-  if (!userId) return res.status(400).json({ message: "userId is required" });
+  const empId = userId || req.user?.id_employee;
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" });
+  
   try {
     const [rows] = await pool.query(
       `SELECT check_in_time, check_out_time, DAYNAME(work_date) as day 
        FROM attendance WHERE id_employee = ? 
        AND YEARWEEK(work_date, 1) = YEARWEEK(CURDATE(), 1) ORDER BY work_date ASC`,
-      [userId]
+      [empId]
     );
 
     const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 };
@@ -325,27 +318,35 @@ export const getWeeklyHours = async (req, res) => {
   }
 }
 
-//  GET CURRENT STATUS
+// 🐱🐱  GET CURRENT STATUS
 export const getCurrentStatus = async (req, res) => {
   const { userId } = req.query;
+  const empId = userId || req.user?.id_employee;
+  
+  if (!empId) return res.status(400).json({ message: "userId is required" });
+  
   try {
     const [rows] = await pool.query(
       `SELECT check_in_time, check_out_time, check_in_status, check_out_status 
        FROM attendance WHERE id_employee = ? AND work_date = CURDATE() LIMIT 1`,
-      [userId]
+      [empId]
     );
 
     let result = { message: "no-activity" };
+
     if (rows.length > 0) {
       const row = rows[0];
       if (row.check_out_time) {
         result = { type: 'checkout', status: row.check_out_status, created_at: row.check_out_time };
-      } else if (row.check_in_time) {
+      } 
+      else if (row.check_in_time) {
         result = { type: 'checkin', status: row.check_in_status, created_at: row.check_in_time };
       }
     }
+
     res.json(result);
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: err.message });
   }
 }

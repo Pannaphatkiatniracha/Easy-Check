@@ -55,6 +55,7 @@ export const normalizeUser = (data) => {
     role,
     joinDate,
     profileImage,
+    branch_id: data.branch_id ?? null,  // เก็บ branch_id ไว้ใน localStorage ด้วย
     raw: data
   }
 }

@@ -39,7 +39,7 @@ const WorkHoursTracker = ({ role }) => {
                     name: `${data.firstname} ${data.lastname}`,
                     userid: data.id_employee || "",
                     avatar: avatarPath,
-                    shift: data.shift_name || "Normal Shift"
+                    shift: data.start_time && data.end_time ? `${data.start_time.substring(0,5)} - ${data.end_time.substring(0,5)}` : "No Shift"
                 })
             } 
             catch (error) {
@@ -91,13 +91,15 @@ const WorkHoursTracker = ({ role }) => {
         const itemIndex = dayNames.indexOf(item.day)
         const reached = itemIndex <= todayIndex
         const hoursWorked = realHours[item.day] || 0
-        const percent = (hoursWorked / MAX_HOURS_PER_DAY) * 100
+        // ไม่ให้ percent ที่เกิน 100 และไม่ให้เป็น NaN
+        let percent = (hoursWorked / MAX_HOURS_PER_DAY) * 100
+        percent = Math.min(100, Math.max(0, percent)) // จำกัดให้อยู่ระหว่าง 0-100
 
         return {
             ...item,
             hours: hoursWorked,
             percent: percent,
-            color: reached ? item.color : "#ccc"
+            color: item.color
         }
     })
 
@@ -108,11 +110,30 @@ const WorkHoursTracker = ({ role }) => {
     const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY
     const weeklySummaryPercent = maxPossibleHours > 0 ? Math.round((workedHours / maxPossibleHours) * 100) : 0
 
-    const CustomProgressBar = ({ percent, color, height = '20px' }) => (
-        <div style={{ height, backgroundColor: '#ccc', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${percent}%`, height: '100%', backgroundColor: color }} />
-        </div>
-    )
+
+    const CustomProgressBar = ({ percent, color, height = '20px' }) => {
+        // ตรวจสอบว่า percent เป็นตัวเลขที่ถูกต้อง
+        const validPercent = isNaN(percent) ? 0 : Math.min(100, Math.max(0, percent))
+        
+        return (
+            <div style={{ 
+                height: height, 
+                backgroundColor: '#e0e0e0', 
+                borderRadius: '10px', 
+                overflow: 'hidden',
+                width: '100%',
+                position: 'relative'
+            }}>
+                <div style={{ 
+                    width: `${validPercent}%`, 
+                    height: '100%', 
+                    backgroundColor: color,
+                    transition: 'width 0.3s ease',
+                    borderRadius: '10px'
+                }} />
+            </div>
+        )
+    }
 
 
 
@@ -169,7 +190,7 @@ const WorkHoursTracker = ({ role }) => {
                      style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
                     <h4 className="mt-2 mb-6 fw-bold">Weekly Report</h4>
                     {weeklyData.map((item, index) => (
-                        <div key={index} className='mb-4 text-start'>
+                        <div key={index} className='mb-4 text-start' style={{ width: '100%' }}>
                             <div className='d-flex justify-content-between mb-2'>
                                 <span className='fw-bold'>{item.day}</span>
                                 <span className='fw-bold'>{item.hours.toFixed(1)}h / {MAX_HOURS_PER_DAY}h</span>
