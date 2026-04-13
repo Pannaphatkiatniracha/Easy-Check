@@ -198,9 +198,15 @@ function CheckOut() {
 
     const formData = new FormData();
     formData.append("photo", photo);
-    
+
+    //เพิ่มขึ้นมา 😘ส่งพิกัดของผู้ใช้ไปให้ backend บันทึกลงคอลัมน์ check_out_lat / check_out_lng
+    formData.append("lat", location.lat);
+    formData.append("lng", location.lng);
+
     if (userId) formData.append("userId", userId);
     if (overrideReason) formData.append("reason", overrideReason);
+
+    // ส่ง location_id ของจุดที่ใกล้ที่สุด เพื่อให้ backend รู้ว่าเช็คเอาท์จากจุดไหน
     if (nearestLocation) formData.append("location_id", nearestLocation.id);
 
     try {

@@ -193,8 +193,14 @@ function CheckIn() {
 
     const formData = new FormData();
     formData.append("photo", photo);
-    
+
+    //เพิ่มขึ้นมา 👍ส่งพิกัดของผู้ใช้ไปให้ backend บันทึกลงคอลัมน์ check_in_lat / check_in_lng
+    formData.append("lat", location.lat);
+    formData.append("lng", location.lng);
+
     if (userId) formData.append("userId", userId);
+
+    // ส่ง location_id ของจุดที่ใกล้ที่สุด (ที่ validate ผ่านแล้ว) เพื่อบันทึกว่าเช็คอินที่จุดไหน
     if (nearestLocation) formData.append("location_id", nearestLocation.id);
 
     try {

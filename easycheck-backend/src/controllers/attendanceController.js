@@ -56,9 +56,10 @@ const getUserShift = async (primaryId) => {
 // ─── POST /attendance/check-in ────────────────────────────────────────────────
 export const checkIn = async (req, res) => {
   try {
-    const empId = req.user.id_employee; 
-    const primaryId = req.user.id;      
-    const { location_id } = req.body; // รับค่า location_id มาจาก Frontend
+    const empId = req.user.id_employee;
+    const primaryId = req.user.id;
+    //แก้ตรงนี้💕 รับพิกัด GPS และ location_id ที่ frontend validate แล้วส่งมา
+    const { lat, lng, location_id } = req.body;
 
     if (!req.file) return res.status(400).json({ message: "กรุณาถ่ายรูปก่อนเช็คอิน" });
 
@@ -77,11 +78,11 @@ export const checkIn = async (req, res) => {
     const status = calcTimeStatus(currentTimeStr, shift.start_time, "checkin");
     const photoPath = req.file.path;
     
-    // บันทึกข้อมูล พร้อม location_id
+    // 😊บันทึกข้อมูลการเช็คอิน พร้อม lat/lng และ location_id ของจุดที่เช็คอิน
     const [insertResult] = await pool.query(
-      `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, location_id, check_in_time)
-       VALUES (?, ?, CURDATE(), ?, ?, 'approved', ?, NOW())`,
-      [empId, shift.shift_id, status, photoPath, location_id || null]
+      `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_lat, check_in_lng, location_id, check_in_time)
+       VALUES (?, ?, CURDATE(), ?, ?, 'approved', ?, ?, ?, NOW())`,
+      [empId, shift.shift_id, status, photoPath, lat || null, lng || null, location_id || null]
     );
 
     return res.json({
@@ -101,7 +102,8 @@ export const checkOut = async (req, res) => {
   try {
     const empId = req.user.id_employee;
     const primaryId = req.user.id;
-    const { reason } = req.body;
+    // ❤️รับพิกัด GPS ที่ frontend validate แล้ว และเหตุผลกรณีออกก่อนเวลา
+    const { reason, lat, lng } = req.body;
 
     if (!req.file) return res.status(400).json({ message: "กรุณาถ่ายรูปก่อนเช็คเอาท์" });
 
@@ -121,12 +123,12 @@ export const checkOut = async (req, res) => {
     const photoPath = req.file.path;
     const approvalStatus = status === "early" ? "pending" : "approved";
 
-    // อัปเดตข้อมูลการเช็คเอาท์
+    // ❤️อัปเดตข้อมูลการเช็คเอาท์ พร้อม lat/lng ของตำแหน่งที่เช็คเอาท์
     await pool.query(
-      `UPDATE attendance 
-       SET check_out_status = ?, check_out_photo = ?, approval_status = ?, early_leave_reason = ?, check_out_time = NOW()
+      `UPDATE attendance
+       SET check_out_status = ?, check_out_photo = ?, approval_status = ?, early_leave_reason = ?, check_out_lat = ?, check_out_lng = ?, check_out_time = NOW()
        WHERE id = ?`,
-      [status, photoPath, approvalStatus, reason || null, todayRecord[0].id]
+      [status, photoPath, approvalStatus, reason || null, lat || null, lng || null, todayRecord[0].id]
     );
 
     return res.json({
