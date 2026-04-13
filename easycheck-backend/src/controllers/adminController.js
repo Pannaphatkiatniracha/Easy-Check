@@ -698,3 +698,100 @@ export const DeleteEvent = async (req, res) => {
         res.status(500).json({ message: "Error deleting event" });
     }
 };
+
+
+// -------------------- access control tar------------------------------------------
+
+export const GetPositionCount = async (req, res) => {
+    try {
+        const sql = `
+            SELECT roles.role, COUNT(users.id_employee) AS total
+            FROM users
+            JOIN roles ON users.role_id = roles.role_id
+            GROUP BY roles.role
+        `;
+
+        const [rows] = await pool.query(sql);
+
+        res.json(rows);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+export const SaveRolePermissions = async (req, res) => {
+    try {
+        const { role_id, role_permissions } = req.body;
+
+        //  ดึงของเก่าจาก db
+        const [rows] = await pool.query(
+            `SELECT id_permission 
+             FROM role_permissions 
+             WHERE role_id = ?`,
+            [role_id]
+        );
+        const oldPermissions = rows.map(r => r.id_permission);
+        //มันคือตัวดึงค่า id  จะได้ oldPermissions = [1,2,3]
+
+
+        // หา ที่ต้องเพิ่ม เอาของใหม่ หาอันที่ไม่มีในของเก่า
+        const toAdd = role_permissions.filter(p => !oldPermissions.includes(p));
+
+
+        // หา ที่ต้องลบ เอาของเก่า หาอันที่ไม่มีในของใหม่
+        const toDelete = oldPermissions.filter(p => !role_permissions.includes(p));
+
+
+        //  insert เฉพาะที่เพิ่ม
+        if (toAdd.length > 0) {
+            const values = toAdd.map(p => [role_id, p]);
+
+            await pool.query(
+                `INSERT INTO role_permissions (role_id, id_permission) VALUES ?`,
+                [values]
+            );
+        }
+
+        //  delete (เฉพาะที่ลบ)
+        if (toDelete.length > 0) {
+            await pool.query(
+                `DELETE FROM role_permissions 
+                 WHERE role_id = ? 
+                 AND id_permission IN (?)`,
+                [role_id, toDelete]
+            );
+        }
+
+        res.json({
+            message: "Updated",
+            added: toAdd,
+            deleted: toDelete
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const GetRolePermissions = async (req, res) => {
+    try {
+        const { role_id } = req.query;
+
+        const [rows] = await pool.query(
+            `   SELECT id_permission 
+                FROM role_permissions
+                WHERE role_id = ?
+             ` , [role_id]
+        );
+
+        res.json(rows);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

@@ -59,8 +59,8 @@ const ShiftSchedule = () => {
         setEditingUserId(item.userId);
         setEditingShiftId(item.shift_id);
 
-        setEditShift(shift_id); // ใช้ค่าที่ map แล้ว
-        setEditRole(role_id);   // ค่าที่ map แล้ว
+        setEditShift(shift_id || null); // ใช้ค่าที่ map แล้ว
+        setEditRole(role_id || null);   // ค่าที่ map แล้ว
 
         setShowEdit(true);
     };
@@ -75,10 +75,10 @@ const ShiftSchedule = () => {
     };
 
     const roleMap = {
-        "User": 1,
-        "Approver": 2,
-        "Admin": 3,
-        "Super Admin": 4
+        "user": 1,
+        "approver": 2,
+        "admin": 3,
+        "super admin": 4
     };
 
     const roleLabel = (roleId) => {
@@ -455,7 +455,7 @@ const ShiftSchedule = () => {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseEdit}>
+                    <Button variant="danger" onClick={handleCloseEdit}>
                         Cancel
                     </Button>
                     <Button

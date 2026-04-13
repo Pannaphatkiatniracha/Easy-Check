@@ -1,21 +1,101 @@
-import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import React, { useState } from 'react'
+import { useEffect } from 'react'
 import { Card, Button, Form } from 'react-bootstrap'
-import { fetchApi } from '../../data/Api'
 import Dropdown from 'react-bootstrap/Dropdown'
 
 export default function AccessControl() {
-  const [apiRows, setApiRows] = useState([])
+
+  const [selectedRole, setSelectedRole] = useState(null)
+
+  const [openMenu, setOpenMenu] = useState(null)
+
+  const toggleMenu = (menu) => {
+    setOpenMenu(openMenu === menu ? null : menu)
+  }
+
+
+
+  // api role counts
+  const [counts, setCounts] = useState([])
+
+  //save role permission
+  const [role_id, setRoleId] = useState(null);
+  const [role_permissions, setRolePermissions] = useState([]);
+
+
 
   useEffect(() => {
-    const rows = fetchApi()
-    setApiRows(rows)
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/admin/GetPositionCount")
+        setCounts(res.data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    fetchData()
   }, [])
 
-  const counts = apiRows.reduce((acc, r) => {
-    const level = r.Level || 'Unknown'
-    acc[level] = (acc[level] || 0) + 1
+
+
+
+  const countMap = counts.reduce((acc, item) => {
+    acc[item.role] = item.total
     return acc
   }, {})
+
+  // acc(accumulator) คือ ตัวที่เก็บผลลัพธ์ไว้เรื่อย ๆ เหมือนกล่องอ่ะ
+  // ใช้ reduce มารวม array ทุกอย่างไว้ แล้วแปลงเป็น object{} หนึ่งตัว(แต่ในนั้นมีข้อมูลหลายค่า) แล้วเก็บมันไว้ใน countmap
+
+  // กันงงนะ reduce = คนที่ "วน loop"
+  // acc = ของที่ "ค่อย ๆ ถูกสร้าง" 
+
+
+
+  const SaveRolePermissions = async () => {
+
+    if (!role_id) {
+      alert("กรุณาเลือกข้อมูล");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:5000/admin/SaveRolePermissions", {
+        role_id,
+        role_permissions
+      });
+
+      alert("บันทึกสำเร็จ");
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const GetRolePermissions = async (role_id) => {
+    try {
+      const res = await axios.get("http://localhost:5000/admin/GetRolePermissions", {
+        params: { role_id }
+      }
+      );
+
+      const ids = res.data.map(item => item.id_permission); //เอาแต่ id_permission ออกมา
+      setRolePermissions(ids); //setRolePermissions ด้วย ([1,2,3])
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    if (role_id) {
+      GetRolePermissions(role_id)
+    }
+  }, [role_id])
+
+
 
   return (
     <div
@@ -24,164 +104,390 @@ export default function AccessControl() {
         minHeight: '100vh',
         paddingBottom: '60px',
         width: '100vw',
-        height: '200vh',
       }}
     >
       {/* header */}
-      <div className="position-relative py-4">
-        <i
-          className="bi bi-chevron-left position-absolute"
-          style={{
-            color: '#FFFF',
-            fontSize: '30px',
-            left: '0',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            cursor: 'pointer'
-          }}
-        ></i>
+      <div className="py-4">
         <h1 className="fw-bold text-center m-4" style={{ color: '#FFFF' }}>
           Access Control System
         </h1>
       </div>
 
-      {/* content box */}
+      {/* content */}
       <div
         className="mx-auto mt-5"
         style={{
           width: '500px',
           backgroundColor: '#FFF',
           padding: '30px',
-          borderRadius: 12,
-          marginBottom: 30
+          borderRadius: 12
         }}
       >
-        {/* Control 1 */}
-        <div style={{ padding: '20px', borderRadius: 12, marginBottom: 40 }}>
 
-          <h3 className="mb-4" style={{ color: '#0A0043' }}>จัดการสิทธิ์การเข้าถึง</h3>
-          <hr className="mb-4" style={{ border: '1px solid #0A0043' }} />
+        <h3 className="mb-4" style={{ color: '#0A0043' }}>
+          จัดการสิทธิ์การเข้าถึง
+        </h3>
 
-          {[
-            { label: 'Admin', key: 'Admin' },
-            { label: 'Executive Level', key: 'Executive Level' },
-            { label: 'Management Level', key: 'Management Level' },
-            { label: 'Staff Level', key: 'Staff Level' }
-          ].map(({ label, key }) => (
 
-            <Card key={key} style={{ border: '5px solid #0A0043', borderRadius: 12 }} className="mb-3">
+        <Card className="mb-2">
+          <div className="p-2 d-flex justify-content-between align-items-center">
+            <span style={{ fontWeight: "bold" }}>Admin</span>
+            <span
+              style={{
+                backgroundColor: "#0A0043",
+                color: "#fff",
+                padding: "3px 20px",
+                borderRadius: "20px",
+                fontWeight: "bold"
+              }}
+            >{countMap["admin"] || 0}</span>
+          </div>
+        </Card>
 
-              <Card.Body className="d-flex justify-content-between align-items-center">
-                <div style={{ fontWeight: 600 }}>{label}</div>
-                <div style={{
-                  minWidth: 40,
-                  textAlign: 'right',
-                  backgroundColor: '#0A0043',
-                  color: '#FFF',
-                  borderRadius: 12,
-                  padding: '4px 8px'
-                }}>
-                  {counts[key] || 0} คน
-                </div>
-              </Card.Body>
+        <Card className="mb-2">
+          <div className="p-2 d-flex justify-content-between align-items-center">
+            <span style={{ fontWeight: "bold" }}>Super Admin</span>
+            <span
+              style={{
+                backgroundColor: "#0A0043",
+                color: "#fff",
+                padding: "3px 20px",
+                borderRadius: "20px",
+                fontWeight: "bold"
+              }}
+            >{countMap["super admin"] || 0}</span>
+          </div>
+        </Card>
+
+        <Card className="mb-2">
+          <div className="p-2 d-flex justify-content-between align-items-center">
+            <span style={{ fontWeight: "bold" }}>Approver</span>
+            <span
+              style={{
+                backgroundColor: "#0A0043",
+                color: "#fff",
+                padding: "3px 20px",
+                borderRadius: "20px",
+                fontWeight: "bold"
+              }}
+            >{countMap["approver"] || 0}</span>
+          </div>
+        </Card>
+
+        <Card className="mb-2">
+          <div className="p-2 d-flex justify-content-between align-items-center">
+            <span style={{ fontWeight: "bold" }}>User</span>
+            <span
+              style={{
+                backgroundColor: "#0A0043",
+                color: "#fff",
+                padding: "3px 20px",
+                borderRadius: "20px",
+                fontWeight: "bold"
+              }}
+            >{countMap["user"] || 0}</span>
+          </div>
+        </Card>
+
+        <hr />
+
+        {/* 🔥 ปุ่มเพิ่ม */}
+        <Dropdown className="mb-4">
+
+          <Dropdown.Toggle
+            style={{ backgroundColor: '#0A0043' }}
+            className="w-100"
+          >
+            <i className="bi bi-plus" /> เลือก
+          </Dropdown.Toggle>
+
+
+
+
+
+
+          <Dropdown.Menu className="w-100">
+            <Dropdown.Item
+              onClick={() => {
+                setSelectedRole('Admin')
+                setRoleId(3)
+                setRolePermissions([])
+              }}>
+              Admin
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => {
+              setSelectedRole('super admin')
+              setRoleId(4)
+              setRolePermissions([])
+            }}>
+              Super Admim
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => {
+              setSelectedRole('approver')
+              setRoleId(2)
+              setRolePermissions([])
+            }}>
+              Approver
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => {
+              setSelectedRole('user')
+              setRoleId(1)
+              setRolePermissions([])
+            }}>
+              User
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
+
+
+        {/* แสดงสิทธิ์เมื่อเลือก */}
+        {selectedRole && (
+          <div>
+
+            <h4 className="mb-3" style={{ color: '#0A0043' }}>
+              สิทธิ์การเข้าถึง - {selectedRole}
+            </h4>
+            {/* 🔹 Dashboard */}
+            <Card className="mb-2" >
+              <div className="p-2 text-white">
+
+                <Button
+                  variant="light"
+                  className="w-100"
+                  onClick={() => toggleMenu("dashboard")}
+                >
+                  Dashboard และรายงาน
+                </Button>
+
+                {openMenu === "dashboard" && (
+                  <div className="mt-2 bg-white text-dark p-2 rounded">
+                    <Form.Check
+                      label="ดู Dashboard"
+                      checked={role_permissions.includes(1)}
+                      onChange={(e) =>
+                        setRolePermissions(prev => //prev = ค่าเก่าของ role_permissions
+                          e.target.checked
+                            ? [...new Set([...prev, 1])]
+                            //ตอนติ๊ก (เพิ่ม)
+                            : prev.filter(id => id !== 1)
+                            //ตอนเอาติ๊กออก (ลบ)
+                        )
+                      }
+                    />
+
+                    <Form.Check label="ดูรายงานการเข้าออกของพนักงาน"
+                      checked={role_permissions.includes(2)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 2])]
+                            : prev.filter(id => id !== 2)
+                        )
+                      }
+                    />
+                  </div>
+                )}
+
+              </div>
             </Card>
 
-          ))}
 
-          <Dropdown>
 
-            <Dropdown.Toggle
-              style={{ backgroundColor: '#0A0043' }}
-              className="w-100 mb-4"
-              id="dropdown-basic"
-            >
-              <i className="bi bi-plus" /> เพิ่ม
-            </Dropdown.Toggle>
+            {/* พนักงาน */}
+            <Card className="mb-2">
+              <div className="p-2 text-white">
 
-            <Dropdown.Menu className="w-100 mb-4">
-              <Dropdown.Item>Admin</Dropdown.Item>
-              <Dropdown.Item>Executive Level</Dropdown.Item>
-              <Dropdown.Item>Management Level</Dropdown.Item>
-            </Dropdown.Menu>
+                <Button
+                  variant="light"
+                  className="w-100"
+                  onClick={() => toggleMenu("employee")}
+                >
+                  จัดการพนักงาน
+                </Button>
 
-          </Dropdown>
+                {openMenu === "employee" && (
+                  <div className="mt-2 bg-white text-dark p-2 rounded">
+                    <Form.Check
+                      label="ดูข้อมูลพนักงาน"
+                      checked={role_permissions.includes(3)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 3])]
+                            : prev.filter(id => id !== 3)
+                        )
+                      } />
+                    <Form.Check
+                      label="เพิ่มรายชื่อพนักงาน"
+                      checked={role_permissions.includes(4)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 4])]
+                            : prev.filter(id => id !== 4)
+                        )
+                      } />
+                    <Form.Check
+                      label="แก้ไขข้อมูลพนักงาน"
+                      checked={role_permissions.includes(5)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 5])]
+                            : prev.filter(id => id !== 5)
+                        )
+                      } />
+                    <Form.Check
+                      label="ลบรายชื่อพนักงาน"
+                      checked={role_permissions.includes(6)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 6])]
+                            : prev.filter(id => id !== 6)
+                        )
+                      } />
+                  </div>
+                )}
 
-        </div>
+              </div>
+            </Card>
 
-        {/* Control 2 */}
-        <div>
 
-          <h3 className="mb-4" style={{ color: '#0A0043' }}>สิทธิ์การเข้าถึง - Admin</h3>
-          <hr className="mb-4" style={{ border: '1px solid #0A0043' }} />
 
-          {[
-            {
-              title: 'Dashboard และ รายงาน',
-              items: [{ id: 'dashboard', label: 'ดู Dashboard และรายงาน' }]
-            },
-            {
-              title: 'จัดการพนักงาน',
-              items: [
-                { id: 'view', label: 'ดูข้อมูลพนักงาน' },
-                { id: 'edit', label: 'แก้ไขข้อมูล' },
-                { id: 'add', label: 'เพิ่มพนักงาน' },
-                { id: 'delete', label: 'ลบพนักงาน' }
-              ]
-            },
-            {
-              title: 'จัดการเวลาทำงาน',
-              items: [
-                { id: 'timeview', label: 'ดูบันทึกเวลา' },
-                { id: 'approve', label: 'อนุมัติการแก้ไข' },
-                { id: 'edittime', label: 'แก้ไขเวลาเข้าออก' },
-                { id: 'report', label: 'กำหนดค่ารายงาน' }
-              ]
-            },
-            {
-              title: 'ตั้งค่าระบบ',
-              items: [
-                { id: 'export', label: 'ส่งออกข้อมูล' },
-                { id: 'perm', label: 'กำหนดสิทธิ์' },
-                { id: 'gps', label: 'จัดการ GPS' },
-                { id: 'log', label: 'ดูบันทึก' }
-              ]
-            }
-          ].map((group) => (
 
-            <div key={group.title} className="mb-4">
+            {/* เวลา */}
+            <Card className="mb-2">
+              <div className="p-2 text-white">
 
-              <div className="d-flex justify-content-between align-items-center mb-2">
+                <Button
+                  variant="light"
+                  className="w-100"
+                  onClick={() => toggleMenu("time")}
+                >
+                  จัดการเวลาทำงาน
+                </Button>
 
-                <h5 style={{ color: '#0A0043' }}>
-                  <i className="bi bi-caret-right-fill" style={{ color: '#735BF2' }} /> {group.title}
-                </h5>
+                {openMenu === "time" && (
+                  <div className="mt-2 bg-white text-dark p-2 rounded">
+                    <Form.Check
+                      label="ดูบันทึกเวลาเข้าออกงาน"
+                      checked={role_permissions.includes(7)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 7])]
+                            : prev.filter(id => id !== 7)
+                        )
+                      } />
+                    <Form.Check
+                      label="อนุมัติการเข้าออกงาน"
+                      checked={role_permissions.includes(8)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 8])]
+                            : prev.filter(id => id !== 8)
+                        )
+                      } />
+                    <Form.Check
+                      label="แก้ไขเวลาเข้าออกงาน"
+                      checked={role_permissions.includes(9)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 9])]
+                            : prev.filter(id => id !== 9)
+                        )
+                      } />
+                  </div>
+                )}
 
-                <Button style={{ backgroundColor: '#0A0043', color: '#FFF' }}>เลือกทั้งหมด</Button>
+              </div>
+            </Card>
+
+
+
+            {/* ตั้งค่า */}
+            <Card className="mb-2" >
+              <div className="p-2 text-white">
+
+                <Button
+                  variant="light"
+                  className="w-100"
+                  onClick={() => toggleMenu("settings")}
+                >
+                  ตั้งค่าระบบ
+                </Button>
+
+                {openMenu === "settings" && (
+                  <div className="mt-2 bg-white text-dark p-2 rounded">
+                    <Form.Check
+                      label="ส่งออกข้อมูล"
+                      checked={role_permissions.includes(10)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 10])]
+                            : prev.filter(id => id !== 10)
+                        )
+                      }
+                    />
+                    <Form.Check
+                      label="กำหนดสิทธิ์การเข้าถึง"
+                      checked={role_permissions.includes(11)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 11])]
+                            : prev.filter(id => id !== 11)
+                        )
+                      } />
+                    <Form.Check
+                      label="จัดการ GPS"
+                      checked={role_permissions.includes(12)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 12])]
+                            : prev.filter(id => id !== 12)
+                        )
+                      } />
+                    <Form.Check
+                      label="ดูบันทึกระบบ"
+                      checked={role_permissions.includes(13)}
+                      onChange={(e) =>
+                        setRolePermissions(prev =>
+                          e.target.checked
+                            ? [...new Set([...prev, 13])]
+                            : prev.filter(id => id !== 13)
+                        )
+                      } />
+                  </div>
+                )}
 
               </div>
 
-              {group.items.map((item) => (
+            </Card>
 
-                <Card key={item.id} className="mb-2" style={{ backgroundColor: '#0A0043' }}>
-                  <Form className="ml-4" style={{ color: '#FFF' }}>
-                    <Form.Check type="checkbox" id={item.id} label={item.label} />
-                  </Form>
-                </Card>
 
-              ))}
 
+            {/* ปุ่ม save / cancel */}
+
+            <div className="d-flex justify-content-center mt-5 mb-3" style={{ gap: '150px' }}>
+              <Button
+                variant="success"
+                style={{ color: '#ffffff' }}
+                onClick={SaveRolePermissions}
+              > Save </Button>
+              <Button variant="danger" style={{ color: '#FFF' }} onClick={() => setSelectedRole(null)}> Cancel</Button>
             </div>
 
-          ))}
-        </div>
-
-        <div className="d-flex justify-content-center mt-5 mb-3" style={{ gap: '150px' }}>
-          <Button variant="light" style={{ color: '#0A0043' }}>บันทึก</Button>
-          <Button style={{ backgroundColor: '#0A0043', color: '#FFF' }}>ยกเลิก</Button>
-        </div>
+          </div>
+        )}
 
       </div>
-
     </div>
   )
 }

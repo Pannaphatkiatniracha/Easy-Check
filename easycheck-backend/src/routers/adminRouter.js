@@ -23,7 +23,10 @@ import {
   DeleteEvent,
   getDepartments,
   getEmployees,
-  sendNotification
+  sendNotification,
+  GetPositionCount ,
+  SaveRolePermissions ,
+  GetRolePermissions
 } from "../controllers/adminController.js";
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -203,6 +206,10 @@ router.get('/Event', getAllEvent)
 router.post('/CreateEvent', CreateEvent)
 router.patch('/EditEvent', EditEvent)
 router.delete('/DeleteEvent', DeleteEvent)
+router.get('/GetPositionCount', GetPositionCount)
+router.post('/SaveRolePermissions' , SaveRolePermissions)
+router.get('/GetRolePermissions' , GetRolePermissions)
+
 
 
 
