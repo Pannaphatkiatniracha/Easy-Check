@@ -1,16 +1,26 @@
 import pool from '../config/db.js'
 
 // ---------- ดึงสถานที่ทั้งหมด (สำหรับหน้า Admin) ----------
+// รองรับ query param ?branch_id= เพื่อกรองเฉพาะสาขาของ admin ที่ login อยู่
 export const getAllLocations = async (req, res) => {
   try {
-    // ดึงข้อมูลจากตาราง gps_locations แล้ว JOIN กับตาราง branch
-    // เพื่อให้ได้ชื่อสาขา (branch_name) ติดมาด้วย แทนที่จะได้แค่ branch_id
-    const [rows] = await pool.execute(
-      `SELECT g.*, b.name AS branch_name
-       FROM gps_locations g
-       JOIN branch b ON g.branch_id = b.id
-       ORDER BY g.branch_id, g.id`
-    )
+    const { branch_id } = req.query
+
+    // สร้าง SQL แบบ dynamic: ถ้าส่ง branch_id มา → WHERE กรองเฉพาะสาขานั้น
+    let sql = `SELECT g.*, b.name AS branch_name
+               FROM gps_locations g
+               JOIN branch b ON g.branch_id = b.id`
+    const params = []
+
+    // ป้องกันสตริง "undefined" ที่ frontend ส่งมาเมื่อ branch_id ไม่มีค่า
+    if (branch_id && branch_id !== 'undefined') {
+      sql += ` WHERE g.branch_id = ?`
+      params.push(branch_id)
+    }
+
+    sql += ` ORDER BY g.id`
+
+    const [rows] = await pool.execute(sql, params)
     res.json(rows)
   } catch (err) {
     res.status(500).json({ message: err.message })

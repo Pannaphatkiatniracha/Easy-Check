@@ -34,9 +34,6 @@ export default function GPSAdminDashboard() {
   const [locations, setLocations] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(true); // โหลด locations ครั้งแรก
 
-  // branches: ดึงจาก API GET /gps-locations/branches สำหรับ dropdown เลือกสาขา
-  const [branches, setBranches] = useState([]);
-
   // checkInLogs: ยังเป็น mock เพราะ attendance API ยังไม่เสร็จ (รอเพื่อนในทีม)
   const [checkInLogs] = useState([
     { id: 1, employee: 'สมชาย ใจดี', employeeId: 'EMP001', position: 'พนักงานช่าง', location: 'สำนักงานใหญ่', time: '08:30:00', date: '30/10/2025', lat: 13.7563, lng: 100.5018 },
@@ -84,17 +81,21 @@ export default function GPSAdminDashboard() {
     active: true
   });
 
-  // ดึง JWT token จาก localStorage สำหรับ Authorization header
+  // ดึง JWT token และข้อมูล admin จาก localStorage
   const token = localStorage.getItem('token');
+  // ดึง branch_id ของ admin ที่ login อยู่ เพื่อกรอง GPS เฉพาะสาขาของตัวเอง
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const adminBranchId = user?.branch_id;
 
   // ==========================================================
   // API CALLS — ดึงและจัดการข้อมูลจาก backend
   // ==========================================================
 
-  // ดึง GPS locations ทั้งหมดจาก DB (รวม branch_name ด้วย)
+  // ดึง GPS locations เฉพาะสาขาของ admin ที่ login อยู่
   const fetchLocations = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:5000/gps-locations', {
+      // ส่ง branch_id ของ admin ไปกรองให้เห็นเฉพาะสาขาตัวเอง
+      const res = await fetch(`http://localhost:5000/gps-locations?branch_id=${adminBranchId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('โหลดข้อมูลสถานที่ไม่สำเร็จ');
@@ -105,27 +106,12 @@ export default function GPSAdminDashboard() {
     } finally {
       setLoadingLocations(false);
     }
-  }, [token]);
-
-  // ดึงสาขาทั้งหมดสำหรับ dropdown ใน form
-  const fetchBranches = useCallback(async () => {
-    try {
-      const res = await fetch('http://localhost:5000/gps-locations/branches', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      setBranches(data);
-    } catch (err) {
-      console.error('โหลดสาขาไม่สำเร็จ:', err.message);
-    }
-  }, [token]);
+  }, [token, adminBranchId]);
 
   // โหลดข้อมูลเมื่อ component mount ครั้งแรก
   useEffect(() => {
     fetchLocations();
-    fetchBranches();
-  }, [fetchLocations, fetchBranches]);
+  }, [fetchLocations]);
 
   // ==========================================================
   // MAP EFFECTS — สร้าง/ทำลาย Leaflet map instances
@@ -363,7 +349,7 @@ export default function GPSAdminDashboard() {
     if (!formData.lat || isNaN(formData.lat)) errors.lat = 'กรุณาเลือกตำแหน่งบนแผนที่';
     if (!formData.lng || isNaN(formData.lng)) errors.lng = 'กรุณาเลือกตำแหน่งบนแผนที่';
     if (!formData.radius || formData.radius < 10) errors.radius = 'รัศมีต้องมากกว่า 10 เมตร';
-    if (!formData.branch_id) errors.branch_id = 'กรุณาเลือกสาขา'; // ตรวจสอบ branch_id
+    // branch_id ไม่ต้อง validate เพราะ set อัตโนมัติจาก adminBranchId
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -389,7 +375,8 @@ export default function GPSAdminDashboard() {
         lat: parseFloat(formData.lat),
         lng: parseFloat(formData.lng),
         radius: parseInt(formData.radius),
-        branch_id: parseInt(formData.branch_id)
+        // ใช้ adminBranchId โดยตรง ไม่ต้องให้ admin เลือกเอง
+        branch_id: parseInt(adminBranchId)
       };
 
       if (modalType === 'add') {
@@ -497,18 +484,18 @@ export default function GPSAdminDashboard() {
         lat: location.lat,
         lng: location.lng,
         radius: location.radius,
-        branch_id: location.branch_id || '',
+        branch_id: adminBranchId, // ใช้ branch ของ admin เสมอ
         active: location.active
       });
     } else {
-      // กรณีเพิ่มใหม่: เคลียร์ form
+      // กรณีเพิ่มใหม่: เคลียร์ form และ set branch_id อัตโนมัติ
       setFormData({
         name: '',
         address: '',
         lat: '',
         lng: '',
         radius: 100,
-        branch_id: '',
+        branch_id: adminBranchId, // ใช้ branch ของ admin เสมอ
         active: true
       });
     }
@@ -575,16 +562,8 @@ export default function GPSAdminDashboard() {
     return [...new Set(checkInLogs.map(log => log.location))];
   }, [checkInLogs]);
 
-  // สถิติสรุป: จำนวน log ทั้งหมด, วันนี้, เดือนนี้
-  const stats = useMemo(() => {
-    return {
-      total: filteredLogs.length,
-      today: filteredLogs.filter(l => l.date === '30/10/2025').length,
-      thisMonth: filteredLogs.length,
-    };
-  }, [filteredLogs]);
-
   // กรอง checkInLogs ตาม searchTerm และ filters
+  // ต้องประกาศก่อน stats เพราะ stats ใช้ filteredLogs
   const filteredLogs = useMemo(() => {
     let result = [...checkInLogs];
 
@@ -622,6 +601,15 @@ export default function GPSAdminDashboard() {
 
     return result;
   }, [checkInLogs, searchTerm, filters]);
+
+  // สถิติสรุป: จำนวน log ทั้งหมด, วันนี้, เดือนนี้ (ประกาศหลัง filteredLogs)
+  const stats = useMemo(() => {
+    return {
+      total: filteredLogs.length,
+      today: filteredLogs.filter(l => l.date === '30/10/2025').length,
+      thisMonth: filteredLogs.length,
+    };
+  }, [filteredLogs]);
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
@@ -894,100 +882,99 @@ export default function GPSAdminDashboard() {
         ) : (
           /* ===== TAB: ตั้งค่าสถานที่ ===== */
           <div>
-            <div className="flex justify-end mb-6">
-              <button onClick={() => openModal('add')} className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer">
-                <Plus size={20} />
-                เพิ่มสถานที่
-              </button>
-            </div>
-
-            {/* Loading state สำหรับโหลด locations ครั้งแรก */}
             {loadingLocations ? (
-              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
-                <span className="font-medium">กำลังโหลดสถานที่...</span>
+              /* กำลังโหลด */
+              <div className="flex items-center justify-center py-20">
+                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
               </div>
             ) : locations.length === 0 ? (
-              // ไม่มีสถานที่ใน DB
-              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                <MapPin size={48} className="mb-4 text-gray-300" />
-                <h3 className="text-lg font-bold text-gray-500 mb-1">ยังไม่มีสถานที่</h3>
-                <p className="text-sm">กดปุ่ม "เพิ่มสถานที่" เพื่อเริ่มต้น</p>
+              /* ยังไม่มีจุดเช็คอินสำหรับสาขานี้ */
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-12 flex flex-col items-center text-center gap-6">
+                <div className="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center">
+                  <MapPin size={40} className="text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">ยังไม่มีจุดเช็คอินสำหรับสาขานี้</h3>
+                  <p className="text-gray-500 text-sm">กรุณาตั้งค่าพิกัดสำหรับให้พนักงานในสาขาของคุณเช็คอิน</p>
+                </div>
+                <button
+                  onClick={() => openModal('add')}
+                  className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg border-none cursor-pointer"
+                >
+                  <Plus size={20} />
+                  ตั้งค่าจุดเช็คอิน
+                </button>
               </div>
             ) : (
-              /* Location Cards Grid */
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {locations.map((location) => (
-                  <div key={location.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
-                    {/* Card Header */}
-                    <div className="p-6 border-b border-gray-50 flex gap-4 items-start bg-gradient-to-b from-gray-50 to-white">
-                      <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">
-                        <MapPin size={24} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-gray-800 m-0 truncate group-hover:text-indigo-600 transition-colors">{location.name}</h3>
-                        {/* แสดงชื่อสาขา (branch_name มาจาก JOIN ใน getAllLocations) */}
-                        {location.branch_name && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-md mt-1">
-                            {location.branch_name}
+              /* มี location อยู่แล้ว: แสดง single card */
+              (() => {
+                const loc = locations[0];
+                return (
+                  <div className="max-w-2xl">
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                      {/* Card Header */}
+                      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                              <MapPin size={24} />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold m-0">{loc.name}</h3>
+                              <p className="text-indigo-100 text-sm mt-1 m-0">{loc.branch_name}</p>
+                            </div>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${loc.active ? 'bg-emerald-500/30 text-emerald-100 border border-emerald-400/40' : 'bg-gray-500/30 text-gray-100 border border-gray-400/40'}`}>
+                            {loc.active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                           </span>
-                        )}
-                        {/* Badge แสดงสถานะเปิด/ปิด */}
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold mt-2 border ${location.active ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${location.active ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
-                          {location.active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
-                        </span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Card Body - ข้อมูลสถานที่ */}
-                    <div className="p-6 flex-1 flex flex-col gap-3 text-sm text-gray-600">
-                      <div className="flex gap-2">
-                        <MapPin size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">{location.address}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Navigation size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
-                        <span className="font-mono">{location.lat}, {location.lng}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Locate size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
-                        <span>รัศมี <strong className="text-gray-800">{location.radius}</strong> เมตร</span>
-                      </div>
-                    </div>
+                      {/* Card Body */}
+                      <div className="p-6 flex flex-col gap-4">
+                        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                          <Navigation size={18} className="text-indigo-500 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 mb-1">ที่อยู่</p>
+                            <p className="text-sm text-gray-700 m-0 leading-relaxed">{loc.address || '-'}</p>
+                          </div>
+                        </div>
 
-                    {/* Card Footer - ปุ่มจัดการ (แก้ไข, เปิด/ปิด, ลบ) */}
-                    <div className="p-4 border-t border-gray-50 bg-gray-50/80 flex gap-2">
-                      {/* ปุ่มแก้ไข */}
-                      <button
-                        onClick={() => openModal('edit', location)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white rounded-xl font-bold transition-all cursor-pointer"
-                      >
-                        <Edit size={16} />
-                        แก้ไข
-                      </button>
-                      {/* ปุ่มเปิด/ปิด (toggle active) */}
-                      <button
-                        onClick={() => handleToggleLocation(location.id)}
-                        title={location.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
-                        className={`flex items-center justify-center gap-2 px-4 py-2.5 border-2 rounded-xl font-bold transition-all cursor-pointer ${location.active
-                          ? 'bg-white border-amber-100 text-amber-500 hover:bg-amber-500 hover:border-amber-500 hover:text-white'
-                          : 'bg-white border-emerald-100 text-emerald-500 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white'
-                        }`}
-                      >
-                        <Power size={16} />
-                      </button>
-                      {/* ปุ่มลบ */}
-                      <button
-                        onClick={() => handleDeleteLocation(location.id)}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-rose-100 text-rose-500 hover:bg-rose-500 hover:border-rose-500 hover:text-white rounded-xl font-bold transition-all cursor-pointer"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-indigo-50 rounded-xl text-center">
+                            <p className="text-xs font-bold text-indigo-500 mb-1">พิกัด (Lat, Lng)</p>
+                            <p className="text-sm font-mono text-indigo-700 m-0">{parseFloat(loc.lat).toFixed(5)}</p>
+                            <p className="text-sm font-mono text-indigo-700 m-0">{parseFloat(loc.lng).toFixed(5)}</p>
+                          </div>
+                          <div className="p-4 bg-purple-50 rounded-xl text-center">
+                            <p className="text-xs font-bold text-purple-500 mb-1">รัศมีเช็คอิน</p>
+                            <p className="text-2xl font-extrabold text-purple-700 m-0">{loc.radius}</p>
+                            <p className="text-xs text-purple-500 m-0">เมตร</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Footer */}
+                      <div className="p-6 border-t border-gray-100 flex gap-3">
+                        <button
+                          onClick={() => openModal('edit', loc)}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all border-none cursor-pointer"
+                        >
+                          <Edit size={18} />
+                          แก้ไข
+                        </button>
+                        <button
+                          onClick={() => handleToggleLocation(loc.id)}
+                          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all border-none cursor-pointer ${loc.active ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                        >
+                          <Power size={18} />
+                          {loc.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })()
             )}
           </div>
         )}
@@ -1022,23 +1009,6 @@ export default function GPSAdminDashboard() {
                   placeholder="เช่น สำนักงานใหญ่"
                 />
                 {formErrors.name && <span className="text-xs font-bold text-rose-500 mt-1">{formErrors.name}</span>}
-              </div>
-
-              {/* Dropdown เลือกสาขา (ดึงจาก API) */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700">สาขา <span className="text-rose-500">*</span></label>
-                <select
-                  name="branch_id"
-                  value={formData.branch_id}
-                  onChange={handleInputChange}
-                  className={`px-4 py-3 bg-gray-50 border ${formErrors.branch_id ? 'border-rose-300 focus:ring-rose-500' : 'border-gray-200 focus:ring-indigo-500'} rounded-xl focus:outline-none focus:ring-2 focus:bg-white font-medium transition-colors w-full cursor-pointer`}
-                >
-                  <option value="">-- เลือกสาขา --</option>
-                  {branches.map(b => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
-                {formErrors.branch_id && <span className="text-xs font-bold text-rose-500 mt-1">{formErrors.branch_id}</span>}
               </div>
 
               {/* ปุ่มเลือกพิกัดจากแผนที่ */}
