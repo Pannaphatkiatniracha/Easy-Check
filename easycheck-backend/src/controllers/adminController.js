@@ -36,7 +36,7 @@ export const loginAdmin = async (req, res) => {
 
         // สร้าง token (เปลี่ยน role -> position)
         const token = jwt.sign(
-            { id: admin.id, position: admin.position },
+            { id: admin.id, position: admin.position, branch: admin.branch },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         )
@@ -47,7 +47,8 @@ export const loginAdmin = async (req, res) => {
             user: {
                 id: admin.id,
                 full_name: admin.full_name,
-                position: admin.position
+                position: admin.position,
+                branch: admin.branch 
             }
         })
 
