@@ -4,9 +4,20 @@ import pool from '../config/db.js'
 //ส่งการแจ้งเตือน
 export const getDepartments = async (req, res) => {
     try {
-        const [rows] = await pool.execute(
-            `SELECT DISTINCT department FROM Users WHERE department IS NOT NULL ORDER BY department`
-        )
+        const adminBranch = req.user.branch
+
+        let query = `SELECT DISTINCT department FROM Users WHERE department IS NOT NULL`
+        let params = []
+
+        // ถ้าไม่ใช่ superadmin → กรองตามสาขา
+        if (adminBranch) {
+            query += ` AND branch = ?`
+            params.push(adminBranch)
+        }
+
+        query += ` ORDER BY department`
+
+        const [rows] = await pool.execute(query, params)
         res.json(rows.map(row => ({ id: row.department, name: row.department })))
     } catch (err) {
         console.error(err)
@@ -16,13 +27,24 @@ export const getDepartments = async (req, res) => {
 
 export const getEmployees = async (req, res) => {
     const { department } = req.query
+    const adminBranch = req.user.branch
+
     try {
         let query = `SELECT id, id_employee, firstname, lastname, position, department, avatar FROM Users WHERE role_id IN (1, 2)`
         let params = []
+
+        // กรองตามสาขาของ admin
+        if (adminBranch) {
+            query += ` AND branch = ?`
+            params.push(adminBranch)
+        }
+
+        // กรองตามแผนก (ถ้าเลือก)
         if (department) {
             query += ` AND department = ?`
             params.push(department)
         }
+
         const [rows] = await pool.execute(query, params)
         res.json(rows)
     } catch (err) {
