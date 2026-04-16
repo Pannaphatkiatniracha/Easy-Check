@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 12, 2026 at 08:34 AM
+-- Generation Time: Apr 16, 2026 at 01:21 PM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -42,6 +42,13 @@ CREATE TABLE `attendance` (
   `approval_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'approved',
   `location_id` int DEFAULT NULL COMMENT 'อ้างอิง gps_locations.id (ไม่ใช่ FK)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `attendance`
+--
+
+INSERT INTO `attendance` (`id`, `id_employee`, `shift_id`, `work_date`, `check_in_time`, `check_in_photo`, `check_in_status`, `check_out_time`, `check_out_photo`, `check_out_status`, `early_leave_reason`, `approval_status`, `location_id`) VALUES
+(2, '303031', 2, '2026-04-16', '2026-04-16 09:22:22', 'uploads\\attendance\\attendance-303031-1776331342166-330107359.jpg', 'late', NULL, NULL, NULL, NULL, 'approved', 5);
 
 -- --------------------------------------------------------
 
@@ -156,11 +163,11 @@ CREATE TABLE `gps_locations` (
 --
 
 INSERT INTO `gps_locations` (`id`, `name`, `address`, `lat`, `lng`, `radius`, `branch_id`, `active`, `created_at`) VALUES
-(1, 'บริษัท ศรีปทุม จำกัด (สำนักงานใหญ่ กรุงเทพฯ)\r\nSripatum Co., Ltd. (Head Office - Bangkok)', '2410 2 Phahonyothin Rd, Sena Nikhom, Chatuchak, Bangkok 10900', 13.8558796, 100.5855061, 100, 1, 1, '2026-04-11 19:55:49'),
-(2, 'บริษัท ศรีปทุม จำกัด (สาขาเชียงใหม่)\r\nSripatum Co., Ltd. (Chiang Mai Branch)', '99 9 Huay Kaew Rd, Chang Phueak, Mueang Chiang Mai, Chiang Mai 50300', 13.8728345, 100.6226486, 100, 2, 1, '2026-04-11 20:28:45'),
-(3, 'บริษัท ศรีปทุม จำกัด (สาขาภูเก็ต)\r\nSripatum Co., Ltd. (Phuket Branch)', '128 3 Rat-U-Thit 200 Pee Rd, Patong, Kathu, Phuket 83150', 13.7562150, 100.4189270, 100, 3, 1, '2026-04-11 20:28:45'),
-(4, 'บริษัท ศรีปทุม จำกัด (สาขาชลบุรี)\r\nSripatum Co., Ltd. (Chonburi Branch)', '88 88 Sukhumvit Rd, Bang Lamung, Chonburi 20150', 13.0005000, 100.9155000, 100, 4, 1, '2026-04-11 20:30:31'),
-(5, 'บริษัท ศรีปทุม จำกัด (สาขาขอนแก่น)\r\nSripatum Co., Ltd. (Khon Kaen Branch)', '555 5 Mittraphap Rd, Nai Mueang, Mueang Khon Kaen, Khon Kaen 40000', 16.4322000, 102.8236000, 100, 5, 1, '2026-04-11 20:30:31');
+(1, 'บริษัท ศรีปทุม จำกัด (สำนักงานใหญ่ กรุงเทพฯ)\r\nSripatum Co., Ltd. (Head Office - Bangkok)', '2410 2 Phahonyothin Rd, Sena Nikhom, Chatuchak, Bangkok 10900', 13.8558796, 100.5855061, 160, 1, 0, '2026-04-11 19:55:49'),
+(2, 'บริษัท ศรีปทุม จำกัด (สาขาเชียงใหม่)\r\nSripatum Co., Ltd. (Chiang Mai Branch)', '99 9 Huay Kaew Rd, Chang Phueak, Mueang Chiang Mai, Chiang Mai 50300', 13.8728345, 100.6226486, 100, 2, 0, '2026-04-11 20:28:45'),
+(3, 'บริษัท ศรีปทุม จำกัด (สาขาภูเก็ต)\r\nSripatum Co., Ltd. (Phuket Branch)', '128 3 Rat-U-Thit 200 Pee Rd, Patong, Kathu, Phuket 83150', 13.7562150, 100.4189270, 100, 3, 0, '2026-04-11 20:28:45'),
+(4, 'บริษัท ศรีปทุม จำกัด (สาขาชลบุรี)\r\nSripatum Co., Ltd. (Chonburi Branch)', '88 88 Sukhumvit Rd, Bang Lamung, Chonburi 20150', 13.0005000, 100.9155000, 170, 4, 0, '2026-04-11 20:30:31'),
+(5, 'บริษัท ศรีปทุม จำกัด (สาขาขอนแก่น)\r\nSripatum Co., Ltd. (Khon Kaen Branch)', 'Soi Ram Inthra 65 Yaek 2-18-2, Tha Raeng Subdistrict, Bang Khen District, Bangkok, 10220, Thailand', 13.8563442, 100.6549839, 100, 5, 1, '2026-04-11 20:30:31');
 
 -- --------------------------------------------------------
 
@@ -321,7 +328,7 @@ INSERT INTO `Users` (`id`, `id_employee`, `role_id`, `firstname`, `lastname`, `g
 (106, '030303', 1, 'Valentin', 'Sinclair', 'male', '2005-01-19', '2026-04-02', 'Approver', 'Finance', 'Valentin741@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0368794456', 'https://i.pinimg.com/736x/ad/e3/0c/ade30c662d92b862c67a9902384f9e98.jpg', 1, 3),
 (109, '323232', 1, 'Hyewon', 'Shim', 'other', '2004-03-20', '2026-04-06', 'Budgeting & Planning Officer', 'Finance', 'princessbell@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0812345678', 'https://i.pinimg.com/736x/a1/f8/e9/a1f8e96f6bb7fde4f7e730381032574b.jpg', 3, 5),
 (110, '333333', 1, 'Haneul', 'Won', 'other', '2005-05-25', '2026-04-03', 'Content Creator', 'Creative', 'bobsky@gmail.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0857486793', 'https://i.pinimg.com/736x/ac/2d/5f/ac2d5f458f05bcf8593d952f193b6c00.jpg', 1, 5),
-(111, '343434', 3, 'Dechawat', 'Pondechapiphat', 'male', '2006-04-18', '2026-04-07', 'Payroll Specialist', 'IT', 'copper.cu@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0812345678', 'https://i.pinimg.com/736x/35/38/7c/35387cea6cca6db614f419018c1c79ac.jpg', 3, 1),
+(111, '343434', 3, 'Dechawat', 'Pondechapiphat', 'male', '2006-04-18', '2026-04-07', 'Admin', 'IT', 'copper.cu@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0812345678', 'https://i.pinimg.com/736x/35/38/7c/35387cea6cca6db614f419018c1c79ac.jpg', 3, 1),
 (112, '353535', 3, 'Mark', 'Lee', 'male', '1999-08-02', '2026-04-07', 'Admin', 'Creative', 'onyourmark@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0878901234', 'https://i.pinimg.com/736x/c2/82/dc/c282dc23b0a49d3a6ec3b9c392788027.jpg', 3, 2),
 (121, '363636', 3, 'Jacqueline', 'Muench', 'other', '1993-10-21', '2026-04-07', 'Admin', 'Creative', 'jackie@easycheck.com', '$2b$10$PN1/D5XmKbogOZJwhN9YROzcYKS7yytq1GGbdXCCHvOdQaa2szF5a', '0812345678', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPqwLHAYXWU4aPlT5eWFWIwWGBykbLOx49Qw&s', 2, 3);
 
@@ -345,7 +352,9 @@ INSERT INTO `User_shifts` (`role_id`, `shift_id`, `id`) VALUES
 (1, 1, 1),
 (1, 1, 2),
 (1, 3, 16),
-(1, 1, 27);
+(1, 1, 27),
+(1, 3, 12),
+(1, 2, 30);
 
 --
 -- Indexes for dumped tables
@@ -441,7 +450,7 @@ ALTER TABLE `User_shifts`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `branch`
@@ -465,7 +474,7 @@ ALTER TABLE `event_registrations`
 -- AUTO_INCREMENT for table `gps_locations`
 --
 ALTER TABLE `gps_locations`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `leave_policy`
