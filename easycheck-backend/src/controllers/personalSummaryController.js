@@ -4,22 +4,17 @@ import pool from '../config/db.js'
 // ฟังก์ชันสำหรับดึงข้อมูลพนักงานทั้งหมด (กรองเฉพาะสาขาของ admin ที่ login)
 export const getAllEmployees = async (req, res) => {
   try {
-    const userId = req.user.id
+    const branch_id = req.user.branch_id
+    if (!branch_id) return res.status(400).json({ success: false, message: 'Admin token missing branch_id' })
 
-    // ดึง branch_id ของ admin ที่ login
-    const [[currentUser]] = await pool.query(
-      `SELECT branch_id FROM Users WHERE id = ?`,
-      [userId]
-    )
-
-    // กรองพนักงานเฉพาะสาขาเดียวกันกับ admin เสมอ
     const [rows] = await pool.query(
       `SELECT u.id, u.id_employee, u.firstname, u.lastname, u.email, u.phone,
        u.position, u.department, b.name AS branch, u.joindate, u.avatar
        FROM Users u
        LEFT JOIN branch b ON u.branch_id = b.id
-       WHERE u.branch_id = ?`,
-      [currentUser.branch_id]
+       WHERE u.role_id IN (1, 2)
+       AND u.branch_id = ?`,
+      [branch_id]
     )
 
     res.json({ success: true, data: rows })
