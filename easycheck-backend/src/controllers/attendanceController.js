@@ -44,9 +44,9 @@ const calcTimeStatus = (currentTimeStr, shiftTimeStr, type) => {
 const getUserShift = async (primaryId) => {
   const [rows] = await pool.query(
     `SELECT s.shift_id, s.start_time, s.end_time
-     FROM User_shifts us
-     JOIN Shifts s ON us.shift_id = s.shift_id
-     WHERE us.id = ? 
+     FROM Users u
+     JOIN Shifts s ON u.shift_id = s.shift_id
+     WHERE u.id = ?
      LIMIT 1`,
     [primaryId]
   );
