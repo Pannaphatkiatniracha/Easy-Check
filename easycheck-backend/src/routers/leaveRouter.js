@@ -7,7 +7,10 @@ import {
   getPendingLeaves,
   approveLeave,
   rejectLeave,
-} from "../controllers/leaveController.js"; // เช็ค path ตรงนี้ให้ตรงกับโฟลเดอร์ของคุณด้วยนะ
+} from "../controllers/leaveController.js"; // เช็ค path ตรงนี้ให้ตรงกับโฟลเดอร์ของกุค่า
+
+// เพิ่ม Import verifyToken เข้ามา (แก้ไข path ให้ตรงกับที่เก็บไฟล์ middleware )
+import { verifyToken } from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 
@@ -18,8 +21,8 @@ router.get("/history", getLeaveHistory);
 router.get("/balance", getLeaveBalance);
 
 /* APPROVER */
-router.get("/pending", getPendingLeaves);
-router.put("/:id/approve", approveLeave);
-router.put("/:id/reject", rejectLeave);
+router.get("/pending", verifyToken, getPendingLeaves);
+router.put("/:id/approve", verifyToken, approveLeave);
+router.put("/:id/reject", verifyToken, rejectLeave);
 
 export default router;
