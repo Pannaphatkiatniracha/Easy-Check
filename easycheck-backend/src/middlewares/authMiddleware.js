@@ -1,5 +1,12 @@
 import jwt from 'jsonwebtoken'
 
+// ใช้ใน admin controllers เพื่อกรองข้อมูลเฉพาะสาขาของ admin ที่ login
+export const branchFilter = (req, alias = 'u') => {
+    const { branch_id } = req.user
+    if (!branch_id) throw new Error('Admin token missing branch_id')
+    return { clause: `AND ${alias}.branch_id = ?`, params: [branch_id] }
+}
+
 export const verifyToken = (req, res, next) => {
     // Extract token from the authorization header
     const authHeader = req.headers.authorization
