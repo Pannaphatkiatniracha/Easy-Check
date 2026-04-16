@@ -199,10 +199,6 @@ function CheckOut() {
     const formData = new FormData();
     formData.append("photo", photo);
 
-    //เพิ่มขึ้นมา 😘ส่งพิกัดของผู้ใช้ไปให้ backend บันทึกลงคอลัมน์ check_out_lat / check_out_lng
-    formData.append("lat", location.lat);
-    formData.append("lng", location.lng);
-
     if (userId) formData.append("userId", userId);
     if (overrideReason) formData.append("reason", overrideReason);
 
