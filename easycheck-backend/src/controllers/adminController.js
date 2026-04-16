@@ -34,9 +34,9 @@ export const loginAdmin = async (req, res) => {
             return res.status(401).json({ message: "Password incorrect" })
         }
 
-        // สร้าง token (เปลี่ยน role -> position)
+        // สร้าง token
         const token = jwt.sign(
-            { id: admin.id, position: admin.position, branch: admin.branch },
+            { id: admin.id, position: admin.position, role_id: admin.role_id, branch_id: admin.branch_id },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         )
@@ -46,9 +46,10 @@ export const loginAdmin = async (req, res) => {
             token,
             user: {
                 id: admin.id,
-                full_name: admin.full_name,
+                full_name: `${admin.firstname} ${admin.lastname}`,
                 position: admin.position,
-                branch: admin.branch 
+                branch_id: admin.branch_id,
+                role_id: admin.role_id
             }
         })
 
@@ -231,6 +232,95 @@ export const resetAdminPassword = async (req, res) => {
         res.status(500).json({ message: "เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน" });
     }
 };
+
+// dashboard วันนี้ — กรองเฉพาะสาขาของ admin ที่ login
+export const getDashboardToday = async (req, res) => {
+    try {
+        const branch_id = req.user.branch_id
+        if (!branch_id) return res.status(400).json({ message: 'Admin token missing branch_id' })
+
+        const [rows] = await pool.query(
+            `SELECT
+                u.id_employee, u.firstname, u.lastname,
+                u.position, u.department, u.avatar,
+                s.start_time AS shift_start, s.end_time AS shift_end,
+                a.check_in_time, a.check_out_time, a.check_in_status,
+                lr.id AS leave_id, lr.leave_reasons
+            FROM Users u
+            LEFT JOIN Shifts s ON s.shift_id = u.shift_id
+            LEFT JOIN attendance a
+                ON a.id_employee = u.id_employee AND a.work_date = CURDATE()
+            LEFT JOIN leave_requests lr
+                ON lr.id_employee = u.id_employee
+                AND lr.status = 'approved'
+                AND CURDATE() BETWEEN lr.leave_start AND lr.leave_end
+            WHERE u.role_id IN (1, 2)
+            AND u.branch_id = ?
+            ORDER BY u.department, u.firstname`,
+            [branch_id]
+        )
+
+        const formatTime = (dt) => dt ? new Date(dt).toTimeString().slice(0, 5) : null
+
+        const employees = rows.map(row => {
+            let overallStatus = 'ขาด'
+            if (row.check_in_time) {
+                overallStatus = row.check_in_status === 'late' ? 'สาย' : 'ปกติ'
+            } else if (row.leave_id) {
+                overallStatus = 'ลา'
+            }
+
+            let leaveReasons = null
+            if (row.leave_reasons) {
+                try { leaveReasons = typeof row.leave_reasons === 'string' ? JSON.parse(row.leave_reasons) : row.leave_reasons } catch (e) {}
+            }
+
+            return {
+                id_employee: row.id_employee,
+                firstname: row.firstname,
+                lastname: row.lastname,
+                position: row.position,
+                department: row.department,
+                avatar: row.avatar,
+                checkInTime: formatTime(row.check_in_time),
+                checkOutTime: formatTime(row.check_out_time),
+                checkInStatus: row.check_in_status,
+                overallStatus,
+                leaveReasons,
+                shiftStart: row.shift_start ? String(row.shift_start).slice(0, 5) : null,
+                shiftEnd: row.shift_end ? String(row.shift_end).slice(0, 5) : null
+            }
+        })
+
+        const present = employees.filter(e => e.overallStatus === 'ปกติ' || e.overallStatus === 'สาย').length
+        const late = employees.filter(e => e.overallStatus === 'สาย').length
+        const absent = employees.filter(e => e.overallStatus === 'ขาด').length
+        const onLeave = employees.filter(e => e.overallStatus === 'ลา').length
+        const notCheckedOut = employees.filter(e => e.checkInTime && !e.checkOutTime).length
+
+        const deptMap = {}
+        employees.forEach(e => {
+            if (!deptMap[e.department]) {
+                deptMap[e.department] = { department: e.department, total: 0, present: 0, late: 0, absent: 0, onLeave: 0 }
+            }
+            deptMap[e.department].total++
+            if (e.overallStatus === 'ปกติ') deptMap[e.department].present++
+            else if (e.overallStatus === 'สาย') { deptMap[e.department].present++; deptMap[e.department].late++ }
+            else if (e.overallStatus === 'ขาด') deptMap[e.department].absent++
+            else if (e.overallStatus === 'ลา') deptMap[e.department].onLeave++
+        })
+
+        res.json({
+            summary: { present, late, absent, onLeave, notCheckedOut, total: employees.length },
+            employees,
+            departmentStats: Object.values(deptMap)
+        })
+
+    } catch (err) {
+        console.error('getDashboardToday error:', err)
+        res.status(500).json({ message: err.message })
+    }
+}
 
 //ส่งการแจ้งเตือน
 export const getDepartments = async (req, res) => {
