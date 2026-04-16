@@ -150,8 +150,12 @@ const WorkHoursTracker = ({ role }) => {
                     ID: {employeeData ? employeeData.employeeId : userProfile.userid}
                 </div>
                 {(employeeData?.shift || userProfile.shift) && (
-                    <div className="text-sm text-warning text-center mt-2 fw-bold">
-                        Shift: {employeeData ? employeeData.shift : userProfile.shift}
+                    <div className="relative backdrop-blur-xl rounded-[40px] shadow-2xl
+                         mt-3 px-8 flex items-center justify-center h-12"
+                         style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+                        <span className="font-bold text-black tracking-wide">
+                            🕐 Shift: {employeeData ? employeeData.shift : userProfile.shift}
+                        </span>
                     </div>
                 )}
             </div>

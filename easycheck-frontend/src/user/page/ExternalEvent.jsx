@@ -66,102 +66,111 @@ const ExternalEvent = () => {
         <div className='app-container'>
 
             {/* หัวข้อ + icon */}
-            <div className="d-flex justify-content-between text-white mt-16">
+            <div className="d-flex justify-content-between align-items-center text-white mt-16 px-4">
                 <Link to="/event" className='text-decoration-none'>
-                    <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-white"></i>
+                    <Button variant="link" className="p-0 border-0">
+                        <i className="bi bi-chevron-left fs-4 text-white"></i>
                     </Button>
                 </Link>
 
-                <h3 className="text-white text-center fw-bold">Corporate <br /> External event</h3>
-                <div className="me-4"></div>
+                <h3 className="text-white text-center fw-bold mb-0">Corporate <br /> External event</h3>
+                <div style={{ width: '24px' }}></div> {/* Spacer เพื่อให้หัวข้ออยู่กลางเป๊ะ */}
             </div>
 
             {/* หัวข้อ + กล่องงาน event */}
-            <div className="mt-4 px-3">
+            <div className="mt-5 px-3">
                 {exevents.map((exevent) => {
                     const canRegisterNow = canRegister(exevent.register_start, exevent.register_end) // เอาวันที่เปิดลงทะเบียนกับวันที่ปิดมาคำนวณใน canRegister
                     const isUpcoming = isEventUpcoming(exevent.event_date)
 
                     return (
-                        <Card key={exevent.id} className="mb-3 rounded-3 text-black hover:scale-105 transition-all duration-200 ease-in-out"
-                            style={{ backgroundColor: '#D9D9D9', opacity: isUpcoming ? 1 : 0.6 }}>
+                        <Card key={exevent.id} className="mb-4 border-0 shadow-lg transform transition-all duration-300 hover:-translate-y-1"
+                            style={{ 
+                                borderRadius: '30px',
+                                background: 'linear-gradient(145deg, #ffffff, #e6e6e6)',
+                                opacity: isUpcoming ? 1 : 0.7 
+                            }}>
 
-                            <Card.Body className="p-3">
-                                <div className="d-flex align-items-start">
+                            <Card.Body className="p-4">
+                                <div className="d-flex align-items-start mb-3">
 
                                     {/* icon ใหญ่ */}
-                                    <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle"
-                                        style={{ width: '45px', height: '45px', backgroundColor: 'white', opacity: 0.9 }}>
-                                        <i className={`bi ${exevent.icon || 'bi-calendar-event'} fs-5 text-[#6D29F6]`}></i>
+                                    <div className="me-3 flex-shrink-0 d-flex align-items-center justify-content-center rounded-4 shadow-sm"
+                                        style={{ width: '55px', height: '55px', backgroundColor: '#636CCB', color: 'white' }}>
+                                        <i className={`bi ${exevent.icon || 'bi-calendar-event'} fs-4`}></i>
                                     </div>
 
-                                    {/* เนื้อหา */}
+                                    {/* เนื้อหาข้างบน */}
                                     <div className="flex-grow-1">
 
                                         {/* ชื่ออีเว้น */}
-                                        <Card.Title className="h6 mb-2">
-                                            <b>{exevent.title}</b>
+                                        <Card.Title className="h5 mb-2 text-dark">
+                                            <span className="fw-bold">{exevent.title}</span>
 
                                             {/* กรณีที่อีเว้นจบแล้ว */}
                                             {!isUpcoming && (
-                                                <span className="badge bg-secondary ms-2">จบแล้ว</span>
+                                                <span className="badge rounded-pill bg-dark ms-2 small">จบแล้ว</span>
                                             )}
                                         </Card.Title>
 
                                         {/* รายละเอียดอีเว้น */}
-                                        <Card.Text className="small mb-2">
-                                            <i className="bi bi-calendar3 me-1"></i> วันที่: {exevent.date_thai || formatDate(exevent.event_date)} <br />
-                                            <i className="bi bi-clock me-1"></i> เวลา: {exevent.event_time} <br />
-                                            <i className="bi bi-geo-alt me-1"></i> สถานที่: {exevent.location}
-                                        </Card.Text>
-
-                                        {/* แสดงจำนวนผู้เข้าร่วมสูงสุด */}
-                                        {exevent.max_participants > 0 && (
-                                            <div className="small text-muted mb-1">
-                                                <i className="bi bi-people-fill me-1"></i>
-                                                รับจำนวน: {exevent.max_participants} คน
-                                                {exevent.current_participants !== undefined && (
-                                                    <span className="ms-2">
-                                                        (ลงทะเบียนแล้ว {exevent.current_participants} คน)
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* วันที่ลงทะเบียน */}
-                                        <div className="small text-muted mb-2">
-                                            <i className="bi bi-calendar-check me-1"></i>
-                                            ลงทะเบียนได้: {formatDate(exevent.register_start)} - {formatDate(exevent.register_end)}
+                                        <div className="text-muted small">
+                                            <div className="mb-1"><i className="bi bi-calendar3 me-2 text-[#636CCB]"></i>{exevent.date_thai || formatDate(exevent.event_date)}</div>
+                                            <div className="mb-1"><i className="bi bi-clock me-2 text-[#636CCB]"></i>{exevent.event_time}</div>
+                                            <div><i className="bi bi-geo-alt me-2 text-[#636CCB]"></i>{exevent.location}</div>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        {/* สถานะการลงทะเบียน */}
-                                        <div className="mb-2">
+                                {/* รายละเอียดเพิ่มเติมที่แสดงเต็มความกว้าง */}
+                                <div className="w-100">
+                                    {/* แสดงจำนวนผู้เข้าร่วมสูงสุด */}
+                                    {exevent.max_participants > 0 && (
+                                        <div className="small mb-2 p-2 rounded-3 bg-white bg-opacity-50 border border-gray-100">
+                                            <i className="bi bi-people-fill me-2 text-[#636CCB]"></i>
+                                            <span className="fw-medium text-dark">รับจำนวน: {exevent.max_participants} คน</span>
+                                            {exevent.current_participants !== undefined && (
+                                                <span className="ms-2 text-muted text-xs">
+                                                    (ลงทะเบียนแล้ว {exevent.current_participants} คน)
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* วันที่ลงทะเบียน */}
+                                    <div className="small text-muted mb-3 italic px-1" style={{ fontSize: '0.75rem' }}>
+                                        <i className="bi bi-info-circle me-1"></i>
+                                        เปิดลงทะเบียน: {formatDate(exevent.register_start)} - {formatDate(exevent.register_end)}
+                                    </div>
+
+                                    {/* ส่วนของปุ่มที่ขยายเต็มความกว้าง */}
+                                    <div className="d-flex flex-column gap-2 pt-3 border-top">
+                                        <div className="text-center">
                                             {canRegisterNow ? (
-                                                <span className="badge bg-success">เปิดลงทะเบียน</span>
+                                                <span className="badge rounded-pill w-100 py-2 bg-success bg-opacity-10 text-success border border-success border-opacity-25">เปิดลงทะเบียน</span>
                                             ) : currentDate < new Date(exevent.register_start) ? (
-                                                <span className="badge bg-warning text-dark">ยังไม่เปิดลงทะเบียน</span>
+                                                <span className="badge rounded-pill w-100 py-2 bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25">ยังไม่เปิดลงทะเบียน</span>
                                             ) : (
-                                                <span className="badge bg-danger">ปิดลงทะเบียนแล้ว</span>
+                                                <span className="badge rounded-pill w-100 py-2 bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">ปิดลงทะเบียนแล้ว</span>
                                             )}
                                         </div>
 
                                         {/* ปุ่มลงทะเบียน */}
                                         {canRegisterNow && isUpcoming ? (
-                                            <Link to="/exregister" className='text-decoration-none'
+                                            <Link to="/exregister" className='text-decoration-none w-100'
                                                 state={{ 
                                                     selectedEvent: exevent.title,
                                                     event: exevent 
                                                 }}>
-                                                <Button className='text-white mt-1 fw-semibold'
-                                                    style={{ backgroundColor: '#636CCB', border: 'none', padding: '0.375rem 1.25rem', fontSize: '0.8rem', borderRadius: '20px' }}>
-                                                    REGISTER
+                                                <Button className='text-white fw-bold shadow-sm w-100'
+                                                    style={{ backgroundColor: '#636CCB', border: 'none', padding: '0.75rem', fontSize: '0.9rem', borderRadius: '20px' }}>
+                                                    REGISTER NOW
                                                 </Button>
                                             </Link>
                                         ) : (
                                             <Button
-                                                className='text-white mt-1 fw-semibold'
-                                                style={{ backgroundColor: '#6c757d', border: 'none', padding: '0.375rem 1.25rem', fontSize: '0.8rem', borderRadius: '20px' }}
+                                                className='text-white fw-bold w-100'
+                                                style={{ backgroundColor: '#adb5bd', border: 'none', padding: '0.75rem', fontSize: '0.9rem', borderRadius: '20px' }}
                                                 disabled
                                             >
                                                 {!isUpcoming ? 'EVENT ENDED' : 'REGISTRATION CLOSED'}
@@ -178,4 +187,4 @@ const ExternalEvent = () => {
     )
 }
 
-export default ExternalEvent
+export default ExternalEvent;
