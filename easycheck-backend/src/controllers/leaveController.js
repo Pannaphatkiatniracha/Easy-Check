@@ -1,9 +1,6 @@
 import multer from "multer";
 import db from "../config/db.js";
 
-// =========================
-// Multer
-// =========================
 const storage = multer.memoryStorage();
 
 export const upload = multer({
@@ -20,9 +17,7 @@ export const upload = multer({
     ];
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
-      return cb(
-        new Error("รองรับเฉพาะไฟล์ JPG, JPEG, PNG และ PDF เท่านั้น")
-      );
+      return cb(new Error("รองรับเฉพาะไฟล์ JPG, JPEG, PNG และ PDF เท่านั้น"));
     }
 
     cb(null, true);
@@ -35,10 +30,9 @@ const bufferToBase64 = (buffer, mime = "image/jpeg") => {
   return `data:${mime};base64,${buf.toString("base64")}`;
 };
 
-// ✅ เพิ่มฟังก์ชันแก้ปัญหา JSON Array ที่ถูกดึงมาจาก DB
 const safeParseJSON = (data) => {
   if (!data) return [];
-  if (Array.isArray(data)) return data; // ถ้าเป็น Array อยู่แล้ว ไม่ต้อง parse ซ้ำ
+  if (Array.isArray(data)) return data;
   if (typeof data === "object") return Object.values(data);
   try {
     return JSON.parse(data);
@@ -47,9 +41,6 @@ const safeParseJSON = (data) => {
   }
 };
 
-// =========================
-// Map ชื่อจาก frontend -> leave_policy.leave_code
-// =========================
 const LEAVE_REASON_TO_CODE = {
   "Sick Leave": "SICK",
   "Personal Leave": "PERSONAL",
@@ -57,7 +48,7 @@ const LEAVE_REASON_TO_CODE = {
   "Maternity Leave": "MATERNITY",
   "Wedding Leave": "WEDDING",
   "Religious Leave": "RELIGIOUS",
-  "Other": "OTHER",
+  Other: "OTHER",
 };
 
 const getTodayDateString = () => {
@@ -90,7 +81,11 @@ const calculateLeaveDays = (startDate, endDate) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) {
+  if (
+    Number.isNaN(start.getTime()) ||
+    Number.isNaN(end.getTime()) ||
+    start > end
+  ) {
     return 0;
   }
 
@@ -98,7 +93,7 @@ const calculateLeaveDays = (startDate, endDate) => {
   const current = new Date(start);
 
   while (current <= end) {
-    const day = current.getDay(); // 0=Sun, 6=Sat
+    const day = current.getDay();
     if (day !== 0 && day !== 6) {
       count++;
     }
@@ -140,7 +135,7 @@ const getUserByEmployeeId = async (employeeId) => {
      FROM Users
      WHERE id_employee = ?
      LIMIT 1`,
-    [employeeId]
+    [employeeId],
   );
 
   return rows[0] || null;
@@ -152,7 +147,7 @@ const getLeavePolicyByCode = async (leaveCode) => {
      FROM leave_policy
      WHERE leave_code = ? AND active = 1
      LIMIT 1`,
-    [leaveCode]
+    [leaveCode],
   );
 
   return rows[0] || null;
@@ -170,7 +165,7 @@ const getUsedLeaveStatsInYear = async (employeeId, reasonLabel, leaveStart) => {
        AND status IN ('pending', 'approved')
        AND leave_start BETWEEN ? AND ?
        AND JSON_CONTAINS(leave_reasons, JSON_QUOTE(?))`,
-    [employeeId, startOfYear, endOfYear, reasonLabel]
+    [employeeId, startOfYear, endOfYear, reasonLabel],
   );
 
   return {
@@ -179,7 +174,10 @@ const getUsedLeaveStatsInYear = async (employeeId, reasonLabel, leaveStart) => {
   };
 };
 
-const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYear()) => {
+const getLeaveBalanceData = async (
+  employeeId,
+  targetYear = new Date().getFullYear(),
+) => {
   const user = await getUserByEmployeeId(employeeId);
   if (!user) {
     throw new Error("ไม่พบข้อมูลพนักงาน");
@@ -189,7 +187,7 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
     `SELECT leave_code, leave_name, max_days_per_year, require_evidence, active
      FROM leave_policy
      WHERE active = 1
-     ORDER BY id ASC`
+     ORDER BY id ASC`,
   );
 
   const startOfYear = `${targetYear}-01-01`;
@@ -201,14 +199,14 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
      WHERE id_employee = ?
        AND status IN ('pending', 'approved')
        AND leave_start BETWEEN ? AND ?`,
-    [employeeId, startOfYear, endOfYear]
+    [employeeId, startOfYear, endOfYear],
   );
 
   const result = [];
 
   for (const policy of policies) {
     const reasonLabel = Object.keys(LEAVE_REASON_TO_CODE).find(
-      (key) => LEAVE_REASON_TO_CODE[key] === policy.leave_code
+      (key) => LEAVE_REASON_TO_CODE[key] === policy.leave_code,
     );
 
     let usedDays = 0;
@@ -216,7 +214,6 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
 
     if (reasonLabel) {
       for (const req of requests) {
-        // ✅ ใช้ safeParseJSON ตรงนี้เพื่อไม่ให้มัน Error ข้ามการบวกเลขไป
         const reasons = safeParseJSON(req.leave_reasons);
 
         if (reasons.includes(reasonLabel)) {
@@ -228,7 +225,6 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
 
     let maxDays = Number(policy.max_days_per_year || 0);
 
-    // Vacation Leave: ได้สิทธิ์เมื่อทำงานครบ 1 ปี
     if (policy.leave_code === "VACATION") {
       if (!user.joindate) {
         maxDays = 0;
@@ -257,18 +253,11 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
   return result;
 };
 
-/* =========================
-   ✅ ส่งคำขอลางาน
-========================= */
+/* ส่งคำขอลางาน */
 export const createLeaveRequest = async (req, res) => {
   try {
-    const {
-      userId,
-      leaveStart,
-      leaveEnd,
-      leaveReasons,
-      otherReasonText,
-    } = req.body;
+    const { userId, leaveStart, leaveEnd, leaveReasons, otherReasonText } =
+      req.body;
 
     const file = req.file;
 
@@ -292,7 +281,8 @@ export const createLeaveRequest = async (req, res) => {
 
     if (normalizedStart < today || normalizedEnd < today) {
       return res.status(400).json({
-        message: "ไม่สามารถยื่นลาย้อนหลังได้ กรุณาเลือกวันที่วันนี้หรือวันถัดไป",
+        message:
+          "ไม่สามารถยื่นลาย้อนหลังได้ กรุณาเลือกวันที่วันนี้หรือวันถัดไป",
       });
     }
 
@@ -365,13 +355,13 @@ export const createLeaveRequest = async (req, res) => {
 
     const mainReasonLabel =
       Object.keys(LEAVE_REASON_TO_CODE).find(
-        (key) => LEAVE_REASON_TO_CODE[key] === leaveCode
+        (key) => LEAVE_REASON_TO_CODE[key] === leaveCode,
       ) || reasons[0];
 
     const stats = await getUsedLeaveStatsInYear(
       user.id_employee,
       mainReasonLabel,
-      normalizedStart
+      normalizedStart,
     );
 
     const maxDays = Number(policy.max_days_per_year || 0);
@@ -381,7 +371,7 @@ export const createLeaveRequest = async (req, res) => {
       return res.status(400).json({
         message: `สิทธิลาไม่พอ ใช้ไปแล้ว ${stats.usedDays} วัน เหลือ ${Math.max(
           remainingDays,
-          0
+          0,
         )} วัน แต่กำลังยื่น ${leaveDays} วัน`,
       });
     }
@@ -390,6 +380,7 @@ export const createLeaveRequest = async (req, res) => {
       `INSERT INTO leave_requests
       (
         id_employee,
+        branch_id,
         leave_start,
         leave_end,
         leave_days,
@@ -400,9 +391,10 @@ export const createLeaveRequest = async (req, res) => {
         status,
         created_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,
       [
         user.id_employee,
+        user.branch_id,
         normalizedStart,
         normalizedEnd,
         leaveDays,
@@ -410,7 +402,7 @@ export const createLeaveRequest = async (req, res) => {
         otherReasonText?.trim() || null,
         file ? file.buffer : null,
         file ? file.mimetype : null,
-      ]
+      ],
     );
 
     return res.json({
@@ -435,9 +427,7 @@ export const createLeaveRequest = async (req, res) => {
   }
 };
 
-/* =========================
-   ✅ ดูสิทธิวันลาคงเหลือ
-========================= */
+/* ดูสิทธิวันลาคงเหลือ */
 export const getLeaveBalance = async (req, res) => {
   try {
     const { userId, year } = req.query;
@@ -447,7 +437,10 @@ export const getLeaveBalance = async (req, res) => {
     }
 
     const targetYear = Number(year || new Date().getFullYear());
-    const balance = await getLeaveBalanceData(String(userId).trim(), targetYear);
+    const balance = await getLeaveBalanceData(
+      String(userId).trim(),
+      targetYear,
+    );
 
     return res.json({
       userId: String(userId).trim(),
@@ -460,9 +453,7 @@ export const getLeaveBalance = async (req, res) => {
   }
 };
 
-/* =========================
-   ✅ ประวัติการลา
-========================= */
+/* ประวัติการลา */
 export const getLeaveHistory = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -489,13 +480,13 @@ export const getLeaveHistory = async (req, res) => {
        FROM leave_requests
        WHERE id_employee = ?
        ORDER BY created_at DESC`,
-      [String(userId).trim()]
+      [String(userId).trim()],
     );
 
     const formatted = rows.map((row) => {
       return {
         ...row,
-        leave_reasons: safeParseJSON(row.leave_reasons), // ✅ แก้ตรงนี้ด้วย
+        leave_reasons: safeParseJSON(row.leave_reasons),
       };
     });
 
@@ -506,12 +497,22 @@ export const getLeaveHistory = async (req, res) => {
   }
 };
 
-/* =========================
-   ✅ pending (สำหรับ approver)
-========================= */
+/* ดูคำขอลางานที่รออนุมัติ (สำหรับ approver) */
 export const getPendingLeaves = async (req, res) => {
   try {
-    const [rows] = await db.execute(`
+    const [approverRows] = await db.execute(
+      `SELECT branch_id FROM Users WHERE id = ? LIMIT 1`,
+      [req.user.id],
+    );
+
+    if (!approverRows.length) {
+      return res.status(403).json({ message: "ไม่พบข้อมูล approver" });
+    }
+
+    const approverBranchId = approverRows[0].branch_id;
+
+    const [rows] = await db.execute(
+      `
       SELECT 
         lr.*, 
         u.firstname, 
@@ -522,8 +523,11 @@ export const getPendingLeaves = async (req, res) => {
       FROM leave_requests lr
       LEFT JOIN Users u ON lr.id_employee = u.id_employee
       WHERE lr.status = 'pending'
+        AND lr.branch_id = ?
       ORDER BY lr.created_at DESC
-    `);
+    `,
+      [approverBranchId],
+    );
 
     const formatted = rows.map((row) => {
       let fullName = row.id_employee;
@@ -543,10 +547,12 @@ export const getPendingLeaves = async (req, res) => {
         leaveStart: row.leave_start,
         leaveEnd: row.leave_end,
         leaveDays: row.leave_days,
-        reasons: safeParseJSON(row.leave_reasons), // ✅ แก้ตรงนี้เพื่อให้อ่านเหตุผลในฝั่งหัวหน้าได้ออก
+        reasons: safeParseJSON(row.leave_reasons),
         otherReason: row.other_reason,
         evidencePreview:
-          row.evidence_mime && row.evidence_mime.startsWith("image/") && row.evidence_file
+          row.evidence_mime &&
+          row.evidence_mime.startsWith("image/") &&
+          row.evidence_file
             ? bufferToBase64(row.evidence_file, row.evidence_mime)
             : null,
         evidenceMime: row.evidence_mime || null,
@@ -563,16 +569,22 @@ export const getPendingLeaves = async (req, res) => {
   }
 };
 
-/* =========================
-   ✅ approve
-========================= */
+/* approve*/
 export const approveLeave = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const [approverRows] = await db.execute(
+      `SELECT id, branch_id FROM Users WHERE id = ? LIMIT 1`,
+      [req.user.id],
+    );
+    if (!approverRows.length) {
+      return res.status(403).json({ message: "ไม่พบข้อมูล approver" });
+    }
+
     const [rows] = await db.execute(
-      `SELECT id, status FROM leave_requests WHERE id = ? LIMIT 1`,
-      [id]
+      `SELECT id, status, branch_id FROM leave_requests WHERE id = ? LIMIT 1`,
+      [id],
     );
 
     if (!rows.length) {
@@ -580,17 +592,24 @@ export const approveLeave = async (req, res) => {
     }
 
     if (rows[0].status !== "pending") {
-      return res.status(400).json({
-        message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ",
-      });
+      return res
+        .status(400)
+        .json({ message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ" });
+    }
+
+    if (rows[0].branch_id !== approverRows[0].branch_id) {
+      return res
+        .status(403)
+        .json({ message: "ไม่มีสิทธิ์อนุมัติคำขอลาของสาขาอื่น" });
     }
 
     await db.execute(
       `UPDATE leave_requests
        SET status = 'approved',
-           approved_at = NOW()
+           approved_at = NOW(),
+           approved_by = ?
        WHERE id = ?`,
-      [id]
+      [approverRows[0].id, id],
     );
 
     return res.json({ message: "approver อนุมัติการลาเรียบร้อย" });
@@ -600,17 +619,23 @@ export const approveLeave = async (req, res) => {
   }
 };
 
-/* =========================
-   ✅ reject
-========================= */
+/* reject */
 export const rejectLeave = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
 
+    const [approverRows] = await db.execute(
+      `SELECT id, branch_id FROM Users WHERE id = ? LIMIT 1`,
+      [req.user.id],
+    );
+    if (!approverRows.length) {
+      return res.status(403).json({ message: "ไม่พบข้อมูล approver" });
+    }
+
     const [rows] = await db.execute(
-      `SELECT id, status FROM leave_requests WHERE id = ? LIMIT 1`,
-      [id]
+      `SELECT id, status, branch_id FROM leave_requests WHERE id = ? LIMIT 1`,
+      [id],
     );
 
     if (!rows.length) {
@@ -618,18 +643,25 @@ export const rejectLeave = async (req, res) => {
     }
 
     if (rows[0].status !== "pending") {
-      return res.status(400).json({
-        message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ",
-      });
+      return res
+        .status(400)
+        .json({ message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ" });
+    }
+
+    if (rows[0].branch_id !== approverRows[0].branch_id) {
+      return res
+        .status(403)
+        .json({ message: "ไม่มีสิทธิ์ปฏิเสธคำขอลาของสาขาอื่น" });
     }
 
     await db.execute(
       `UPDATE leave_requests
        SET status = 'rejected',
            reject_reason = ?,
-           rejected_at = NOW()
+           rejected_at = NOW(),
+           approved_by = ?
        WHERE id = ?`,
-      [reason?.trim() || "ไม่ระบุเหตุผล", id]
+      [reason?.trim() || "ไม่ระบุเหตุผล", approverRows[0].id, id],
     );
 
     return res.json({ message: "approver ไม่อนุมัติการลาเรียบร้อย" });
