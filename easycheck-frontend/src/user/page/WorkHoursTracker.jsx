@@ -17,6 +17,13 @@ const WorkHoursTracker = ({ role }) => {
         shift: ""
     })
 
+    const profileData = {
+        name: employeeData?.name || userProfile.name,
+        userid: employeeData?.employeeId || userProfile.userid,
+        avatar: employeeData?.profile || userProfile.avatar,
+        shift: employeeData?.shift || userProfile.shift
+    }
+
     // =State สำหรับเก็บข้อมูลชั่วโมงทำงาน
     const [realHours, setRealHours] = useState({
         Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0
@@ -47,16 +54,14 @@ const WorkHoursTracker = ({ role }) => {
             }
         }
         
-        if (role !== "approver" && !employeeData) {
-            loadUserProfile()
-        }
-    }, [role, employeeData])
+        loadUserProfile()
+    }, [])
 
 
     // ดึงข้อมูลชั่วโมงทำงาน
     useEffect(() => {
         const fetchWeeklyHours = async () => {
-            const id = employeeData?.employeeId || userProfile.userid
+            const id = profileData.userid
             if (id) {
                 try {
                     const response = await Api.get(`/attendance/weekly-hours?userId=${id}`)
@@ -68,7 +73,7 @@ const WorkHoursTracker = ({ role }) => {
             }
         }
         fetchWeeklyHours()
-    }, [employeeData, userProfile.userid])
+    }, [profileData.userid])
 
 
     // การคำนวณวันและ ProgressBar
@@ -91,9 +96,8 @@ const WorkHoursTracker = ({ role }) => {
         const itemIndex = dayNames.indexOf(item.day)
         const reached = itemIndex <= todayIndex
         const hoursWorked = realHours[item.day] || 0
-        // ไม่ให้ percent ที่เกิน 100 และไม่ให้เป็น NaN
         let percent = (hoursWorked / MAX_HOURS_PER_DAY) * 100
-        percent = Math.min(100, Math.max(0, percent)) // จำกัดให้อยู่ระหว่าง 0-100
+        percent = Math.min(100, Math.max(0, percent))
 
         return {
             ...item,
@@ -112,7 +116,6 @@ const WorkHoursTracker = ({ role }) => {
 
 
     const CustomProgressBar = ({ percent, color, height = '20px' }) => {
-        // ตรวจสอบว่า percent เป็นตัวเลขที่ถูกต้อง
         const validPercent = isNaN(percent) ? 0 : Math.min(100, Math.max(0, percent))
         
         return (
@@ -135,36 +138,10 @@ const WorkHoursTracker = ({ role }) => {
         )
     }
 
-
-
-    // 🐸🐸 result
-    const EmployeeProfile = (
-        <div className='d-flex justify-content-center mt-6'>
-            <div className="flex flex-col items-center w-80">
-                <img src={employeeData ? employeeData.profile : userProfile.avatar} 
-                     alt="profile" className="w-28 h-28 rounded-full object-cover mb-3"/>
-                <div className="text-white font-semibold fs-5 text-center">
-                    {employeeData ? employeeData.name : userProfile.name}
-                </div>
-                <div className="text-sm text-white text-center">
-                    ID: {employeeData ? employeeData.employeeId : userProfile.userid}
-                </div>
-                {(employeeData?.shift || userProfile.shift) && (
-                    <div className="relative backdrop-blur-xl rounded-[40px] shadow-2xl
-                         mt-3 px-8 flex items-center justify-center h-12"
-                         style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                        <span className="font-bold text-black tracking-wide">
-                            🕐 Shift: {employeeData ? employeeData.shift : userProfile.shift}
-                        </span>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-
     return (
+
+        // หัวข้อ
         <div className="app-container">
-            {/* Header */}
             <div className="d-flex justify-content-between text-white mt-16">
                 <Link to={role === "approver" ? "/datatocheck" : "/home"} className='text-decoration-none'>
                     <Button variant="link" className="p-0"><i className="bi bi-chevron-left ms-3 text-white"></i></Button>
@@ -173,9 +150,32 @@ const WorkHoursTracker = ({ role }) => {
                 <div className="me-4"></div>
             </div>
 
-            {EmployeeProfile}
 
-            {/* Today Summary */}
+            {/* ข้อมูลของพนักงาน */}
+            <div className='d-flex justify-content-center mt-6'>
+                <div className="flex flex-col items-center w-80">
+                    <img src={profileData.avatar} 
+                         alt="profile" className="w-28 h-28 rounded-full object-cover mb-3"/>
+                    <div className="text-white font-semibold fs-5 text-center">
+                        {profileData.name}
+                    </div>
+                    <div className="text-sm text-white text-center">
+                        ID: {profileData.userid}
+                    </div>
+                    {profileData.shift && (
+                        <div className="relative backdrop-blur-xl rounded-[40px] shadow-2xl
+                             mt-3 px-8 flex items-center justify-center h-12"
+                             style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
+                            <span className="font-bold text-black tracking-wide">
+                                Shift: {profileData.shift}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+
+            {/* ของวันนี้ */}
             <div className='d-flex justify-content-center mt-6'>
                 <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80" 
                      style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
@@ -188,7 +188,8 @@ const WorkHoursTracker = ({ role }) => {
                 </div>
             </div>
 
-            {/* Weekly Report */}
+            
+            {/* ของทั้งวีค */}
             <div className='d-flex justify-content-center mt-8 mb-6'>
                 <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80" 
                      style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
@@ -203,7 +204,8 @@ const WorkHoursTracker = ({ role }) => {
                         </div>
                     ))}
                     
-                    {/* Summary เฉพาะหน้า Approver หรือจะโชว์ให้ User เห็นด้วยก็ได้ */}
+
+                    {/* ทั้งวีค */}
                     <div className="mt-4 pt-4 border-top border-secondary">
                         <div className='d-flex justify-content-between mb-2'>
                             <span className='fw-bold'>Total Worked: {workedHours.toFixed(1)}h</span>

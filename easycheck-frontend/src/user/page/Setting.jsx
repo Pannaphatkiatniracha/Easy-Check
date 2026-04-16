@@ -18,7 +18,7 @@ const Setting = ({ role, setToken, setRole }) => {
         try {
             const token = localStorage.getItem('token') 
 
-            await Api.post(`http://${HOST}:${PORT}/auth/logout`, {}, {
+            await Api.post('/auth/logout', {}, {
             headers: {
                 Authorization: `Bearer ${token}` // ต้องส่ง token ไปด้วยเพราะว่าใน authRouter API มัน (for ต่อท่อ)
             }

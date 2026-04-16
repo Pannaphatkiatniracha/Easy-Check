@@ -55,8 +55,8 @@ import ResetPassword from "./user/page/ForgotToChange";
 
 
 function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "")
-  const [role, setRole] = useState(() => localStorage.getItem("role") || "")
+  const [token, setToken] = useState(() => sessionStorage.getItem("token") || "")
+  const [role, setRole] = useState(() => sessionStorage.getItem("role") || "")
 
   return (
     <>

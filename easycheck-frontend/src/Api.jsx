@@ -15,7 +15,7 @@ const Api = axios.create({
 Api.interceptors.request.use(
     (config) => {
         // token ใบสั้น
-        const token = localStorage.getItem('token')
+        const token = sessionStorage.getItem('token')
         
         if (token) {
             config.headers.Authorization = `Bearer ${token}` // ถ้ามี token ให้ส่งกลับให้แบคเอน check
@@ -40,7 +40,7 @@ Api.interceptors.response.use(
 
             try {
                 // ไปหยิบ token ยาว (refreshToken) ตอน Login มาใช้
-                const refreshToken = localStorage.getItem('refreshToken')
+                const refreshToken = sessionStorage.getItem('refreshToken')
 
                 // ยิงไปหาแบคเอน
                 const res = await axios.post(`http://${HOST}:${PORT}/auth/refresh-token`, { refreshToken })
@@ -50,8 +50,8 @@ Api.interceptors.response.use(
                     // แลก token ใหม่
                     const { accessToken, refreshToken: newRefreshToken } = res.data
 
-                    localStorage.setItem('token', accessToken)
-                    localStorage.setItem('refreshToken', newRefreshToken)
+                    sessionStorage.setItem('token', accessToken)
+                    sessionStorage.setItem('refreshToken', newRefreshToken)
 
                     // เอาตั๋วใหม่ไปแปะในคำสั่งเดิมที่เคยพังเมื่อกี้
                     Api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
@@ -65,7 +65,7 @@ Api.interceptors.response.use(
             } catch (refreshError) {
                 // ถ้า newRefreshToken หมดอายุ
                 console.log("Session expired. Please login again")
-                localStorage.clear()
+                sessionStorage.clear()
                 window.location.href = '/login'
             }
         }

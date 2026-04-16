@@ -44,16 +44,15 @@ const Login = ({ setToken, setRole }) => {
                 mappedRole = "user";
             }
 
-            localStorage.setItem('token', token || '');
-            localStorage.setItem('role', mappedRole);
-            localStorage.setItem('refreshToken', refreshToken || '');
+            sessionStorage.setItem('token', token || '');
+            sessionStorage.setItem('role', mappedRole);
+            sessionStorage.setItem('refreshToken', refreshToken || '');
 
-            // สำคัญมาก
-            localStorage.setItem('user', JSON.stringify(user || {}));
-            localStorage.setItem('id_employee', user?.id_employee || username);
+            sessionStorage.setItem('user', JSON.stringify(user || {}));
+            sessionStorage.setItem('id_employee', user?.id_employee || username);
 
-            console.log("SAVED user =", localStorage.getItem("user"));
-            console.log("SAVED id_employee =", localStorage.getItem("id_employee"));
+            console.log("SAVED user =", sessionStorage.getItem("user"));
+            console.log("SAVED id_employee =", sessionStorage.getItem("id_employee"));
 
             setToken(token);
             setRole(mappedRole);
