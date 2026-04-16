@@ -26,7 +26,8 @@ import {
   sendNotification,
   GetPositionCount ,
   SaveRolePermissions ,
-  GetRolePermissions
+  GetRolePermissions,
+  getDashboardToday
 } from "../controllers/adminController.js";
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -38,6 +39,7 @@ const router = express.Router();
 // -----------------------------------------
 router.post("/login", loginAdmin);
 router.get("/me", verifyToken, getAdmin);
+router.get("/dashboard/today", verifyToken, getDashboardToday);
 
 // Forgot Password Routes for Admin
 router.post("/forgot-password/verify-identity", verifyAdminIdentity);
