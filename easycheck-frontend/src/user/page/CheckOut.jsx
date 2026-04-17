@@ -39,9 +39,10 @@ function CheckOut() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userId = user?.id_employee || user?.id || localStorage.getItem("userId"); 
+  // User เก็บ token ใน sessionStorage (ต่างจาก Admin ที่ใช้ localStorage)
+  const token = sessionStorage.getItem("token");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const userId = user?.id_employee || user?.id || sessionStorage.getItem("id_employee");
 
   useEffect(() => {
     const tick = () => {
