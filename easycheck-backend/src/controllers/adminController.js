@@ -874,7 +874,7 @@ export const GetRolePermissions = async (req, res) => {
         const { role_id } = req.query;
 
         const [rows] = await pool.query(
-            `   SELECT id_permission 
+            `   SELECT id_permission
                 FROM role_permissions
                 WHERE role_id = ?
              ` , [role_id]
@@ -884,5 +884,69 @@ export const GetRolePermissions = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+}
+
+
+// สรุปสถิติการลาเดือนนี้ — กรองเฉพาะสาขาของ admin ที่ login
+export const getDashboardLeaveStats = async (req, res) => {
+    try {
+        const branch_id = req.user.branch_id
+        if (!branch_id) return res.status(400).json({ message: 'Admin token missing branch_id' })
+
+        // ดึง leave_requests ที่ approved เดือนนี้ ของพนักงานในสาขา
+        const [rows] = await pool.query(
+            `SELECT lr.leave_reasons, lr.leave_days
+             FROM leave_requests lr
+             JOIN Users u ON lr.id_employee = u.id_employee
+             WHERE u.branch_id = ?
+               AND lr.status = 'approved'
+               AND MONTH(lr.leave_start) = MONTH(CURDATE())
+               AND YEAR(lr.leave_start) = YEAR(CURDATE())`,
+            [branch_id]
+        )
+
+        // 7 ประเภทการลา ตาม leave_policy
+        const leaveTypes = [
+            { label: 'Sick Leave',      thLabel: 'ลาป่วย',       color: '#f44336' },
+            { label: 'Personal Leave',  thLabel: 'ลากิจ',         color: '#ff9800' },
+            { label: 'Vacation Leave',  thLabel: 'ลาพักร้อน',    color: '#4caf50' },
+            { label: 'Maternity Leave', thLabel: 'ลาคลอด',       color: '#e91e63' },
+            { label: 'Wedding Leave',   thLabel: 'ลาแต่งงาน',    color: '#9c27b0' },
+            { label: 'Religious Leave', thLabel: 'ลาบวช/ศาสนา', color: '#2196f3' },
+            { label: 'Other',           thLabel: 'อื่นๆ',         color: '#607d8b' },
+        ]
+
+        // นับจำนวนครั้งและวันลาของแต่ละประเภท
+        const stats = {}
+        leaveTypes.forEach(t => { stats[t.label] = { count: 0, days: 0 } })
+
+        rows.forEach(row => {
+            let reasons = row.leave_reasons
+            if (typeof reasons === 'string') {
+                try { reasons = JSON.parse(reasons) } catch { reasons = [] }
+            }
+            if (!Array.isArray(reasons)) reasons = []
+            reasons.forEach(r => {
+                if (stats[r] !== undefined) {
+                    stats[r].count++
+                    stats[r].days += Number(row.leave_days || 0)
+                }
+            })
+        })
+
+        const data = leaveTypes.map(t => ({
+            label:   t.label,
+            thLabel: t.thLabel,
+            color:   t.color,
+            count:   stats[t.label].count,
+            days:    stats[t.label].days,
+        }))
+
+        res.json({ success: true, data })
+
+    } catch (err) {
+        console.error('getDashboardLeaveStats error:', err)
+        res.status(500).json({ message: err.message })
     }
 }
