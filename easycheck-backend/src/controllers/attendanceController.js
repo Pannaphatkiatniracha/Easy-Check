@@ -252,13 +252,14 @@ export const getMyShift = async (req, res) => {
 
 // 🐱🐱 ATTENDANCE-SUMMARY
 export const getAttendanceHistory = async (req, res) => {
-  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน
-  const empId = userId || req.user?.id_employee
+  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน (ก็คือ token + id)
+  const empId = userId || req.user?.id_employee // empId = userId นั่นแหละ แต่ถ้าไม่มีให้ดึงมาจาก req.user ของ ทรกกสำไฟพำ
 
   if (!empId) return res.status(400).json({ message: "userId is required" })
 
   try {
     // ดึงข้อมูลการเข้า-ออกงาน
+    // work_date > YYYY-MM-DD
     const [attendanceRows] = await pool.query(
       `SELECT check_in_status AS status, DATE_FORMAT(work_date, '%Y-%m-%d') as date 
        FROM attendance 
@@ -267,7 +268,7 @@ export const getAttendanceHistory = async (req, res) => {
       [empId]
     )
 
-    // ดึงข้อมูลการลา (เอาเป็นช่วง)
+    // ดึงวันที่เริ่มลากับวันสุดท้ายที่ลา แต่ดึงมาแค่คนที่อนุมัติแล้ว
     const [leaveRows] = await pool.query(
       `SELECT leave_start, leave_end
        FROM leave_requests 
@@ -277,7 +278,7 @@ export const getAttendanceHistory = async (req, res) => {
 
     // ฟังก์ชันแตกวันลา
     const expandLeaveDates = (start, end) => {
-      const dates = []
+      const dates = [] // สร้าง array เปล่า
       let current = new Date(start)
       const last = new Date(end)
 
@@ -290,13 +291,15 @@ export const getAttendanceHistory = async (req, res) => {
     }
 
     // รวมวันลาทั้งหมด (แตกเป็นรายวัน)
+    // flatMap คือ map แบบแนวนอนอะแม่
     const leaveDates = leaveRows.flatMap(row =>
       expandLeaveDates(row.leave_start, row.leave_end)
-    );
+    )
 
-    // กันซ้ำ (กรณีมี overlap หรือ query ซ้ำ)
+    // กันซ้ำ แบบเราไม่ให้วันที่มันซ้ำมาในระบบ กันนางเอ๋อ
     const uniqueLeaveDates = [...new Set(leaveDates)]
 
+    // แยกประเภทพวกมาปกติ / มาสาย / วันลา
     const attendanceData = {
       onTimes: attendanceRows
         .filter(r => r.status === 'on_time')
@@ -309,7 +312,7 @@ export const getAttendanceHistory = async (req, res) => {
       leaves: uniqueLeaveDates
     }
 
-    res.json(attendanceData)
+    res.json(attendanceData) // ส่งทั้งหมดกลับไป
 
   } catch (err) {
     console.error("Error in getAttendanceHistory:", err)
@@ -319,30 +322,49 @@ export const getAttendanceHistory = async (req, res) => {
 
 // 🐱🐱  WORK-HOURS TRACKER
 export const getWeeklyHours = async (req, res) => {
-  const { userId } = req.query;
-  const empId = userId || req.user?.id_employee;
+  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน (ก็คือ token + id)
   
-  if (!empId) return res.status(400).json({ message: "userId is required" });
+  if (!userId) {
+  return res.status(400).json({ message: "userId is required" })
+}
+
+  const empId = userId // // empId = userId นั่นแหละ
   
   try {
+    // ตรงนี้ก็คือดึงเวลาเข้างาน-ออกงานของพนักงานคนนี้ (เริ่มตั้งแต่วันจันทร์ ก็คือ ,1 นั่นแหละ)
     const [rows] = await pool.query(
       `SELECT check_in_time, check_out_time, DAYNAME(work_date) as day 
        FROM attendance WHERE id_employee = ? 
        AND YEARWEEK(work_date, 1) = YEARWEEK(CURDATE(), 1) ORDER BY work_date ASC`,
       [empId]
-    );
+    )
 
-    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 };
+    // เป็นค่าเริ่มต้นว่าทุกวันเริ่มต้นที่ 0 ชั่วโมงก่อนนะ
+    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 }
+    
+    // loop row
     rows.forEach(row => {
-      const day = row.day;
+      
+      const day = row.day // ดึงวันแบบ monday sunday ไรเงี้ย
+      
+      // ต้องมี เวลาเช็คอิน,เช็คเอ้า,วันใน object day
       if (row.check_in_time && row.check_out_time && hoursData.hasOwnProperty(day)) {
-        const diffMs = new Date(row.check_out_time) - new Date(row.check_in_time);
-        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1));
+        // แปลงเป็นเวลาเริ่ดๆ “ออก - เข้า”
+        const diffMs = new Date(row.check_out_time) - new Date(row.check_in_time)
+        
+        // คำนวณชั่วโมง
+        // 1000 = ms → sec
+        // 60 = sec → min
+        // 60 = min → hour
+        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1))
       }
-    });
-    res.json(hoursData);
+    })
+
+    res.json(hoursData)
+
+
   } catch (err) {
-    res.status(500).json({ message: "Error calculating hours", error: err.message });
+    res.status(500).json({ message: "Error calculating hours", error: err.message })
   }
 }
 

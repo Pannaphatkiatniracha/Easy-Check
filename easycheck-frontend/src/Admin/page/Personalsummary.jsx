@@ -42,6 +42,8 @@ const Personalsummary = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [employeeStats, setEmployeeStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
   const [filterPosition, setFilterPosition] = useState('');
@@ -65,7 +67,7 @@ const Personalsummary = () => {
     return `${months} เดือน`;
   };
 
-  const openDetails = (employee) => {
+  const openDetails = async (employee) => {
     setSelectedEmployee(employee);
     setEditData({
       phone: employee.phone,
@@ -75,6 +77,22 @@ const Personalsummary = () => {
     });
     setIsEditing(false);
     setShowModal(true);
+
+    // ดึงสถิติการทำงานจริงของพนักงานคนนี้
+    setStatsLoading(true);
+    setEmployeeStats(null);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/personal-summary/${employee.id}/stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const json = await res.json();
+      if (json.success) setEmployeeStats(json.data);
+    } catch (err) {
+      console.error('Failed to fetch employee stats:', err);
+    } finally {
+      setStatsLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -330,11 +348,15 @@ const handleDeleteEmployee = async (employeeId) => {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-4 px-4 bg-slate-50/50 rounded-xl mt-2">
                     <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm mb-3 sm:mb-0 flex items-center gap-2"><TrendingUp size={18} className="text-emerald-400"/> เดือนนี้:</span>
-                    <div className="w-full sm:w-2/3 flex flex-wrap gap-3">
-                      <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">มาทำงาน</span><span className="text-lg text-emerald-600 font-bold">{selectedEmployee.workStats.present} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
-                      <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">มาสาย</span><span className="text-lg text-amber-500 font-bold">{selectedEmployee.workStats.late} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
-                      <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">ขาดงาน</span><span className="text-lg text-rose-500 font-bold">{selectedEmployee.workStats.absent} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
-                    </div>
+                    {statsLoading ? (
+                      <div className="w-full sm:w-2/3 text-sm text-gray-400 animate-pulse">กำลังโหลด...</div>
+                    ) : (
+                      <div className="w-full sm:w-2/3 flex flex-wrap gap-3">
+                        <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">มาทำงาน</span><span className="text-lg text-emerald-600 font-bold">{employeeStats?.workStats.present ?? 0} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
+                        <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">มาสาย</span><span className="text-lg text-amber-500 font-bold">{employeeStats?.workStats.late ?? 0} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
+                        <div className="flex flex-col items-center bg-white border border-gray-100 shadow-sm rounded-lg px-4 py-2 flex-1"><span className="text-xs text-gray-500 font-semibold mb-1">ขาดงาน</span><span className="text-lg text-rose-500 font-bold">{employeeStats?.workStats.absent ?? 0} <span className="text-xs font-medium text-gray-400">วัน</span></span></div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </section>
@@ -343,37 +365,60 @@ const handleDeleteEmployee = async (employeeId) => {
                 <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><CheckCircle2 size={22} className="text-blue-500"/> สัดส่วนการเข้างาน</h3>
                 <div className="flex items-center gap-4">
                   <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden shadow-inner p-0.5">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full relative"
-                      style={{ width: `${selectedEmployee.attendanceRate}%` }}
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full relative transition-all duration-500"
+                      style={{ width: `${employeeStats?.attendanceRate ?? 0}%` }}
                     >
                       <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
                     </div>
                   </div>
-                  <span className="font-extrabold text-indigo-700 w-16 text-right text-xl">{selectedEmployee.attendanceRate}%</span>
+                  <span className="font-extrabold text-indigo-700 w-16 text-right text-xl">{employeeStats?.attendanceRate ?? 0}%</span>
                 </div>
               </section>
 
               <section className="mb-4">
                 <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><FileText size={22} className="text-orange-500"/> โควตาวันลาคงเหลือ</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-5">
-                  <div className="bg-gradient-to-b from-blue-50 to-white p-5 rounded-2xl text-center border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
-                    <span className="block text-sm text-blue-600 mb-2 font-bold bg-blue-100/50 py-1 rounded-lg">ลากิจ</span>
-                    <span className="block text-3xl font-extrabold text-blue-900">{selectedEmployee.leaveBalance.personal} <span className="text-sm font-bold text-blue-400">วัน</span></span>
+                {statsLoading ? (
+                  <div className="text-sm text-gray-400 animate-pulse py-4">กำลังโหลด...</div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-3">
+                    <div className="bg-gradient-to-b from-red-50 to-white p-4 rounded-2xl text-center border border-red-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-red-600 mb-2 font-bold bg-red-100/50 py-1 rounded-lg">ลาป่วย</span>
+                      <span className="block text-2xl font-extrabold text-red-900">{employeeStats?.leaveBalance.sick ?? 0}</span>
+                      <span className="text-xs font-bold text-red-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-blue-50 to-white p-4 rounded-2xl text-center border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-blue-600 mb-2 font-bold bg-blue-100/50 py-1 rounded-lg">ลากิจ</span>
+                      <span className="block text-2xl font-extrabold text-blue-900">{employeeStats?.leaveBalance.personal ?? 0}</span>
+                      <span className="text-xs font-bold text-blue-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-emerald-50 to-white p-4 rounded-2xl text-center border border-emerald-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-emerald-600 mb-2 font-bold bg-emerald-100/50 py-1 rounded-lg">ลาพักร้อน</span>
+                      <span className="block text-2xl font-extrabold text-emerald-900">{employeeStats?.leaveBalance.vacation ?? 0}</span>
+                      <span className="text-xs font-bold text-emerald-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-purple-50 to-white p-4 rounded-2xl text-center border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-purple-600 mb-2 font-bold bg-purple-100/50 py-1 rounded-lg">ลาคลอด</span>
+                      <span className="block text-2xl font-extrabold text-purple-900">{employeeStats?.leaveBalance.maternity ?? 0}</span>
+                      <span className="text-xs font-bold text-purple-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-rose-50 to-white p-4 rounded-2xl text-center border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-rose-600 mb-2 font-bold bg-rose-100/50 py-1 rounded-lg">ลาแต่งงาน</span>
+                      <span className="block text-2xl font-extrabold text-rose-900">{employeeStats?.leaveBalance.wedding ?? 0}</span>
+                      <span className="text-xs font-bold text-rose-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-indigo-50 to-white p-4 rounded-2xl text-center border border-indigo-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-indigo-600 mb-2 font-bold bg-indigo-100/50 py-1 rounded-lg">ลาบวช</span>
+                      <span className="block text-2xl font-extrabold text-indigo-900">{employeeStats?.leaveBalance.religious ?? 0}</span>
+                      <span className="text-xs font-bold text-indigo-400">วัน</span>
+                    </div>
+                    <div className="bg-gradient-to-b from-slate-50 to-white p-4 rounded-2xl text-center border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="block text-xs text-slate-600 mb-2 font-bold bg-slate-100/50 py-1 rounded-lg">อื่นๆ</span>
+                      <span className="block text-2xl font-extrabold text-slate-900">{employeeStats?.leaveBalance.other ?? 0}</span>
+                      <span className="text-xs font-bold text-slate-400">วัน</span>
+                    </div>
                   </div>
-                  <div className="bg-gradient-to-b from-amber-50 to-white p-5 rounded-2xl text-center border border-amber-100 shadow-sm hover:shadow-md transition-shadow">
-                    <span className="block text-sm text-amber-600 mb-2 font-bold bg-amber-100/50 py-1 rounded-lg">ลาป่วย</span>
-                    <span className="block text-3xl font-extrabold text-amber-900">{selectedEmployee.leaveBalance.sick} <span className="text-sm font-bold text-amber-400">วัน</span></span>
-                  </div>
-                  <div className="bg-gradient-to-b from-emerald-50 to-white p-5 rounded-2xl text-center border border-emerald-100 shadow-sm hover:shadow-md transition-shadow">
-                    <span className="block text-sm text-emerald-600 mb-2 font-bold bg-emerald-100/50 py-1 rounded-lg">ลาพักร้อน</span>
-                    <span className="block text-3xl font-extrabold text-emerald-900">{selectedEmployee.leaveBalance.vacation} <span className="text-sm font-bold text-emerald-400">วัน</span></span>
-                  </div>
-                  <div className="bg-gradient-to-b from-purple-50 to-white p-5 rounded-2xl text-center border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
-                    <span className="block text-sm text-purple-600 mb-2 font-bold bg-purple-100/50 py-1 rounded-lg">ลาคลอด</span>
-                    <span className="block text-3xl font-extrabold text-purple-900">{selectedEmployee.leaveBalance.maternity} <span className="text-sm font-bold text-purple-400">วัน</span></span>
-                  </div>
-                </div>
+                )}
               </section>
 
               <div className="flex flex-wrap gap-3 justify-end mt-10 pt-6 border-t border-gray-200">
