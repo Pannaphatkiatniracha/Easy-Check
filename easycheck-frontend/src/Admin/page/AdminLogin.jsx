@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveTokenToStorage, saveUserToStorage, fetchCurrentUser, normalizeUser } from '../data/userApi';
 
-const AdminLogin = () => {
+const AdminLogin = ({setToken={setToken}, setRole={setRole}}) => {
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -32,7 +32,6 @@ const handleSubmit = async (e) => {
   }
 
   try {
-
     const res = await fetch("http://localhost:5000/admin/login", {
       method: "POST",
       headers: {
@@ -47,29 +46,30 @@ const handleSubmit = async (e) => {
     const data = await res.json();
 
     if (data.success) {
-      saveTokenToStorage(data.token)
+      saveTokenToStorage(data.token);
+      
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("role", "admin");
+      setToken(data.token);
+      setRole("admin");
 
       try {
-        await fetchCurrentUser()
+        await fetchCurrentUser();
       } catch (fetchError) {
-        console.error('Unable to fetch profile after login:', fetchError)
+        console.error('Unable to fetch profile after login:', fetchError);
         if (data.user) {
-          saveUserToStorage(normalizeUser(data.user))
+          saveUserToStorage(normalizeUser(data.user));
         }
       }
 
-      navigate('/dashboard')
+      navigate('/dashboard');
 
     } else {
-
       showError(data.message || "Login failed");
-
     }
 
   } catch (err) {
-
     showError("Server error");
-
   }
 
   setLoading(false);
