@@ -27,13 +27,23 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
 
     // ดึงข้อมูลการเข้างานวันนี้ และสถิติการลาเดือนนี้พร้อมกัน
+    const checkAuth = (r) => {
+      // token หมดอายุหรือ invalid → ล้าง token แล้ว redirect ไปหน้า login
+      if (r.status === 401 || r.status === 403) {
+        localStorage.removeItem('token')
+        window.location.href = '/adminlogin'
+        throw new Error('Unauthorized')
+      }
+      return r.json()
+    }
+
     Promise.all([
       fetch(`${API_BASE}/admin/dashboard/today`, {
         headers: { Authorization: `Bearer ${token}` }
-      }).then(r => r.json()),
+      }).then(checkAuth),
       fetch(`${API_BASE}/admin/dashboard/leave-stats`, {
         headers: { Authorization: `Bearer ${token}` }
-      }).then(r => r.json())
+      }).then(checkAuth)
     ])
       .then(([todayData, leaveData]) => {
         setEmployees(todayData.employees || []);
@@ -634,6 +644,35 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
+
+              {/* รูปถ่ายเช็คอิน / เช็คเอาท์ */}
+              {(selectedEmployee.checkInPhoto || selectedEmployee.checkOutPhoto) && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100">รูปถ่ายการลงเวลา</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedEmployee.checkInPhoto && (
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm text-gray-500 font-medium">รูปเช็คอิน</span>
+                        <img
+                          src={selectedEmployee.checkInPhoto}
+                          alt="Check-in photo"
+                          className="w-full rounded-xl object-cover border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    )}
+                    {selectedEmployee.checkOutPhoto && (
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm text-gray-500 font-medium">รูปเช็คเอาท์</span>
+                        <img
+                          src={selectedEmployee.checkOutPhoto}
+                          alt="Check-out photo"
+                          className="w-full rounded-xl object-cover border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

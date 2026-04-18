@@ -251,6 +251,7 @@ export const getDashboardToday = async (req, res) => {
                 u.position, u.department, u.avatar,
                 s.start_time AS shift_start, s.end_time AS shift_end,
                 a.check_in_time, a.check_out_time, a.check_in_status,
+                a.check_in_photo, a.check_out_photo,
                 lr.id AS leave_id, lr.leave_reasons
             FROM Users u
             LEFT JOIN Shifts s ON s.shift_id = u.shift_id
@@ -291,6 +292,9 @@ export const getDashboardToday = async (req, res) => {
                 checkInTime: formatTime(row.check_in_time),
                 checkOutTime: formatTime(row.check_out_time),
                 checkInStatus: row.check_in_status,
+                // แปลง path (backslash) เป็น URL ที่ใช้งานได้
+                checkInPhoto: row.check_in_photo ? `http://localhost:5000/${row.check_in_photo.replace(/\\/g, '/')}` : null,
+                checkOutPhoto: row.check_out_photo ? `http://localhost:5000/${row.check_out_photo.replace(/\\/g, '/')}` : null,
                 overallStatus,
                 leaveReasons,
                 shiftStart: row.shift_start ? String(row.shift_start).slice(0, 5) : null,
