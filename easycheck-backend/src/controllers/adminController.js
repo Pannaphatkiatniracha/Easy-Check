@@ -17,12 +17,15 @@ export const loginAdmin = async (req, res) => {
 
         // หา admin ใน db
         const [rows] = await pool.execute(
-            "SELECT * FROM users WHERE id_employee = ? AND role_id IN ('3','4')",
+            "SELECT * FROM users WHERE id_employee = ? AND role_id IN (3,4)",
             [id_employee]
         )
 
         if (rows.length === 0) {
-            return res.status(401).json({ message: "Admin not found" })
+            return res.status(401).json({
+            success: false,
+            message: "Admin not found"
+        })
         }
 
         const admin = rows[0]
@@ -31,7 +34,10 @@ export const loginAdmin = async (req, res) => {
         const isMatch = await bcrypt.compare(password, admin.password)
 
         if (!isMatch) {
-            return res.status(401).json({ message: "Password incorrect" })
+            return res.status(401).json({
+            success: false,
+            message: "Password incorrect"
+            })
         }
 
         // สร้าง token
