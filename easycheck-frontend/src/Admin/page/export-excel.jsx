@@ -102,7 +102,7 @@ const ExportExcel = () => {
           
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">📊 ส่งออกรายงานการเข้างาน</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">ส่งออกรายงานการเข้างาน</h1>
             <p className="text-gray-500 text-lg">เลือกวันที่และแผนกเพื่อส่งออกข้อมูลเป็นไฟล์ Excel หรือ PDF</p>
           </div>
 
@@ -132,10 +132,10 @@ const ExportExcel = () => {
 
           {/* Filters */}
           <div className="bg-gray-50 p-8 rounded-2xl mb-8 border-2 border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800 mb-5">🔍 ตัวกรองข้อมูล</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-5">ตัวกรองข้อมูล</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">📅 เลือกวันที่</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">เลือกวันที่</label>
                 <input
                   type="date"
                   value={selectedDate}
@@ -145,7 +145,7 @@ const ExportExcel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">🏢 เลือกแผนก</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">เลือกแผนก</label>
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -159,7 +159,7 @@ const ExportExcel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">📄 รูปแบบไฟล์</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">รูปแบบไฟล์</label>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setFormat('excel')}
@@ -169,7 +169,7 @@ const ExportExcel = () => {
                         : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
                     }`}
                   >
-                    📊 Excel
+                    Excel
                   </button>
                   <button
                     onClick={() => setFormat('pdf')}
@@ -179,7 +179,7 @@ const ExportExcel = () => {
                         : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
                     }`}
                   >
-                    📑 PDF
+                    PDF
                   </button>
                 </div>
               </div>
@@ -189,7 +189,7 @@ const ExportExcel = () => {
           {/* Data Table */}
           <div className="bg-white rounded-2xl overflow-hidden shadow-md mb-8">
             <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-8 py-5">
-              <h2 className="text-xl font-semibold text-white">📋 ข้อมูลที่จะส่งออก</h2>
+              <h2 className="text-xl font-semibold text-white">ข้อมูลที่จะส่งออก</h2>
             </div>
             
             <div className="overflow-x-auto">
