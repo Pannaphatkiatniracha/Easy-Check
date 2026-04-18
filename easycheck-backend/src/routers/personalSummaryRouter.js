@@ -1,7 +1,7 @@
 
 import express from 'express'
 // นำเข้า Controller ฟังก์ชันที่เราเขียนไว้เพื่อดึงข้อมูลพนักงาน
-import { getAllEmployees, updateEmployee, deleteEmployee } from '../controllers/personalSummaryController.js'
+import { getAllEmployees, updateEmployee, deleteEmployee, getEmployeeStats } from '../controllers/personalSummaryController.js'
 import { verifyToken } from '../middlewares/authMiddleware.js'
 
 // สร้างตัวจัดการเส้นทาง (Router instance)
@@ -9,6 +9,7 @@ const router = express.Router()
 
 // กำหนดเส้นทางแบบ GET (เมื่อมีการเรียก API มาที่พาธนี้ ให้ไปทำงานที่ฟังก์ชัน getAllEmployees)
 router.get('/list', verifyToken, getAllEmployees)
+router.get('/:id/stats', verifyToken, getEmployeeStats) // ต้องอยู่ก่อน /:id เพื่อไม่ให้ชนกัน
 router.put('/:id', updateEmployee)
 router.delete('/:id', deleteEmployee)
 
