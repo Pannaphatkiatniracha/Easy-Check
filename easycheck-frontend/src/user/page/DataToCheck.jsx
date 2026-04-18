@@ -101,7 +101,7 @@ const DataToCheck = () => {
                                           state={{ 
                                             employeeData: {
                                                 name: (person.firstname && person.lastname) ? `${person.firstname} ${person.lastname}` : (person.name || ''),
-                                                employeeId: person.id_employee || person.userid,
+                                                employeeId: Number(person.id_employee || person.userid), // 🐷 แก้ตรงนี้
                                                 profile: person.avatar || '/easycheck/img/default.jpg',
                                                 shift: person.shift,
                                                 department: person.department,
