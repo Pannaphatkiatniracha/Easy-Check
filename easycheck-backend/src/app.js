@@ -18,6 +18,9 @@ import groupNotiRouter from "./routers/group-notiRouter.js";
 //เพิ่มการ Import ไฟล์ assignRoutes ที่เราสร้างใหม่
 import assignRoutes from "./routers/assignRoutes.js";
 
+// เพิ่มการ Import ไฟล์ earlyLeaveRoutes สำหรับการขอออกก่อนเวลา
+import earlyleaveRouter from "./routers/earlyleaveRouter.js"; 
+
 import pool from "./config/db.js";
 
 dotenv.config();
@@ -31,8 +34,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
 });
 
 app.use("/uploads", express.static("uploads"));
@@ -48,8 +51,8 @@ app.use("/gps-locations", gpsLocationRouter);
 app.use("/api/group-noti", groupNotiRouter);
 app.use("/checkin-approve", requestRoutes);
 app.use("/approver", shiftRoutes);
+app.use('/api/earlyleave', earlyleaveRouter);
 
-//   เพิ่ม Route สำหรับระบบแต่งตั้ง Approver
 app.use("/api/assign", assignRoutes);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

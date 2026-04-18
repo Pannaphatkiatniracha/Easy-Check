@@ -21,19 +21,21 @@ import ExRegister from "./user/page/ExRegister";
 import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
-import CheckApporve from "./user/page/RequestApprove";
+
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
 import ApproverManagement from "./user/page/ApproverManagement";
-import PaymentRequest from "./user/page/PaymentRequest"; // KEEP BOTH
+import PaymentRequest from "./user/page/PaymentRequest"; 
+import ShiftSelection from "./user/page/ShiftSelection"; 
+import EarlyLeave from "./user/page/EarlyLeave";
 
 import Dashboard from "./Admin/page/Dashboard";
 import AppLayouts from "./Admin/layouts/AppLayouts";
 import AdminLogin from "./Admin/page/AdminLogin";
 import AdminForgotPassword from "./Admin/page/AdminForgotPassword";
-import Settings from "./Admin/page/SettingsAdmin";
+
 import CreateEvent from "./Admin/page/CreateEvent";
 import AdminPrivacyPolicy from "./Admin/page/AdminPrivacyPolicy";
 import AccessControl from "./Admin/page/AccessControl";
@@ -109,6 +111,8 @@ function App() {
 
                 <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
                 <Route path="paymentrequest" element={<PaymentRequest />} />
+                <Route path="shiftselection" element={<ShiftSelection />} />
+                <Route path="earlyleave" element={<EarlyLeave />} />
                 
                 <Route
                   path="datacheck"
