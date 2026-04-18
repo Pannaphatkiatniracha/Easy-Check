@@ -14,7 +14,8 @@ function LeaveRequestApprove() {
       setLoading(true);
       const res = await axios.get(`${API}/pending`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          //  เปลี่ยนจาก localStorage → sessionStorage
+          Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
         },
       });
       setRequests(res.data || []);
@@ -40,7 +41,8 @@ function LeaveRequestApprove() {
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            // เปลี่ยนจาก localStorage → sessionStorage
+            Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
           },
         },
       );
@@ -59,7 +61,7 @@ function LeaveRequestApprove() {
       "",
     );
 
-    if (reason === null) return; // กด Cancel ปิดหน้าต่าง
+    if (reason === null) return;
     if (reason.trim() === "") {
       alert("กรุณาระบุเหตุผลในการไม่อนุมัติ เพื่อแจ้งให้พนักงานทราบครับ");
       return;
@@ -71,7 +73,8 @@ function LeaveRequestApprove() {
         { reason: reason.trim() },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            // เปลี่ยนจาก localStorage → sessionStorage
+            Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
           },
         },
       );
@@ -128,9 +131,7 @@ function LeaveRequestApprove() {
                 className="w-16 h-16 rounded-full object-cover shadow-sm border border-gray-200"
               />
               <div className="flex-1">
-                <div className="font-bold text-gray-800 text-lg">
-                  {req.name}
-                </div>
+                <div className="font-bold text-gray-800 text-lg">{req.name}</div>
                 <div className="text-sm text-gray-500 font-medium">
                   รหัส: {req.employeeId}
                 </div>
@@ -205,7 +206,6 @@ function LeaveRequestApprove() {
         ))}
       </div>
 
-      {/* Modal ดูรูปภาพหลักฐานแบบกดปิดได้ */}
       {selectedEvidence && (
         <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-fade-in"
