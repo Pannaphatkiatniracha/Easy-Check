@@ -185,6 +185,15 @@ const Dashboard = () => {
     return diff > 0 ? diff.toFixed(1) : null;
   };
 
+  const statusClass = (s) => ({
+    'ปกติ':          'bg-emerald-100 text-emerald-700 border-emerald-200',
+    'สาย':           'bg-amber-100 text-amber-700 border-amber-200',
+    'ขาด':           'bg-rose-100 text-rose-700 border-rose-200',
+    'ลา':            'bg-purple-100 text-purple-700 border-purple-200',
+    'วันหยุด':        'bg-slate-100 text-slate-700 border-slate-200',
+    'ยังไม่เข้างาน':   'bg-sky-100 text-sky-700 border-sky-200',
+  }[s] || 'bg-gray-100 text-gray-700 border-gray-200');
+
   const departments = [...new Set(employees.map(e => e.department))].filter(Boolean).sort();
 
   const filteredEmployees = employees.filter(emp => {
@@ -401,6 +410,8 @@ const Dashboard = () => {
               <option>สาย</option>
               <option>ขาด</option>
               <option>ลา</option>
+              <option>วันหยุด</option>
+              <option>ยังไม่เข้างาน</option>
             </select>
           </div>
         </div>
@@ -459,12 +470,7 @@ const Dashboard = () => {
                           : <span className="text-gray-400 ml-4">-</span>}
                       </td>
                       <td className="px-6 py-4 align-middle">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block shadow-sm border ${
-                          emp.overallStatus === 'ปกติ' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                          emp.overallStatus === 'สาย'  ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                          emp.overallStatus === 'ขาด'  ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                         'bg-purple-100 text-purple-700 border-purple-200'
-                        }`}>
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block shadow-sm border ${statusClass(emp.overallStatus)}`}>
                           {emp.overallStatus}
                         </span>
                       </td>
@@ -633,12 +639,7 @@ const Dashboard = () => {
                   <div className="p-2.5 bg-gray-200 text-gray-600 rounded-lg shrink-0"><AlertCircle size={20} /></div>
                   <div className="flex flex-col justify-center">
                     <span className="text-sm text-gray-500 font-medium mb-1">สถานะปัจจุบัน</span>
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block w-fit shadow-sm border ${
-                      selectedEmployee.overallStatus === 'ปกติ' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                      selectedEmployee.overallStatus === 'สาย'  ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                      selectedEmployee.overallStatus === 'ขาด'  ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                                   'bg-purple-100 text-purple-700 border-purple-200'
-                    }`}>
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block w-fit shadow-sm border ${statusClass(selectedEmployee.overallStatus)}`}>
                       {selectedEmployee.overallStatus}
                     </span>
                   </div>
