@@ -1,12 +1,5 @@
 import express from "express";
 
-// import {  forgotPassword } from "../controllers/adminController.js";
-// EditEvent , CreateEvent  
-
-// import {  getAdmin, verifyAdminIdentity, verifyAdminOTP, resetAdminPassword, addNewUserShift, userShift, deleteUserShift, editShift, getAllEvent , CreateEvent , DeleteEvent , EditEvent ,getDepartments, getEmployees, sendNotification } from "../controllers/adminController.js";
-// , CreateEvent , EditEvent , CreateEvent  , DeleteEvent
-
-
 import {
   loginAdmin,
   getAdmin,
@@ -19,15 +12,16 @@ import {
   editShift,
   getAllEvent,
   CreateEvent,
-  EditEvent ,
+  EditEvent,
   DeleteEvent,
   getDepartments,
   getEmployees,
   sendNotification,
-  GetPositionCount ,
-  SaveRolePermissions ,
+  GetPositionCount,
+  SaveRolePermissions,
   GetRolePermissions,
-  getDashboardToday
+  getDashboardToday,
+  getDashboardLeaveStats
 } from "../controllers/adminController.js";
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -35,230 +29,47 @@ import { verifyToken } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 // -----------------------------------------
-// Admin auth
+// Admin Auth (ไม่ต้อง token เพราะเป็นหน้า login/forgot)
 // -----------------------------------------
 router.post("/login", loginAdmin);
 router.get("/me", verifyToken, getAdmin);
 router.get("/dashboard/today", verifyToken, getDashboardToday);
+router.get("/dashboard/leave-stats", verifyToken, getDashboardLeaveStats); // สถิติการลาเดือนนี้
 
-// Forgot Password Routes for Admin
+// Forgot Password (ไม่ต้อง token เพราะยังไม่ได้ login)
 router.post("/forgot-password/verify-identity", verifyAdminIdentity);
 router.post("/forgot-password/verify-otp", verifyAdminOTP);
 router.post("/forgot-password/reset-password", resetAdminPassword);
 
 // -----------------------------------------
-// Shift Management
+// Shift Management (ต้อง login ก่อนถึงจะใช้ได้)
 // -----------------------------------------
-router.post("/newUserShift", addNewUserShift);
-router.get("/userShift", userShift);
-router.delete("/deleteUserShift", deleteUserShift);
-router.put("/editShift", editShift);
-
-// -----------------------------------------
-// Event Management
-// -----------------------------------------
-router.get("/Event", getAllEvent);
-router.post("/CreateEvent", CreateEvent);
-router.delete("/DeleteEvent", DeleteEvent);
+router.post("/newUserShift", verifyToken, addNewUserShift)    // เพิ่ม shift ให้ user
+router.get("/userShift", verifyToken, userShift)              // ดึงข้อมูล shift ทั้งหมด
+router.delete("/deleteUserShift", verifyToken, deleteUserShift) // ลบ shift ของ user
+router.put("/editShift", verifyToken, editShift)              // แก้ไข shift
 
 // -----------------------------------------
-// Notification / Employee / Department
+// Event Management (ต้อง login ก่อนถึงจะใช้ได้)
 // -----------------------------------------
-router.get("/departments", getDepartments);
-router.get("/employees", getEmployees);
-router.post("/send-notification", sendNotification);
+router.get("/Event", verifyToken, getAllEvent)                 // ดึงกิจกรรมทั้งหมด
+router.post("/CreateEvent", verifyToken, CreateEvent)         // สร้างกิจกรรม
+router.put("/EditEvent", verifyToken, EditEvent)              // แก้ไขกิจกรรม
+router.delete("/DeleteEvent", verifyToken, DeleteEvent)       // ลบกิจกรรม
 
+// -----------------------------------------
+// Notification / Employee / Department (ต้อง login ก่อนถึงจะใช้ได้)
+// -----------------------------------------
+router.get("/departments", verifyToken, getDepartments)       // ดึงรายชื่อแผนก
+router.get("/employees", verifyToken, getEmployees)           // ดึงรายชื่อพนักงาน
+router.post("/send-notification", verifyToken, sendNotification) // ส่งการแจ้งเตือน
 
-
-
-// ดึงข้อมูลมาแสดงพนักงานทั้งหมดจาก data php
-router.get('/userShift', userShift);
-/**
- * @swagger
- * /users/userShift:
- *   get:
- *     summary: Get all user shifts
- *     description: Retrieve all user shift assignments including employee details, role level, and shift times.
- *     tags: [User]
- *     responses:
- *       200:
- *         description: User shifts retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   idemployee:
- *                     type: integer
- *                     example: 1001
- *                   Firstname:
- *                     type: string
- *                     example: "tatar"
- *                   Lastname:
- *                     type: string
- *                     example: "Prasert"
- *                   level:
- *                     type: string
- *                     description: ระดับ role ของพนักงาน
- *                     example: "staff"
- *                   start_time:
- *                     type: string
- *                     format: time
- *                     example: "08:00:00"
- *                   end_time:
- *                     type: string
- *                     format: time
- *                     example: "17:00:00"
- *                   shift_id:
- *                     type: integer
- *                     example: 3
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal Server Error"
- */
-
-
-
-
-
-//ลบ user ออกจาก shift
-router.delete('/deleteUserShift' , deleteUserShift ) 
-/**
- * @swagger
- * /users/deleteUserShift:
- *   delete:
- *     summary: Delete user shift assignment
- *     description: Remove a specific shift assignment from a user by userId and shiftId.
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - shiftId
- *             properties:
- *               userId:
- *                 type: integer
- *                 description: Employee ID ของผู้ใช้
- *                 example: 1001
- *               shiftId:
- *                 type: integer
- *                 description: ID ของกะงานที่จะลบออก
- *                 example: 3
- *     responses:
- *       200:
- *         description: User shift deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User shift deleted successfully"
- *       400:
- *         description: Missing required fields
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Missing userId or shiftId"
- *       404:
- *         description: User shift not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "User shift not found"
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Server error"
- */
-
-router.put('/editShift', editShift)
-router.get('/editShift', editShift)
-
-
-router.get('/Event', getAllEvent)
-router.post('/CreateEvent', CreateEvent)
-router.patch('/EditEvent', EditEvent)
-router.delete('/DeleteEvent', DeleteEvent)
-router.get('/GetPositionCount', GetPositionCount)
-router.post('/SaveRolePermissions' , SaveRolePermissions)
-router.get('/GetRolePermissions' , GetRolePermissions)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//-----------------------------------------------tar----------------------------------------//
-
+// -----------------------------------------
+// Permission (ต้อง login ก่อนถึงจะใช้ได้)
+// -----------------------------------------
+router.get('/GetPositionCount', verifyToken, GetPositionCount)        // นับจำนวนตามตำแหน่ง
+router.post('/SaveRolePermissions', verifyToken, SaveRolePermissions) // บันทึก permission
+router.get('/GetRolePermissions', verifyToken, GetRolePermissions)    // ดึง permission ของ role
 
 // -----------------------------------------
 router.get("/", (req, res) => {
@@ -266,3 +77,4 @@ router.get("/", (req, res) => {
 });
 
 export default router;
+

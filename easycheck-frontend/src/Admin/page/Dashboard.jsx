@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Search, Clock, Users, UserX, Calendar, TrendingUp, AlertCircle, MoreVertical, ChevronLeft } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5000';
@@ -7,30 +7,44 @@ const Dashboard = () => {
   const [summary, setSummary] = useState({ present: 0, late: 0, absent: 0, onLeave: 0, notCheckedOut: 0, total: 0 });
   const [employees, setEmployees] = useState([]);
   const [deptStats, setDeptStats] = useState([]);
+  const [leaveStats, setLeaveStats] = useState([]); // สถิติการลา 7 ประเภท
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDept, setFilterDept] = useState('ทั้งหมด');
   const [filterStatus, setFilterStatus] = useState('ทั้งหมด');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 10;
+
+  // ใช้ ref เก็บ chart instance แทนการแขวนไว้บน DOM element
+  const lineChartRef = useRef(null)
+  const doughnutChartRef = useRef(null)
 
   // ดึงข้อมูลจาก API
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch(`${API_BASE}/admin/dashboard/today`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => r.json())
-      .then(data => {
-        setEmployees(data.employees || []);
-        setDeptStats(data.departmentStats || []);
-        setSummary(data.summary || {});
+
+    // ดึงข้อมูลการเข้างานวันนี้ และสถิติการลาเดือนนี้พร้อมกัน
+    Promise.all([
+      fetch(`${API_BASE}/admin/dashboard/today`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(r => r.json()),
+      fetch(`${API_BASE}/admin/dashboard/leave-stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(r => r.json())
+    ])
+      .then(([todayData, leaveData]) => {
+        setEmployees(todayData.employees || []);
+        setDeptStats(todayData.departmentStats || []);
+        setSummary(todayData.summary || {});
+        setLeaveStats(leaveData.data || []); // เก็บสถิติการลา 7 ประเภท
         setIsLoading(false);
       })
       .catch(err => {
         console.error('Dashboard error:', err);
+        setError('ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
         setIsLoading(false);
       });
   }, []);
@@ -39,111 +53,119 @@ const Dashboard = () => {
   useEffect(() => {
     if (isLoading) return;
 
-    const initCharts = () => {
-      if (typeof Chart === 'undefined') return;
+    if (typeof Chart === 'undefined') return;
 
-      Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
-      const lineCtx = document.getElementById('lineChart');
-      if (lineCtx) {
-        const barData = [
-          (summary.present || 0) - (summary.late || 0),
-          summary.late || 0,
-          summary.absent || 0,
-          summary.onLeave || 0
-        ];
-        if (lineCtx.chart) {
-          lineCtx.chart.data.datasets[0].data = barData;
-          lineCtx.chart.update();
-        } else {
-          lineCtx.chart = new Chart(lineCtx, {
-            type: 'bar',
-            data: {
-              labels: ['เข้างาน', 'มาสาย', 'ขาดงาน', 'ลา'],
-              datasets: [{
-                label: 'จำนวนคน',
-                data: barData,
-                backgroundColor: ['#50589C', '#ff9800', '#f44336', '#9c27b0'],
-                borderRadius: 8,
-                barThickness: 60
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  padding: 12,
-                  callbacks: { label: (ctx) => `${ctx.parsed.y} คน` }
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  grid: { color: 'rgba(0,0,0,0.05)' },
-                  ticks: { callback: (v) => `${v} คน` }
-                },
-                x: { grid: { display: false } }
+    const barData = [
+      (summary.present || 0) - (summary.late || 0),
+      summary.late || 0,
+      summary.absent || 0,
+      summary.onLeave || 0
+    ];
+
+    // --- Bar Chart ---
+    const lineCtx = document.getElementById('lineChart');
+    if (lineCtx) {
+      // ถ้า chart มีอยู่แล้ว update ข้อมูล / ถ้าไม่มีให้สร้างใหม่
+      if (lineChartRef.current) {
+        lineChartRef.current.data.datasets[0].data = barData;
+        lineChartRef.current.update();
+      } else {
+        lineChartRef.current = new Chart(lineCtx, {
+          type: 'bar',
+          data: {
+            labels: ['เข้างาน', 'มาสาย', 'ขาดงาน', 'ลา'],
+            datasets: [{
+              label: 'จำนวนคน',
+              data: barData,
+              backgroundColor: ['#50589C', '#ff9800', '#f44336', '#9c27b0'],
+              borderRadius: 8,
+              barThickness: 60
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                callbacks: { label: (ctx) => `${ctx.parsed.y} คน` }
               }
-            }
-          });
-        }
-      }
-
-      const doughnutCtx = document.getElementById('doughnutChart');
-      if (doughnutCtx) {
-        const doughnutData = [
-          (summary.present || 0) - (summary.late || 0),
-          summary.late || 0,
-          summary.absent || 0,
-          summary.onLeave || 0
-        ];
-        const doughnutLabels = ['เข้างานปกติ', 'มาสาย', 'ขาดงาน', 'ลา'];
-        if (doughnutCtx.chart) {
-          doughnutCtx.chart.data.datasets[0].data = doughnutData;
-          doughnutCtx.chart.update();
-        } else {
-          doughnutCtx.chart = new Chart(doughnutCtx, {
-            type: 'doughnut',
-            data: {
-              labels: doughnutLabels,
-              datasets: [{
-                data: doughnutData,
-                backgroundColor: ['#3C467B', '#ff9800', '#f44336', '#9c27b0'],
-                borderWidth: 0,
-                hoverOffset: 10
-              }]
             },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                  labels: { padding: 12, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' }
-                },
-                tooltip: {
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  padding: 12,
-                  callbacks: {
-                    label: (ctx) => {
-                      const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                      const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                      return `${ctx.label}: ${ctx.parsed} คน (${pct}%)`;
-                    }
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                ticks: { callback: (v) => `${v} คน` }
+              },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+    }
+
+    // --- Doughnut Chart (สัดส่วนการลา 7 ประเภท) ---
+    const doughnutCtx = document.getElementById('doughnutChart');
+    if (doughnutCtx && leaveStats.length > 0) {
+      // กรองเฉพาะประเภทที่มีการลาเพื่อให้ chart ไม่รก
+      const activeLeave = leaveStats.filter(t => t.count > 0);
+      const doughnutData   = activeLeave.length > 0 ? activeLeave.map(t => t.count) : leaveStats.map(t => t.count);
+      const doughnutLabels = activeLeave.length > 0 ? activeLeave.map(t => t.thLabel) : leaveStats.map(t => t.thLabel);
+      const doughnutColors = activeLeave.length > 0 ? activeLeave.map(t => t.color)   : leaveStats.map(t => t.color);
+
+      // ถ้า chart มีอยู่แล้ว update ข้อมูล / ถ้าไม่มีให้สร้างใหม่
+      if (doughnutChartRef.current) {
+        doughnutChartRef.current.data.labels = doughnutLabels;
+        doughnutChartRef.current.data.datasets[0].data = doughnutData;
+        doughnutChartRef.current.data.datasets[0].backgroundColor = doughnutColors;
+        doughnutChartRef.current.update();
+      } else {
+        doughnutChartRef.current = new Chart(doughnutCtx, {
+          type: 'doughnut',
+          data: {
+            labels: doughnutLabels,
+            datasets: [{
+              data: doughnutData,
+              backgroundColor: doughnutColors,
+              borderWidth: 0,
+              hoverOffset: 10
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { padding: 12, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                callbacks: {
+                  label: (ctx) => {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                    return `${ctx.label}: ${ctx.parsed} ครั้ง (${pct}%)`;
                   }
                 }
               }
             }
-          });
-        }
+          }
+        });
       }
-    };
+    }
 
-    setTimeout(initCharts, 100);
-  }, [isLoading, summary]);
+    // ทำลาย chart เมื่อ component ถูกถอดออกจากหน้า เพื่อป้องกัน memory leak
+    return () => {
+      if (lineChartRef.current) { lineChartRef.current.destroy(); lineChartRef.current = null; }
+      if (doughnutChartRef.current) { doughnutChartRef.current.destroy(); doughnutChartRef.current = null; }
+    };
+  }, [isLoading, summary, leaveStats]);
 
   const calcWorkHours = (inTime, outTime) => {
     if (!inTime || !outTime) return null;
@@ -182,6 +204,15 @@ const Dashboard = () => {
     );
   }
 
+  // แสดง error UI แทนหน้าว่างเมื่อ API ล้มเหลว
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex-1 box-border overflow-x-hidden bg-gray-50 p-4 sm:p-6 md:p-8 font-sans text-gray-800">
 
@@ -197,9 +228,9 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* KPI Cards — 3 ใบ */}
+      {/* KPI Cards — 4 ใบ */}
       <section className="mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 border-l-4 border-l-emerald-500 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600"><Users /></div>
@@ -228,6 +259,15 @@ const Dashboard = () => {
             <div className="text-4xl font-bold text-gray-800 mb-1">{summary.absent}</div>
             <div className="text-sm text-gray-400">ขาดโดยไม่แจ้ง</div>
           </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 border-l-4 border-l-purple-500 flex flex-col">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-xl bg-purple-100 text-purple-600"><Calendar /></div>
+              <span className="text-gray-500 font-medium">ลางาน</span>
+            </div>
+            <div className="text-4xl font-bold text-gray-800 mb-1">{summary.onLeave}</div>
+            <div className="text-sm text-gray-400">ลาได้รับอนุมัติวันนี้</div>
+          </div>
         </div>
       </section>
 
@@ -254,10 +294,18 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 m-0">สัดส่วนการเข้างาน</h3>
-          <div className="relative h-80 w-full flex items-center justify-center">
-            <canvas id="doughnutChart"></canvas>
-          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-1 m-0">สัดส่วนการลาเดือนนี้</h3>
+          <p className="text-sm text-gray-400 mb-4 m-0">จำนวนครั้งที่ลา แยกตามประเภท</p>
+          {leaveStats.every(t => t.count === 0) ? (
+            // แสดงข้อความเมื่อยังไม่มีการลาเดือนนี้
+            <div className="flex-1 flex items-center justify-center text-gray-400 text-sm font-medium h-80">
+              ไม่มีข้อมูลการลาเดือนนี้
+            </div>
+          ) : (
+            <div className="relative h-80 w-full flex items-center justify-center">
+              <canvas id="doughnutChart"></canvas>
+            </div>
+          )}
         </div>
       </section>
 
