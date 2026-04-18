@@ -50,7 +50,8 @@ app.use("/admin", adminRouter);
 app.use("/gps-locations", gpsLocationRouter);
 app.use("/api/group-noti", groupNotiRouter);
 app.use("/checkin-approve", requestRoutes);
-app.use("/approver", shiftRoutes);
+// server.js
+app.use("/shifts", shiftRoutes);  // เปลี่ยน /approver → /shifts
 app.use('/api/earlyleave', earlyleaveRouter);
 
 app.use("/api/assign", assignRoutes);
