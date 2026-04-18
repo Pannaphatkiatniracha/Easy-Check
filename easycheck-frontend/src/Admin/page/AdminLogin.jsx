@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveTokenToStorage, saveUserToStorage, fetchCurrentUser, normalizeUser } from '../data/userApi';
 
-const AdminLogin = ({setToken={setToken}, setRole={setRole}}) => {
+const AdminLogin = ({ setToken = { setToken }, setRole = { setRole } }) => {
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -20,70 +20,70 @@ const AdminLogin = ({setToken={setToken}, setRole={setRole}}) => {
     setTimeout(() => setError(''), 5000);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  if (!formData.id || !formData.password) {
-    showError('กรุณากรอกข้อมูลให้ครบถ้วน');
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:5000/admin/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id_employee: formData.id,
-        password: formData.password
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      saveTokenToStorage(data.token);
-      
-      sessionStorage.setItem("token", data.token);
-      sessionStorage.setItem("role", "admin");
-      setToken(data.token);
-      setRole("admin");
-
-      try {
-        await fetchCurrentUser();
-      } catch (fetchError) {
-        console.error('Unable to fetch profile after login:', fetchError);
-        if (data.user) {
-          saveUserToStorage(normalizeUser(data.user));
-        }
-      }
-
-      navigate('/dashboard');
-
-    } else {
-      showError(data.message || "Login failed");
+    if (!formData.id || !formData.password) {
+      showError('กรุณากรอกข้อมูลให้ครบถ้วน');
+      setLoading(false);
+      return;
     }
 
-  } catch (err) {
-    showError("Server error");
-  }
+    try {
+      const res = await fetch("http://localhost:5000/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          id_employee: formData.id,
+          password: formData.password
+        })
+      });
 
-  setLoading(false);
-};
+      const data = await res.json();
+
+      if (data.success) {
+        saveTokenToStorage(data.token);
+
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("role", data.user.role);
+        setRole(data.user.role);
+        setToken(data.token);
+
+        try {
+          await fetchCurrentUser();
+        } catch (fetchError) {
+          console.error('Unable to fetch profile after login:', fetchError);
+          if (data.user) {
+            saveUserToStorage(normalizeUser(data.user));
+          }
+        }
+
+        navigate('/dashboard');
+
+      } else {
+        showError(data.message || "Login failed");
+      }
+
+    } catch (err) {
+      showError("Server error");
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#3C467B' }}>
       <div className="w-full max-w-2xl bg-white p-12 flex flex-col items-center rounded-lg shadow-lg relative">
-        
+
         {/* Profile Circle */}
         <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-lg mb-12">
-          <img 
-            src="https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_hybrid&w=740&q=80" 
-            alt="Profile" 
+          <img
+            src="https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_hybrid&w=740&q=80"
+            alt="Profile"
             className="w-full h-full object-cover"
           />
         </div>
@@ -103,12 +103,12 @@ const handleSubmit = async (e) => {
         {/* Form */}
         <form className="w-full max-w-xl flex flex-col gap-6" onSubmit={handleSubmit}>
           <div className="relative">
-            <input 
-              type="text" 
-              name="id" 
-              placeholder="Employee ID" 
-              value={formData.id} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="id"
+              placeholder="Employee ID"
+              value={formData.id}
+              onChange={handleChange}
               disabled={loading}
               className="w-full px-12 py-4 rounded-lg bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -119,12 +119,12 @@ const handleSubmit = async (e) => {
           </div>
 
           <div className="relative">
-            <input 
-              type={showPassword ? 'text' : 'password'} 
-              name="password" 
-              placeholder="Password" 
-              value={formData.password} 
-              onChange={handleChange} 
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
               disabled={loading}
               className="w-full px-12 py-4 rounded-lg bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -132,8 +132,8 @@ const handleSubmit = async (e) => {
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700"
             >
@@ -142,7 +142,7 @@ const handleSubmit = async (e) => {
           </div>
 
           <div className="text-right">
-            <button 
+            <button
               type="button"
               onClick={() => navigate('/adminforgotpassword')}
               className="text-blue-800 hover:text-blue-500 text-sm"
@@ -151,9 +151,9 @@ const handleSubmit = async (e) => {
             </button>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={loading} 
+          <button
+            type="submit"
+            disabled={loading}
             className="w-full py-4 bg-gradient-to-r from-blue-900 to-blue-400 text-white font-bold rounded-lg hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading && <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>}

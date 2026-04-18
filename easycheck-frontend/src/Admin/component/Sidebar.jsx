@@ -8,6 +8,8 @@ const Sidebar = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const role = sessionStorage.getItem("role");
 
   // โหลดข้อมูลผู้ใช้จาก storage แล้วรีเฟรชจาก backend
   useEffect(() => {

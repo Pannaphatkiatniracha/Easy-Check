@@ -7,12 +7,12 @@ const AppLayouts = () => {
         <div>
             
 
-            <div>
+            <div className="layout">
                 <Sidebar />
             </div>  
 
 
-            <main style={{ marginLeft: '260px' }}>
+            <main sclassName="mainContent">
                 <Outlet /> 
             </main>
 
