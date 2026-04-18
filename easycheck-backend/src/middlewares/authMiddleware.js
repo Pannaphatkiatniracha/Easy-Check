@@ -13,7 +13,10 @@ export const verifyToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1] // Split to get the token (skip 'Bearer')
 
     if (!token) {
-        return res.status(401).json({ message: 'Login first! Token not provided.' })
+        return res.status(401).json({
+        success: false,
+        message: 'Login first! Token not provided.'
+})
     }
 
     // Token exists, attempt to verify it

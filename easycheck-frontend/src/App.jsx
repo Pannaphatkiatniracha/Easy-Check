@@ -66,12 +66,12 @@ function App() {
           {/* --- ส่วนที่ใครก็เข้าได้ --- */}
           <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
           <Route path="forgotpassword" element={<ForgotPassword  />} />
+          <Route path="/adminlogin" element={<AdminLogin setToken={setToken} setRole={setRole} />} />
+          <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
 
           {/* ตรงนี้ต้องใส่ token เพื่อให้มันรู้ว่าคนนี้มีสิทธิ์ reset รหัสผ่านนะ */}
           <Route path="resetpassword/:token" element={<ResetPassword />} />
           
-          <Route path="/adminlogin" element={<AdminLogin/>} />
-          <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
 
           {/* --- ถ้าไม่มี Token ให้ดีดกลับไปหน้า Login เสมอ --- */}
           {!token ? (
