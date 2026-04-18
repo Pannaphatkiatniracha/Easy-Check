@@ -12,21 +12,28 @@ export const getShifts = async (req, res) => {
   }
 };
 
-// user + shift ปัจจุบัน (กรองตามสาขา)
+// ดึง users พร้อม shift ปัจจุบัน — ใช้ Users.shift_id เป็น source of truth
 export const getUsersWithShifts = async (req, res) => {
   try {
     const { branch_id } = req.query;
 
+    //  ดึง shift_id จาก Users โดยตรง (ไม่ JOIN User_shifts แล้ว)
     let query = `
-      SELECT u.id, u.id_employee, u.firstname, u.lastname,
-             u.position, u.department, u.branch_id, u.avatar, u.role_id,
-             us.shift_id
+      SELECT
+        u.id,
+        u.id_employee,
+        u.firstname,
+        u.lastname,
+        u.position,
+        u.department,
+        u.branch_id,
+        u.avatar,
+        u.role_id,
+        u.shift_id
       FROM Users u
-      LEFT JOIN User_shifts us ON u.id = us.id
     `;
     const params = [];
 
-    // เพิ่มเงื่อนไขการกรองสาขา
     if (branch_id) {
       query += ` WHERE u.branch_id = ?`;
       params.push(branch_id);
@@ -35,15 +42,16 @@ export const getUsersWithShifts = async (req, res) => {
     query += ` ORDER BY u.department, u.firstname`;
 
     const [rows] = await pool.query(query, params);
-
     res.json(rows);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// assign / update shift
+// assign / ยกเลิกกะ — อัปเดต Users.shift_id เป็น source of truth
+// และ sync User_shifts ไว้ด้วยเพื่อ backward compatibility
 export const assignShift = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
     const { userId, shiftId } = req.body;
 
@@ -51,7 +59,7 @@ export const assignShift = async (req, res) => {
       return res.status(400).json({ message: "userId จำเป็น" });
     }
 
-    const [users] = await pool.query(
+    const [users] = await conn.query(
       "SELECT id, role_id FROM Users WHERE id = ? LIMIT 1",
       [userId]
     );
@@ -61,33 +69,50 @@ export const assignShift = async (req, res) => {
     }
 
     const user = users[0];
+    const newShiftId = shiftId === null || shiftId === "" ? null : Number(shiftId);
 
-    // รองรับกรณีอยากถอดกะพนักงาน
-    if (shiftId === null || shiftId === "") {
-      await pool.query("DELETE FROM User_shifts WHERE id = ?", [userId]);
-      return res.json({ message: "ยกเลิกกะเรียบร้อยแล้ว" });
-    }
+    await conn.beginTransaction();
 
-    const [exists] = await pool.query(
-      "SELECT id FROM User_shifts WHERE id = ? LIMIT 1",
-      [userId]
-    );
+    //  อัปเดต Users.shift_id (source of truth)
+    await conn.query("UPDATE Users SET shift_id = ? WHERE id = ?", [
+      newShiftId,
+      userId,
+    ]);
 
-    if (exists.length > 0) {
-      await pool.query(
-        "UPDATE User_shifts SET shift_id = ?, role_id = ? WHERE id = ?",
-        [shiftId, user.role_id, userId]
-      );
-      return res.json({ message: "อัปเดตกะแล้ว" });
+    // Sync User_shifts ให้ตรงกัน
+    if (newShiftId === null) {
+      // ถอดกะ → ลบออกจาก User_shifts
+      await conn.query("DELETE FROM User_shifts WHERE id = ?", [userId]);
     } else {
-      await pool.query(
-        "INSERT INTO User_shifts (id, shift_id, role_id) VALUES (?, ?, ?)",
-        [userId, shiftId, user.role_id]
+      const [exists] = await conn.query(
+        "SELECT id FROM User_shifts WHERE id = ? LIMIT 1",
+        [userId]
       );
-      return res.json({ message: "เพิ่มกะแล้ว" });
+
+      if (exists.length > 0) {
+        await conn.query(
+          "UPDATE User_shifts SET shift_id = ?, role_id = ? WHERE id = ?",
+          [newShiftId, user.role_id, userId]
+        );
+      } else {
+        await conn.query(
+          "INSERT INTO User_shifts (id, shift_id, role_id) VALUES (?, ?, ?)",
+          [userId, newShiftId, user.role_id]
+        );
+      }
     }
+
+    await conn.commit();
+
+    res.json({
+      message: newShiftId === null ? "ยกเลิกกะเรียบร้อยแล้ว" : "อัปเดตกะแล้ว",
+      shift_id: newShiftId,
+    });
   } catch (err) {
+    await conn.rollback();
     console.error("assignShift error:", err);
     res.status(500).json({ message: err.message });
+  } finally {
+    conn.release();
   }
 };

@@ -6,7 +6,6 @@ import nodemailer from 'nodemailer'
 
 dotenv.config()
 
-
 // 🐻🐻 LOGIN
 export const login = async (req, res) => {
     const { id_employee, password } = req.body
@@ -29,7 +28,7 @@ export const login = async (req, res) => {
         )
 
         if (users.length === 0) {
-            console.log("❌ 2. หา ID นี้ไม่เจอใน Database:", id_employee)
+            console.log(" 2. หา ID นี้ไม่เจอใน Database:", id_employee)
             return res.status(404).json({ message: 'Login failed' })
         }
 
@@ -41,31 +40,40 @@ export const login = async (req, res) => {
         console.log("5. ผลการเทียบรหัส (isMatch):", isMatch)
 
         if (!isMatch) {
-            console.log("❌ 6. รหัสผ่านไม่ตรงกันจ้า!")
+            console.log(" 6. รหัสผ่านไม่ตรงกันจ้า!")
             return res.status(401).json({ message: 'Login failed' })
         }
 
+        //  เพิ่ม branch_id ใน token ทั้ง access และ refresh
         const token = jwt.sign(
-            { id: user.id, id_employee: user.id_employee, role: user.role },
+            {
+                id: user.id,
+                id_employee: user.id_employee,
+                role: user.role,
+                role_id: user.role_id,
+                branch_id: user.branch_id  //  เพิ่มตรงนี้
+            },
             JWT_SECRET,
             { expiresIn: '30m' }
         )
 
         const refreshToken = jwt.sign(
-            { id: user.id, id_employee: user.id_employee },
+            {
+                id: user.id,
+                id_employee: user.id_employee,
+                branch_id: user.branch_id  // เพิ่มตรงนี้
+            },
             JWT_SECRET,
             { expiresIn: '7d' }
         )
 
-        console.log("✅ 7. Login สำเร็จ! กำลังส่ง Token กลับไป...")
+        console.log(" Login สำเร็จ! กำลังส่ง Token กลับไป...")
 
         return res.status(200).json({
             message: 'Login successful',
             token,
             refreshToken,
             role: user.role,
-
-            // สำคัญมาก: frontend จะอ่าน response.data.user
             user: {
                 id: user.id,
                 id_employee: user.id_employee,
@@ -82,18 +90,16 @@ export const login = async (req, res) => {
         })
 
     } catch (error) {
-        console.error("🔥 เกิด Error:", error)
+        console.error(" เกิด Error:", error)
         return res.status(500).json({ message: 'Internal server error นางงอแง' })
     }
 }
-
 
 // 🐻🐻 LOGOUT
 export const logout = (req, res) => {
     console.log(`${req.user.firstname} is logging out...`)
     res.status(200).json({ message: 'Logout successful' })
 }
-
 
 // 🐻🐻 FORGOT PASSWORD
 export const forgotPassword = async (req, res) => {
@@ -152,7 +158,6 @@ export const forgotPassword = async (req, res) => {
     }
 }
 
-
 // 🐻🐻 RESET PASSWORD
 export const resetPassword = async (req, res) => {
     const { token } = req.params
@@ -171,7 +176,6 @@ export const resetPassword = async (req, res) => {
         return res.status(400).json({ message: 'Invalid or expired token', error: err.message })
     }
 }
-
 
 // 🐻🐻 REFRESH TOKEN
 export const refreshToken = async (req, res) => {
@@ -198,14 +202,25 @@ export const refreshToken = async (req, res) => {
             return res.status(403).json({ message: "User not found" })
         }
 
+        //  เพิ่ม branch_id ใน token ที่ refresh แล้วด้วย
         const newAccessToken = jwt.sign(
-            { id: user.id, id_employee: user.id_employee, role: user.role },
+            {
+                id: user.id,
+                id_employee: user.id_employee,
+                role: user.role,
+                role_id: user.role_id,
+                branch_id: user.branch_id  //  เพิ่มตรงนี้
+            },
             process.env.JWT_SECRET,
             { expiresIn: '30m' }
         )
 
         const newRefreshToken = jwt.sign(
-            { id: user.id, id_employee: user.id_employee },
+            {
+                id: user.id,
+                id_employee: user.id_employee,
+                branch_id: user.branch_id  // เพิ่มตรงนี้
+            },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         )
