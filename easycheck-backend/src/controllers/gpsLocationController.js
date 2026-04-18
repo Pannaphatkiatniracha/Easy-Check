@@ -1,6 +1,5 @@
 import pool from '../config/db.js'
 
-// ---------- ดึงสถานที่ทั้งหมด (สำหรับหน้า Admin) ----------
 export const getAllLocations = async (req, res) => {
   try {
     const { branch_id } = req.query
@@ -24,16 +23,16 @@ export const getAllLocations = async (req, res) => {
   }
 }
 
-// ---------- ดึงสถานที่ที่เปิดใช้งาน กรองตาม branch_id (สำหรับ Check-in / Check-out) ----------
+// ดึงสถานที่ที่เปิดใช้งาน กรองตาม branch_id (สำหรับ Check-in / Check-out) 
 export const getActiveLocationsByBranch = async (req, res) => {
   try {
-    const { branch_id } = req.query  // ✅ ใช้แค่ branch_id — ตัด role_id logic ที่ผิดออก
+    const { branch_id } = req.query  // ใช้แค่ branch_id — ตัด role_id logic ที่ผิดออก
 
     if (!branch_id || branch_id === 'undefined') {
       return res.status(400).json({ message: 'กรุณาระบุ branch_id' })
     }
 
-    // ✅ กรองตาม branch_id เสมอ ทุก role ต้องเช็คอินที่สาขาตัวเองเท่านั้น
+    // กรองตาม branch_id เสมอ ทุก role ต้องเช็คอินที่สาขาตัวเองเท่านั้น
     const [rows] = await pool.execute(
       `SELECT id, name, address, lat, lng, radius
        FROM gps_locations
@@ -51,7 +50,7 @@ export const getActiveLocationsByBranch = async (req, res) => {
   }
 }
 
-// ---------- เพิ่มสถานที่ใหม่ ----------
+// - เพิ่มสถานที่ใหม่ 
 export const createLocation = async (req, res) => {
   try {
     const { name, address, lat, lng, radius, branch_id } = req.body
@@ -72,7 +71,7 @@ export const createLocation = async (req, res) => {
   }
 }
 
-// ---------- แก้ไขสถานที่ ----------
+//  แก้ไขสถานที่ 
 export const updateLocation = async (req, res) => {
   try {
     const { id } = req.params
@@ -99,7 +98,7 @@ export const updateLocation = async (req, res) => {
   }
 }
 
-// ---------- ลบสถานที่ ----------
+// ลบสถานที่ 
 export const deleteLocation = async (req, res) => {
   try {
     const { id } = req.params
@@ -119,7 +118,7 @@ export const deleteLocation = async (req, res) => {
   }
 }
 
-// ---------- เปิด/ปิดสถานที่ (Toggle active) ----------
+//  เปิด/ปิดสถานที่ (Toggle active) 
 export const toggleLocation = async (req, res) => {
   try {
     const { id } = req.params
@@ -149,7 +148,7 @@ export const toggleLocation = async (req, res) => {
   }
 }
 
-// ---------- ดึงสาขาทั้งหมด (สำหรับ dropdown ใน SetGPS) ----------
+//  ดึงสาขาทั้งหมด (สำหรับ dropdown ใน SetGPS) 
 export const getAllBranches = async (req, res) => {
   try {
     const [rows] = await pool.execute(
