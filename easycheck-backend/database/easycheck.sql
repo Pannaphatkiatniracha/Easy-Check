@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 16, 2026 at 01:21 PM
+-- Generation Time: Apr 18, 2026 at 09:45 AM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -206,6 +206,7 @@ INSERT INTO `leave_policy` (`id`, `leave_code`, `leave_name`, `max_days_per_year
 CREATE TABLE `leave_requests` (
   `id` int NOT NULL,
   `id_employee` char(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch_id` int NOT NULL,
   `leave_start` date NOT NULL,
   `leave_end` date NOT NULL,
   `leave_days` int NOT NULL,
@@ -217,8 +218,16 @@ CREATE TABLE `leave_requests` (
   `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `approved_at` datetime DEFAULT NULL,
+  `approved_by` int DEFAULT NULL,
   `rejected_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `leave_requests`
+--
+
+INSERT INTO `leave_requests` (`id`, `id_employee`, `branch_id`, `leave_start`, `leave_end`, `leave_days`, `leave_reasons`, `other_reason`, `evidence_file`, `evidence_mime`, `status`, `reject_reason`, `created_at`, `approved_at`, `approved_by`, `rejected_at`) VALUES
+(1, '101010', 1, '2026-04-16', '2026-04-17', 2, '[\"Sick Leave\"]', NULL, NULL, NULL, 'pending', NULL, '2026-04-18 09:44:01', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -408,7 +417,9 @@ ALTER TABLE `leave_policy`
 --
 ALTER TABLE `leave_requests`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_employee` (`id_employee`);
+  ADD KEY `fk_leave_requests_employee` (`id_employee`),
+  ADD KEY `fk_leave_requests_branch` (`branch_id`),
+  ADD KEY `fk_leave_requests_approver` (`approved_by`);
 
 --
 -- Indexes for table `Roles`
@@ -486,7 +497,7 @@ ALTER TABLE `leave_policy`
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Users`
@@ -517,6 +528,14 @@ ALTER TABLE `event_registrations`
 --
 ALTER TABLE `gps_locations`
   ADD CONSTRAINT `fk_gps_branch` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Constraints for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  ADD CONSTRAINT `fk_leave_requests_approver` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_leave_requests_branch` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `fk_leave_requests_employee` FOREIGN KEY (`id_employee`) REFERENCES `employees` (`id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `Users`

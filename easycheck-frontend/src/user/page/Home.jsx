@@ -46,6 +46,36 @@ const Home = ({ role }) => {
           </div>
         </Link>
 
+      
+        {/* กล่องที่เพิ่มใหม่ เลือกกะงาน (Shift Selection) */}
+        <Link to="/shiftselection" className="text-decoration-none">
+          <div
+            className="p-4 text-center fw-semibold rounded-3 text-dark
+                        hover:scale-105 transition-all duration-200 ease-in-out"
+            style={{
+              background: "linear-gradient(to bottom, #D9D9D9, #636CCB)",
+            }}
+          >
+            <i className="bi bi-clock-fill fs-2"></i> <br />
+            SHIFT SELECTION
+          </div>
+        </Link>
+
+        {/* กล่องที่เพิ่มใหม่ ขอออกจากงานกรณีมีธุระ (Early Leave) */}
+        <Link to="/earlyleave" className="text-decoration-none">
+          <div
+            className="p-4 text-center fw-semibold rounded-3 text-dark
+                        hover:scale-105 transition-all duration-200 ease-in-out"
+            style={{
+              background: "linear-gradient(to bottom, #D9D9D9, #636CCB)",
+            }}
+          >
+            <i className="bi bi-box-arrow-right fs-2"></i> <br />
+            EARLY LEAVE
+          </div>
+        </Link>
+        {/* ---------------------------------------------------- */}
+
         {/* <Link to="/paymentrequest" className="text-decoration-none">
           <div
             className="p-4 text-center fw-semibold rounded-3 text-dark
