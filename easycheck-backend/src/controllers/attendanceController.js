@@ -252,42 +252,68 @@ export const getMyShift = async (req, res) => {
 
 // 🐱🐱 ATTENDANCE-SUMMARY
 export const getAttendanceHistory = async (req, res) => {
-  const { userId } = req.query;
-  const empId = userId || req.user?.id_employee;
-  
-  if (!empId) return res.status(400).json({ message: "userId is required" });
-  
+  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน
+  const empId = userId || req.user?.id_employee
+
+  if (!empId) return res.status(400).json({ message: "userId is required" })
+
   try {
     // ดึงข้อมูลการเข้า-ออกงาน
     const [attendanceRows] = await pool.query(
       `SELECT check_in_status AS status, DATE_FORMAT(work_date, '%Y-%m-%d') as date 
-       FROM attendance WHERE id_employee = ? ORDER BY work_date DESC`,
+       FROM attendance 
+       WHERE id_employee = ? 
+       ORDER BY work_date DESC`,
       [empId]
-    );
-    
-    // ดึงข้อมูลการลา
+    )
+
+    // ดึงข้อมูลการลา (เอาเป็นช่วง)
     const [leaveRows] = await pool.query(
-      `SELECT DISTINCT DATE_FORMAT(leave_start, '%Y-%m-%d') as date 
-       FROM leave_requests 
-       WHERE id_employee = ? AND status = 'approved' 
-       UNION 
-       SELECT DISTINCT DATE_FORMAT(leave_end, '%Y-%m-%d') as date 
+      `SELECT leave_start, leave_end
        FROM leave_requests 
        WHERE id_employee = ? AND status = 'approved'`,
-      [empId, empId]
+      [empId]
+    )
+
+    // ฟังก์ชันแตกวันลา
+    const expandLeaveDates = (start, end) => {
+      const dates = []
+      let current = new Date(start)
+      const last = new Date(end)
+
+      while (current <= last) {
+        dates.push(current.toISOString().split("T")[0])
+        current.setDate(current.getDate() + 1)
+      }
+
+      return dates
+    }
+
+    // รวมวันลาทั้งหมด (แตกเป็นรายวัน)
+    const leaveDates = leaveRows.flatMap(row =>
+      expandLeaveDates(row.leave_start, row.leave_end)
     );
 
+    // กันซ้ำ (กรณีมี overlap หรือ query ซ้ำ)
+    const uniqueLeaveDates = [...new Set(leaveDates)]
+
     const attendanceData = {
-      onTimes: attendanceRows.filter(r => r.status === 'on_time').map(r => r.date), // มาปกติ
-      lates: attendanceRows.filter(r => r.status === 'late').map(r => r.date), // มาสาย
-      leaves: leaveRows.map(r => r.date)  // ดึงวันลา
-    };
-    
-    res.json(attendanceData);
+      onTimes: attendanceRows
+        .filter(r => r.status === 'on_time')
+        .map(r => r.date),
+
+      lates: attendanceRows
+        .filter(r => r.status === 'late')
+        .map(r => r.date),
+
+      leaves: uniqueLeaveDates
+    }
+
+    res.json(attendanceData)
 
   } catch (err) {
-    console.error("Error in getAttendanceHistory:", err);
-    res.status(500).json({ message: "Database Error", error: err.message });
+    console.error("Error in getAttendanceHistory:", err)
+    res.status(500).json({ message: "Database Error", error: err.message })
   }
 }
 
