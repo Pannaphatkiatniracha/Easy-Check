@@ -1,41 +1,60 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+const API_BASE = 'http://localhost:5000';
+
 const ExportExcel = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [employees, setEmployees] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [format, setFormat] = useState('excel');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [isExporting, setIsExporting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // ข้อมูลตัวอย่างพนักงาน
-  const employeeData = [
-    { id: 'EMP001', name: 'สมชาย ใจดี', department: 'IT', status: 'มาทำงาน', checkIn: '08:00', checkOut: '17:00' },
-    { id: 'EMP002', name: 'สมหญิง รักงาน', department: 'IT', status: 'มาทำงาน', checkIn: '08:15', checkOut: '17:05' },
-    { id: 'EMP003', name: 'วิชัย เก่งงาน', department: 'HR', status: 'ลา', checkIn: '-', checkOut: '-' },
-    { id: 'EMP004', name: 'นภา สวยงาม', department: 'HR', status: 'มาทำงาน', checkIn: '08:05', checkOut: '17:00' },
-    { id: 'EMP005', name: 'ประยุทธ์ ขยัน', department: 'Finance', status: 'สาย', checkIn: '09:30', checkOut: '17:00' },
-    { id: 'EMP006', name: 'สุดา มั่นคง', department: 'Finance', status: 'มาทำงาน', checkIn: '07:55', checkOut: '17:10' },
-    { id: 'EMP007', name: 'ธนา พัฒนา', department: 'Marketing', status: 'ขาด', checkIn: '-', checkOut: '-' },
-    { id: 'EMP008', name: 'อรุณ สว่างใส', department: 'Marketing', status: 'มาทำงาน', checkIn: '08:00', checkOut: '17:00' },
-  ];
-
-  const departments = ['all', 'IT', 'HR', 'Finance', 'Marketing'];
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const userData = { name: 'Admin User', role: 'admin' };
     setUser(userData);
+
+    // ดึงข้อมูลพนักงานจาก API
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE}/admin/dashboard/today`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => {
+        // แปลงข้อมูลจาก API ให้เข้ากับรูปแบบของตาราง
+        if (data.employees) {
+          const transformedEmployees = data.employees.map(emp => ({
+            id: emp.id_employee || emp.id,
+            name: `${emp.firstname} ${emp.lastname}`,
+            department: emp.department || '-',
+            status: emp.overallStatus === 'ปกติ' ? 'มาทำงาน' : emp.overallStatus,
+            checkIn: emp.checkInTime || '-',
+            checkOut: emp.checkOutTime || '-'
+          }));
+          setEmployees(transformedEmployees);
+        }
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching employee data:', err);
+        setEmployees([]);
+        setIsLoading(false);
+      });
   }, []);
 
   const handleLogout = () => {
     navigate('/login');
   };
 
+  const departments = ['all', ...new Set(employees.map(e => e.department))].filter(d => d !== '-');
+
   const filteredData = selectedDepartment === 'all' 
-    ? employeeData 
-    : employeeData.filter(emp => emp.department === selectedDepartment);
+    ? employees 
+    : employees.filter(emp => emp.department === selectedDepartment);
 
   const stats = {
     total: filteredData.length,
@@ -82,6 +101,15 @@ const ExportExcel = () => {
   };
 
   if (!user) return <div className="flex items-center justify-center h-screen">Loading...</div>;
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium">กำลังโหลดข้อมูล...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#3C467B' }}>
