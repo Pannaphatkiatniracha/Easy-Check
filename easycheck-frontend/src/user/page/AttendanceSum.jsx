@@ -13,7 +13,15 @@ const AttendanceSum = ({ role }) => {
     
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({ title: "", dates: [], color: "" })
+
+    const now = new Date()
+
+    const monthYear = now.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric"
+    })
     
+
     // State สำหรับเก็บข้อมูลผู้ใช้
     const [userProfile, setUserProfile] = useState({
         name: "",
@@ -155,7 +163,7 @@ const AttendanceSum = ({ role }) => {
             {EmployeeProfile}
             <div className='d-flex justify-content-center mt-6'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80" style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    <h4 className="mt-3 fw-bold text-black">October 2025 Summary</h4>
+                    <h4 className="mt-3 fw-bold text-black">{monthYear} Summary</h4>
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105' style={{ backgroundColor: '#1CA983', border: 'none', borderRadius: '12px' }} onClick={() => scrollToSection("ontime")}>On time: {onTimes.length}</Button>
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105' style={{ backgroundColor: '#D06356', border: 'none', borderRadius: '12px' }} onClick={() => scrollToSection("late")}>Late: {lates.length}</Button>
@@ -187,7 +195,7 @@ const AttendanceSum = ({ role }) => {
             {EmployeeProfile}
             <div className='d-flex justify-content-center mt-6'>
                 <div className="p-2 px-1 text-center fw-semibold rounded-3 text-dark w-80" style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    <h4 className="mt-3 fw-bold text-black">October 2025 Summary</h4>
+                    <h4 className="mt-3 fw-bold text-black">{monthYear} Summary</h4>
                     <div className='grid grid-cols-2 gap-2 p-3 mt-3'>
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105' style={{ backgroundColor: '#1CA983', border: 'none', borderRadius: '12px' }} onClick={() => openModal("ontime")}>On time: {onTimes.length}</Button>
                         <Button className='w-100 p-2 text-white fw-semibold hover:scale-105' style={{ backgroundColor: '#D06356', border: 'none', borderRadius: '12px' }} onClick={() => openModal("late")}>Late: {lates.length}</Button>
