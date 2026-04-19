@@ -54,46 +54,57 @@ export const getEmployees = async (req, res) => {
 }
 
 export const sendNotification = async (req, res) => {
-    const { departments, employees, message } = req.body
-    try {
-        let targetEmployees = employees || []
-        if (departments && departments.length > 0) {
-            // หาพนักงานจากแผนกที่เลือก
-            let query = `SELECT id_employee FROM Users WHERE role_id IN (1, 2)`
-            let params = []
-            if (departments.length > 0) {
-                query += ` AND department IN (${departments.map(() => '?').join(',')})`
-                params = departments
-            }
-            const adminBranch = req.user.branch_id
-            if (adminBranch) {
-                query += ` AND branch_id = ?`
-                params.push(adminBranch)
-            }
-            const [rows] = await pool.execute(query, params)
-            targetEmployees = rows.map(row => row.id_employee)
-        }
-        if (targetEmployees.length === 0) {
-            return res.status(400).json({ message: "No employees found" })
-        }
-        // บันทึก notification สำหรับแต่ละพนักงาน
-        for (const empId of targetEmployees) {
-            await pool.execute('INSERT INTO notifications (id_employee, message) VALUES (?, ?)', [empId, message])
-        }
-        res.json({ success: true, message: 'Notification sent successfully' })
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: "Server Error" })
+  const { departments, employees, message } = req.body
+  try {
+    let targetUsers = employees || []
+
+    if (departments && departments.length > 0) {
+      let query = `SELECT id FROM Users WHERE role_id IN (1, 2)`
+      let params = [...departments]
+      query += ` AND department IN (${departments.map(() => '?').join(',')})`
+
+      const adminBranch = req.user.branch_id
+      if (adminBranch) {
+        query += ` AND branch_id = ?`
+        params.push(adminBranch)
+      }
+
+      const [rows] = await pool.execute(query, params)
+      targetUsers = rows.map(row => row.id)
     }
+
+    if (targetUsers.length === 0) {
+      return res.status(400).json({ message: "No employees found" })
+    }
+
+    for (const userId of targetUsers) {
+      await pool.execute(
+        `INSERT INTO notifications (id_employee, type, title, message, is_read) VALUES (?, 'default', 'แจ้งเตือนจากผู้ดูแล', ?, 0)`,
+        [userId, message]
+      )
+      await pool.execute(
+        `INSERT INTO group_notifications (id_employee, type, title, message, is_read) VALUES (?, 'default', 'แจ้งเตือนจากผู้ดูแล', ?, 0)`,
+        [userId, message]
+      )
+    }
+
+    res.json({ success: true, message: 'Notification sent successfully' })
+  } catch (err) {
+    console.error('ERROR:', err)
+    res.status(500).json({ message: "Server Error" })
+  }
 }
 
 export const getNotifications = async (req, res) => {
-    try {
-        const userId = req.user.id_employee
-        const [rows] = await pool.execute('SELECT * FROM notifications WHERE id_employee = ? ORDER BY sent_at DESC', [userId])
-        res.json(rows)
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: "Server Error" })
-    }
+  try {
+    const userId = req.user.id  // แก้จาก id_employee → id (int) ใช้ตามuser
+    const [rows] = await pool.execute(
+      `SELECT * FROM group_notifications WHERE id_employee = ? ORDER BY created_at DESC`,  // แก้จาก sent_at → created_at ใช้ตาม user
+      [userId]
+    )
+    res.json(rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: "Server Error" })
+  }
 }
