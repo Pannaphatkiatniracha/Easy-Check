@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Search, Clock, Users, UserX, Calendar, TrendingUp, AlertCircle, MoreVertical, ChevronLeft } from 'lucide-react';
+import { X, Search, Clock, Users, UserX, Calendar, TrendingUp, AlertCircle, MoreVertical, ChevronLeft, LogOut } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5000';
 
 const Dashboard = () => {
-  const [summary, setSummary] = useState({ present: 0, late: 0, absent: 0, onLeave: 0, notCheckedOut: 0, total: 0 });
+  const [summary, setSummary] = useState({ present: 0, late: 0, earlyLeave: 0, absent: 0, onLeave: 0, notCheckedOut: 0, total: 0 });
   const [employees, setEmployees] = useState([]);
   const [deptStats, setDeptStats] = useState([]);
   const [leaveStats, setLeaveStats] = useState([]); // สถิติการลา 7 ประเภท
@@ -68,8 +68,9 @@ const Dashboard = () => {
     Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
     const barData = [
-      (summary.present || 0) - (summary.late || 0),
+      (summary.present || 0) - (summary.late || 0) - (summary.earlyLeave || 0),
       summary.late || 0,
+      summary.earlyLeave || 0,
       summary.absent || 0,
       summary.onLeave || 0
     ];
@@ -85,11 +86,11 @@ const Dashboard = () => {
         lineChartRef.current = new Chart(lineCtx, {
           type: 'bar',
           data: {
-            labels: ['เข้างาน', 'มาสาย', 'ขาดงาน', 'ลา'],
+            labels: ['เข้างาน', 'มาสาย', 'ออกก่อนเวลา', 'ขาดงาน', 'ลา'],
             datasets: [{
               label: 'จำนวนคน',
               data: barData,
-              backgroundColor: ['#50589C', '#ff9800', '#f44336', '#9c27b0'],
+              backgroundColor: ['#50589C', '#ff9800', '#f97316', '#f44336', '#9c27b0'],
               borderRadius: 8,
               barThickness: 60
             }]
@@ -194,6 +195,7 @@ const Dashboard = () => {
     'สาย':           'bg-amber-100 text-amber-700 border-amber-200',
     'ขาด':           'bg-rose-100 text-rose-700 border-rose-200',
     'ลา':            'bg-purple-100 text-purple-700 border-purple-200',
+    'ออกก่อนเวลา':    'bg-orange-100 text-orange-700 border-orange-200',
     'วันหยุด':        'bg-slate-100 text-slate-700 border-slate-200',
     'ยังไม่เข้างาน':   'bg-sky-100 text-sky-700 border-sky-200',
   }[s] || 'bg-gray-100 text-gray-700 border-gray-200');
@@ -253,7 +255,7 @@ const Dashboard = () => {
 
       {/* KPI Cards — 4 ใบ */}
       <section className="mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 border-l-4 border-l-emerald-500 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600"><Users /></div>
@@ -290,6 +292,15 @@ const Dashboard = () => {
             </div>
             <div className="text-4xl font-bold text-gray-800 mb-1">{summary.onLeave}</div>
             <div className="text-sm text-gray-400">ลาได้รับอนุมัติวันนี้</div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 border-l-4 border-l-orange-500 flex flex-col">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-xl bg-orange-100 text-orange-600"><LogOut /></div>
+              <span className="text-gray-500 font-medium">ออกก่อนเวลา</span>
+            </div>
+            <div className="text-4xl font-bold text-gray-800 mb-1">{summary.earlyLeave}</div>
+            <div className="text-sm text-gray-400">ต้องรอหัวหน้าอนุมัติ</div>
           </div>
         </div>
       </section>
@@ -344,6 +355,7 @@ const Dashboard = () => {
                   <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">ทั้งหมด</th>
                   <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">ปกติ</th>
                   <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">สาย</th>
+                  <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">ออกก่อน</th>
                   <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">ขาด</th>
                   <th className="pb-3 border-b-2 border-gray-100 text-gray-500 font-semibold">ลา</th>
                 </tr>
@@ -360,6 +372,9 @@ const Dashboard = () => {
                       <span className="px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">{dept.late}</span>
                     </td>
                     <td className="py-4 border-b border-gray-50">
+                      <span className="px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">{dept.earlyLeave || 0}</span>
+                    </td>
+                    <td className="py-4 border-b border-gray-50">
                       <span className="px-2 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700">{dept.absent}</span>
                     </td>
                     <td className="py-4 border-b border-gray-50">
@@ -369,7 +384,7 @@ const Dashboard = () => {
                 ))}
                 {deptStats.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="py-8 text-center text-gray-400">ไม่มีข้อมูล</td>
+                    <td colSpan="7" className="py-8 text-center text-gray-400">ไม่มีข้อมูล</td>
                   </tr>
                 )}
               </tbody>
@@ -414,6 +429,7 @@ const Dashboard = () => {
               <option>สาย</option>
               <option>ขาด</option>
               <option>ลา</option>
+              <option>ออกก่อนเวลา</option>
               <option>วันหยุด</option>
               <option>ยังไม่เข้างาน</option>
             </select>
