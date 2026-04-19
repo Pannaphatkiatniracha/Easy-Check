@@ -130,7 +130,7 @@ const ExportExcel = () => {
     }
   }
 
-  return (
+return (
     <div className="min-h-screen" style={{ backgroundColor: '#3C467B' }}>
       {showSuccess && (
         <div className="fixed top-5 right-5 bg-gradient-to-r from-emerald-500 to-green-400 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50">
@@ -241,110 +241,77 @@ const ExportExcel = () => {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">รหัสพนักงาน</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">ชื่อ-นามสกุล</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">แผนก</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">สถานะ</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาเข้างาน</th>
-                    <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาออกงาน</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.map((emp, index) => (
-                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-4 text-sm text-gray-800">{emp.id}</td>
-                      <td className="px-4 py-4 text-sm text-gray-800 font-medium">{emp.name}</td>
-                      <td className="px-4 py-4 text-sm text-gray-500">{emp.department}</td>
-                      <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${emp.status === 'มาทำงาน' ? 'bg-green-100 text-green-800' :
-                          emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' :
-                            emp.status === 'ลา' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                          {emp.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkIn}</td>
-                      <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkOut}</td>
-                  
-                      
-
-                      <div className="overflow-x-auto">
-                        {isLoading ? (
-                          <div className="flex items-center justify-center py-16 gap-3 text-gray-400">
-                            <div className="w-6 h-6 border-2 border-gray-300 border-t-indigo-500 rounded-full animate-spin" />
-                            กำลังโหลดข้อมูล...
-                          </div>
-                        ) : (
-                          <table className="w-full">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                {['รหัสพนักงาน', 'ชื่อ-นามสกุล', 'แผนก', 'ตำแหน่ง', 'สถานะ', 'เวลาเข้างาน', 'เวลาออกงาน'].map(h => (
-                                  <th key={h} className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">{h}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {employees.length === 0 ? (
-                                <tr><td colSpan={7} className="text-center py-12 text-gray-400">ไม่มีข้อมูลในวันที่เลือก</td></tr>
-                              ) : employees.map((emp, i) => (
-                                <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
-                                  <td className="px-4 py-4 text-sm text-gray-800">{emp.id_employee}</td>
-                                  <td className="px-4 py-4 text-sm font-medium text-gray-800">{emp.name}</td>
-                                  <td className="px-4 py-4 text-sm text-gray-500">{emp.department}</td>
-                                  <td className="px-4 py-4 text-sm text-gray-500">{emp.position}</td>
-                                  <td className="px-4 py-4 text-center">
-                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${emp.status === 'ปกติ' ? 'bg-green-100 text-green-800' :
-                                      emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' :
-                                        emp.status === 'ออกก่อนเวลา' ? 'bg-orange-100 text-orange-800' :
-                                          'bg-red-100 text-red-800'
-                                      }`}>{emp.status}</span>
-                                  </td>
-                                  <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkIn}</td>
-                                  <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkOut}</td>
-                                </tr>
-                                  
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                      </div>
-                    </div>
-                  
-
-          {/* Export Button */ }
-                    <div className = "text-center pt-4" >
-                    <button
-                      onClick={handleExport}
-                      disabled={isExporting || isLoading || employees.length === 0}
-                      className="inline-flex items-center gap-3 px-16 py-5 bg-gradient-to-r from-indigo-600 to-blue-500 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                    >
-                      {isExporting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          กำลังสร้างไฟล์...
-                        </>
-                      ) : (
-                        <>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                          </svg>
-                          ส่งออกไฟล์ {format === 'excel' ? 'Excel' : 'PDF'}
-                        </>
-                      )}
-                    </button>
-          </div>
-
+              {isLoading ? (
+                <div className="flex items-center justify-center py-16 gap-3 text-gray-400">
+                  <div className="w-6 h-6 border-2 border-gray-300 border-t-indigo-500 rounded-full animate-spin" />
+                  กำลังโหลดข้อมูล...
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">รหัสพนักงาน</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">ชื่อ-นามสกุล</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-gray-800 border-b-2 border-gray-200">แผนก</th>
+                      <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">สถานะ</th>
+                      <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาเข้างาน</th>
+                      <th className="px-4 py-4 text-center text-sm font-semibold text-gray-800 border-b-2 border-gray-200">เวลาออกงาน</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredData.map((emp, index) => (
+                      <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-4 text-sm text-gray-800">{emp.id}</td>
+                        <td className="px-4 py-4 text-sm text-gray-800 font-medium">{emp.name}</td>
+                        <td className="px-4 py-4 text-sm text-gray-500">{emp.department}</td>
+                        <td className="px-4 py-4 text-center">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${emp.status === 'มาทำงาน' ? 'bg-green-100 text-green-800' :
+                            emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' :
+                              emp.status === 'ลา' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                            {emp.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkIn}</td>
+                        <td className="px-4 py-4 text-sm text-gray-800 text-center">{emp.checkOut}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
+
+          {/* Export Button */}
+          <div className="text-center pt-4">
+            <button
+              onClick={handleExport}
+              disabled={isExporting || isLoading || employees.length === 0}
+              className="inline-flex items-center gap-3 px-16 py-5 bg-gradient-to-r from-indigo-600 to-blue-500 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
+              {isExporting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  กำลังสร้างไฟล์...
+                </>
+              ) : (
+                <>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  ส่งออกไฟล์ {format === 'excel' ? 'Excel' : 'PDF'}
+                </>
+              )}
+            </button>
+          </div>
+
         </div>
-        );
-        
-};
+      </div>
+    </div>
+  );
+}
 
 
-export default ExportExcel;
+export default ExportExcel ;
