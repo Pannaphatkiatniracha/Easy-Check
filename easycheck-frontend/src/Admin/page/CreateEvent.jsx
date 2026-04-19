@@ -386,14 +386,25 @@ const CreateEvent = () => {
 
                                     {/* month control */}
                                     <div className="d-flex justify-content-between mb-3">
-                                        <Button onClick={prevMonth}><i class="bi bi-arrow-left"></i></Button>
+                                        <Button
+                                            onClick={prevMonth}
+                                            style={{ backgroundColor: '#1c1d27', color: '#fff', border: 'none' }}
+                                        >
+                                            <i class="bi bi-arrow-left"></i>
+                                        </Button>
                                         <strong>
                                             {currentDate.toLocaleDateString('en-GB', {
                                                 month: 'long',
                                                 year: 'numeric',
                                             })}
                                         </strong>
-                                        <Button onClick={nextMonth}><i class="bi bi-arrow-right"></i></Button>
+                                        <Button
+                                            onClick={nextMonth}
+                                            style={{ backgroundColor: '#1c1d27', color: '#fff', border: 'none' }}
+
+                                        >
+                                            <i class="bi bi-arrow-right"></i>
+                                        </Button>
                                     </div>
 
                                     {/* header */}

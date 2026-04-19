@@ -380,18 +380,18 @@ export const userShift = async (req, res) => {
     try {
         const sql = `
             SELECT 
-                Users.id_employee AS userId,   -- ส่งกลับเป็น id_employee ให้ frontend ใช้
-                Users.firstname,
-                Users.lastname,
-                Roles.role AS level,
-                Shifts.start_time,
-                Shifts.end_time,
-                User_shifts.shift_id,
-                User_shifts.role_id
-            FROM User_shifts
-            JOIN Users ON User_shifts.id_employee = Users.id   -- 🔥 FIX ตรงนี้
-            JOIN Roles ON User_shifts.role_id = Roles.role_id
-            JOIN Shifts ON User_shifts.shift_id = Shifts.shift_id;
+                u.id_employee AS userId,
+                u.firstname,
+                u.lastname,
+                r.role AS level,
+                s.start_time,
+                s.end_time,
+                us.shift_id,
+                us.role_id
+            FROM User_shifts us
+            JOIN Users u ON us.id = u.id
+            JOIN Roles r ON us.role_id = r.role_id
+            JOIN Shifts s ON us.shift_id = s.shift_id;
         `;
 
         const [rows] = await pool.execute(sql);
@@ -414,7 +414,7 @@ export const addNewUserShift = async (req, res) => {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        //แปลง id_employee → id (ตัวจริง)
+        // แปลง id_employee → id (ตัวจริง)
         const [userRows] = await pool.execute(
             "SELECT id FROM Users WHERE id_employee = ?",
             [userId]
@@ -428,7 +428,7 @@ export const addNewUserShift = async (req, res) => {
 
         // เช็คซ้ำ
         const [shiftRows] = await pool.execute(
-            "SELECT * FROM User_shifts WHERE id_employee = ? AND shift_id = ?",
+            "SELECT * FROM User_shifts WHERE id = ? AND shift_id = ?",
             [realUserId, shiftId]
         );
 
@@ -438,7 +438,7 @@ export const addNewUserShift = async (req, res) => {
 
         // insert
         await pool.execute(
-            "INSERT INTO User_shifts (id_employee, shift_id, role_id) VALUES (?, ?, ?)",
+            "INSERT INTO User_shifts (id, shift_id, role_id) VALUES (?, ?, ?)",
             [realUserId, shiftId, roleId]
         );
 
@@ -474,7 +474,7 @@ export const deleteUserShift = async (req, res) => {
         const realUserId = userRows[0].id;
 
         const [result] = await pool.execute(
-            "DELETE FROM User_shifts WHERE id_employee = ? AND shift_id = ?",
+            "DELETE FROM User_shifts WHERE id = ? AND shift_id = ?",
             [realUserId, shiftId]
         );
 
@@ -533,9 +533,8 @@ export const editShift = async (req, res) => {
         const sql = `
             UPDATE User_shifts 
             SET ${updates.join(", ")} 
-            WHERE id_employee = ? AND shift_id = ?
+            WHERE id = ? AND shift_id = ?
         `;
-
         params.push(realUserId, shiftId);
 
         const [result] = await pool.execute(sql, params);

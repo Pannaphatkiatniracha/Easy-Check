@@ -104,7 +104,11 @@ const ShiftSchedule = () => {
     // โหลดข้อมูลจาก backend
     useEffect(() => {
         Api.get("/admin/userShift")
-            .then(res => setShifts(res.data)) //res.data คือข้อมูลจริงที่ backend ส่งมา มาเก็ลไว้ใน setShifts
+            .then(res => {
+                console.log("DATA:", res.data); 
+
+                setShifts(res.data);
+            })
             .catch(err => console.error("Error fetching shifts:", err));
     }, []);
 
@@ -315,9 +319,9 @@ const ShiftSchedule = () => {
                     </thead>
 
                     <tbody style={{ color: '#ffffff' }}>
-                        {filteredData.map((item, index) => (
+                        {pagedData.map((item, index) => (
                             <tr key={index}>
-                                <td className="p-4">{item.userId}</td>
+                                <td className="p-4">{item.userId || "-"}</td>
                                 <td className="p-4">{item.firstname}</td>
                                 <td className="p-4">{item.lastname}</td>
                                 <td className="p-4">{item.start_time} - {item.end_time}</td>
