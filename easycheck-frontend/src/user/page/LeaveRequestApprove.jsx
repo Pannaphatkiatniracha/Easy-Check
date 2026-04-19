@@ -14,7 +14,6 @@ function LeaveRequestApprove() {
       setLoading(true);
       const res = await axios.get(`${API}/pending`, {
         headers: {
-          //  เปลี่ยนจาก localStorage → sessionStorage
           Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
         },
       });
@@ -41,7 +40,6 @@ function LeaveRequestApprove() {
         {},
         {
           headers: {
-            // เปลี่ยนจาก localStorage → sessionStorage
             Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
           },
         },
@@ -73,7 +71,6 @@ function LeaveRequestApprove() {
         { reason: reason.trim() },
         {
           headers: {
-            // เปลี่ยนจาก localStorage → sessionStorage
             Authorization: `Bearer ${sessionStorage.getItem("token") || ""}`,
           },
         },

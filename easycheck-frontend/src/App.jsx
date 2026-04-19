@@ -21,6 +21,7 @@ import ExRegister from "./user/page/ExRegister";
 import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
+import Notification from "./user/page/Notification";
 
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
@@ -113,6 +114,7 @@ function App() {
                 <Route path="paymentrequest" element={<PaymentRequest />} />
                 <Route path="shiftselection" element={<ShiftSelection />} />
                 <Route path="earlyleave" element={<EarlyLeave />} />
+                <Route path="notification" element={<Notification />} />
                 
                 <Route
                   path="datacheck"

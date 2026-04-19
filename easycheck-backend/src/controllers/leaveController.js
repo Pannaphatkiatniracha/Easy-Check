@@ -1,5 +1,6 @@
 import multer from "multer";
 import db from "../config/db.js";
+import { createNotification } from "../controllers/notificationController.js";
 
 const storage = multer.memoryStorage();
 
@@ -188,7 +189,6 @@ const getLeaveBalanceData = async (employeeId, targetYear = new Date().getFullYe
 /* ส่งคำขอลางาน */
 export const createLeaveRequest = async (req, res) => {
   try {
-    // ดึงจาก token เท่านั้น ไม่รับจาก body
     const userId = req.user?.id_employee;
     if (!userId) {
       return res.status(401).json({ message: "ไม่พบข้อมูลผู้ใช้ กรุณา Login ใหม่" });
@@ -319,7 +319,6 @@ export const createLeaveRequest = async (req, res) => {
 /* ดูสิทธิวันลาคงเหลือ */
 export const getLeaveBalance = async (req, res) => {
   try {
-    //  ดึงจาก token แทน query param
     const userId = req.user?.id_employee;
     if (!userId) {
       return res.status(401).json({ message: "ไม่พบข้อมูลผู้ใช้ กรุณา Login ใหม่" });
@@ -338,7 +337,6 @@ export const getLeaveBalance = async (req, res) => {
 /* ประวัติการลา */
 export const getLeaveHistory = async (req, res) => {
   try {
-    // ดึงจาก token แทน query param
     const userId = req.user?.id_employee;
     if (!userId) {
       return res.status(401).json({ message: "ไม่พบข้อมูลผู้ใช้ กรุณา Login ใหม่" });
@@ -429,32 +427,43 @@ export const approveLeave = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [approverRows] = await db.execute(
+    const [[approver]] = await db.execute(
       `SELECT id, branch_id FROM Users WHERE id = ? LIMIT 1`,
       [req.user.id],
     );
-    if (!approverRows.length) {
-      return res.status(403).json({ message: "ไม่พบข้อมูล approver" });
-    }
+    if (!approver) return res.status(403).json({ message: "ไม่พบข้อมูล approver" });
 
-    const [rows] = await db.execute(
-      `SELECT id, status, branch_id FROM leave_requests WHERE id = ? LIMIT 1`,
+    const [[leave]] = await db.execute(
+      `SELECT lr.id, lr.status, lr.branch_id, lr.leave_start, lr.leave_end,
+              lr.leave_days, lr.id_employee,
+              u.id AS user_pk, u.firstname, u.lastname
+       FROM leave_requests lr
+       LEFT JOIN Users u ON u.id_employee = lr.id_employee
+       WHERE lr.id = ? LIMIT 1`,
       [id],
     );
-    if (!rows.length) {
-      return res.status(404).json({ message: "ไม่พบคำขอลา" });
-    }
-    if (rows[0].status !== "pending") {
-      return res.status(400).json({ message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ" });
-    }
-    if (rows[0].branch_id !== approverRows[0].branch_id) {
-      return res.status(403).json({ message: "ไม่มีสิทธิ์อนุมัติคำขอลาของสาขาอื่น" });
-    }
+    if (!leave)                              return res.status(404).json({ message: "ไม่พบคำขอลา" });
+    if (leave.status !== "pending")          return res.status(400).json({ message: "คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติ" });
+    if (leave.branch_id !== approver.branch_id) return res.status(403).json({ message: "ไม่มีสิทธิ์อนุมัติคำขอลาของสาขาอื่น" });
 
     await db.execute(
       `UPDATE leave_requests SET status = 'approved', approved_at = NOW(), approved_by = ? WHERE id = ?`,
-      [approverRows[0].id, id],
+      [approver.id, id],
     );
+
+    // ✅ แจ้งเตือน user ที่ยื่นคำขอ
+    if (leave.user_pk) {
+      const startStr = new Date(leave.leave_start).toLocaleDateString("th-TH");
+      const endStr   = new Date(leave.leave_end).toLocaleDateString("th-TH");
+
+      await createNotification({
+        userId:  leave.user_pk,
+        type:    "leave_approved",
+        title:   "✅ คำขอลาได้รับการอนุมัติแล้ว",
+        message: `คำขอลาของคุณ ${startStr} – ${endStr} (${leave.leave_days} วัน) ได้รับการอนุมัติเรียบร้อยแล้ว`,
+        refId:   leave.id,
+      });
+    }
 
     return res.json({ message: "approver อนุมัติการลาเรียบร้อย" });
   } catch (err) {
