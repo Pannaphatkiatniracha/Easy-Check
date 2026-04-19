@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import Api from '../../Api';
+import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import Api from '../../Api'
 
-const WorkHoursTable = ({ role }) => {
+const WorkHoursTracker = ({ role }) => {
     const location = useLocation()
     const employeeData = location.state?.employeeData
 
@@ -14,19 +13,21 @@ const WorkHoursTable = ({ role }) => {
         avatar: ""
     })
 
+    const [timeline, setTimeline] = useState([])
+
     const profileData = {
         name: employeeData?.name || userProfile.name,
         userid: employeeData?.employeeId || userProfile.userid,
         avatar: employeeData?.profile || userProfile.avatar
     }
 
-    const [timelineData, setTimelineData] = useState([])
-
     useEffect(() => {
         const loadUserProfile = async () => {
+            if (employeeData) return
+
             try {
-                const response = await Api.get('/users/profile')
-                const data = response.data
+                const res = await Api.get('/users/profile')
+                const data = res.data
 
                 const avatarPath = data.avatar
                     ? (data.avatar.startsWith('http')
@@ -36,17 +37,16 @@ const WorkHoursTable = ({ role }) => {
 
                 setUserProfile({
                     name: `${data.firstname} ${data.lastname}`,
-                    userid: data.id_employee || "",
+                    userid: data.id_employee,
                     avatar: avatarPath
                 })
-            }
-            catch (error) {
-                console.error("Error loading profile:", error.response?.data?.message || error.message)
+            } catch (err) {
+                console.error(err)
             }
         }
 
         loadUserProfile()
-    }, [])
+    }, [employeeData])
 
     useEffect(() => {
         const fetchTimeline = async () => {
@@ -54,22 +54,23 @@ const WorkHoursTable = ({ role }) => {
             if (!id) return
 
             try {
-                const res = await Api.get(`/attendance/timeline?userId=${id}`)
-                
-                // 🔥 ตัด Saturday / Sunday ออกตรงนี้เลย
-                const filtered = res.data.filter(item => {
-                    const day = new Date(item.date).getDay()
-                    return day !== 0 && day !== 6
-                })
-
-                setTimelineData(filtered)
+                const res = await Api.get(`/attendance/weekly-timeline?userId=${id}`)
+                setTimeline(res.data)
             } catch (err) {
-                console.error("Error fetching timeline:", err.response?.data?.message || err.message)
+                console.error(err)
             }
         }
 
         fetchTimeline()
     }, [employeeData?.employeeId, userProfile.userid])
+
+    const formatTime = (time) => {
+        if (!time) return "-"
+        return new Date(time).toLocaleTimeString("th-TH", {
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
 
     return (
         <div className="app-container">
@@ -77,9 +78,7 @@ const WorkHoursTable = ({ role }) => {
             {/* Header */}
             <div className="d-flex justify-content-between text-white mt-16">
                 <Link to={role === "approver" ? "/datatocheck" : "/home"} className='text-decoration-none'>
-                    <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-white"></i>
-                    </Button>
+                    <i className="bi bi-chevron-left ms-3 text-white"></i>
                 </Link>
                 <h3 className="fw-bold">Work Hours Tracker</h3>
                 <div className="me-4"></div>
@@ -103,45 +102,68 @@ const WorkHoursTable = ({ role }) => {
             </div>
 
             {/* Timeline */}
-            <div className='d-flex justify-content-center mt-8 mb-10'>
-                <div className="w-80 space-y-4">
+            <div className="d-flex justify-content-center mt-8 mb-12">
+                <div className="w-80 flex flex-col gap-4">
 
-                    {timelineData.map((item, index) => (
-                        <div key={index}
-                            className="bg-white rounded-3 p-3 shadow-md flex justify-between items-center">
-
-                            <div>
-                                <div className="fw-bold text-dark">
-                                    {item.date}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    {item.day}
-                                </div>
-                            </div>
-
-                            <div className="text-end">
-                                <div className="text-sm">
-                                    <span className="fw-bold bg-gradient-to-r from-green-400 to-emerald-600 text-transparent bg-clip-text">
-                                        IN:
-                                    </span>{" "}
-                                    {item.check_in || "-"}
-                                </div>
-                                <div className="text-sm">
-                                    <span className="fw-bold bg-gradient-to-r from-red-400 to-pink-600 text-transparent bg-clip-text">
-                                        OUT:
-                                    </span>{" "}
-                                    {item.check_out || "-"}
-                                </div>
-                            </div>
-
-                        </div>
-                    ))}
-
-                    {timelineData.length === 0 && (
-                        <div className="text-center text-white mt-4">
-                            ไม่มีข้อมูล
+                    {timeline.length === 0 && (
+                        <div className="text-center text-gray-300">
+                            No data this week
                         </div>
                     )}
+
+                    {timeline.map((item, index) => (
+                        <div key={index} className="flex gap-3 items-start">
+
+                            {/* timeline line */}
+                            <div className="flex flex-col items-center mt-1">
+                                <div className="w-3 h-3 bg-[#6D29F6] rounded-full"></div>
+                                {index !== timeline.length - 1 && (
+                                    <div className="w-[2px] h-full bg-gray-400 opacity-40"></div>
+                                )}
+                            </div>
+
+                            {/* card ขาว */}
+                            <div className="flex-1 rounded-xl px-4 py-3 bg-white shadow-md">
+
+                                {/* day */}
+                                <div className="font-semibold text-gray-800 mb-2">
+                                    {item.day}
+                                </div>
+
+                                {/* times */}
+                                <div className="flex justify-between items-center text-sm">
+
+                                    {/* IN */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] px-2 py-[2px] rounded-full text-white"
+                                            style={{
+                                                background: 'linear-gradient(to right, #34d399, #059669)'
+                                            }}>
+                                            IN
+                                        </span>
+                                        <span className="text-gray-800 font-medium">
+                                            {formatTime(item.check_in)}
+                                        </span>
+                                    </div>
+
+                                    {/* OUT */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] px-2 py-[2px] rounded-full text-white"
+                                            style={{
+                                                background: 'linear-gradient(to right, #60a5fa, #2563eb)'
+                                            }}>
+                                            OUT
+                                        </span>
+                                        <span className="text-gray-800 font-medium">
+                                            {formatTime(item.check_out)}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    ))}
 
                 </div>
             </div>
@@ -150,4 +172,4 @@ const WorkHoursTable = ({ role }) => {
     )
 }
 
-export default WorkHoursTable
+export default WorkHoursTracker
