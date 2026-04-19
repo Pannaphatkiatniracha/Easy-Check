@@ -109,7 +109,11 @@ const Dashboard = () => {
               y: {
                 beginAtZero: true,
                 grid: { color: 'rgba(0,0,0,0.05)' },
-                ticks: { callback: (v) => `${v} คน` }
+                ticks: {
+                  stepSize: 1,
+                  precision: 0,
+                  callback: (v) => Number.isInteger(v) ? `${v} คน` : ''
+                }
               },
               x: { grid: { display: false } }
             }
