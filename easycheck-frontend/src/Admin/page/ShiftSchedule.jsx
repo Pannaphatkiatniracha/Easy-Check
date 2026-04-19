@@ -105,7 +105,7 @@ const ShiftSchedule = () => {
     useEffect(() => {
         Api.get("/admin/userShift")
             .then(res => {
-                console.log("DATA:", res.data); 
+                console.log("DATA:", res.data);
 
                 setShifts(res.data);
             })
@@ -262,11 +262,13 @@ const ShiftSchedule = () => {
 
         <div style={{
             background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-            minHeight: '100vh',
-            width: '100vw',
-            overflow: 'hidden',
-            padding: '5rem',
-            position: 'relative',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
         }}>
 
             {/* header */}
@@ -304,7 +306,7 @@ const ShiftSchedule = () => {
             </div>
 
             {/* table */}
-            <div style={{ backgroundColor: 'transparent' }} className="p-3 w-auto">
+            <div style={{ backgroundColor: 'transparent' }} className="table-container">
                 <Table variant="light" style={{ color: '#ffffff', border: 'none' }}>
                     <thead style={{ color: '#ffffff' }}>
                         <tr>

@@ -341,14 +341,16 @@ const CreateEvent = () => {
 
 
     return (
-        <div
-            style={{
-                background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-                minHeight: '100vh',
-                width: '99vw',
-                height: '200vh',
-            }}
-        >
+        <div style={{
+            background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
+        }}>
             {/* Header */}
             <div className="d-flex justify-content-center align-items-center py-5 position-relative">
                 <h1 className="text-white m-0">Event Management</h1>

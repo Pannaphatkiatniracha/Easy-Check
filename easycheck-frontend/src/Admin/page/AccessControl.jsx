@@ -98,14 +98,16 @@ export default function AccessControl() {
 
 
   return (
-    <div
-      style={{
-        background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-        minHeight: '100vh',
-        paddingBottom: '60px',
-        width: '100vw',
-      }}
-    >
+     <div style={{
+            background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
+        }}>
       {/* header */}
       <div className="py-4">
         <h1 className="fw-bold text-center m-4" style={{ color: '#FFFF' }}>

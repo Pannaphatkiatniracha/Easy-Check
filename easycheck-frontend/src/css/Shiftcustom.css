@@ -42,3 +42,28 @@
 .dropdown-item:hover {
   background-color: #1a1a80 !important;
 }
+
+.table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table-container table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.table-container th,
+.table-container td {
+  padding: 10px 12px;   /* ลดจาก p-4 */
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .table-container th,
+  .table-container td {
+    padding: 6px;
+    font-size: 12px;
+  }
+}
