@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -13,6 +15,19 @@ const ExportExcel = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { can } = usePermission();
+  const { permissions, loading } = useAuth();
+  //permissions access control
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+  if (!can("export_data")) {
+    return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+  }
+
 
   useEffect(() => {
     const userData = { name: 'Admin User', role: 'admin' };
@@ -52,8 +67,8 @@ const ExportExcel = () => {
 
   const departments = ['all', ...new Set(employees.map(e => e.department))].filter(d => d !== '-');
 
-  const filteredData = selectedDepartment === 'all' 
-    ? employees 
+  const filteredData = selectedDepartment === 'all'
+    ? employees
     : employees.filter(emp => emp.department === selectedDepartment);
 
   const stats = {
@@ -66,7 +81,7 @@ const ExportExcel = () => {
 
   const handleExport = () => {
     setIsExporting(true);
-    
+
     setTimeout(() => {
       if (format === 'excel') {
         exportToExcel();
@@ -78,7 +93,7 @@ const ExportExcel = () => {
       setTimeout(() => setShowSuccess(false), 3000);
     }, 1500);
   };
-/*เป็นแค่การจำลอง ไม่มีlibraryเก็บ ไม่ได้ใช้excelจริงๆเพราะค่อนข้างหนัก อันนี้เลยเป็นแค่ตัวCSVจำลองที่เอาข้อมูลจากArrayที่ทำไว้จา */
+  /*เป็นแค่การจำลอง ไม่มีlibraryเก็บ ไม่ได้ใช้excelจริงๆเพราะค่อนข้างหนัก อันนี้เลยเป็นแค่ตัวCSVจำลองที่เอาข้อมูลจากArrayที่ทำไว้จา */
   const exportToExcel = () => {
     const csvContent = [
       ['รายงานการเข้างานพนักงาน'],
@@ -127,7 +142,7 @@ const ExportExcel = () => {
       {/* Main Content */}
       <div className="w-full max-w-7xl mx-auto px-4 py-10">
         <div className="bg-white rounded-xl shadow-sm p-10">
-          
+
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">ส่งออกรายงานการเข้างาน</h1>
@@ -191,21 +206,19 @@ const ExportExcel = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setFormat('excel')}
-                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${
-                      format === 'excel' 
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600' 
+                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${format === 'excel'
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
                         : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
-                    }`}
+                      }`}
                   >
                     Excel
                   </button>
                   <button
                     onClick={() => setFormat('pdf')}
-                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${
-                      format === 'pdf' 
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600' 
+                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${format === 'pdf'
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
                         : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
-                    }`}
+                      }`}
                   >
                     PDF
                   </button>
@@ -219,7 +232,7 @@ const ExportExcel = () => {
             <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-8 py-5">
               <h2 className="text-xl font-semibold text-white">ข้อมูลที่จะส่งออก</h2>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -239,11 +252,10 @@ const ExportExcel = () => {
                       <td className="px-4 py-4 text-sm text-gray-800 font-medium">{emp.name}</td>
                       <td className="px-4 py-4 text-sm text-gray-500">{emp.department}</td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                          emp.status === 'มาทำงาน' ? 'bg-green-100 text-green-800' : 
-                          emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' : 
-                          emp.status === 'ลา' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${emp.status === 'มาทำงาน' ? 'bg-green-100 text-green-800' :
+                            emp.status === 'สาย' ? 'bg-yellow-100 text-yellow-800' :
+                              emp.status === 'ลา' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
+                          }`}>
                           {emp.status}
                         </span>
                       </td>

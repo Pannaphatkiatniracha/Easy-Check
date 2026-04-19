@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Search, Clock, Users, UserX, Calendar, TrendingUp, AlertCircle, MoreVertical, ChevronLeft } from 'lucide-react';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -21,6 +23,22 @@ const Dashboard = () => {
   // ใช้ ref เก็บ chart instance แทนการแขวนไว้บน DOM element
   const lineChartRef = useRef(null)
   const doughnutChartRef = useRef(null)
+
+
+  const { can } = usePermission();
+  const { permissions, loading } = useAuth();
+  //permissions access control
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+  if (!can("view_dashboard") && !can("view_attendance_report")) {
+    return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+  }
+
+
 
   // ดึงข้อมูลจาก API
   useEffect(() => {
@@ -123,9 +141,9 @@ const Dashboard = () => {
     if (doughnutCtx && leaveStats.length > 0) {
       // กรองเฉพาะประเภทที่มีการลาเพื่อให้ chart ไม่รก
       const activeLeave = leaveStats.filter(t => t.count > 0);
-      const doughnutData   = activeLeave.length > 0 ? activeLeave.map(t => t.count) : leaveStats.map(t => t.count);
+      const doughnutData = activeLeave.length > 0 ? activeLeave.map(t => t.count) : leaveStats.map(t => t.count);
       const doughnutLabels = activeLeave.length > 0 ? activeLeave.map(t => t.thLabel) : leaveStats.map(t => t.thLabel);
-      const doughnutColors = activeLeave.length > 0 ? activeLeave.map(t => t.color)   : leaveStats.map(t => t.color);
+      const doughnutColors = activeLeave.length > 0 ? activeLeave.map(t => t.color) : leaveStats.map(t => t.color);
 
       // ถ้า chart มีอยู่แล้ว update ข้อมูล / ถ้าไม่มีให้สร้างใหม่
       if (doughnutChartRef.current) {
@@ -186,12 +204,12 @@ const Dashboard = () => {
   };
 
   const statusClass = (s) => ({
-    'ปกติ':          'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'สาย':           'bg-amber-100 text-amber-700 border-amber-200',
-    'ขาด':           'bg-rose-100 text-rose-700 border-rose-200',
-    'ลา':            'bg-purple-100 text-purple-700 border-purple-200',
-    'วันหยุด':        'bg-slate-100 text-slate-700 border-slate-200',
-    'ยังไม่เข้างาน':   'bg-sky-100 text-sky-700 border-sky-200',
+    'ปกติ': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    'สาย': 'bg-amber-100 text-amber-700 border-amber-200',
+    'ขาด': 'bg-rose-100 text-rose-700 border-rose-200',
+    'ลา': 'bg-purple-100 text-purple-700 border-purple-200',
+    'วันหยุด': 'bg-slate-100 text-slate-700 border-slate-200',
+    'ยังไม่เข้างาน': 'bg-sky-100 text-sky-700 border-sky-200',
   }[s] || 'bg-gray-100 text-gray-700 border-gray-200');
 
   const departments = [...new Set(employees.map(e => e.department))].filter(Boolean).sort();
@@ -519,11 +537,10 @@ const Dashboard = () => {
                   return (
                     <button
                       key={pageNum}
-                      className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all shadow-sm cursor-pointer ${
-                        currentPage === pageNum
+                      className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all shadow-sm cursor-pointer ${currentPage === pageNum
                           ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'
                           : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-indigo-600 bg-white'
-                      }`}
+                        }`}
                       onClick={() => setCurrentPage(pageNum)}
                     >
                       {pageNum}

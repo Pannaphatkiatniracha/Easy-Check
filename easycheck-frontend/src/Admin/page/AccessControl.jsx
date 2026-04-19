@@ -179,7 +179,7 @@ export default function AccessControl() {
 
         <hr />
 
-        {/* 🔥 ปุ่มเพิ่ม */}
+        {/* ปุ่มเพิ่ม */}
         <Dropdown className="mb-4">
 
           <Dropdown.Toggle
@@ -416,7 +416,7 @@ export default function AccessControl() {
                         )
                       }
                     />
-                    <Form.Check
+                    {/* <Form.Check
                       label="กำหนดสิทธิ์การเข้าถึง"
                       checked={role_permissions.includes(11)}
                       onChange={(e) =>
@@ -425,7 +425,7 @@ export default function AccessControl() {
                             ? [...new Set([...prev, 11])]
                             : prev.filter(id => id !== 11)
                         )
-                      } />
+                      } /> */}
                     <Form.Check
                       label="จัดการ GPS"
                       checked={role_permissions.includes(12)}
@@ -436,7 +436,7 @@ export default function AccessControl() {
                             : prev.filter(id => id !== 12)
                         )
                       } />
-                    <Form.Check
+                    {/* <Form.Check
                       label="ดูบันทึกระบบ"
                       checked={role_permissions.includes(13)}
                       onChange={(e) =>
@@ -445,7 +445,7 @@ export default function AccessControl() {
                             ? [...new Set([...prev, 13])]
                             : prev.filter(id => id !== 13)
                         )
-                      } />
+                      } /> */}
                   </div>
                 )}
 

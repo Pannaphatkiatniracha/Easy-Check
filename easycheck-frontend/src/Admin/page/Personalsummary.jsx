@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Phone, Mail, Briefcase, MapPin, Calendar, X, User, TrendingUp, Clock, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 const AVATAR_COLORS = ['#3C4678', '#50589C', '#636CCB', '#6E8CFB'];
 
 const Personalsummary = () => {
   const [employees, setEmployees] = useState([]);
 
-// ดึงข้อมูลจาก API
+  const { can } = usePermission();
+  const { permissions, loading } = useAuth();
+  //permissions access control
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+  if (!can("view_time_logs") && !can("view_attendance_report")) {
+    return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+  }
+
+
+  // ดึงข้อมูลจาก API
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetch('http://localhost:5000/personal-summary/list', {
@@ -60,7 +76,7 @@ const Personalsummary = () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const years = Math.floor(diffDays / 365);
     const months = Math.floor((diffDays % 365) / 30);
-    
+
     if (years > 0) {
       return `${years} ปี ${months} เดือน`;
     }
@@ -133,7 +149,7 @@ const Personalsummary = () => {
     setIsEditing(false);
   };
 
-const handleDeleteEmployee = async (employeeId) => {
+  const handleDeleteEmployee = async (employeeId) => {
     if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบพนักงานคนนี้?')) {
       try {
         const res = await fetch(`http://localhost:5000/personal-summary/${employeeId}`, { method: 'DELETE' });
@@ -183,16 +199,16 @@ const handleDeleteEmployee = async (employeeId) => {
           />
         </div>
         <div className="flex gap-4">
-          <select 
-            value={filterDepartment} 
+          <select
+            value={filterDepartment}
             onChange={(e) => setFilterDepartment(e.target.value)}
             className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 hover:bg-gray-100 font-semibold text-gray-700 min-w-[150px] transition-colors cursor-pointer"
           >
             <option value="">ทุกแผนก</option>
             {allDepartments.map(dep => <option key={dep} value={dep}>{dep}</option>)}
           </select>
-          <select 
-            value={filterPosition} 
+          <select
+            value={filterPosition}
             onChange={(e) => setFilterPosition(e.target.value)}
             className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 hover:bg-gray-100 font-semibold text-gray-700 min-w-[150px] transition-colors cursor-pointer"
           >
@@ -219,12 +235,12 @@ const handleDeleteEmployee = async (employeeId) => {
                 </div>
                 <p className="text-xs text-indigo-600 mb-2.5 m-0 font-bold bg-indigo-50 inline-block px-2 py-0.5 rounded">{employee.empCode}</p>
                 <div className="flex flex-col gap-1.5">
-                  <p className="text-gray-500 font-medium m-0 text-sm truncate flex items-center gap-2"><Briefcase size={14} className="text-gray-400"/> {employee.position}</p>
-                  <p className="text-gray-500 font-medium m-0 text-sm truncate flex items-center gap-2"><MapPin size={14} className="text-gray-400"/> {employee.department}</p>
+                  <p className="text-gray-500 font-medium m-0 text-sm truncate flex items-center gap-2"><Briefcase size={14} className="text-gray-400" /> {employee.position}</p>
+                  <p className="text-gray-500 font-medium m-0 text-sm truncate flex items-center gap-2"><MapPin size={14} className="text-gray-400" /> {employee.department}</p>
                 </div>
               </div>
             </div>
-            
+
             <div className="px-5 py-4 bg-gray-50/80 border-t border-b border-gray-100 grid grid-cols-3 gap-2 divide-x divide-gray-200">
               <div className="flex flex-col items-center justify-center">
                 <span className="text-xs text-gray-500 font-medium mb-1">เข้างาน</span>
@@ -241,8 +257,8 @@ const handleDeleteEmployee = async (employeeId) => {
             </div>
 
             <div className="p-4 mt-auto bg-white">
-              <button 
-                className="w-full text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white py-2.5 rounded-xl font-bold transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 border-none" 
+              <button
+                className="w-full text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white py-2.5 rounded-xl font-bold transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 border-none"
                 onClick={() => openDetails(employee)}
               >
                 ดูรายละเอียดพนักงาน <ChevronRight size={18} />
@@ -255,11 +271,11 @@ const handleDeleteEmployee = async (employeeId) => {
       {showModal && selectedEmployee && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6 transition-all duration-200" onClick={closeModal}>
           <div className="bg-white rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <button className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 rounded-full transition-colors z-20 bg-transparent border-none text-2xl cursor-pointer" onClick={closeModal}><X size={24}/></button>
-            
+            <button className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 rounded-full transition-colors z-20 bg-transparent border-none text-2xl cursor-pointer" onClick={closeModal}><X size={24} /></button>
+
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 p-10 text-white flex flex-col items-center text-center relative flex-shrink-0">
-               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
-               <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full translate-y-1/3 -translate-x-1/4 blur-2xl"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full translate-y-1/3 -translate-x-1/4 blur-2xl"></div>
               <div className="w-28 h-28 rounded-full border-4 border-white/30 shadow-lg mb-5 z-10 overflow-hidden" style={{ backgroundColor: selectedEmployee.avatarColor }}>
                 {selectedEmployee.avatar
                   ? <img src={selectedEmployee.avatar} alt={selectedEmployee.firstName} className="w-full h-full object-cover" />
@@ -272,82 +288,82 @@ const handleDeleteEmployee = async (employeeId) => {
 
             <div className="p-6 sm:p-10 overflow-y-auto flex-1 bg-slate-50">
               <section className="mb-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><User size={22} className="text-indigo-600"/> ข้อมูลส่วนตัว</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><User size={22} className="text-indigo-600" /> ข้อมูลส่วนตัว</h3>
                 <div className="flex flex-col bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Phone size={18} className="text-indigo-400"/> เบอร์โทรศัพท์:</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editData.phone}
-                      onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Phone size={18} className="text-indigo-400" /> เบอร์โทรศัพท์:</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editData.phone}
+                        onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
                         className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  ) : (
+                      />
+                    ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.phone}</span>
-                  )}
-                </div>
+                    )}
+                  </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Mail size={18} className="text-indigo-400"/> อีเมล:</span>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={editData.email}
-                      onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Mail size={18} className="text-indigo-400" /> อีเมล:</span>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        value={editData.email}
+                        onChange={(e) => setEditData({ ...editData, email: e.target.value })}
                         className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  ) : (
+                      />
+                    ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.email}</span>
-                  )}
-                </div>
+                    )}
+                  </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Briefcase size={18} className="text-indigo-400"/> ตำแหน่ง:</span>
-                  {isEditing ? (
-                    <select
-                      value={editData.position}
-                      onChange={(e) => setEditData({ ...editData, position: e.target.value })}
-                      className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {['Budgeting & Planning Officer','Cybersecurity Specialist','Payroll Specialist','Content Marketing Executive','Customer Experience Analyst','Sales Coordinator','Key Account Manager','Content Creator','Motion Graphic Designer','Approver','Admin','Super Admin'].map(p => (
-                        <option key={p} value={p}>{p}</option>
-                      ))}
-                    </select>
-                  ) : (
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Briefcase size={18} className="text-indigo-400" /> ตำแหน่ง:</span>
+                    {isEditing ? (
+                      <select
+                        value={editData.position}
+                        onChange={(e) => setEditData({ ...editData, position: e.target.value })}
+                        className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        {['Budgeting & Planning Officer', 'Cybersecurity Specialist', 'Payroll Specialist', 'Content Marketing Executive', 'Customer Experience Analyst', 'Sales Coordinator', 'Key Account Manager', 'Content Creator', 'Motion Graphic Designer', 'Approver', 'Admin', 'Super Admin'].map(p => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                      </select>
+                    ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.position}</span>
-                  )}
-                </div>
+                    )}
+                  </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 hover:bg-slate-50 px-4 rounded-xl transition-colors">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><MapPin size={18} className="text-indigo-400"/> แผนก:</span>
-                  {isEditing ? (
-                    <select
-                      value={editData.department}
-                      onChange={(e) => setEditData({ ...editData, department: e.target.value })}
-                      className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {['Finance','IT','Sales','Creative'].map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  ) : (
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><MapPin size={18} className="text-indigo-400" /> แผนก:</span>
+                    {isEditing ? (
+                      <select
+                        value={editData.department}
+                        onChange={(e) => setEditData({ ...editData, department: e.target.value })}
+                        className="w-full sm:w-2/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        {['Finance', 'IT', 'Sales', 'Creative'].map(d => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    ) : (
                       <span className="w-full sm:w-2/3 text-gray-900 font-bold">{selectedEmployee.department}</span>
-                  )}
-                </div>
+                    )}
+                  </div>
                 </div>
               </section>
 
               <section className="mb-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><Clock size={22} className="text-emerald-600"/> สถิติการทำงาน</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><Clock size={22} className="text-emerald-600" /> สถิติการทำงาน</h3>
                 <div className="flex flex-col bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 px-4">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Calendar size={18} className="text-emerald-400"/> วันเริ่มงาน:</span>
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Calendar size={18} className="text-emerald-400" /> วันเริ่มงาน:</span>
                     <span className="w-full sm:w-2/3 text-gray-900 font-bold">{new Date(selectedEmployee.startDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-3.5 border-b border-gray-50 gap-2 sm:gap-0 px-4">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Clock size={18} className="text-emerald-400"/> อายุงาน:</span>
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm flex items-center gap-2"><Clock size={18} className="text-emerald-400" /> อายุงาน:</span>
                     <span className="w-full sm:w-2/3 text-gray-900 font-bold">{calculateWorkDuration(selectedEmployee.startDate)}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center py-4 px-4 bg-slate-50/50 rounded-xl mt-2">
-                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm mb-3 sm:mb-0 flex items-center gap-2"><TrendingUp size={18} className="text-emerald-400"/> เดือนนี้:</span>
+                    <span className="w-full sm:w-1/3 text-gray-500 font-semibold text-sm mb-3 sm:mb-0 flex items-center gap-2"><TrendingUp size={18} className="text-emerald-400" /> เดือนนี้:</span>
                     {statsLoading ? (
                       <div className="w-full sm:w-2/3 text-sm text-gray-400 animate-pulse">กำลังโหลด...</div>
                     ) : (
@@ -362,7 +378,7 @@ const handleDeleteEmployee = async (employeeId) => {
               </section>
 
               <section className="mb-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><CheckCircle2 size={22} className="text-blue-500"/> สัดส่วนการเข้างาน</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><CheckCircle2 size={22} className="text-blue-500" /> สัดส่วนการเข้างาน</h3>
                 <div className="flex items-center gap-4">
                   <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden shadow-inner p-0.5">
                     <div
@@ -377,7 +393,7 @@ const handleDeleteEmployee = async (employeeId) => {
               </section>
 
               <section className="mb-4">
-                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><FileText size={22} className="text-orange-500"/> โควตาวันลาคงเหลือ</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-5 pb-3 border-b border-gray-200 m-0 flex items-center gap-2"><FileText size={22} className="text-orange-500" /> โควตาวันลาคงเหลือ</h3>
                 {statsLoading ? (
                   <div className="text-sm text-gray-400 animate-pulse py-4">กำลังโหลด...</div>
                 ) : (

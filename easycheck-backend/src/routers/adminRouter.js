@@ -21,7 +21,8 @@ import {
   SaveRolePermissions,
   GetRolePermissions,
   getDashboardToday,
-  getDashboardLeaveStats
+  getDashboardLeaveStats ,
+  GetMyPermissions
 } from "../controllers/adminController.js";
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -71,6 +72,7 @@ router.post("/send-notification", verifyToken, sendNotification) // ส่งก
 router.get('/GetPositionCount', verifyToken, GetPositionCount)        // นับจำนวนตามตำแหน่ง
 router.post('/SaveRolePermissions', verifyToken, SaveRolePermissions) // บันทึก permission
 router.get('/GetRolePermissions', verifyToken, GetRolePermissions)    // ดึง permission ของ role
+router.get('/permissions', verifyToken, GetMyPermissions)
 
 // -----------------------------------------
 router.get("/", (req, res) => {

@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../css/Shiftcustom.css'
 import Api from "../../Api";
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 
 const ShiftSchedule = () => {
@@ -43,6 +45,20 @@ const ShiftSchedule = () => {
     const [editRole, setEditRole] = useState(null);
     const [editShift, setEditShift] = useState(null);
     //edit
+
+
+    const { can } = usePermission();
+    const { permissions, loading } = useAuth();
+    //permissions access control
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+    if (!can("edit_time_logs")) {
+        return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+    }
 
 
 

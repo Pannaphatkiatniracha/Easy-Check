@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 // คอมโพเนนต์สำหรับไอคอนรูปคน (ใช้เมื่อยังไม่มีรูปโปรไฟล์)
 const PersonIcon = () => (
@@ -7,11 +9,17 @@ const PersonIcon = () => (
   </svg>
 );
 
+
 // คอมโพเนนต์หลักของแอป
 function Manageusers() {
   // State สำหรับเก็บ URL ของรูปโปรไฟล์ (สำหรับ Preview)
   const [profileImage, setProfileImage] = useState(null);
-  
+
+
+  const { can } = usePermission();
+  const { permissions, loading } = useAuth();
+  //permissions access control
+
   // State สำหรับเก็บข้อมูลในฟอร์ม
   const [formData, setFormData] = useState({
     fullName: '',
@@ -31,7 +39,7 @@ function Manageusers() {
       if (profileImage) {
         URL.revokeObjectURL(profileImage);
       }
-      
+
       // สร้าง URL ชั่วคราวสำหรับแสดงรูปภาพ
       setProfileImage(URL.createObjectURL(e.target.files[0]));
       // ในแอปจริง คุณอาจจะต้องอัปโหลดไฟล์นี้ไปยัง Server
@@ -47,6 +55,19 @@ function Manageusers() {
     }));
   };
 
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+  if (!can("create_employee") && !can("edit_employee")) {
+    return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+  }
+
+
+
+
   // ฟังก์ชันเมื่อกดปุ่มบันทึก
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,18 +75,18 @@ function Manageusers() {
     if (profileImage) {
       console.log("มีการอัปเดตรูปโปรไฟล์");
     }
-    
+
     // **NOTE: ห้ามใช้ alert() ใน Canvas/Immersive Environment**
     // ใช้วิธีแสดงข้อความใน Console หรือ Modal แทน
     console.log("บันทึกข้อมูลสำเร็จ! (ฟังก์ชัน API ควรทำงานที่นี่)");
-    
+
     // สามารถเพิ่ม logic สำหรับแสดงสถานะการบันทึกสำเร็จบนหน้าจอได้ที่นี่
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start py-8 px-4 font-['Sarabun'] text-gray-800">
-      
-      
+
+
       <div className="max-w-[1000px] w-[170%] bg-white rounded-2xl shadow-lg overflow-hidden grid grid-cols-[300px,1fr] mx-2.5">
         {/* ส่วนด้านซ้าย: รูปโปรไฟล์และปุ่ม */}
         <div className="bg-gray-50 p-10 flex flex-col items-center border-r border-gray-200">
@@ -76,12 +97,12 @@ function Manageusers() {
               <PersonIcon />
             )}
           </div>
-          
+
           {/* Input แบบ file ที่ซ่อนไว้ แต่ทำงานผ่าน label */}
-          <input 
-            type="file" 
-            id="fileUpload" 
-            className="hidden" 
+          <input
+            type="file"
+            id="fileUpload"
+            className="hidden"
             accept="image/*"
             onChange={handleImageChange}
           />
@@ -89,15 +110,20 @@ function Manageusers() {
             เปลี่ยนรูปโปรไฟล์
           </label>
 
-          <button className="w-full max-w-[200px] py-3 bg-indigo-500 text-white border-none rounded-lg text-base font-['Sarabun'] font-semibold cursor-pointer hover:bg-indigo-600 transition-colors" onClick={handleSubmit}>
-            บันทึก
-          </button>
+          {(can("create_employee") || can("edit_employee")) && (
+
+            <button className="w-full max-w-[200px] py-3 bg-indigo-500 text-white border-none rounded-lg text-base font-['Sarabun'] font-semibold cursor-pointer hover:bg-indigo-600 transition-colors" onClick={handleSubmit}>
+              บันทึก
+            </button>
+
+          )}
+
         </div>
-            
+
         {/* ส่วนด้านขวา: ฟอร์มข้อมูล */}
         <div className="p-10 overflow-y-auto rounded-lg">
           <form onSubmit={handleSubmit}>
-            
+
             {/* ข้อมูลส่วนตัว */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-gray-700 border-b border-gray-300 pb-2 mb-6 mt-0">ข้อมูลส่วนตัว</h2>
@@ -146,7 +172,7 @@ function Manageusers() {
             </div>
 
             {/* ตารางงาน (Work Schedule) - ตามที่ระบุในหัวข้อ */}
-          
+
             {/* NOTE: ลบปุ่มบันทึกออกจาก form เพราะมีปุ่มใน left-pane อยู่แล้วและเราใช้ onClick */}
           </form>
         </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveTokenToStorage, saveUserToStorage, fetchCurrentUser, normalizeUser } from '../data/userApi';
+import { useAuth } from '../../AuthContext.jsx';
 
 const AdminLogin = ({ setToken = { setToken }, setRole = { setRole } }) => {
   const [formData, setFormData] = useState({ id: '', password: '' });
@@ -8,6 +9,8 @@ const AdminLogin = ({ setToken = { setToken }, setRole = { setRole } }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { setPermissions } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +56,24 @@ const AdminLogin = ({ setToken = { setToken }, setRole = { setRole } }) => {
         setRole(data.user.role);
         setToken(data.token);
 
+
+        try {
+          const resPerm = await fetch("http://localhost:5000/admin/me", {
+            headers: {
+              Authorization: `Bearer ${data.token}`
+            }
+          });
+
+          const permData = await resPerm.json();
+
+          // เอา permission ไปใส่ context
+          setPermissions(permData.permissions || []);
+          navigate('/dashboard');
+        } catch (err) {
+          console.error("โหลด permission ไม่ได้", err);
+        }
+
+        // ของเดิม
         try {
           await fetchCurrentUser();
         } catch (fetchError) {
@@ -62,8 +83,7 @@ const AdminLogin = ({ setToken = { setToken }, setRole = { setRole } }) => {
           }
         }
 
-        navigate('/dashboard');
-
+        // navigate('/dashboard');
       } else {
         showError(data.message || "Login failed");
       }

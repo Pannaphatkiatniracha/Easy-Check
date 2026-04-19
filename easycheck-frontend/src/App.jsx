@@ -27,8 +27,8 @@ import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
 import DataCheck from "./user/page/DataCheck";
 import DataToCheck from "./user/page/DataToCheck";
 import ApproverManagement from "./user/page/ApproverManagement";
-import PaymentRequest from "./user/page/PaymentRequest"; 
-import ShiftSelection from "./user/page/ShiftSelection"; 
+import PaymentRequest from "./user/page/PaymentRequest";
+import ShiftSelection from "./user/page/ShiftSelection";
 import EarlyLeave from "./user/page/EarlyLeave";
 
 import Dashboard from "./Admin/page/Dashboard";
@@ -55,7 +55,7 @@ import RequestApprove from "./user/page/RequestApprove";
 import EditProfile from "./Admin/page/EditProfile";
 import ResetPassword from "./user/page/ForgotToChange";
 
-
+import { AuthProvider } from "./AuthContext.jsx";
 
 
 function App() {
@@ -63,107 +63,110 @@ function App() {
   const [role, setRole] = useState(() => sessionStorage.getItem("role") || "")
 
   const RequireSuperAdmin = ({ children }) => {
-  const role = sessionStorage.getItem("role");
+    const role = sessionStorage.getItem("role");
 
-  if (role !== "super admin") {
-    return <Navigate to="/dashboard" />;
-  }
+    if (role !== "super admin") {
+      return <Navigate to="/dashboard" />;
+    }
 
-  return children;
-};
+    return children;
+  };
 
   return (
     <>
-      <BrowserRouter basename="/easycheck/">
-        
-        <Routes>
-          {/* --- ส่วนที่ใครก็เข้าได้ --- */}
-          <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
-          <Route path="forgotpassword" element={<ForgotPassword  />} />
-          <Route path="/adminlogin" element={<AdminLogin setToken={setToken} setRole={setRole} />} />
-          <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
+      <AuthProvider>
 
-          {/* ตรงนี้ต้องใส่ token เพื่อให้มันรู้ว่าคนนี้มีสิทธิ์ reset รหัสผ่านนะ */}
-          <Route path="resetpassword/:token" element={<ResetPassword />} />
-          
+        <BrowserRouter basename="/easycheck/">
 
-          {/* --- ถ้าไม่มี Token ให้ดีดกลับไปหน้า Login เสมอ --- */}
-          {!token ? (
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          ) : (
-            <>
-              {/* --- กลุ่มหน้า USER --- */}
-              <Route element={<AppLayout />}>
-                <Route path="home" element={<Home role={role} />} />
-                <Route path="event" element={<Event />} />
-                <Route
-                  path="setting"
-                  element={<Setting role={role} setToken={setToken} setRole={setRole} />}
-                />
-              </Route>
+          <Routes>
+            {/* --- ส่วนที่ใครก็เข้าได้ --- */}
+            <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
+            <Route path="forgotpassword" element={<ForgotPassword />} />
+            <Route path="/adminlogin" element={<AdminLogin setToken={setToken} setRole={setRole} />} />
+            <Route path="/adminforgotpassword" element={<AdminForgotPassword />} />
 
-              <Route element={<AppNobar />}>
-                <Route path="userprofile" element={<Profile />} />
-                <Route path="approveprofile" element={<ApproveProfile />} />
-                <Route path="inregister" element={<InRegister role={role} />} />
-                <Route path="exregister" element={<ExRegister role={role} />} />
-                <Route path="leaverequest" element={<LeaveRequest />} />
-                <Route path="checkin" element={<CheckIn />} />
-                <Route path="checkout" element={<CheckOut />} />
-                <Route path="support" element={<Support />} />
-                <Route path="changepassword" element={<ChangePassword />} />
-                <Route path="internalevent" element={<InternalEvent />} />
-                <Route path="externalevent" element={<ExternalEvent />} />
-                <Route path="privacypolicy" element={<PrivacyPolicy />} />
-                <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
-                <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
-                <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
-                
-                <Route path="requestapprove" element={<RequestApprove role={role} />} />
+            {/* ตรงนี้ต้องใส่ token เพื่อให้มันรู้ว่าคนนี้มีสิทธิ์ reset รหัสผ่านนะ */}
+            <Route path="resetpassword/:token" element={<ResetPassword />} />
 
-                <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
-                <Route path="paymentrequest" element={<PaymentRequest />} />
-                <Route path="shiftselection" element={<ShiftSelection />} />
-                <Route path="earlyleave" element={<EarlyLeave />} />
-                
-                <Route
-                  path="datacheck"
-                  element={<DataCheck role={role} />}
-                />
 
-                <Route
-                  path="datatocheck"
-                  element={<DataToCheck role={role} />}
-                />
-              </Route>
+            {/* --- ถ้าไม่มี Token ให้ดีดกลับไปหน้า Login เสมอ --- */}
+            {!token ? (
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            ) : (
+              <>
+                {/* --- กลุ่มหน้า USER --- */}
+                <Route element={<AppLayout />}>
+                  <Route path="home" element={<Home role={role} />} />
+                  <Route path="event" element={<Event />} />
+                  <Route
+                    path="setting"
+                    element={<Setting role={role} setToken={setToken} setRole={setRole} />}
+                  />
+                </Route>
 
-              {/* --- หน้า ADMIN --- */}
-              <Route element={<AppLayouts />}>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path='settingsadmin' element={<SettingsAdmin/>} />
-                <Route path='createevent' element={<CreateEvent />} />
-                <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
+                <Route element={<AppNobar />}>
+                  <Route path="userprofile" element={<Profile />} />
+                  <Route path="approveprofile" element={<ApproveProfile />} />
+                  <Route path="inregister" element={<InRegister role={role} />} />
+                  <Route path="exregister" element={<ExRegister role={role} />} />
+                  <Route path="leaverequest" element={<LeaveRequest />} />
+                  <Route path="checkin" element={<CheckIn />} />
+                  <Route path="checkout" element={<CheckOut />} />
+                  <Route path="support" element={<Support />} />
+                  <Route path="changepassword" element={<ChangePassword />} />
+                  <Route path="internalevent" element={<InternalEvent />} />
+                  <Route path="externalevent" element={<ExternalEvent />} />
+                  <Route path="privacypolicy" element={<PrivacyPolicy />} />
+                  <Route path="attendancesummary" element={<AttendanceSum role={role} />} />
+                  <Route path="workhourstracker" element={<WorkHoursTracker role={role} />} />
+                  <Route path="approvermanagement" element={<ApproverManagement role={role} />} />
 
-                <Route path='accesscontrol' element={<AccessControl/>} />
-                
-                <Route path='shiftschedule' element={<ShiftSchedule/>} />
-                <Route path='setGPS' element={<SetGPS/>} />
-                <Route path='exportexcel' element={<ExportExcel/>} />
-                <Route path='groupnoti' element={<GroupNoti />} />
-                <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
-                <Route path='permission' element={<Permission />} />
-                <Route path="MyProfile" element={<MyProfile/>} />
-                <Route path="Manageusers" element={<Manageusers />} />
-                <Route path="Personalsummary" element={<Personalsummary />} />
-                <Route path="EditProfile" element={<EditProfile />} />
-              </Route>
+                  <Route path="requestapprove" element={<RequestApprove role={role} />} />
 
-              {/* หน้า NotFound สำหรับคนที่ Login แล้ว แต่พิมพ์ URL มั่ว */}
-              <Route path="*" element={<NotFound />} />
-            </>
-          )}
-        </Routes>
-      </BrowserRouter>
+                  <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+                  <Route path="paymentrequest" element={<PaymentRequest />} />
+                  <Route path="shiftselection" element={<ShiftSelection />} />
+                  <Route path="earlyleave" element={<EarlyLeave />} />
+
+                  <Route
+                    path="datacheck"
+                    element={<DataCheck role={role} />}
+                  />
+
+                  <Route
+                    path="datatocheck"
+                    element={<DataToCheck role={role} />}
+                  />
+                </Route>
+
+                {/* --- หน้า ADMIN --- */}
+                <Route element={<AppLayouts />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path='settingsadmin' element={<SettingsAdmin />} />
+                  <Route path='createevent' element={<CreateEvent />} />
+                  <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy />} />
+
+                  <Route path='accesscontrol' element={<AccessControl />} />
+
+                  <Route path='shiftschedule' element={<ShiftSchedule />} />
+                  <Route path='setGPS' element={<SetGPS />} />
+                  <Route path='exportexcel' element={<ExportExcel />} />
+                  <Route path='groupnoti' element={<GroupNoti />} />
+                  <Route path='groupnoti2/:departmentId' element={<GroupNoti2 />} />
+                  <Route path='permission' element={<Permission />} />
+                  <Route path="MyProfile" element={<MyProfile />} />
+                  <Route path="Manageusers" element={<Manageusers />} />
+                  <Route path="Personalsummary" element={<Personalsummary />} />
+                  <Route path="EditProfile" element={<EditProfile />} />
+                </Route>
+
+                {/* หน้า NotFound สำหรับคนที่ Login แล้ว แต่พิมพ์ URL มั่ว */}
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </>
   );
 }

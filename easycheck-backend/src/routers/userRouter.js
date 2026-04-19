@@ -3,6 +3,8 @@ import { verifyToken } from '../middlewares/authMiddleware.js'
 import { getProfile, updateProfile, changePassword, uploadAvatar, getAllUsers } from '../controllers/userController.js'
 import { upload } from '../middlewares/uploadMiddleware.js'
 
+import { GetMyPermissions } from '../controllers/adminController.js'
+
 const router = express.Router();
 
 
@@ -238,6 +240,8 @@ router.put('/change-password', verifyToken, changePassword)
 
 // single คือจะรับแค่ไฟล์เดียวน้า avatar คือตัวรับต้องตรงกับตัวส่งที่ฟ้อนเอนส่งมาด้วย
 router.post('/upload-avatar', verifyToken, upload.single('avatar'), uploadAvatar)
+
+router.get('/permissions', verifyToken, GetMyPermissions)
 
 router.get('/all', verifyToken, getAllUsers)
 // ----------------------------------------------------------------

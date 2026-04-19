@@ -3,24 +3,38 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
+
 
 import Api from '../../Api';
 
 const AttendanceSum = ({ role }) => {
-    
+
     const location = useLocation()
     const employeeData = location.state?.employeeData
-    
+
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({ title: "", dates: [], color: "" })
 
     const now = new Date()
 
     const monthYear = now.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric"
+        month: "long",
+        year: "numeric"
     })
-    
+
+
+
+
+    const { can } = usePermission();
+    const { permissions, loading } = useAuth();
+    //permissions access control
+    //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+    if (!can("view_time_logs")) {
+        return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+    }
+
 
     // State สำหรับเก็บข้อมูลผู้ใช้
     const [userProfile, setUserProfile] = useState({
@@ -43,11 +57,11 @@ const AttendanceSum = ({ role }) => {
                 // ไปดึงหน้า profile มา
                 const response = await Api.get('/users/profile')
                 const data = response.data
-                
-                const avatarPath = data.avatar 
-                    ? (data.avatar.startsWith('http') 
-                        ? data.avatar  
-                        : `${Api.defaults.baseURL}/uploads/avatars/${data.avatar}`) 
+
+                const avatarPath = data.avatar
+                    ? (data.avatar.startsWith('http')
+                        ? data.avatar
+                        : `${Api.defaults.baseURL}/uploads/avatars/${data.avatar}`)
                     : "/easycheck/img/an.jpg"
 
                 setUserProfile({
@@ -59,7 +73,7 @@ const AttendanceSum = ({ role }) => {
                 console.error("Error loading profile:", error.response?.data?.message || error.message)
             }
         }
-        
+
         if (role !== "approver" && !employeeData) {
             loadUserProfile()
         }
@@ -72,12 +86,12 @@ const AttendanceSum = ({ role }) => {
         const fetchAttendanceHistory = async () => {
             // approver ใช้ employeeData , user ใช้ userProfile
             const id = employeeData?.employeeId || userProfile.userid
-            
+
             if (id) {
                 try {
                     const response = await Api.get(`/attendance/attendance-history?userId=${id}`)
                     setAttendanceData(response.data)
-                } 
+                }
                 catch (error) {
                     console.error("Error fetching history:", error.response?.data?.message || error.message)
                 }
@@ -136,7 +150,7 @@ const AttendanceSum = ({ role }) => {
     const EmployeeProfile = employeeData ? (
         <div className='d-flex justify-content-center mt-6'>
             <div className="flex flex-col items-center w-80">
-                <img src={employeeData.profile} alt="profile" className="w-28 h-28 rounded-full object-cover mb-3"/>
+                <img src={employeeData.profile} alt="profile" className="w-28 h-28 rounded-full object-cover mb-3" />
                 <div className="text-white font-semibold fs-5 text-center">{employeeData.name}</div>
                 <div className="text-sm text-white text-center">ID: {employeeData.employeeId}</div>
             </div>
@@ -144,7 +158,7 @@ const AttendanceSum = ({ role }) => {
     ) : userProfile.name ? (
         <div className='d-flex justify-content-center mt-6'>
             <div className="flex flex-col items-center w-80">
-                <img src={userProfile.avatar} alt="profile" className="w-28 h-28 rounded-full object-cover mb-3"/>
+                <img src={userProfile.avatar} alt="profile" className="w-28 h-28 rounded-full object-cover mb-3" />
                 <div className="text-white font-semibold fs-5 text-center">{userProfile.name}</div>
                 <div className="text-sm text-white text-center">ID: {userProfile.userid}</div>
             </div>
@@ -174,10 +188,10 @@ const AttendanceSum = ({ role }) => {
             </div>
             <div className='d-flex justify-content-center mt-8 mb-12'>
                 <div className='rounded-3 w-80 p-4' style={{ background: 'linear-gradient(to bottom right, #D9D9D9, #636CCB)' }}>
-                    <div id="ontime" className="mb-6"><DateGridModal dates={onTimes} title="On Time Details" color="#1CA983"/></div>
-                    <div id="late" className="mb-6"><DateGridModal dates={lates} title="Late Details" color="#D06356"/></div>
-                    <div id="leave" className="mb-6"><DateGridModal dates={leaves} title="Leave Details" color="#C7C76E"/></div>
-                    <div id="all"><DateGridModal dates={allRecords} title="All Records" color="#252A46"/></div>
+                    <div id="ontime" className="mb-6"><DateGridModal dates={onTimes} title="On Time Details" color="#1CA983" /></div>
+                    <div id="late" className="mb-6"><DateGridModal dates={lates} title="Late Details" color="#D06356" /></div>
+                    <div id="leave" className="mb-6"><DateGridModal dates={leaves} title="Leave Details" color="#C7C76E" /></div>
+                    <div id="all"><DateGridModal dates={allRecords} title="All Records" color="#252A46" /></div>
                 </div>
             </div>
         </div>

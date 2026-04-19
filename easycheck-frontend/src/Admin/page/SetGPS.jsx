@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { MapPin, Settings, Search, Filter, Download, Eye, Edit, Trash2, Plus, Save, X, ChevronLeft, ChevronRight, Calendar, CheckCircle, AlertCircle, MapPinned, Navigation, Locate, UsersRound, Power } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { usePermission } from '../../usePermission';
+import { useAuth } from '../../AuthContext.jsx';
 
 // แก้ปัญหา Leaflet default marker icon ที่หายไปเมื่อ build ด้วย Vite/Webpack
 delete L.Icon.Default.prototype._getIconUrl;
@@ -28,6 +30,9 @@ export default function GPSAdminDashboard() {
   const [loading, setLoading] = useState(false);              // loading ทั่วไป (save/delete)
   const [toast, setToast] = useState({ show: false, message: '', type: '' }); // toast notification
   const [gettingLocation, setGettingLocation] = useState(false); // กำลังดึง GPS ปัจจุบันไหม
+
+
+
 
   // ----- state ข้อมูลหลัก -----
   // locations: ดึงจาก API GET /gps-locations (แทน mock data เดิม)
@@ -658,6 +663,16 @@ export default function GPSAdminDashboard() {
   // ==========================================================
   // RENDER
   // ==========================================================
+
+
+  const { can } = usePermission();
+  const { permissions} = useAuth();
+  //permissions access control
+
+  //กั้นหน้า ถ้าไม่มีสิทธิ์จ้า
+  if (!can("manage_gps")) {
+    return <div> คุณไม่มีสิทธิ์เข้าถึงหน้านี้ </div>;
+  }
 
   return (
     <div className="w-full flex-1 box-border overflow-x-hidden bg-slate-50 p-4 sm:p-6 md:p-8 font-sans text-gray-800 min-h-screen">
