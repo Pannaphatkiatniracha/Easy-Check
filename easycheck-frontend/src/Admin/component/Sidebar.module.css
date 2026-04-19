@@ -140,3 +140,17 @@
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.layout {
+  display: flex;
+}
+
+
+.mainContent {
+  margin-left: 260px;              /* กัน sidebar */
+  width: calc(100% - 260px);       /* ให้เต็มจอ */
+  min-height: 100vh;
+  padding: 30px 40px;
+  box-sizing: border-box;
+}
+

@@ -367,6 +367,7 @@ export const getLeaveHistory = async (req, res) => {
 /* ดูคำขอลางานที่รออนุมัติ (สำหรับ approver) */
 export const getPendingLeaves = async (req, res) => {
   try {
+    console.log("req.user:", req.user);
     const [approverRows] = await db.execute(
       `SELECT branch_id FROM Users WHERE id = ? LIMIT 1`,
       [req.user.id],

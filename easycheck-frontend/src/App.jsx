@@ -57,9 +57,21 @@ import EditProfile from "./Admin/page/EditProfile";
 import ResetPassword from "./user/page/ForgotToChange";
 
 
+
+
 function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("token") || "")
   const [role, setRole] = useState(() => sessionStorage.getItem("role") || "")
+
+  const RequireSuperAdmin = ({ children }) => {
+  const role = sessionStorage.getItem("role");
+
+  if (role !== "super admin") {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
+};
 
   return (
     <>
@@ -133,7 +145,9 @@ function App() {
                 <Route path='settingsadmin' element={<SettingsAdmin/>} />
                 <Route path='createevent' element={<CreateEvent />} />
                 <Route path='adminprivacypolicy' element={<AdminPrivacyPolicy/>} />
+
                 <Route path='accesscontrol' element={<AccessControl/>} />
+                
                 <Route path='shiftschedule' element={<ShiftSchedule/>} />
                 <Route path='setGPS' element={<SetGPS/>} />
                 <Route path='exportexcel' element={<ExportExcel/>} />

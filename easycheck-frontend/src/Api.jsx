@@ -16,6 +16,7 @@ Api.interceptors.request.use(
     (config) => {
         // token ใบสั้น
         const token = sessionStorage.getItem('token')
+        console.log("TOKEN:", token)
         
         if (token) {
             config.headers.Authorization = `Bearer ${token}` // ถ้ามี token ให้ส่งกลับให้แบคเอน check

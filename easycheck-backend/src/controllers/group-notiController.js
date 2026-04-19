@@ -4,14 +4,14 @@ import pool from '../config/db.js'
 //ส่งการแจ้งเตือน
 export const getDepartments = async (req, res) => {
     try {
-        const adminBranch = req.user.branch
+        const adminBranch = req.user.branch_id
 
         let query = `SELECT DISTINCT department FROM Users WHERE department IS NOT NULL`
         let params = []
 
         // ถ้าไม่ใช่ superadmin → กรองตามสาขา
         if (adminBranch) {
-            query += ` AND branch = ?`
+            query += ` AND branch_id = ?`
             params.push(adminBranch)
         }
 
@@ -27,7 +27,7 @@ export const getDepartments = async (req, res) => {
 
 export const getEmployees = async (req, res) => {
     const { department } = req.query
-    const adminBranch = req.user.branch
+    const adminBranch = req.user.branch_id
 
     try {
         let query = `SELECT id, id_employee, firstname, lastname, position, department, avatar FROM Users WHERE role_id IN (1, 2)`
@@ -35,7 +35,7 @@ export const getEmployees = async (req, res) => {
 
         // กรองตามสาขาของ admin
         if (adminBranch) {
-            query += ` AND branch = ?`
+            query += ` AND branch_id = ?`
             params.push(adminBranch)
         }
 
@@ -56,9 +56,42 @@ export const getEmployees = async (req, res) => {
 export const sendNotification = async (req, res) => {
     const { departments, employees, message } = req.body
     try {
-        // mock logic
-        console.log('Sending notification:', { departments, employees, message })
+        let targetEmployees = employees || []
+        if (departments && departments.length > 0) {
+            // หาพนักงานจากแผนกที่เลือก
+            let query = `SELECT id_employee FROM Users WHERE role_id IN (1, 2)`
+            let params = []
+            if (departments.length > 0) {
+                query += ` AND department IN (${departments.map(() => '?').join(',')})`
+                params = departments
+            }
+            const adminBranch = req.user.branch_id
+            if (adminBranch) {
+                query += ` AND branch_id = ?`
+                params.push(adminBranch)
+            }
+            const [rows] = await pool.execute(query, params)
+            targetEmployees = rows.map(row => row.id_employee)
+        }
+        if (targetEmployees.length === 0) {
+            return res.status(400).json({ message: "No employees found" })
+        }
+        // บันทึก notification สำหรับแต่ละพนักงาน
+        for (const empId of targetEmployees) {
+            await pool.execute('INSERT INTO notifications (id_employee, message) VALUES (?, ?)', [empId, message])
+        }
         res.json({ success: true, message: 'Notification sent successfully' })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ message: "Server Error" })
+    }
+}
+
+export const getNotifications = async (req, res) => {
+    try {
+        const userId = req.user.id_employee
+        const [rows] = await pool.execute('SELECT * FROM notifications WHERE id_employee = ? ORDER BY sent_at DESC', [userId])
+        res.json(rows)
     } catch (err) {
         console.error(err)
         res.status(500).json({ message: "Server Error" })

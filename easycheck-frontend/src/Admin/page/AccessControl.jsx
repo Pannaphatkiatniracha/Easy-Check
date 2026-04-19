@@ -1,4 +1,4 @@
-import axios from 'axios'
+import Api from "../../Api";
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { Card, Button, Form } from 'react-bootstrap'
@@ -28,7 +28,7 @@ export default function AccessControl() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/admin/GetPositionCount")
+        const res = await Api.get("/admin/GetPositionCount")
         setCounts(res.data)
       } catch (err) {
         console.error(err)
@@ -62,7 +62,7 @@ export default function AccessControl() {
     }
 
     try {
-      await axios.post("http://localhost:5000/admin/SaveRolePermissions", {
+      await Api.post("/admin/SaveRolePermissions", {
         role_id,
         role_permissions
       });
@@ -76,7 +76,7 @@ export default function AccessControl() {
 
   const GetRolePermissions = async (role_id) => {
     try {
-      const res = await axios.get("http://localhost:5000/admin/GetRolePermissions", {
+      const res = await Api.get("/admin/GetRolePermissions", {
         params: { role_id }
       }
       );
@@ -98,14 +98,16 @@ export default function AccessControl() {
 
 
   return (
-    <div
-      style={{
-        background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-        minHeight: '100vh',
-        paddingBottom: '60px',
-        width: '100vw',
-      }}
-    >
+     <div style={{
+            background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
+        }}>
       {/* header */}
       <div className="py-4">
         <h1 className="fw-bold text-center m-4" style={{ color: '#FFFF' }}>
@@ -144,20 +146,6 @@ export default function AccessControl() {
           </div>
         </Card>
 
-        <Card className="mb-2">
-          <div className="p-2 d-flex justify-content-between align-items-center">
-            <span style={{ fontWeight: "bold" }}>Super Admin</span>
-            <span
-              style={{
-                backgroundColor: "#0A0043",
-                color: "#fff",
-                padding: "3px 20px",
-                borderRadius: "20px",
-                fontWeight: "bold"
-              }}
-            >{countMap["super admin"] || 0}</span>
-          </div>
-        </Card>
 
         <Card className="mb-2">
           <div className="p-2 d-flex justify-content-between align-items-center">
@@ -215,13 +203,7 @@ export default function AccessControl() {
               }}>
               Admin
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => {
-              setSelectedRole('super admin')
-              setRoleId(4)
-              setRolePermissions([])
-            }}>
-              Super Admim
-            </Dropdown.Item>
+           
             <Dropdown.Item onClick={() => {
               setSelectedRole('approver')
               setRoleId(2)

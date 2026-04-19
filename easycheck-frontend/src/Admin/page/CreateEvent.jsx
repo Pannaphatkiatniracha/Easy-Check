@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Table } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap'
-import axios from "axios";
+import Api from "../../Api";
 import '../../css/EventAdmincustom.css'
 
 const CreateEvent = () => {
@@ -160,7 +160,7 @@ const CreateEvent = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/admin/Event")
+                const res = await Api.get("/admin/Event")
 
                 console.log("API:", res.data)
 
@@ -208,7 +208,7 @@ const CreateEvent = () => {
         }
 
         try {
-            const res = await axios.post("http://localhost:5000/admin/CreateEvent", {
+            const res = await Api.post("/admin/CreateEvent", {
                 title: eventTitle,
                 //ใช้ formatDate ให้รูปแบบถูกต้องเพื่อส่งไป backend
                 event_date: eventDate,
@@ -231,7 +231,7 @@ const CreateEvent = () => {
         }
 
         try {
-            const res = await axios.get("http://localhost:5000/admin/Event");
+            const res = await Api.get("/admin/Event");
             setEvents(res.data);
         } catch (err) {
             console.error("GET ERROR:", err);
@@ -271,8 +271,8 @@ const CreateEvent = () => {
         if (!id) return alert("NO event id");
 
         try {
-            const res = await axios.delete(
-                "http://localhost:5000/admin/DeleteEvent",
+            const res = await Api.delete(
+                "/admin/DeleteEvent",
                 { data: { id } }
             );
 
@@ -324,8 +324,8 @@ const CreateEvent = () => {
 
             console.log("SEND DATA:", payload); // 🔥 debug
 
-            const res = await axios.patch(
-                "http://localhost:5000/admin/EditEvent",
+            const res = await Api.patch(
+                "/admin/EditEvent",
                 payload
             );
 
@@ -341,14 +341,16 @@ const CreateEvent = () => {
 
 
     return (
-        <div
-            style={{
-                background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-                minHeight: '100vh',
-                width: '99vw',
-                height: '200vh',
-            }}
-        >
+        <div style={{
+            background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
+        }}>
             {/* Header */}
             <div className="d-flex justify-content-center align-items-center py-5 position-relative">
                 <h1 className="text-white m-0">Event Management</h1>
@@ -386,14 +388,25 @@ const CreateEvent = () => {
 
                                     {/* month control */}
                                     <div className="d-flex justify-content-between mb-3">
-                                        <Button onClick={prevMonth}><i class="bi bi-arrow-left"></i></Button>
+                                        <Button
+                                            onClick={prevMonth}
+                                            style={{ backgroundColor: '#1c1d27', color: '#fff', border: 'none' }}
+                                        >
+                                            <i class="bi bi-arrow-left"></i>
+                                        </Button>
                                         <strong>
                                             {currentDate.toLocaleDateString('en-GB', {
                                                 month: 'long',
                                                 year: 'numeric',
                                             })}
                                         </strong>
-                                        <Button onClick={nextMonth}><i class="bi bi-arrow-right"></i></Button>
+                                        <Button
+                                            onClick={nextMonth}
+                                            style={{ backgroundColor: '#1c1d27', color: '#fff', border: 'none' }}
+
+                                        >
+                                            <i class="bi bi-arrow-right"></i>
+                                        </Button>
                                     </div>
 
                                     {/* header */}

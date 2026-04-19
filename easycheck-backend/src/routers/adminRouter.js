@@ -26,6 +26,7 @@ import {
 
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
+
 const router = express.Router();
 
 // -----------------------------------------
@@ -54,7 +55,7 @@ router.put("/editShift", verifyToken, editShift)              // แก้ไข
 // -----------------------------------------
 router.get("/Event", verifyToken, getAllEvent)                 // ดึงกิจกรรมทั้งหมด
 router.post("/CreateEvent", verifyToken, CreateEvent)         // สร้างกิจกรรม
-router.put("/EditEvent", verifyToken, EditEvent)              // แก้ไขกิจกรรม
+router.patch("/EditEvent", verifyToken, EditEvent)              // แก้ไขกิจกรรม
 router.delete("/DeleteEvent", verifyToken, DeleteEvent)       // ลบกิจกรรม
 
 // -----------------------------------------
@@ -65,7 +66,7 @@ router.get("/employees", verifyToken, getEmployees)           // ดึงรา
 router.post("/send-notification", verifyToken, sendNotification) // ส่งการแจ้งเตือน
 
 // -----------------------------------------
-// Permission (ต้อง login ก่อนถึงจะใช้ได้)
+// Permission (ต้อง login ก่อนถึงจะใช้ได้) หน้า access control
 // -----------------------------------------
 router.get('/GetPositionCount', verifyToken, GetPositionCount)        // นับจำนวนตามตำแหน่ง
 router.post('/SaveRolePermissions', verifyToken, SaveRolePermissions) // บันทึก permission

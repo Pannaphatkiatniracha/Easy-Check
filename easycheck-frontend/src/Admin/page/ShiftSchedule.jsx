@@ -3,7 +3,7 @@ import { Button, Form, Table, Modal, Dropdown, DropdownButton } from 'react-boot
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../css/Shiftcustom.css'
-import axios from "axios";
+import Api from "../../Api";
 
 
 const ShiftSchedule = () => {
@@ -78,7 +78,6 @@ const ShiftSchedule = () => {
         "user": 1,
         "approver": 2,
         "admin": 3,
-        "super admin": 4
     };
 
     const roleLabel = (roleId) => {
@@ -86,7 +85,6 @@ const ShiftSchedule = () => {
             case 1: return "User";
             case 2: return "Approver";
             case 3: return "Admin";
-            case 4: return "Super Admin";
             default: return "";
         }
     };
@@ -103,18 +101,14 @@ const ShiftSchedule = () => {
     // -------------------------- handleEdit -----------------------------------//
 
 
-
-
-
-
-
-
-
-
     // โหลดข้อมูลจาก backend
     useEffect(() => {
-        axios.get("http://localhost:5000/admin/userShift")
-            .then(res => setShifts(res.data)) //res.data คือข้อมูลจริงที่ backend ส่งมา มาเก็ลไว้ใน setShifts
+        Api.get("/admin/userShift")
+            .then(res => {
+                console.log("DATA:", res.data);
+
+                setShifts(res.data);
+            })
             .catch(err => console.error("Error fetching shifts:", err));
     }, []);
 
@@ -177,14 +171,14 @@ const ShiftSchedule = () => {
         }
 
         try {
-            await axios.post("http://localhost:5000/admin/newUserShift", {
+            await Api.post("/admin/newUserShift", {
                 userId,
                 shiftId: newShift,
                 roleId: newRole
             });
 
             // fetch ใหม่ให้ data ตรง
-            const res = await axios.get("http://localhost:5000/admin/userShift");
+            const res = await Api.get("/admin/userShift");
             setShifts(res.data);
 
             setNewShift('');
@@ -211,7 +205,7 @@ const ShiftSchedule = () => {
     // ---------------------- DELETE ---------------------- //
     const handleDelete = async (userId, shiftId) => {
         try {
-            await axios.delete("http://localhost:5000/admin/deleteUserShift", {
+            await Api.delete("/admin/deleteUserShift", {
                 data: { userId, shiftId }
             });
 
@@ -238,14 +232,14 @@ const ShiftSchedule = () => {
         console.log("SEND DATA:", { userId, shiftId, newShiftId, roleId });
 
         try {
-            await axios.put("http://localhost:5000/admin/editShift", {
+            await Api.put("/admin/editShift", {
                 userId,
                 shiftId,
                 newShiftId,
                 roleId
             });
 
-            const res = await axios.get("http://localhost:5000/admin/userShift");
+            const res = await Api.get("/admin/userShift");
             setShifts(res.data);
 
             handleCloseEdit();
@@ -268,11 +262,13 @@ const ShiftSchedule = () => {
 
         <div style={{
             background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-            minHeight: '100vh',
-            width: '100vw',
-            overflow: 'hidden',
-            padding: '5rem',
-            position: 'relative',
+            position: 'fixed',
+            top: 0,
+            left: 260,             // กัน sidebar
+            right: 0,
+            bottom: 0,
+            overflowY: 'auto',
+            padding: '2rem'
         }}>
 
             {/* header */}
@@ -310,7 +306,7 @@ const ShiftSchedule = () => {
             </div>
 
             {/* table */}
-            <div style={{ backgroundColor: 'transparent' }} className="p-3 w-auto">
+            <div style={{ backgroundColor: 'transparent' }} className="table-container">
                 <Table variant="light" style={{ color: '#ffffff', border: 'none' }}>
                     <thead style={{ color: '#ffffff' }}>
                         <tr>
@@ -325,9 +321,9 @@ const ShiftSchedule = () => {
                     </thead>
 
                     <tbody style={{ color: '#ffffff' }}>
-                        {filteredData.map((item, index) => (
+                        {pagedData.map((item, index) => (
                             <tr key={index}>
-                                <td className="p-4">{item.userId}</td>
+                                <td className="p-4">{item.userId || "-"}</td>
                                 <td className="p-4">{item.firstname}</td>
                                 <td className="p-4">{item.lastname}</td>
                                 <td className="p-4">{item.start_time} - {item.end_time}</td>
@@ -394,7 +390,6 @@ const ShiftSchedule = () => {
                             <Dropdown.Item onClick={() => setNewRole(1)}>User</Dropdown.Item>
                             <Dropdown.Item onClick={() => setNewRole(2)}>Approver</Dropdown.Item>
                             <Dropdown.Item onClick={() => setNewRole(3)}>Admin</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setNewRole(4)}>Super Admin</Dropdown.Item>
                         </DropdownButton>
 
 
@@ -438,7 +433,6 @@ const ShiftSchedule = () => {
                             <Dropdown.Item onClick={() => setEditRole(1)}>User</Dropdown.Item>
                             <Dropdown.Item onClick={() => setEditRole(2)}>Approver</Dropdown.Item>
                             <Dropdown.Item onClick={() => setEditRole(3)}>Admin</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setEditRole(4)}>Super Admin</Dropdown.Item>
                         </DropdownButton>
 
                         <DropdownButton

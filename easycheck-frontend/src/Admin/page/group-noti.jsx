@@ -57,10 +57,10 @@ const GroupNoti = () => {
       return;
     }
     try {
-      await Api.post('/api/group-noti/notifications', {
-        departmentIds: selectedDepartments,
+        await Api.post('/api/group-noti/notifications', {
+        departments: selectedDepartments,
         message,
-      });
+    });
       alert(`ส่งการแจ้งเตือนไปยัง ${selectedDepartments.length} แผนกเรียบร้อยแล้ว`);
       setMessage('');
       setSelectedDepartments([]);

@@ -61,6 +61,11 @@ const WorkHoursTracker = ({ role }) => {
 
             const id = employeeData?.employeeId || userProfile.userid
 
+        console.log("employeeData:", employeeData)
+        console.log("userProfile.userid:", userProfile.userid)
+        console.log("id ที่จะส่ง:", id)
+
+
             if (!id) return
 
             try {
@@ -162,7 +167,7 @@ const WorkHoursTracker = ({ role }) => {
                         ID: {profileData.userid}
                     </div>
 
-                    {profileData.shift && (
+                    {/* {profileData.shift && (
                         <div className="relative backdrop-blur-xl rounded-[40px] shadow-2xl
                              mt-3 px-8 flex items-center justify-center h-12"
                             style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
@@ -170,7 +175,7 @@ const WorkHoursTracker = ({ role }) => {
                                 Shift: {profileData.shift}
                             </span>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
 

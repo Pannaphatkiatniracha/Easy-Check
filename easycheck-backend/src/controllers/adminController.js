@@ -23,9 +23,9 @@ export const loginAdmin = async (req, res) => {
 
         if (rows.length === 0) {
             return res.status(401).json({
-            success: false,
-            message: "Admin not found"
-        })
+                success: false,
+                message: "Admin not found"
+            })
         }
 
         const admin = rows[0]
@@ -35,8 +35,8 @@ export const loginAdmin = async (req, res) => {
 
         if (!isMatch) {
             return res.status(401).json({
-            success: false,
-            message: "Password incorrect"
+                success: false,
+                message: "Password incorrect"
             })
         }
 
@@ -251,6 +251,7 @@ export const getDashboardToday = async (req, res) => {
                 u.position, u.department, u.avatar,
                 s.start_time AS shift_start, s.end_time AS shift_end,
                 a.check_in_time, a.check_out_time, a.check_in_status,
+                a.check_in_photo, a.check_out_photo,
                 lr.id AS leave_id, lr.leave_reasons
             FROM Users u
             LEFT JOIN Shifts s ON s.shift_id = u.shift_id
@@ -268,17 +269,30 @@ export const getDashboardToday = async (req, res) => {
 
         const formatTime = (dt) => dt ? new Date(dt).toTimeString().slice(0, 5) : null
 
+        const now = new Date()
+        const dayOfWeek = now.getDay() // 0=อาทิตย์, 6=เสาร์
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+        const currentMinutes = now.getHours() * 60 + now.getMinutes()
+
         const employees = rows.map(row => {
-            let overallStatus = 'ขาด'
+            let overallStatus
             if (row.check_in_time) {
                 overallStatus = row.check_in_status === 'late' ? 'สาย' : 'ปกติ'
             } else if (row.leave_id) {
                 overallStatus = 'ลา'
+            } else if (isWeekend) {
+                overallStatus = 'วันหยุด'
+            } else if (row.shift_start) {
+                const [sh, sm] = String(row.shift_start).split(':').map(Number)
+                const shiftStartMinutes = sh * 60 + sm
+                overallStatus = currentMinutes < shiftStartMinutes ? 'ยังไม่เข้างาน' : 'ขาด'
+            } else {
+                overallStatus = 'ขาด'
             }
 
             let leaveReasons = null
             if (row.leave_reasons) {
-                try { leaveReasons = typeof row.leave_reasons === 'string' ? JSON.parse(row.leave_reasons) : row.leave_reasons } catch (e) {}
+                try { leaveReasons = typeof row.leave_reasons === 'string' ? JSON.parse(row.leave_reasons) : row.leave_reasons } catch (e) { }
             }
 
             return {
@@ -291,6 +305,9 @@ export const getDashboardToday = async (req, res) => {
                 checkInTime: formatTime(row.check_in_time),
                 checkOutTime: formatTime(row.check_out_time),
                 checkInStatus: row.check_in_status,
+                // แปลง path (backslash) เป็น URL ที่ใช้งานได้
+                checkInPhoto: row.check_in_photo ? `http://localhost:5000/${row.check_in_photo.replace(/\\/g, '/')}` : null,
+                checkOutPhoto: row.check_out_photo ? `http://localhost:5000/${row.check_out_photo.replace(/\\/g, '/')}` : null,
                 overallStatus,
                 leaveReasons,
                 shiftStart: row.shift_start ? String(row.shift_start).slice(0, 5) : null,
@@ -302,22 +319,26 @@ export const getDashboardToday = async (req, res) => {
         const late = employees.filter(e => e.overallStatus === 'สาย').length
         const absent = employees.filter(e => e.overallStatus === 'ขาด').length
         const onLeave = employees.filter(e => e.overallStatus === 'ลา').length
+        const holiday = employees.filter(e => e.overallStatus === 'วันหยุด').length
+        const notStarted = employees.filter(e => e.overallStatus === 'ยังไม่เข้างาน').length
         const notCheckedOut = employees.filter(e => e.checkInTime && !e.checkOutTime).length
 
         const deptMap = {}
         employees.forEach(e => {
             if (!deptMap[e.department]) {
-                deptMap[e.department] = { department: e.department, total: 0, present: 0, late: 0, absent: 0, onLeave: 0 }
+                deptMap[e.department] = { department: e.department, total: 0, present: 0, late: 0, absent: 0, onLeave: 0, holiday: 0, notStarted: 0 }
             }
             deptMap[e.department].total++
             if (e.overallStatus === 'ปกติ') deptMap[e.department].present++
             else if (e.overallStatus === 'สาย') { deptMap[e.department].present++; deptMap[e.department].late++ }
             else if (e.overallStatus === 'ขาด') deptMap[e.department].absent++
             else if (e.overallStatus === 'ลา') deptMap[e.department].onLeave++
+            else if (e.overallStatus === 'วันหยุด') deptMap[e.department].holiday++
+            else if (e.overallStatus === 'ยังไม่เข้างาน') deptMap[e.department].notStarted++
         })
 
         res.json({
-            summary: { present, late, absent, onLeave, notCheckedOut, total: employees.length },
+            summary: { present, late, absent, onLeave, holiday, notStarted, notCheckedOut, total: employees.length },
             employees,
             departmentStats: Object.values(deptMap)
         })
@@ -373,37 +394,39 @@ export const sendNotification = async (req, res) => {
 //---------------------------------tar----------------------------------------------//
 
 
+//--------------------------------- USER SHIFT ----------------------------------//
+
 // ดึงข้อมูลทั้งหมดของ user shifts พร้อมรายละเอียด
 export const userShift = async (req, res) => {
     try {
         const sql = `
-         SELECT 
-            Users.id_employee AS userId,
-            Users.firstname,
-            Users.lastname,
-            Roles.role AS level,
-            Shifts.start_time,
-            Shifts.end_time,
-            User_shifts.shift_id,
-            User_shifts.role_id
-        FROM User_shifts
-        JOIN Users ON User_shifts.user_id = Users.id_employee
-        JOIN Roles ON User_shifts.role_id = Roles.role_id
-        JOIN Shifts ON User_shifts.shift_id = Shifts.shift_id;
+            SELECT 
+                u.id_employee AS userId,
+                u.firstname,
+                u.lastname,
+                r.role AS level,
+                s.start_time,
+                s.end_time,
+                us.shift_id,
+                us.role_id
+            FROM User_shifts us
+            JOIN Users u ON us.id = u.id
+            JOIN Roles r ON us.role_id = r.role_id
+            JOIN Shifts s ON us.shift_id = s.shift_id;
         `;
+
         const [rows] = await pool.execute(sql);
         res.status(200).json(rows);
-        console.log(rows);
 
     } catch (error) {
         console.error("Error fetching user shifts:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-
 };
 
 
-// เพิ่ม shift ให้ user
+
+// ---------------------- ADD ---------------------- //
 export const addNewUserShift = async (req, res) => {
     try {
         const { userId, shiftId, roleId } = req.body;
@@ -412,31 +435,36 @@ export const addNewUserShift = async (req, res) => {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        // ตรวจสอบว่ามี user อยู่แล้วไหม
+        // แปลง id_employee → id (ตัวจริง)
         const [userRows] = await pool.execute(
-            "SELECT id_employee FROM Users WHERE id_employee = ?",
+            "SELECT id FROM Users WHERE id_employee = ?",
             [userId]
         );
+
         if (userRows.length === 0) {
-            return res.status(401).json({ error: "User does not exist" });
+            return res.status(404).json({ error: "User not found" });
         }
 
-        // ตรวจสอบว่ามี user+shift อยู่แล้วหรือยัง
+        const realUserId = userRows[0].id;
+
+        // เช็คซ้ำ
         const [shiftRows] = await pool.execute(
-            "SELECT * FROM User_shifts WHERE user_id = ? AND shift_id = ?",
-            [userId, shiftId]
+            "SELECT * FROM User_shifts WHERE id = ? AND shift_id = ?",
+            [realUserId, shiftId]
         );
+
         if (shiftRows.length > 0) {
             return res.status(400).json({ message: "This user shift already exists" });
         }
 
         // insert
         await pool.execute(
-            "INSERT INTO User_shifts (user_id, shift_id, role_id) VALUES (?, ?, ?)",
-            [userId, shiftId, roleId]
+            "INSERT INTO User_shifts (id, shift_id, role_id) VALUES (?, ?, ?)",
+            [realUserId, shiftId, roleId]
         );
 
         return res.status(200).json({ message: "User shift added successfully" });
+
     } catch (err) {
         console.error("Error adding user shift:", err);
         return res.status(500).json({ error: "Server error" });
@@ -445,10 +473,7 @@ export const addNewUserShift = async (req, res) => {
 
 
 
-
-
-
-// ลบเฉพาะ shift ของ user (ไม่ลบ user)
+// ---------------------- DELETE ---------------------- //
 export const deleteUserShift = async (req, res) => {
     try {
         const { userId, shiftId } = req.body;
@@ -457,9 +482,21 @@ export const deleteUserShift = async (req, res) => {
             return res.status(400).json({ error: "Missing userId or shiftId" });
         }
 
+        //map
+        const [userRows] = await pool.execute(
+            "SELECT id FROM Users WHERE id_employee = ?",
+            [userId]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const realUserId = userRows[0].id;
+
         const [result] = await pool.execute(
-            "DELETE FROM User_shifts WHERE user_id = ? AND shift_id = ?",
-            [userId, shiftId]
+            "DELETE FROM User_shifts WHERE id = ? AND shift_id = ?",
+            [realUserId, shiftId]
         );
 
         if (result.affectedRows === 0) {
@@ -467,6 +504,7 @@ export const deleteUserShift = async (req, res) => {
         }
 
         return res.status(200).json({ message: "User shift deleted successfully" });
+
     } catch (error) {
         console.error("Error deleting user shift:", error);
         return res.status(500).json({ error: "Server error" });
@@ -475,8 +513,7 @@ export const deleteUserShift = async (req, res) => {
 
 
 
-
-// edit Shift
+// ---------------------- EDIT ---------------------- //
 export const editShift = async (req, res) => {
     try {
         const { userId, shiftId, newShiftId, roleId } = req.body;
@@ -484,6 +521,18 @@ export const editShift = async (req, res) => {
         if (!userId || !shiftId) {
             return res.status(400).json({ error: "Missing userId or shiftId" });
         }
+
+        //map
+        const [userRows] = await pool.execute(
+            "SELECT id FROM Users WHERE id_employee = ?",
+            [userId]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const realUserId = userRows[0].id;
 
         let updates = [];
         let params = [];
@@ -503,11 +552,11 @@ export const editShift = async (req, res) => {
         }
 
         const sql = `
-      UPDATE User_shifts 
-      SET ${updates.join(", ")} 
-      WHERE user_id = ? AND shift_id = ?
-    `;
-        params.push(userId, shiftId);
+            UPDATE User_shifts 
+            SET ${updates.join(", ")} 
+            WHERE id = ? AND shift_id = ?
+        `;
+        params.push(realUserId, shiftId);
 
         const [result] = await pool.execute(sql, params);
 
@@ -516,6 +565,7 @@ export const editShift = async (req, res) => {
         }
 
         return res.status(200).json({ message: "Update successful" });
+
     } catch (error) {
         console.error("Error editing user shift:", error);
         res.status(500).json({ error: "Server error" });
@@ -894,6 +944,7 @@ export const GetRolePermissions = async (req, res) => {
 }
 
 
+
 // สรุปสถิติการลาเดือนนี้ — กรองเฉพาะสาขาของ admin ที่ login
 export const getDashboardLeaveStats = async (req, res) => {
     try {
@@ -914,13 +965,13 @@ export const getDashboardLeaveStats = async (req, res) => {
 
         // 7 ประเภทการลา ตาม leave_policy
         const leaveTypes = [
-            { label: 'Sick Leave',      thLabel: 'ลาป่วย',       color: '#f44336' },
-            { label: 'Personal Leave',  thLabel: 'ลากิจ',         color: '#ff9800' },
-            { label: 'Vacation Leave',  thLabel: 'ลาพักร้อน',    color: '#4caf50' },
-            { label: 'Maternity Leave', thLabel: 'ลาคลอด',       color: '#e91e63' },
-            { label: 'Wedding Leave',   thLabel: 'ลาแต่งงาน',    color: '#9c27b0' },
+            { label: 'Sick Leave', thLabel: 'ลาป่วย', color: '#f44336' },
+            { label: 'Personal Leave', thLabel: 'ลากิจ', color: '#ff9800' },
+            { label: 'Vacation Leave', thLabel: 'ลาพักร้อน', color: '#4caf50' },
+            { label: 'Maternity Leave', thLabel: 'ลาคลอด', color: '#e91e63' },
+            { label: 'Wedding Leave', thLabel: 'ลาแต่งงาน', color: '#9c27b0' },
             { label: 'Religious Leave', thLabel: 'ลาบวช/ศาสนา', color: '#2196f3' },
-            { label: 'Other',           thLabel: 'อื่นๆ',         color: '#607d8b' },
+            { label: 'Other', thLabel: 'อื่นๆ', color: '#607d8b' },
         ]
 
         // นับจำนวนครั้งและวันลาของแต่ละประเภท
@@ -942,11 +993,11 @@ export const getDashboardLeaveStats = async (req, res) => {
         })
 
         const data = leaveTypes.map(t => ({
-            label:   t.label,
+            label: t.label,
             thLabel: t.thLabel,
-            color:   t.color,
-            count:   stats[t.label].count,
-            days:    stats[t.label].days,
+            color: t.color,
+            count: stats[t.label].count,
+            days: stats[t.label].days,
         }))
 
         res.json({ success: true, data })
