@@ -24,6 +24,8 @@ export const verifyToken = (req, res, next) => {
         // Verify the token using the secret key
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
+        console.log("decoded token:", decoded)
+
         // If token is valid, attach user data to the request
         req.user = decoded
 

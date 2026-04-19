@@ -27,13 +27,23 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
 
     // ดึงข้อมูลการเข้างานวันนี้ และสถิติการลาเดือนนี้พร้อมกัน
+    const checkAuth = (r) => {
+      // token หมดอายุหรือ invalid → ล้าง token แล้ว redirect ไปหน้า login
+      if (r.status === 401 || r.status === 403) {
+        localStorage.removeItem('token')
+        window.location.href = '/adminlogin'
+        throw new Error('Unauthorized')
+      }
+      return r.json()
+    }
+
     Promise.all([
       fetch(`${API_BASE}/admin/dashboard/today`, {
         headers: { Authorization: `Bearer ${token}` }
-      }).then(r => r.json()),
+      }).then(checkAuth),
       fetch(`${API_BASE}/admin/dashboard/leave-stats`, {
         headers: { Authorization: `Bearer ${token}` }
-      }).then(r => r.json())
+      }).then(checkAuth)
     ])
       .then(([todayData, leaveData]) => {
         setEmployees(todayData.employees || []);
@@ -174,6 +184,15 @@ const Dashboard = () => {
     const diff = (oh * 60 + om - ih * 60 - im) / 60;
     return diff > 0 ? diff.toFixed(1) : null;
   };
+
+  const statusClass = (s) => ({
+    'ปกติ':          'bg-emerald-100 text-emerald-700 border-emerald-200',
+    'สาย':           'bg-amber-100 text-amber-700 border-amber-200',
+    'ขาด':           'bg-rose-100 text-rose-700 border-rose-200',
+    'ลา':            'bg-purple-100 text-purple-700 border-purple-200',
+    'วันหยุด':        'bg-slate-100 text-slate-700 border-slate-200',
+    'ยังไม่เข้างาน':   'bg-sky-100 text-sky-700 border-sky-200',
+  }[s] || 'bg-gray-100 text-gray-700 border-gray-200');
 
   const departments = [...new Set(employees.map(e => e.department))].filter(Boolean).sort();
 
@@ -391,6 +410,8 @@ const Dashboard = () => {
               <option>สาย</option>
               <option>ขาด</option>
               <option>ลา</option>
+              <option>วันหยุด</option>
+              <option>ยังไม่เข้างาน</option>
             </select>
           </div>
         </div>
@@ -449,12 +470,7 @@ const Dashboard = () => {
                           : <span className="text-gray-400 ml-4">-</span>}
                       </td>
                       <td className="px-6 py-4 align-middle">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block shadow-sm border ${
-                          emp.overallStatus === 'ปกติ' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                          emp.overallStatus === 'สาย'  ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                          emp.overallStatus === 'ขาด'  ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                         'bg-purple-100 text-purple-700 border-purple-200'
-                        }`}>
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block shadow-sm border ${statusClass(emp.overallStatus)}`}>
                           {emp.overallStatus}
                         </span>
                       </td>
@@ -623,17 +639,41 @@ const Dashboard = () => {
                   <div className="p-2.5 bg-gray-200 text-gray-600 rounded-lg shrink-0"><AlertCircle size={20} /></div>
                   <div className="flex flex-col justify-center">
                     <span className="text-sm text-gray-500 font-medium mb-1">สถานะปัจจุบัน</span>
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block w-fit shadow-sm border ${
-                      selectedEmployee.overallStatus === 'ปกติ' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                      selectedEmployee.overallStatus === 'สาย'  ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                      selectedEmployee.overallStatus === 'ขาด'  ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                                   'bg-purple-100 text-purple-700 border-purple-200'
-                    }`}>
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold inline-block w-fit shadow-sm border ${statusClass(selectedEmployee.overallStatus)}`}>
                       {selectedEmployee.overallStatus}
                     </span>
                   </div>
                 </div>
               </div>
+
+              {/* รูปถ่ายเช็คอิน / เช็คเอาท์ */}
+              {(selectedEmployee.checkInPhoto || selectedEmployee.checkOutPhoto) && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100">รูปถ่ายการลงเวลา</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedEmployee.checkInPhoto && (
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm text-gray-500 font-medium">รูปเช็คอิน</span>
+                        <img
+                          src={selectedEmployee.checkInPhoto}
+                          alt="Check-in photo"
+                          className="w-full rounded-xl object-cover border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    )}
+                    {selectedEmployee.checkOutPhoto && (
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm text-gray-500 font-medium">รูปเช็คเอาท์</span>
+                        <img
+                          src={selectedEmployee.checkOutPhoto}
+                          alt="Check-out photo"
+                          className="w-full rounded-xl object-cover border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
