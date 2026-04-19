@@ -1,9 +1,7 @@
-import { Link } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-
-import Api from '../../Api';
+import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import Api from '../../Api'
 
 const WorkHoursTracker = ({ role }) => {
     const location = useLocation()
@@ -12,26 +10,24 @@ const WorkHoursTracker = ({ role }) => {
     const [userProfile, setUserProfile] = useState({
         name: "",
         userid: "",
-        avatar: "",
-        shift: ""
+        avatar: ""
     })
+
+    const [timeline, setTimeline] = useState([])
 
     const profileData = {
         name: employeeData?.name || userProfile.name,
         userid: employeeData?.employeeId || userProfile.userid,
-        avatar: employeeData?.profile || userProfile.avatar,
-        shift: employeeData?.shift || userProfile.shift
+        avatar: employeeData?.profile || userProfile.avatar
     }
-
-    const [realHours, setRealHours] = useState({
-        Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0
-    })
 
     useEffect(() => {
         const loadUserProfile = async () => {
+            if (employeeData) return
+
             try {
-                const response = await Api.get('/users/profile')
-                const data = response.data
+                const res = await Api.get('/users/profile')
+                const data = res.data
 
                 const avatarPath = data.avatar
                     ? (data.avatar.startsWith('http')
@@ -41,103 +37,65 @@ const WorkHoursTracker = ({ role }) => {
 
                 setUserProfile({
                     name: `${data.firstname} ${data.lastname}`,
-                    userid: data.id_employee || "",
-                    avatar: avatarPath,
-                    shift: data.start_time && data.end_time
-                        ? `${data.start_time.substring(0, 5)} - ${data.end_time.substring(0, 5)}`
-                        : "No Shift"
+                    userid: data.id_employee,
+                    avatar: avatarPath
                 })
-            }
-            catch (error) {
-                console.error("Error loading profile:", error.response?.data?.message || error.message)
+            } catch (err) {
+                console.error(err)
             }
         }
 
         loadUserProfile()
-    }, [])
+    }, [employeeData])
 
     useEffect(() => {
-        const fetchWeeklyHours = async () => {
-
+        const fetchTimeline = async () => {
             const id = employeeData?.employeeId || userProfile.userid
-
-        console.log("employeeData:", employeeData)
-        console.log("userProfile.userid:", userProfile.userid)
-        console.log("id ที่จะส่ง:", id)
-
-
             if (!id) return
 
             try {
-                const response = await Api.get(`/attendance/weekly-hours?userId=${id}`)
-                setRealHours(response.data)
-            }
-            catch (error) {
-                console.error("Error fetching hours:", error.response?.data?.message || error.message)
+                const res = await Api.get(`/attendance/weekly-timeline?userId=${id}`)
+                setTimeline(res.data)
+            } catch (err) {
+                console.error(err)
             }
         }
 
-        fetchWeeklyHours()
+        fetchTimeline()
     }, [employeeData?.employeeId, userProfile.userid])
 
-    const weekTemplate = [
-        { day: "Monday", color: "#FFD700" },
-        { day: "Tuesday", color: "#FF69B4" },
-        { day: "Wednesday", color: "#32CD32" },
-        { day: "Thursday", color: "#FFA500" },
-        { day: "Friday", color: "#1E90FF" },
-    ]
+    const formatTime = (time) => {
+        if (!time) return "-"
+        return new Date(time).toLocaleTimeString("th-TH", {
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
 
-    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    const todayIndex = new Date().getDay()
-    const todayName = dayNames[todayIndex]
-    const MAX_HOURS_PER_DAY = 9
+    const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
-    const weeklyData = weekTemplate.map(item => {
-        const hoursWorked = realHours[item.day] || 0
-        let percent = (hoursWorked / MAX_HOURS_PER_DAY) * 100
-        percent = Math.min(100, Math.max(0, percent))
-
+    const mergedData = weekDays.map(day => {
+        const found = timeline.find(item => item.day === day)
         return {
-            ...item,
-            hours: hoursWorked,
-            percent
+            day,
+            check_in: found?.check_in || null,
+            check_out: found?.check_out || null
         }
     })
 
-    const today = weeklyData.find(d => d.day === todayName) ?? { hours: 0, percent: 0, color: "#ccc" }
+    const getStatusColor = (item, index) => {
+        const todayIndex = new Date().getDay()
+        const dayMap = [1, 2, 3, 4, 5]
 
-    const workedHours = weeklyData.reduce((sum, day) => sum + day.hours, 0)
+        const thisDayIndex = dayMap[index]
 
-    const workDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    const daysWorked = workDays.filter(day => dayNames.indexOf(day) <= todayIndex).length
-    const maxPossibleHours = daysWorked * MAX_HOURS_PER_DAY
+        if (thisDayIndex > todayIndex) return "#9ca3af"
 
-    const weeklySummaryPercent = maxPossibleHours > 0
-        ? Math.round((workedHours / maxPossibleHours) * 100)
-        : 0
+        if (!item.check_in) return "#ef4444"
 
-    const CustomProgressBar = ({ percent, color, height = '20px' }) => {
-        const validPercent = isNaN(percent) ? 0 : Math.min(100, Math.max(0, percent))
+        if (item.check_in && !item.check_out) return "#8b5cf6"
 
-        return (
-            <div style={{
-                height,
-                backgroundColor: '#e0e0e0',
-                borderRadius: '10px',
-                overflow: 'hidden',
-                width: '100%',
-                position: 'relative'
-            }}>
-                <div style={{
-                    width: `${validPercent}%`,
-                    height: '100%',
-                    backgroundColor: color,
-                    transition: 'width 0.3s ease',
-                    borderRadius: '10px'
-                }} />
-            </div>
-        )
+        return "#22c55e"
     }
 
     return (
@@ -145,9 +103,7 @@ const WorkHoursTracker = ({ role }) => {
 
             <div className="d-flex justify-content-between text-white mt-16">
                 <Link to={role === "approver" ? "/datatocheck" : "/home"} className='text-decoration-none'>
-                    <Button variant="link" className="p-0">
-                        <i className="bi bi-chevron-left ms-3 text-white"></i>
-                    </Button>
+                    <i className="bi bi-chevron-left ms-3 text-white"></i>
                 </Link>
                 <h3 className="fw-bold">Work Hours Tracker</h3>
                 <div className="me-4"></div>
@@ -166,57 +122,67 @@ const WorkHoursTracker = ({ role }) => {
                     <div className="text-sm text-white text-center">
                         ID: {profileData.userid}
                     </div>
-
-                    {/* {profileData.shift && (
-                        <div className="relative backdrop-blur-xl rounded-[40px] shadow-2xl
-                             mt-3 px-8 flex items-center justify-center h-12"
-                            style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                            <span className="font-bold text-black tracking-wide">
-                                Shift: {profileData.shift}
-                            </span>
-                        </div>
-                    )} */}
                 </div>
             </div>
 
-            <div className='d-flex justify-content-center mt-6'>
-                <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80"
-                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    <h4 className="mt-2 mb-4 fw-bold">Today - {todayName}</h4>
-                    <div className='d-flex justify-content-between mb-2'>
-                        <span className='fw-bold'>Worked: {today.hours.toFixed(1)}h</span>
-                        <span className='fw-bold'>Target: {MAX_HOURS_PER_DAY}h</span>
-                    </div>
-                    <CustomProgressBar percent={today.percent} color={today.color} />
-                </div>
-            </div>
+            <div className="d-flex justify-content-center mt-8 mb-12">
+                <div className="w-80 flex flex-col gap-4">
 
-            <div className='d-flex justify-content-center mt-8 mb-6'>
-                <div className="p-4 text-center fw-semibold rounded-3 text-dark w-80"
-                    style={{ background: 'linear-gradient(to bottom, #D9D9D9, #636CCB)' }}>
-                    <h4 className="mt-2 mb-6 fw-bold">Weekly Report</h4>
+                    {mergedData.map((item, index) => (
+                        <div key={index} className="flex gap-3 items-start">
 
-                    {weeklyData.map((item, index) => (
-                        <div key={index} className='mb-4 text-start' style={{ width: '100%' }}>
-                            <div className='d-flex justify-content-between mb-2'>
-                                <span className='fw-bold'>{item.day}</span>
-                                <span className='fw-bold'>
-                                    {item.hours.toFixed(1)}h / {MAX_HOURS_PER_DAY}h
-                                </span>
+                            <div className="flex flex-col items-center mt-1">
+                                <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: getStatusColor(item, index) }}
+                                ></div>
+
+                                {index !== mergedData.length - 1 && (
+                                    <div className="w-[2px] h-full bg-gray-400 opacity-40"></div>
+                                )}
                             </div>
-                            <CustomProgressBar percent={item.percent} color={item.color} />
+
+                            <div className="flex-1 rounded-xl px-4 py-3 bg-white shadow-md">
+
+                                <div className="font-semibold text-gray-800 mb-2">
+                                    {item.day}
+                                </div>
+
+                                <div className="flex justify-between items-center text-sm">
+
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] px-2 py-[2px] rounded-full text-white"
+                                            style={{
+                                                background: 'linear-gradient(to right, #34d399, #059669)'
+                                            }}>
+                                            IN
+                                        </span>
+                                        <span className="text-gray-800 font-medium">
+                                            {formatTime(item.check_in)}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] px-2 py-[2px] rounded-full text-white"
+                                            style={{
+                                                background: 'linear-gradient(to right, #60a5fa, #2563eb)'
+                                            }}>
+                                            OUT
+                                        </span>
+                                        <span className="text-gray-800 font-medium">
+                                            {formatTime(item.check_out)}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
                         </div>
                     ))}
 
-                    <div className="mt-4 pt-4 border-top border-secondary">
-                        <div className='d-flex justify-content-between mb-2'>
-                            <span className='fw-bold'>Total Worked: {workedHours.toFixed(1)}h</span>
-                            <span className='fw-bold'>{weeklySummaryPercent}%</span>
-                        </div>
-                        <CustomProgressBar percent={weeklySummaryPercent} color="#6D29F6" />
-                    </div>
                 </div>
             </div>
+
         </div>
     )
 }

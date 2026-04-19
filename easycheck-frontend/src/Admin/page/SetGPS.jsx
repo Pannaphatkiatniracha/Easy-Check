@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { MapPin, Settings, Search, Filter, Download, Eye, Edit, Trash2, Plus, Save, X, ChevronLeft, ChevronRight, Calendar, CheckCircle, AlertCircle, MapPinned, Navigation, Locate, UsersRound, Power } from 'lucide-react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { MapPin, Edit, Plus, Save, X, CheckCircle, AlertCircle, MapPinned, Locate, Power, Search, Navigation } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { usePermission } from '../../usePermission';
@@ -15,18 +15,13 @@ L.Icon.Default.mergeOptions({
 
 export default function GPSAdminDashboard() {
   // ----- state ควบคุม UI -----
-  const [activeTab, setActiveTab] = useState('check');        // แท็บที่แสดงอยู่: 'check' หรือ 'settings'
   const [showModal, setShowModal] = useState(false);          // modal เพิ่ม/แก้ไขสถานที่
-  const [showFilterModal, setShowFilterModal] = useState(false);      // modal ตัวกรอง
-  const [showMapModal, setShowMapModal] = useState(false);            // modal แผนที่ดู check-in log
   const [showLocationMapModal, setShowLocationMapModal] = useState(false); // modal แผนที่เลือกพิกัด
   const [modalType, setModalType] = useState('');             // 'add' หรือ 'edit'
-  const [searchTerm, setSearchTerm] = useState('');           // คำค้นหาในตาราง log
   const [locationSearchTerm, setLocationSearchTerm] = useState('');   // คำค้นหาในแผนที่ Nominatim
   const [searchResults, setSearchResults] = useState([]);     // ผลลัพธ์จาก Nominatim API
   const [searchingLocation, setSearchingLocation] = useState(false);  // กำลังค้นหาอยู่ไหม
   const [selectedLocation, setSelectedLocation] = useState(null);     // location ที่เลือก (สำหรับ edit/delete)
-  const [selectedLog, setSelectedLog] = useState(null);       // log ที่เลือกดูแผนที่
   const [loading, setLoading] = useState(false);              // loading ทั่วไป (save/delete)
   const [toast, setToast] = useState({ show: false, message: '', type: '' }); // toast notification
   const [gettingLocation, setGettingLocation] = useState(false); // กำลังดึง GPS ปัจจุบันไหม
@@ -39,38 +34,12 @@ export default function GPSAdminDashboard() {
   const [locations, setLocations] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(true); // โหลด locations ครั้งแรก
 
-  // checkInLogs: ยังเป็น mock เพราะ attendance API ยังไม่เสร็จ (รอเพื่อนในทีม)
-  const [checkInLogs] = useState([
-    { id: 1, employee: 'สมชาย ใจดี', employeeId: 'EMP001', position: 'พนักงานช่าง', location: 'สำนักงานใหญ่', time: '08:30:00', date: '30/10/2025', lat: 13.7563, lng: 100.5018 },
-    { id: 2, employee: 'สมหญิง รักงาน', employeeId: 'EMP002', position: 'หัวหน้าแผนก', location: 'มหาวิทยาลัยศรีปทุม', time: '08:45:00', date: '30/10/2025', lat: 13.854758, lng: 100.585453 },
-    { id: 3, employee: 'วิไล สวยงาม', employeeId: 'EMP004', position: 'พนักงานขาย', location: 'สำนักงานใหญ่', time: '08:20:00', date: '30/10/2025', lat: 13.7563, lng: 100.5018 },
-    { id: 4, employee: 'สมศักดิ์ มั่นคง', employeeId: 'EMP005', position: 'ช่างเทคนิค', location: 'มหาวิทยาลัยศรีปทุม', time: '08:50:00', date: '30/10/2025', lat: 13.854758, lng: 100.585453 },
-    { id: 5, employee: 'ธนา กล้าหาญ', employeeId: 'EMP007', position: 'หัวหน้าโครงการ', location: 'มหาวิทยาลัยศรีปทุม', time: '08:15:00', date: '30/10/2025', lat: 13.854758, lng: 100.585453 },
-    { id: 6, employee: 'มานี ขยันทำ', employeeId: 'EMP008', position: 'พนักงานคลัง', location: 'มหาวิทยาลัยศรีปทุม', time: '08:25:00', date: '29/10/2025', lat: 13.854758, lng: 100.585453 },
-    { id: 7, employee: 'สมชาย ใจดี', employeeId: 'EMP001', position: 'พนักงานช่าง', location: 'สำนักงานใหญ่', time: '17:30:00', date: '30/10/2025', lat: 13.7565, lng: 100.5020 },
-    { id: 8, employee: 'สมหญิง รักงาน', employeeId: 'EMP002', position: 'หัวหน้าแผนก', location: 'มหาวิทยาลัยศรีปทุม', time: '17:45:00', date: '30/10/2025', lat: 13.854758, lng: 100.585453 },
-  ]);
-
   // ----- Refs สำหรับ Leaflet maps -----
   const mapRef = useRef(null);           // DOM element สำหรับแผนที่เลือกพิกัด
-  const logMapRef = useRef(null);        // DOM element สำหรับแผนที่ดู log
   const mapInstanceRef = useRef(null);   // Leaflet map instance (เลือกพิกัด)
-  const logMapInstanceRef = useRef(null); // Leaflet map instance (ดู log)
   const markerRef = useRef(null);        // marker บนแผนที่เลือกพิกัด
   const circleRef = useRef(null);        // วงกลมรัศมีบนแผนที่
   const searchTimeoutRef = useRef(null); // debounce timer สำหรับ Nominatim search
-
-  // ----- state สำหรับ pagination -----
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  // ----- state ตัวกรอง log -----
-  const [filters, setFilters] = useState({
-    status: 'all',
-    location: 'all',
-    dateFrom: '',
-    dateTo: '',
-  });
 
   // ----- state form errors -----
   const [formErrors, setFormErrors] = useState({});
@@ -121,60 +90,6 @@ export default function GPSAdminDashboard() {
   // ==========================================================
   // MAP EFFECTS — สร้าง/ทำลาย Leaflet map instances
   // ==========================================================
-
-  // สร้างแผนที่สำหรับดู check-in log ของพนักงาน
-  useEffect(() => {
-    if (showMapModal && logMapRef.current && !logMapInstanceRef.current && selectedLog) {
-      // สร้าง map instance โดยใช้พิกัดของ log ที่เลือก
-      logMapInstanceRef.current = L.map(logMapRef.current).setView([selectedLog.lat, selectedLog.lng], 16);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(logMapInstanceRef.current);
-
-      // สร้าง custom icon สีเขียวแสดงตำแหน่ง check-in
-      const icon = L.divIcon({
-        className: 'bg-transparent border-none',
-        html: `<div class="text-emerald-500 drop-shadow-md">
-                <svg width="32" height="40" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3" fill="white"></circle>
-                  <path d="M9 10l2 2 4-4" stroke="white" stroke-width="2" fill="none"></path>
-                </svg>
-              </div>`,
-        iconSize: [32, 40],
-        iconAnchor: [16, 40],
-        popupAnchor: [0, -40]
-      });
-
-      // วาง marker พร้อม popup แสดงข้อมูลพนักงาน
-      L.marker([selectedLog.lat, selectedLog.lng], { icon })
-        .addTo(logMapInstanceRef.current)
-        .bindPopup(`
-          <div class="p-1 min-w-[150px] font-sans">
-            <strong class="text-gray-800 text-base block mb-1">${selectedLog.employee}</strong>
-            <span class="text-gray-600 text-sm flex items-center gap-1 mb-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>${selectedLog.location}</span>
-            <span class="text-indigo-600 text-sm font-bold flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>${selectedLog.date} ${selectedLog.time}</span>
-          </div>
-        `).openPopup();
-
-      // วาดวงกลมแสดงรัศมีอ้างอิง
-      L.circle([selectedLog.lat, selectedLog.lng], {
-        radius: 100,
-        color: '#48bb78',
-        fillColor: '#48bb78',
-        fillOpacity: 0.1
-      }).addTo(logMapInstanceRef.current);
-    }
-
-    // cleanup: ทำลาย map instance เมื่อปิด modal
-    return () => {
-      if (logMapInstanceRef.current) {
-        logMapInstanceRef.current.remove();
-        logMapInstanceRef.current = null;
-      }
-    };
-  }, [showMapModal, selectedLog]);
 
   // สร้างแผนที่สำหรับเลือกพิกัดใน form เพิ่ม/แก้ไขสถานที่
   useEffect(() => {
@@ -512,9 +427,7 @@ export default function GPSAdminDashboard() {
   const closeModal = () => {
     setShowModal(false);
     setShowLocationMapModal(false);
-    setShowMapModal(false);
     setSelectedLocation(null);
-    setSelectedLog(null);
     setFormErrors({});
     setLocationSearchTerm('');
     setSearchResults([]);
@@ -536,129 +449,6 @@ export default function GPSAdminDashboard() {
       setFormErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
-  // เปิด modal แผนที่สำหรับดู location ของ log
-  const openMapModal = (log) => {
-    setSelectedLog(log);
-    setShowMapModal(true);
-  };
-
-  const applyFilters = () => {
-    setShowFilterModal(false);
-    showToast('ใช้ตัวกรองสำเร็จ', 'success');
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      status: 'all',
-      location: 'all',
-      dateFrom: '',
-      dateTo: '',
-    });
-    showToast('ล้างตัวกรองสำเร็จ', 'success');
-  };
-
-  // ==========================================================
-  // COMPUTED / MEMOIZED VALUES
-  // ==========================================================
-
-  // รายชื่อ location ที่ไม่ซ้ำสำหรับ dropdown ในตัวกรอง
-  const uniqueLocations = useMemo(() => {
-    return [...new Set(checkInLogs.map(log => log.location))];
-  }, [checkInLogs]);
-
-  // กรอง checkInLogs ตาม searchTerm และ filters
-  // ต้องประกาศก่อน stats เพราะ stats ใช้ filteredLogs
-  const filteredLogs = useMemo(() => {
-    let result = [...checkInLogs];
-
-    // กรองด้วยคำค้นหา (ชื่อ, รหัส, ตำแหน่ง, สถานที่)
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(log =>
-        log.employee.toLowerCase().includes(term) ||
-        log.employeeId.toLowerCase().includes(term) ||
-        log.position.toLowerCase().includes(term) ||
-        log.location.toLowerCase().includes(term)
-      );
-    }
-
-    // กรองด้วยสถานะ
-    if (filters.status !== 'all') {
-      result = result.filter(log => log.status === filters.status);
-    }
-
-    // กรองด้วยวันที่เริ่มต้น (format dd/MM/yyyy → yyyy-MM-dd เพื่อเปรียบเทียบ)
-    if (filters.dateFrom) {
-      result = result.filter(log => {
-        const logDate = log.date.split('/').reverse().join('-');
-        return logDate >= filters.dateFrom;
-      });
-    }
-
-    // กรองด้วยวันที่สิ้นสุด
-    if (filters.dateTo) {
-      result = result.filter(log => {
-        const logDate = log.date.split('/').reverse().join('-');
-        return logDate <= filters.dateTo;
-      });
-    }
-
-    return result;
-  }, [checkInLogs, searchTerm, filters]);
-
-  // สถิติสรุป: จำนวน log ทั้งหมด, วันนี้, เดือนนี้ (ประกาศหลัง filteredLogs)
-  const stats = useMemo(() => {
-    return {
-      total: filteredLogs.length,
-      today: filteredLogs.filter(l => l.date === '30/10/2025').length,
-      thisMonth: filteredLogs.length,
-    };
-  }, [filteredLogs]);
-
-  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
-
-  // ตัดข้อมูลสำหรับ pagination
-  const paginatedLogs = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredLogs.slice(start, start + itemsPerPage);
-  }, [filteredLogs, currentPage]);
-
-  // reset หน้ากลับไป 1 เมื่อ filter เปลี่ยน
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filters]);
-
-  // Export log เป็น CSV
-  const handleExport = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const headers = ['พนักงาน', 'รหัสพนักงาน', 'ตำแหน่ง', 'สถานที่', 'วันที่', 'เวลา', 'GPS', 'สถานะ'];
-      const csvContent = [
-        headers.join(','),
-        ...filteredLogs.map(log => [
-          log.employee,
-          log.employeeId,
-          log.position,
-          log.location,
-          log.date,
-          log.time,
-          `"${log.lat}, ${log.lng}"`,
-          log.status === 'success' ? 'นอกพื้นที่' : ' เช็คอินสำเร็จ'
-        ].join(','))
-      ].join('\n');
-
-      // ใส่ BOM (0xFEFF) เพื่อให้ Excel อ่านภาษาไทยได้ถูกต้อง
-      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `check-in-logs-${new Date().toISOString().split('T')[0]}.csv`;
-      link.click();
-
-      setLoading(false);
-      showToast('ส่งออกข้อมูลสำเร็จ', 'success');
-    }, 1000);
-  }, [filteredLogs, showToast]);
 
   // ==========================================================
   // RENDER
@@ -707,196 +497,8 @@ export default function GPSAdminDashboard() {
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex gap-2 sm:gap-4 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 w-fit overflow-x-auto max-w-full">
-          <button
-            onClick={() => setActiveTab('check')}
-            className={`flex items-center gap-2 px-5 sm:px-6 py-3 rounded-xl font-bold transition-all duration-300 border-none cursor-pointer whitespace-nowrap ${activeTab === 'check' ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-100' : 'bg-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
-          >
-            <Eye size={20} />
-            ตรวจสอบ GPS
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex items-center gap-2 px-5 sm:px-6 py-3 rounded-xl font-bold transition-all duration-300 border-none cursor-pointer whitespace-nowrap ${activeTab === 'settings' ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-100' : 'bg-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
-          >
-            <Settings size={20} />
-            ตั้งค่าสถานที่
-          </button>
-        </div>
-
-        {/* ===== TAB: ตรวจสอบ GPS (check-in logs) ===== */}
-        {activeTab === 'check' ? (
-          <div>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition-shadow">
-                <div className="p-4 rounded-full bg-indigo-100 text-indigo-600 flex-shrink-0">
-                  <UsersRound size={24} />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-gray-500 font-medium m-0 mb-1 text-sm">ทั้งหมด</p>
-                  <p className="text-2xl font-bold text-gray-800 m-0">{stats.total}</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition-shadow">
-                <div className="p-4 rounded-full bg-emerald-100 text-emerald-600 flex-shrink-0">
-                  <CheckCircle size={24} />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-gray-500 font-medium m-0 mb-1 text-sm">วันนี้</p>
-                  <p className="text-2xl font-bold text-gray-800 m-0">{stats.today}</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition-shadow">
-                <div className="p-4 rounded-full bg-blue-100 text-blue-600 flex-shrink-0">
-                  <Calendar size={24} />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-gray-500 font-medium m-0 mb-1 text-sm">เดือนนี้</p>
-                  <p className="text-2xl font-bold text-gray-800 m-0">{stats.thisMonth}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Search & Filter Bar */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-8">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="ค้นหาพนักงาน, รหัส, ตำแหน่ง, สถานที่..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-10 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white font-medium text-gray-700 transition-all"
-                  />
-                  {searchTerm && (
-                    <button
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-full p-1 transition-colors border-none cursor-pointer"
-                      onClick={() => setSearchTerm('')}
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-6 py-3.5 bg-white text-gray-700 border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl font-bold transition-all cursor-pointer relative"
-                    onClick={() => setShowFilterModal(true)}
-                  >
-                    <Filter size={18} />
-                    ตัวกรอง
-                    {(filters.status !== 'all' || filters.location !== 'all' || filters.dateFrom || filters.dateTo) && (
-                      <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full border-2 border-white"></span>
-                    )}
-                  </button>
-                  <button
-                    className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-6 py-3.5 bg-indigo-600 text-white border-none hover:bg-indigo-700 rounded-xl font-bold transition-all cursor-pointer shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleExport}
-                    disabled={filteredLogs.length === 0}
-                  >
-                    <Download size={18} />
-                    Export
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Check-in Log Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-              <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <h2 className="text-xl font-bold text-gray-800 m-0">บันทึกการลงเวลา</h2>
-                <p className="text-sm font-medium text-gray-500 m-0">แสดง {paginatedLogs.length} จาก {filteredLogs.length} รายการ</p>
-              </div>
-
-              {filteredLogs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                    <Search size={32} className="text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-700 m-0 mb-2">ไม่พบข้อมูลที่ค้นหา</h3>
-                  <p className="text-gray-500 text-sm m-0">ลองเปลี่ยนคำค้นหา หรือปรับตัวกรองใหม่</p>
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[1000px]">
-                      <thead>
-                        <tr>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">พนักงาน</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">รหัส</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">ตำแหน่ง</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">สถานที่</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">วันที่</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">เวลา</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">GPS</th>
-                          <th className="bg-gray-50/80 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200 text-center">ดูแผนที่</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedLogs.map((log) => (
-                          <tr key={log.id} className="hover:bg-indigo-50/30 transition-colors">
-                            <td className="px-6 py-4 text-sm font-bold text-gray-800 border-b border-gray-50 align-middle">{log.employee}</td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-50 align-middle">{log.employeeId}</td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-50 align-middle">{log.position}</td>
-                            <td className="px-6 py-4 text-sm font-bold text-indigo-600 border-b border-gray-50 align-middle bg-indigo-50/20">{log.location}</td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-50 align-middle">{log.date}</td>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-800 border-b border-gray-50 align-middle">{log.time}</td>
-                            <td className="px-6 py-4 text-xs font-mono text-gray-500 border-b border-gray-50 align-middle">{log.lat.toFixed(4)},<br />{log.lng.toFixed(4)}</td>
-                            <td className="px-6 py-4 border-b border-gray-50 align-middle text-center">
-                              <button
-                                className="flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg text-xs font-bold transition-colors border-none cursor-pointer mx-auto"
-                                onClick={() => openMapModal(log)}
-                              >
-                                <MapPinned size={14} />
-                                ดูแผนที่
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-2 p-6 border-t border-gray-100">
-                      <button
-                        className="flex items-center justify-center w-10 h-10 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                      >
-                        <ChevronLeft size={20} />
-                      </button>
-                      <div className="flex items-center gap-1.5">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                          <button
-                            key={page}
-                            className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold border cursor-pointer transition-colors ${currentPage === page ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        className="flex items-center justify-center w-10 h-10 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                      >
-                        <ChevronRight size={20} />
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-        ) : (
-          /* ===== TAB: ตั้งค่าสถานที่ ===== */
-          <div>
+        {/* ===== ตั้งค่าสถานที่ ===== */}
+        <div>
             {loadingLocations ? (
               /* กำลังโหลด */
               <div className="flex items-center justify-center py-20">
@@ -991,8 +593,7 @@ export default function GPSAdminDashboard() {
                 );
               })()
             )}
-          </div>
-        )}
+        </div>
       </div>
 
       {/* ===== MODAL: เพิ่ม/แก้ไขสถานที่ ===== */}
@@ -1234,135 +835,6 @@ export default function GPSAdminDashboard() {
         </div>
       )}
 
-      {/* ===== MODAL: ตัวกรอง Log ===== */}
-      {showFilterModal && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6 transition-all duration-300" onClick={() => setShowFilterModal(false)}>
-          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-xl font-bold text-gray-800 m-0 flex items-center gap-2"><Filter size={24} className="text-indigo-600" /> ตัวกรองข้อมูล</h2>
-              <button onClick={() => setShowFilterModal(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-100 hover:border-gray-300 transition-colors cursor-pointer">
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-8 flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700">สถานะ</label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-colors w-full cursor-pointer"
-                >
-                  <option value="all">ทั้งหมด</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700">สถานที่</label>
-                <select
-                  value={filters.location}
-                  onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-colors w-full cursor-pointer"
-                >
-                  <option value="all">ทั้งหมด</option>
-                  {uniqueLocations.map(loc => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                  <Calendar size={16} className="text-indigo-500" /> วันที่เริ่มต้น
-                </label>
-                <input
-                  type="date"
-                  value={filters.dateFrom}
-                  onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-colors w-full"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                  <Calendar size={16} className="text-indigo-500" /> วันที่สิ้นสุด
-                </label>
-                <input
-                  type="date"
-                  value={filters.dateTo}
-                  onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-colors w-full"
-                />
-              </div>
-            </div>
-
-            <div className="px-8 py-6 border-t border-gray-100 bg-gray-50/80 flex justify-end gap-3 rounded-b-3xl">
-              <button onClick={clearFilters} className="px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-bold transition-colors cursor-pointer">
-                ล้างตัวกรอง
-              </button>
-              <button onClick={applyFilters} className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-xl font-bold transition-all shadow-md hover:shadow-lg cursor-pointer">
-                <Filter size={18} />
-                ใช้ตัวกรอง
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ===== MODAL: แผนที่ดู GPS ของ Log ===== */}
-      {showMapModal && selectedLog && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6 transition-all duration-300" onClick={closeModal}>
-          <div className="bg-white rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-2xl font-bold text-gray-800 m-0 flex items-center gap-3">
-                <MapPin size={28} className="text-indigo-600" /> ตำแหน่ง GPS - {selectedLog.employee}
-              </h2>
-              <button onClick={closeModal} className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-100 hover:border-gray-300 transition-colors cursor-pointer">
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-8 flex flex-col md:flex-row gap-6">
-              {/* ข้อมูลพนักงาน */}
-              <div className="md:w-1/3 flex flex-col gap-4">
-                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-gray-500">พนักงาน</span>
-                    <strong className="text-gray-800 text-lg">{selectedLog.employee} <span className="text-sm text-gray-500 font-normal">({selectedLog.employeeId})</span></strong>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-gray-500">ตำแหน่ง</span>
-                    <strong className="text-gray-800">{selectedLog.position}</strong>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-gray-500">สถานที่</span>
-                    <strong className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg w-fit">{selectedLog.location}</strong>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-gray-500">วันที่ / เวลา</span>
-                    <strong className="text-gray-800">{selectedLog.date} <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded ml-1">{selectedLog.time}</span></strong>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold text-gray-500">พิกัด GPS</span>
-                    <strong className="text-gray-800 font-mono text-sm">{selectedLog.lat.toFixed(6)}, {selectedLog.lng.toFixed(6)}</strong>
-                  </div>
-                  <div className="flex flex-col gap-1 mt-2">
-                    <span className="text-sm font-semibold text-gray-500">สถานะ</span>
-                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl font-bold flex items-center gap-2 w-fit">
-                      <CheckCircle size={16} /> เช็คอินสำเร็จ (อยู่ในพื้นที่)
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Leaflet Map สำหรับดู log */}
-              <div className="md:w-2/3 h-[400px] md:h-auto min-h-[400px]">
-                <div ref={logMapRef} className="w-full h-full rounded-2xl border-2 border-gray-200 z-10 shadow-inner"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -250,7 +250,7 @@ export const getDashboardToday = async (req, res) => {
                 u.id_employee, u.firstname, u.lastname,
                 u.position, u.department, u.avatar,
                 s.start_time AS shift_start, s.end_time AS shift_end,
-                a.check_in_time, a.check_out_time, a.check_in_status,
+                a.check_in_time, a.check_out_time, a.check_in_status, a.check_out_status,
                 a.check_in_photo, a.check_out_photo,
                 lr.id AS leave_id, lr.leave_reasons
             FROM Users u
@@ -277,7 +277,9 @@ export const getDashboardToday = async (req, res) => {
         const employees = rows.map(row => {
             let overallStatus
             if (row.check_in_time) {
-                overallStatus = row.check_in_status === 'late' ? 'สาย' : 'ปกติ'
+                if (row.check_in_status === 'late') overallStatus = 'สาย'
+                else if (row.check_out_status === 'early') overallStatus = 'ออกก่อนเวลา'
+                else overallStatus = 'ปกติ'
             } else if (row.leave_id) {
                 overallStatus = 'ลา'
             } else if (isWeekend) {
@@ -315,8 +317,9 @@ export const getDashboardToday = async (req, res) => {
             }
         })
 
-        const present = employees.filter(e => e.overallStatus === 'ปกติ' || e.overallStatus === 'สาย').length
+        const present = employees.filter(e => ['ปกติ','สาย','ออกก่อนเวลา'].includes(e.overallStatus)).length
         const late = employees.filter(e => e.overallStatus === 'สาย').length
+        const earlyLeave = employees.filter(e => e.overallStatus === 'ออกก่อนเวลา').length
         const absent = employees.filter(e => e.overallStatus === 'ขาด').length
         const onLeave = employees.filter(e => e.overallStatus === 'ลา').length
         const holiday = employees.filter(e => e.overallStatus === 'วันหยุด').length
@@ -326,11 +329,12 @@ export const getDashboardToday = async (req, res) => {
         const deptMap = {}
         employees.forEach(e => {
             if (!deptMap[e.department]) {
-                deptMap[e.department] = { department: e.department, total: 0, present: 0, late: 0, absent: 0, onLeave: 0, holiday: 0, notStarted: 0 }
+                deptMap[e.department] = { department: e.department, total: 0, present: 0, late: 0, earlyLeave: 0, absent: 0, onLeave: 0, holiday: 0, notStarted: 0 }
             }
             deptMap[e.department].total++
             if (e.overallStatus === 'ปกติ') deptMap[e.department].present++
             else if (e.overallStatus === 'สาย') { deptMap[e.department].present++; deptMap[e.department].late++ }
+            else if (e.overallStatus === 'ออกก่อนเวลา') { deptMap[e.department].present++; deptMap[e.department].earlyLeave++ }
             else if (e.overallStatus === 'ขาด') deptMap[e.department].absent++
             else if (e.overallStatus === 'ลา') deptMap[e.department].onLeave++
             else if (e.overallStatus === 'วันหยุด') deptMap[e.department].holiday++
@@ -338,7 +342,7 @@ export const getDashboardToday = async (req, res) => {
         })
 
         res.json({
-            summary: { present, late, absent, onLeave, holiday, notStarted, notCheckedOut, total: employees.length },
+            summary: { present, late, earlyLeave, absent, onLeave, holiday, notStarted, notCheckedOut, total: employees.length },
             employees,
             departmentStats: Object.values(deptMap)
         })

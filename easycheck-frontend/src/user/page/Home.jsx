@@ -1,23 +1,62 @@
 // Home.jsx
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const API = "http://localhost:5000/notifications";
 
 const Home = ({ role }) => {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        if (!token) return;
+        const res = await axios.get(`${API}/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUnreadCount(res.data.count || 0);
+      } catch (err) {
+        console.error("โหลด unread count ไม่สำเร็จ:", err);
+      }
+    };
+
+    fetchUnread();
+
+    // polling ทุก 30 วินาที อัปเดต badge อัตโนมัติ
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ── Bell Button ใช้ร่วมกันทั้ง 2 role ──
+  const BellButton = (
+    <div className="mt-2 mb-4 mr-2 text-end">
+      <Link to="/notification" className="position-relative d-inline-block">
+        <Button
+          size="sm"
+          className="rounded-circle"
+          style={{ backgroundColor: "#636CCB", border: "none" }}
+        >
+          <i className="bi bi-bell-fill text-black"></i>
+        </Button>
+        {unreadCount > 0 && (
+          <span
+            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            style={{ fontSize: "0.6rem", minWidth: "18px" }}
+          >
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </Link>
+    </div>
+  );
+
   // component ของ Approver
   const ApprovePage = (
     <div className="p-4">
-      {/* ปุ่มกระดิ่ง */}
-      <div className="mt-2 mb-4 mr-2 text-end rounded-circle">
-        <Link to="/notification">
-          <Button
-            size="sm"
-            className="rounded-circle"
-            style={{ backgroundColor: "#636CCB", border: "none" }}
-          >
-            <i className="bi bi-bell-fill text-black"></i>
-          </Button>
-        </Link>
-      </div>
+      {BellButton}
 
       <div className="grid grid-cols-2 gap-4 mt-12">
         {/* <Link to="/requestapprove" className="text-decoration-none">
@@ -46,7 +85,6 @@ const Home = ({ role }) => {
           </div>
         </Link>
 
-      
         {/* กล่องที่เพิ่มใหม่ เลือกกะงาน (Shift Selection) */}
         <Link to="/shiftselection" className="text-decoration-none">
           <div
@@ -134,18 +172,7 @@ const Home = ({ role }) => {
   // component ของ User ทั่วไป
   const Userpage = (
     <div className="p-4">
-      {/* ปุ่มกระดิ่ง */}
-      <div className="mt-2 mb-4 mr-2 text-end rounded-circle">
-        <Link to="/notification">
-          <Button
-            size="sm"
-            className="rounded-circle"
-            style={{ backgroundColor: "#636CCB", border: "none" }}
-          >
-            <i className="bi bi-bell-fill text-black"></i>
-          </Button>
-        </Link>
-      </div>
+      {BellButton}
 
       <div className="grid grid-cols-2 gap-4 mt-12">
         <Link to="/checkin" className="text-decoration-none">

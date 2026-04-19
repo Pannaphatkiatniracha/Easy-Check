@@ -2,6 +2,7 @@ import db from '../config/db.js' // ท่อที่เชื่อมไป d
 import bcrypt from 'bcrypt'
 
 
+
 // 🐰🐰 ดึงข้อมูลออกมาโชว์
 export const getProfile = async (req, res) => {
     try {

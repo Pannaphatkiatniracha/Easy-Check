@@ -14,6 +14,8 @@ import gpsLocationRouter from "./routers/gpsLocationRouter.js";
 import requestRoutes from "./routers/requestRoutes.js";
 import shiftRoutes from "./routers/shiftRoutes.js";
 import groupNotiRouter from "./routers/group-notiRouter.js";
+import notificationRouter from "./routers/notificationRouter.js";
+import exportRouter from "./routers/exportRouter.js";
 
 //เพิ่มการ Import ไฟล์ assignRoutes ที่เราสร้างใหม่
 import assignRoutes from "./routers/assignRoutes.js";
@@ -50,9 +52,12 @@ app.use("/admin", adminRouter);
 app.use("/gps-locations", gpsLocationRouter);
 app.use("/api/group-noti", groupNotiRouter);
 app.use("/checkin-approve", requestRoutes);
+app.use("/notifications", notificationRouter);
 // server.js
 app.use("/shifts", shiftRoutes);  // เปลี่ยน /approver → /shifts
 app.use('/api/earlyleave', earlyleaveRouter);
+app.use('/api', exportRouter)
+
 
 app.use("/api/assign", assignRoutes);
 

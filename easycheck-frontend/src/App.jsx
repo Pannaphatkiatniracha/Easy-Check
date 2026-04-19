@@ -21,6 +21,7 @@ import ExRegister from "./user/page/ExRegister";
 import AttendanceSum from "./user/page/AttendanceSum";
 import PrivacyPolicy from "./user/page/PrivacyPolicy";
 import WorkHoursTracker from "./user/page/WorkHoursTracker";
+import Notification from "./user/page/Notification";
 
 import ApproveProfile from "./user/page/ApproveProfile";
 import LeaveRequestApprove from "./user/page/LeaveRequestApprove";
@@ -88,6 +89,17 @@ function App() {
             {/* ตรงนี้ต้องใส่ token เพื่อให้มันรู้ว่าคนนี้มีสิทธิ์ reset รหัสผ่านนะ */}
             <Route path="resetpassword/:token" element={<ResetPassword />} />
 
+
+                <Route path="leaveRequestApprove" element={<LeaveRequestApprove />} />
+                <Route path="paymentrequest" element={<PaymentRequest />} />
+                <Route path="shiftselection" element={<ShiftSelection />} />
+                <Route path="earlyleave" element={<EarlyLeave />} />
+                <Route path="notification" element={<Notification />} />
+                
+                <Route
+                  path="datacheck"
+                  element={<DataCheck role={role} />}
+                />
 
             {/* --- ถ้าไม่มี Token ให้ดีดกลับไปหน้า Login เสมอ --- */}
             {!token ? (
