@@ -1,4 +1,3 @@
-// Home.jsx
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -56,9 +55,9 @@ const Home = ({ role }) => {
   // component ของ Approver
   const ApprovePage = (
     <div className="p-4">
-      {BellButton}
+      {/* {BellButton} */}
 
-      <div className="grid grid-cols-2 gap-4 mt-12">
+      <div className="grid grid-cols-2 gap-4 mt-20">
         {/* <Link to="/requestapprove" className="text-decoration-none">
           <div
             className="p-4 text-center fw-semibold rounded-3 text-dark

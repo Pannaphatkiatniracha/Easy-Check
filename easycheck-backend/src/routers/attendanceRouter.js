@@ -10,7 +10,6 @@ import {
   upload,
   getAttendanceHistory,
   getWeeklyTimeline,
-  getCurrentStatus 
 } from "../controllers/attendanceController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
@@ -24,7 +23,6 @@ router.get("/history", verifyToken, getHistory);
 
 router.get("/attendance-history", getAttendanceHistory)
 router.get('/weekly-timeline', getWeeklyTimeline)
-router.get('/current-status', getCurrentStatus)
 
 // Approver / Admin
 router.get("/pending", verifyToken, getPending);

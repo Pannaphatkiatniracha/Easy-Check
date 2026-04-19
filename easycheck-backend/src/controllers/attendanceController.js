@@ -322,18 +322,16 @@ export const getAttendanceHistory = async (req, res) => {
 
 // 🐱🐱  WORK-HOURS TRACKER
 export const getWeeklyTimeline = async (req, res) => {
-  const { userId } = req.query
+  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน (ก็คือ token + id)
 
   if (!userId) {
     return res.status(400).json({ message: "userId is required" })
   }
 
   try {
+    // ไปดึงเวลาเข้างาน-ออกงาน แล้วก็วันที่ทำออกมา แต่เอาเฉพาะข้อมูล 7 วันล่าสุด
     const [rows] = await pool.query(
-      `SELECT 
-          check_in_time,
-          check_out_time,
-          work_date,
+      `SELECT check_in_time,check_out_time,work_date,
           DAYNAME(work_date) as day
        FROM attendance
        WHERE id_employee = ?
@@ -342,8 +340,9 @@ export const getWeeklyTimeline = async (req, res) => {
       [userId]
     )
 
+    // อันนี้แปลงรูปข้อมูลก่อนจะส่งไปให้ฟ้อนเอน จะได้ใช้ง่าย ๆ
     const formatted = rows.map(row => ({
-      day: row.day,
+      day: row.day, // ส่งวันกลับเป็นแบบ DAYNAME นะ (MONDAY)
       check_in: row.check_in_time,
       check_out: row.check_out_time
     }))
@@ -353,38 +352,5 @@ export const getWeeklyTimeline = async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: err.message })
-  }
-}
-
-// 🐱🐱  GET CURRENT STATUS
-export const getCurrentStatus = async (req, res) => {
-  const { userId } = req.query;
-  const empId = userId || req.user?.id_employee;
-  
-  if (!empId) return res.status(400).json({ message: "userId is required" });
-  
-  try {
-    const [rows] = await pool.query(
-      `SELECT check_in_time, check_out_time, check_in_status, check_out_status 
-       FROM attendance WHERE id_employee = ? AND work_date = CURDATE() LIMIT 1`,
-      [empId]
-    );
-
-    let result = { message: "no-activity" };
-
-    if (rows.length > 0) {
-      const row = rows[0];
-      if (row.check_out_time) {
-        result = { type: 'checkout', status: row.check_out_status, created_at: row.check_out_time };
-      } 
-      else if (row.check_in_time) {
-        result = { type: 'checkin', status: row.check_in_status, created_at: row.check_in_time };
-      }
-    }
-
-    res.json(result);
-  } 
-  catch (err) {
-    res.status(500).json({ message: err.message });
   }
 }

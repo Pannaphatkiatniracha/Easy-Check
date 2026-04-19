@@ -14,7 +14,7 @@ const Api = axios.create({
 // interceptors.request คือเช็คก่อนจะส่งออกไป พอมีการยิง api ตรงนี้มันจะเช็คว่ามี token มั้ย
 Api.interceptors.request.use(
     (config) => {
-        // token ใบสั้น
+        // ไปหยิบ token จาก browser (ใบสั้น)
         const token = sessionStorage.getItem('token')
         console.log("TOKEN:", token)
         
@@ -28,33 +28,35 @@ Api.interceptors.request.use(
     }
 )
 
-// ถ้า token พังต้องไป /refresh-token
+// เช็คผลตอนแบคเอนตอบกลับ
 Api.interceptors.response.use(
     (response) => response, // ถ้าแบคเอนตอบกลับมาปกติ (200) ก็ปล่อยผ่านไปหน้า UI เลย
     
+    // ถ้าพัง
     async (error) => {
-        const originalRequest = error.config // เก็บ "คำสั่งเดิม" ที่พนักงานเพิ่งสั่งมาไว้ก่อน
+        const originalRequest = error.config // เก็บคำสั่งไอที่ทำล่าสุดไว้ก่อน
 
-        // ถ้ายังไม่ได้ login ไม่มี token
+        // พวกนี้คือเช็คว่า token พังไหม (401/403)
         if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true // บอกไว้ว่า "กุกำลังพยายามแก้ปัญหาให้อยู่จ้า" ห้ามวนลูป!
 
             try {
-                // ไปหยิบ token ยาว (refreshToken) ตอน Login มาใช้
+                // ไปดึง token ยาว (refreshToken) ตอน Login มาใช้
                 const refreshToken = sessionStorage.getItem('refreshToken')
 
-                // ยิงไปหาแบคเอน
+                // ยิงไปหาแบคเอน ขอรีเฟรช token
                 const res = await axios.post(`http://${HOST}:${PORT}/auth/refresh-token`, { refreshToken })
 
                 // OK
                 if (res.status === 200) {
-                    // แลก token ใหม่
+                    // accessToken = token ใหม่สำหรับใช้งาน
+                    // refreshToken = token สำรอง แต่เราเปลี่ยนชื่อเป็น newRefreshToken
                     const { accessToken, refreshToken: newRefreshToken } = res.data
 
                     sessionStorage.setItem('token', accessToken)
                     sessionStorage.setItem('refreshToken', newRefreshToken)
 
-                    // เอาตั๋วใหม่ไปแปะในคำสั่งเดิมที่เคยพังเมื่อกี้
+                    // ก็คือต่อไป ยิง api ไปก็จะมี accessToken ติดไปด้วยเสมอ
                     Api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
                     // Body (ข้อมูล) คือสิ่งที่เราส่งให้แบคเอน
                     // Header (token) คือสิ่งที่บอกว่าเรามีสิทธิ์ส่งข้อมูลนี้ไหม
@@ -64,7 +66,7 @@ Api.interceptors.response.use(
                     return Api(originalRequest)
                 }
             } catch (refreshError) {
-                // ถ้า newRefreshToken หมดอายุ
+                // ถ้า newRefreshToken (tokenใหม่) หมดอายุ คือบังคับให้นางไป login ใหม่เลย
                 console.log("Session expired. Please login again")
                 sessionStorage.clear()
                 window.location.href = '/login'
