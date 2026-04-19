@@ -321,50 +321,38 @@ export const getAttendanceHistory = async (req, res) => {
 }
 
 // 🐱🐱  WORK-HOURS TRACKER
-export const getWeeklyHours = async (req, res) => {
-  const { userId } = req.query // ให้ userId = รับข้อมูลจากฟ้อนเอน (ก็คือ token + id)
-  
-  if (!userId) {
-  return res.status(400).json({ message: "userId is required" })
-}
+export const getWeeklyTimeline = async (req, res) => {
+  const { userId } = req.query
 
-  const empId = userId // // empId = userId นั่นแหละ
-  
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" })
+  }
+
   try {
-    // ตรงนี้ก็คือดึงเวลาเข้างาน-ออกงานของพนักงานคนนี้ (เริ่มตั้งแต่วันจันทร์ ก็คือ ,1 นั่นแหละ)
     const [rows] = await pool.query(
-      `SELECT check_in_time, check_out_time, DAYNAME(work_date) as day 
-       FROM attendance WHERE id_employee = ? 
-       AND YEARWEEK(work_date, 1) = YEARWEEK(CURDATE(), 1) ORDER BY work_date ASC`,
-      [empId]
+      `SELECT 
+          check_in_time,
+          check_out_time,
+          work_date,
+          DAYNAME(work_date) as day
+       FROM attendance
+       WHERE id_employee = ?
+       AND work_date >= CURDATE() - INTERVAL 7 DAY
+       ORDER BY work_date ASC`,
+      [userId]
     )
 
-    // เป็นค่าเริ่มต้นว่าทุกวันเริ่มต้นที่ 0 ชั่วโมงก่อนนะ
-    const hoursData = { Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0 }
-    
-    // loop row
-    rows.forEach(row => {
-      
-      const day = row.day // ดึงวันแบบ monday sunday ไรเงี้ย
-      
-      // ต้องมี เวลาเช็คอิน,เช็คเอ้า,วันใน object day
-      if (row.check_in_time && row.check_out_time && hoursData.hasOwnProperty(day)) {
-        // แปลงเป็นเวลาเริ่ดๆ “ออก - เข้า”
-        const diffMs = new Date(row.check_out_time) - new Date(row.check_in_time)
-        
-        // คำนวณชั่วโมง
-        // 1000 = ms → sec
-        // 60 = sec → min
-        // 60 = min → hour
-        hoursData[day] = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(1))
-      }
-    })
+    const formatted = rows.map(row => ({
+      day: row.day,
+      check_in: row.check_in_time,
+      check_out: row.check_out_time
+    }))
 
-    res.json(hoursData)
-
+    res.json(formatted)
 
   } catch (err) {
-    res.status(500).json({ message: "Error calculating hours", error: err.message })
+    console.error(err)
+    res.status(500).json({ message: err.message })
   }
 }
 

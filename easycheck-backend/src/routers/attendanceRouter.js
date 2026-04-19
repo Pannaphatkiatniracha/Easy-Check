@@ -9,7 +9,7 @@ import {
   getMyShift,
   upload,
   getAttendanceHistory,
-  getWeeklyHours,
+  getWeeklyTimeline,
   getCurrentStatus 
 } from "../controllers/attendanceController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -23,7 +23,7 @@ router.post("/check-out", verifyToken, upload.single("photo"), checkOut);
 router.get("/history", verifyToken, getHistory);
 
 router.get("/attendance-history", getAttendanceHistory)
-router.get('/weekly-hours', getWeeklyHours)
+router.get('/weekly-timeline', getWeeklyTimeline)
 router.get('/current-status', getCurrentStatus)
 
 // Approver / Admin
