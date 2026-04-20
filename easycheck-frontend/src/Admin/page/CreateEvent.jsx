@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Form, Button, Table } from 'react-bootstrap'
+import { Container, Row, Col, Card, Form, Button, Table, Modal } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import 'bootstrap'
 import Api from "../../Api";
 import '../../css/EventAdmincustom.css'
 

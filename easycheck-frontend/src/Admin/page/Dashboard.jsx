@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Search, Clock, Users, UserX, Calendar, TrendingUp, AlertCircle, MoreVertical, ChevronLeft } from 'lucide-react';
 import { usePermission } from '../../usePermission';
 import { useAuth } from '../../AuthContext.jsx';
+import { LogOut } from 'lucide-react';
 
 
 const API_BASE = 'http://localhost:5000';
