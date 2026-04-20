@@ -4,19 +4,11 @@ import axios from "axios";
 
 const API = "http://localhost:5000/notifications";
 
-const TYPE_CONFIG = {
-  leave_approved: { icon: "bi-check-circle-fill", color: "text-green-500", bg: "bg-green-50" },
-  leave_rejected: { icon: "bi-x-circle-fill",     color: "text-red-500",   bg: "bg-red-50"   },
-  default:        { icon: "bi-bell-fill",         color: "text-blue-500",  bg: "bg-blue-50"  },
-};
-
-const getConfig = (type) => TYPE_CONFIG[type] || TYPE_CONFIG.default;
-
 const timeAgo = (dateStr) => {
   const diff = (Date.now() - new Date(dateStr)) / 1000;
   if (diff < 60)    return "เมื่อกี้";
   if (diff < 3600)  return `${Math.floor(diff / 60)} นาทีที่แล้ว`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} ชั่วโมงที่แล้ว`;
+
   return new Date(dateStr).toLocaleDateString("th-TH", { day: "numeric", month: "short" });
 };
 
@@ -39,21 +31,17 @@ const Notification = () => {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── โหลดข้อมูลครั้งแรก ─────────────────
   useEffect(() => { 
     loadNotifications(); 
   }, [loadNotifications]);
 
-  // ── SSE: เปิดการเชื่อมต่อเพื่อรอรับ Real-time Updates ─────────────────
   useEffect(() => {
     if (!token) return;
 
-    // ต้องส่ง Token ผ่าน Query String เพราะ EventSource ส่ง Header ไม่ได้
     const eventSource = new EventSource(`${API}/stream?token=${token}`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // หาก Backend ส่ง signal triggerRefresh ให้โหลดรายการใหม่ทันที
       if (data.triggerRefresh) {
         loadNotifications();
       }
@@ -64,14 +52,12 @@ const Notification = () => {
       eventSource.close();
     };
 
-    // ปิดการเชื่อมต่อเมื่อผู้ใช้ออกจากหน้านี้
     return () => {
       eventSource.close();
     };
   }, [token, loadNotifications]);
 
   const handleRead = async (id) => {
-    // Optimistic UI update: อัปเดตหน้าจอก่อนยิง API เพื่อความลื่นไหล
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
     );
@@ -102,8 +88,8 @@ const Notification = () => {
       <div className="w-full max-w-md space-y-5">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
-          <Link to="/home" className="text-white text-2xl">
+        <div className="relative flex items-center justify-center mb-2">
+          <Link to="/home" className="absolute left-0 text-white text-2xl">
             <i className="bi bi-chevron-left" />
           </Link>
 
@@ -121,13 +107,11 @@ const Notification = () => {
             <button
               onClick={handleReadAll}
               disabled={markingAll}
-              className="text-xs text-white/70 hover:text-white transition disabled:opacity-50"
+              className="absolute right-0 text-xs text-white/70 hover:text-white transition disabled:opacity-50"
             >
               อ่านทั้งหมด
             </button>
-          ) : (
-            <div className="w-16" />
-          )}
+          ) : null}
         </div>
 
         {/* Loading */}
@@ -150,7 +134,6 @@ const Notification = () => {
         {/* List */}
         <div className="space-y-3 pb-10">
           {notifications.map((n) => {
-            const cfg = getConfig(n.type);
             const isUnread = n.is_read === 0;
 
             return (
@@ -164,11 +147,6 @@ const Notification = () => {
                   }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center
-                                   flex-shrink-0 ${cfg.bg}`}>
-                    <i className={`bi ${cfg.icon} ${cfg.color} text-lg`} />
-                  </div>
-
                   <div className="flex-1 min-w-0">
                     <div className={`font-semibold text-sm
                       ${isUnread ? "text-gray-800" : "text-white/80"}`}>

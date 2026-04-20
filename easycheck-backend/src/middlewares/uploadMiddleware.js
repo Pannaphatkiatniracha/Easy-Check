@@ -13,6 +13,8 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         // Math.round(Math.random() * 1E9 ตรงนี้ยิ่งทำให้ชื่อไฟล์มันซ้ำกันยากขึ้นอีก Math.round ก็ปัดเศษเป้นจำนวนเต็มไป
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) // 1E9 คือหนึ่งพันล้าน
+        // avatar-รหัสผู้ใช้-เลขสุ่ม.นามสกุลไฟล์
+        // ตรง req.user.id(id) มาจาก verifyToken แปลว่าตรง router ต้องใช้ verifyToken มาก่อน
         cb(null, `avatar-${req.user.id}-${uniqueSuffix}${path.extname(file.originalname)}`) // path.extname คือเอาแค่นามสกุลจาก file.originalname
     }
 })
