@@ -1,219 +1,167 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Api from '../../Api';
 import styles from './Permission.module.css';
 
+const permissionNameMap = {
+  'view_dashboard': 'dashboard',
+  'view_attendance_report': 'viewAllStatistics',
+  'view_employee': 'viewEmployeeDetails',
+  'create_employee': 'addNewEmployee',
+  'edit_employee': 'editEmployeeInformation',
+  'delete_employee': 'deleteEmployee',
+  'view_time_logs': 'timeLog',
+  'approve_time_logs': 'approveChanges',
+  'edit_time_logs': 'editClockTime',
+  'export_data': 'exportData',
+  'manage_gps': 'systemLog'
+};
+
+const defaultPermissions = {
+  dashboard: false,
+  viewAllStatistics: false,
+  viewEmployeeDetails: false,
+  addNewEmployee: false,
+  editEmployeeInformation: false,
+  deleteEmployee: false,
+  timeLog: false,
+  approveChanges: false,
+  editClockTime: false,
+  exportData: false,
+  systemLog: false
+};
+
+
+
 const Permission = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const [user, setUser] = useState(null);
-  const [permissions, setPermissions] = useState({
-    dashboard: true,
-    viewAllStatistics: true,
-    exportReport: true,
-    viewEmployeeDetails: true,
-    editEmployeeInformation: true,
-    addNewEmployee: true,
-    deleteEmployee: true,
-    timeLog: true,
-    approveChanges: true,
-    editClockTime: true,
-    exportData: true,
-    systemLog: true
-  });
+  const [permissions, setPermissions] = useState(defaultPermissions);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        setUser({});
-      }
+      try { setUser(JSON.parse(userData)); }
+      catch { setUser({}); }
     } else {
       setUser({});
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+const fetchPermissions = async (showLoading = false) => {
+  try {
+    if (showLoading) setIsLoading(true);
 
-  const togglePermission = (key) => {
-    setPermissions(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
+    const res = await Api.get("/api/permissions");
 
-  if (!user) {
-    return <div>Loading...</div>;
+    const names = res.data.permissions; // ← ดึง array จาก key "permissions"
+
+    const updated = { ...defaultPermissions };
+    names.forEach(name => {
+      const key = permissionNameMap[name];
+      if (key) updated[key] = true;
+    });
+
+    setPermissions(updated);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setIsLoading(false);
   }
+};
+
+  useEffect(() => {
+    fetchPermissions(true);
+    const interval = setInterval(() => fetchPermissions(false), 3000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  if (!user || isLoading) {
+    return (
+      <div className={styles.layout}>
+        <div className={styles.content}>
+          <div className={styles.skeleton} />
+          <div className={styles.skeletonGrid}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className={styles.skeletonCard}>
+                <div className={styles.skeletonTitle} />
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className={styles.skeletonItem} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const renderItem = (key, label) => (
+    <div className={`${styles.item} ${permissions[key] ? styles.active : styles.inactive}`}>
+      <span className={styles.itemIcon}>
+        {permissions[key] ? '✓' : '✕'}
+      </span>
+      <span className={styles.itemLabel}>{label}</span>
+      <span className={`${styles.status} ${permissions[key] ? styles.statusActive : styles.statusInactive}`}>
+        {permissions[key] ? 'Enabled' : 'Disabled'}
+      </span>
+    </div>
+  );
 
   return (
     <div className={styles.layout}>
-      {/* MAIN CONTENT */}
       <div className={styles.content}>
-        <div className={styles.header}>
-          <h1>Permission</h1>
+        <div className={styles.headerRow}>
+          <div className={styles.header}>
+            <h1>Permission</h1>
+          </div>
         </div>
 
         <div className={styles.grid}>
-          {/* Dashboard and Report Section */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Dashboard and Report</h2>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}></span>
+              Dashboard and Report
+            </h2>
             <div className={styles.items}>
-              <div className={styles.item} onClick={() => togglePermission('dashboard')}>
-                <div className={`${styles.checkbox} ${permissions.dashboard ? styles.checked : ''}`}>
-                  {permissions.dashboard && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Dashboard</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('viewAllStatistics')}>
-                <div className={`${styles.checkbox} ${permissions.viewAllStatistics ? styles.checked : ''}`}>
-                  {permissions.viewAllStatistics && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>View All Statistics</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('exportReport')}>
-                <div className={`${styles.checkbox} ${permissions.exportReport ? styles.checked : ''}`}>
-                  {permissions.exportReport && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Export Report</span>
-              </div>
+              {renderItem('dashboard', 'Dashboard')}
+              {renderItem('viewAllStatistics', 'View All Statistics')}
             </div>
           </div>
 
-          {/* Work Time Management Section */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Work Time Management</h2>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}></span>
+              Work Time Management
+            </h2>
             <div className={styles.items}>
-              <div className={styles.item} onClick={() => togglePermission('timeLog')}>
-                <div className={`${styles.checkbox} ${permissions.timeLog ? styles.checked : ''}`}>
-                  {permissions.timeLog && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Time Log</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('approveChanges')}>
-                <div className={`${styles.checkbox} ${permissions.approveChanges ? styles.checked : ''}`}>
-                  {permissions.approveChanges && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Approve Changes</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('editClockTime')}>
-                <div className={`${styles.checkbox} ${permissions.editClockTime ? styles.checked : ''}`}>
-                  {permissions.editClockTime && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Edit Clock-In/Clock-Out Time</span>
-              </div>
+              {renderItem('timeLog', 'Time Log')}
+              {renderItem('approveChanges', 'Approve Changes')}
+              {renderItem('editClockTime', 'Edit Clock-In/Clock-Out Time')}
             </div>
           </div>
 
-          {/* Employees Section */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Employees</h2>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}></span>
+              Employees
+            </h2>
             <div className={styles.items}>
-              <div className={styles.item} onClick={() => togglePermission('viewEmployeeDetails')}>
-                <div className={`${styles.checkbox} ${permissions.viewEmployeeDetails ? styles.checked : ''}`}>
-                  {permissions.viewEmployeeDetails && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>View Employee Details</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('editEmployeeInformation')}>
-                <div className={`${styles.checkbox} ${permissions.editEmployeeInformation ? styles.checked : ''}`}>
-                  {permissions.editEmployeeInformation && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Edit Employee Information</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('addNewEmployee')}>
-                <div className={`${styles.checkbox} ${permissions.addNewEmployee ? styles.checked : ''}`}>
-                  {permissions.addNewEmployee && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Add New Employee</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('deleteEmployee')}>
-                <div className={`${styles.checkbox} ${permissions.deleteEmployee ? styles.checked : ''}`}>
-                  {permissions.deleteEmployee && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Delete Employee</span>
-              </div>
+              {renderItem('viewEmployeeDetails', 'View Employee Details')}
+              {renderItem('editEmployeeInformation', 'Edit Employee Information')}
+              {renderItem('addNewEmployee', 'Add New Employee')}
+              {renderItem('deleteEmployee', 'Delete Employee')}
             </div>
           </div>
 
-          {/* System Settings Section */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>System Settings</h2>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}></span>
+              System Settings
+            </h2>
             <div className={styles.items}>
-              <div className={styles.item} onClick={() => togglePermission('exportData')}>
-                <div className={`${styles.checkbox} ${permissions.exportData ? styles.checked : ''}`}>
-                  {permissions.exportData && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>Export Data</span>
-              </div>
-
-              <div className={styles.item} onClick={() => togglePermission('systemLog')}>
-                <div className={`${styles.checkbox} ${permissions.systemLog ? styles.checked : ''}`}>
-                  {permissions.systemLog && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
-                </div>
-                <span>System Log</span>
-              </div>
+              {renderItem('exportData', 'Export Data')}
+              {renderItem('systemLog', 'System Log')}
             </div>
           </div>
         </div>
