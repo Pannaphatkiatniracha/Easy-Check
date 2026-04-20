@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import pool from "../config/db.js";
 
-// ─── Multer Setup ─────────────────────────────────────────────────────────────
+// Multer Setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "uploads/attendance/";
@@ -29,7 +29,7 @@ export const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 const calcTimeStatus = (currentTimeStr, shiftTimeStr, type) => {
   const [ch, cm] = currentTimeStr.split(":").map(Number);
   const [sh, sm] = shiftTimeStr.split(":").map(Number);
@@ -64,7 +64,7 @@ const hasLatLngColumns = async () => {
   }
 };
 
-// ─── POST /attendance/check-in ────────────────────────────────────────────────
+//  POST /attendance/check-in 
 export const checkIn = async (req, res) => {
   try {
     const empId = req.user.id_employee; 
@@ -92,7 +92,7 @@ export const checkIn = async (req, res) => {
     
     let result;
     
-    // ✅ เพิ่มการบันทึก shift.shift_id ลงในฐานข้อมูล attendance
+    //  เพิ่มการบันทึก shift.shift_id ลงในฐานข้อมูล attendance
     if (canSaveLatLng) {
       const [insertResult] = await pool.query(
         `INSERT INTO attendance (id_employee, shift_id, work_date, check_in_status, check_in_photo, approval_status, check_in_lat, check_in_lng, check_in_time)
@@ -121,7 +121,7 @@ export const checkIn = async (req, res) => {
   }
 };
 
-// ─── POST /attendance/check-out ───────────────────────────────────────────────
+// POST /attendance/check-out 
 export const checkOut = async (req, res) => {
   try {
     const empId = req.user.id_employee;
@@ -175,12 +175,12 @@ export const checkOut = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/history ──────────────────────────────────────────────────
+//  GET /attendance/history 
 export const getHistory = async (req, res) => {
   try {
     const empId = req.user.id_employee;
     
-    // ✅ โค้ดใหม่: ตอน Join ให้ดึงกะงานจากตาราง attendance (a.shift_id) โดยตรงเลย
+    //  โค้ดใหม่: ตอน Join ให้ดึงกะงานจากตาราง attendance (a.shift_id) โดยตรงเลย
     const [rows] = await pool.query(
       `SELECT a.id, 'checkin' AS type, a.check_in_status AS status, a.check_in_photo AS photo, 
               a.approval_status, NULL AS reject_reason, a.check_in_time AS created_at,
@@ -207,7 +207,7 @@ export const getHistory = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/pending ──────────────────────────────────────────────────
+//  GET /attendance/pending 
 export const getPending = async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -243,7 +243,7 @@ export const getPending = async (req, res) => {
   }
 };
 
-// ─── PUT /attendance/:id/approve ──────────────────────────────────────────────
+// PUT /attendance/:id/approve 
 export const approveAttendance = async (req, res) => {
   try {
     const { id } = req.params;
@@ -254,7 +254,7 @@ export const approveAttendance = async (req, res) => {
   }
 };
 
-// ─── PUT /attendance/:id/reject ───────────────────────────────────────────────
+//  PUT /attendance/:id/reject 
 export const rejectAttendance = async (req, res) => {
   try {
     const { id } = req.params;
@@ -267,7 +267,7 @@ export const rejectAttendance = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/shift/me ─────────────────────────────────────────────────
+//  GET /attendance/shift/me 
 export const getMyShift = async (req, res) => {
   try {
     const primaryId = req.user.id; 
