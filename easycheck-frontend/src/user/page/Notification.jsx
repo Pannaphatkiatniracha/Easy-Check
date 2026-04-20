@@ -7,7 +7,7 @@ const API = "http://localhost:5000/notifications";
 const TYPE_CONFIG = {
   leave_approved: { icon: "bi-check-circle-fill", color: "text-green-500", bg: "bg-green-50" },
   leave_rejected: { icon: "bi-x-circle-fill",     color: "text-red-500",   bg: "bg-red-50"   },
-  default:        { icon: "bi-bell-fill",          color: "text-blue-500",  bg: "bg-blue-50"  },
+  default:        { icon: "bi-bell-fill",         color: "text-blue-500",  bg: "bg-blue-50"  },
 };
 
 const getConfig = (type) => TYPE_CONFIG[type] || TYPE_CONFIG.default;
@@ -30,7 +30,6 @@ const Notification = () => {
 
   const loadNotifications = useCallback(async () => {
     try {
-      setLoading(true);
       const res = await axios.get(API, { headers: authHeader });
       setNotifications(res.data || []);
     } catch (err) {
@@ -40,10 +39,39 @@ const Notification = () => {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { loadNotifications(); }, [loadNotifications]);
+  // ── โหลดข้อมูลครั้งแรก ─────────────────
+  useEffect(() => { 
+    loadNotifications(); 
+  }, [loadNotifications]);
+
+  // ── SSE: เปิดการเชื่อมต่อเพื่อรอรับ Real-time Updates ─────────────────
+  useEffect(() => {
+    if (!token) return;
+
+    // ต้องส่ง Token ผ่าน Query String เพราะ EventSource ส่ง Header ไม่ได้
+    const eventSource = new EventSource(`${API}/stream?token=${token}`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // หาก Backend ส่ง signal triggerRefresh ให้โหลดรายการใหม่ทันที
+      if (data.triggerRefresh) {
+        loadNotifications();
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE Connection Error:", error);
+      eventSource.close();
+    };
+
+    // ปิดการเชื่อมต่อเมื่อผู้ใช้ออกจากหน้านี้
+    return () => {
+      eventSource.close();
+    };
+  }, [token, loadNotifications]);
 
   const handleRead = async (id) => {
-    // tinyint → set เป็น 1
+    // Optimistic UI update: อัปเดตหน้าจอก่อนยิง API เพื่อความลื่นไหล
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
     );
@@ -66,7 +94,6 @@ const Notification = () => {
     }
   };
 
-  // ✅ เปลี่ยนจาก !n.is_read → n.is_read === 0 (tinyint)
   const unreadCount = notifications.filter((n) => n.is_read === 0).length;
 
   return (
@@ -124,7 +151,6 @@ const Notification = () => {
         <div className="space-y-3 pb-10">
           {notifications.map((n) => {
             const cfg = getConfig(n.type);
-            // ✅ tinyint: 0 = ยังไม่อ่าน, 1 = อ่านแล้ว
             const isUnread = n.is_read === 0;
 
             return (

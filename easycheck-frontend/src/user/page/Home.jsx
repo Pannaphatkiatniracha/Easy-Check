@@ -9,10 +9,11 @@ const Home = ({ role }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+
     const fetchUnread = async () => {
       try {
-        const token = sessionStorage.getItem("token");
-        if (!token) return;
         const res = await axios.get(`${API}/unread-count`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -22,11 +23,29 @@ const Home = ({ role }) => {
       }
     };
 
+    // โหลดตัวเลขครั้งแรกตอนเปิดหน้า Home
     fetchUnread();
 
-    // polling ทุก 30 วินาที อัปเดต badge อัตโนมัติ
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    // ── เปลี่ยนมาใช้ SSE รอรับอัปเดตแบบ Real-time แทน Polling ──
+    const eventSource = new EventSource(`${API}/stream?token=${token}`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // ถ้า Backend ส่งสัญญาณ triggerRefresh มา ให้ดึงตัวเลขใหม่ทันที
+      if (data.triggerRefresh) {
+        fetchUnread();
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE Connection Error:", error);
+      eventSource.close();
+    };
+
+    // ปิดการเชื่อมต่อเมื่อผู้ใช้ออกจากหน้านี้
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   // ── Bell Button ใช้ร่วมกันทั้ง 2 role ──
