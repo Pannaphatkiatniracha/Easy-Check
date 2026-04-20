@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Form, Button, Table, Modal } from 'react-bootstrap'
+import { Container, Row, Col, Card, Form, Button, Table } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import Api from "../../Api";
 import '../../css/EventAdmincustom.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import { Modal } from 'bootstrap'
 
 const CreateEvent = () => {
 
@@ -26,6 +28,19 @@ const CreateEvent = () => {
 
 
 
+
+
+    const openModal = () => {
+        const modalEl = document.getElementById('eventModal')
+
+        let modal = Modal.getInstance(modalEl)
+
+        if (!modal) {
+            modal = new Modal(modalEl)
+        }
+
+        modal.show()
+    }
 
 
 
@@ -240,9 +255,9 @@ const CreateEvent = () => {
 
         // เคลียร์ input
 
-        setEventTitle("");
-        setEventDate("");
-        setEventDescription("");
+        seteventTitle("");
+        seteventDate("");
+        seteventDescription("");
         seteventTime("");
         seteventLocation("");
         seteventType("");
@@ -297,57 +312,56 @@ const CreateEvent = () => {
     const formatDateTimeSQL = (dateTime) => {
         if (!dateTime) return null;
 
-        return dateTime.replace("T", " ") + ":00";
+        // ตัด timezone และ milliseconds ออก แล้วแทน T ด้วย space
+        const clean = dateTime.toString().split(".")[0].replace("T", " ");
+
+        // ถ้ายังไม่มี seconds ให้เติม :00
+        const parts = clean.split(":");
+        if (parts.length === 2) return clean + ":00";  // "HH:mm" → "HH:mm:00"
+        return clean;  // "HH:mm:ss" → ใช้เลย
     };
 
 
     const SaveEditEvent = async () => {
-
         try {
+            const rawTime = selectedEvent.event_time || "";
+
             const payload = {
                 id: selectedEvent.id,
                 title: selectedEvent.title,
-                event_date: selectedEvent.event_date,
+                event_date: selectedEvent.event_date?.split("T")[0], // ป้องกัน T ติดมา
                 description: selectedEvent.description,
 
-                event_time: selectedEvent.event_time + ":00",
+                // ป้องกัน :00 ซ้อน
+                event_time: rawTime.split(":").length === 2
+                    ? rawTime + ":00"
+                    : rawTime,
 
                 location: selectedEvent.location,
-
                 register_start: formatDateTimeSQL(selectedEvent.register_start),
                 register_end: formatDateTimeSQL(selectedEvent.register_end),
-
                 type: selectedEvent.type,
                 max_participants: selectedEvent.max_participants
             };
 
-            console.log("SEND DATA:", payload); // 🔥 debug
+            console.log("SEND DATA:", payload); // ดูค่าก่อน submit
 
-            const res = await Api.patch(
-                "/admin/EditEvent",
-                payload
-            );
-
+            const res = await Api.patch("/admin/EditEvent", payload);
             console.log(res.data);
             window.location.reload();
 
         } catch (error) {
             console.error("ERROR FULL:", error.response?.data || error);
+            alert("Save failed: " + (error.response?.data?.message || error.message));
         }
-
-    }
+    };
 
 
 
     return (
         <div style={{
             background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-            position: 'fixed',
-            top: 0,
-            left: 260,             // กัน sidebar
-            right: 0,
-            bottom: 0,
-            overflowY: 'auto',
+            minHeight: '100vh',
             padding: '2rem'
         }}>
             {/* Header */}
@@ -603,30 +617,16 @@ const CreateEvent = () => {
                         <div className="border rounded p-2" style={{ maxHeight: '250px', overflowY: 'auto' }}>
                             <div className="list-group">
                                 {Array.isArray(events) && events.map((event) => (
-                                    <a
-                                        key={event.id}
+                                    <button
+                                        type="button"
                                         className="list-group-item list-group-item-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#eventModal"
-                                        onClick={() =>
-                                            setSelectedEvent({
-                                                ...event,
-                                                event_date: event.event_date
-                                                    ? event.event_date.split("T")[0]
-                                                    : "",
-
-                                                event_time: event.event_time
-                                                    ? event.event_time.slice(0, 5)
-                                                    : "",
-
-
-                                                register_start: event.register_start || "",
-                                                register_end: event.register_end || ""
-                                            })
-                                        }
+                                        onClick={() => {
+                                            setSelectedEvent({ ...event })
+                                            openModal()
+                                        }}
                                     >
                                         {event.title}
-                                    </a>
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -636,7 +636,7 @@ const CreateEvent = () => {
             </div>
 
             {/* MODAL (ตัวเดียวพอ) */}
-            <div className="modal fade" id="eventModal" tabIndex="-1">
+            <div className="modal" id="eventModal" tabIndex="-1">
                 <div
                     className="modal-dialog"
                     style={{

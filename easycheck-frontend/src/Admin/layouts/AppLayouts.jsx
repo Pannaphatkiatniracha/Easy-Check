@@ -6,14 +6,7 @@ const AppLayouts = () => {
     return (
         <div className={styles.layout}>
             <Sidebar />
-            <main
-                className={styles.mainContent}
-                style={{
-                    marginLeft: "260px", 
-                    width: "calc(100% - 260px)",
-                    minHeight: "100vh"
-                }}
-            >
+            <main className={styles.mainContent}>
                 <Outlet />
             </main>
         </div>
