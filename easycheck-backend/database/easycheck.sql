@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Apr 20, 2026 at 04:49 PM
+-- Generation Time: Apr 20, 2026 at 06:32 AM
 -- Server version: 9.6.0
 -- PHP Version: 8.3.30
 
@@ -58,7 +58,10 @@ INSERT INTO `attendance` (`id`, `id_employee`, `shift_id`, `work_date`, `check_i
 (24, '171717', 2, '2026-04-23', '2026-04-23 08:52:20', 'uploads/attendance/attendance-171717-1745395200000-555555555.jpg', 'on_time', '2026-04-23 18:08:30', 'uploads/attendance/attendance-171717-1745398800000-666666666.jpg', 'normal', NULL, 'approved', 2),
 (25, '171717', 2, '2026-04-24', '2026-04-24 08:50:00', 'uploads/attendance/attendance-171717-1745481600000-777777777.jpg', 'on_time', '2026-04-24 16:30:00', 'uploads/attendance/attendance-171717-1745485200000-888888888.jpg', 'early', 'มีนัดพบแพทย์', 'pending', 2),
 (26, '171717', 2, '2026-04-25', '2026-04-25 08:55:00', 'uploads/attendance/attendance-171717-1745568000000-999999999.jpg', 'on_time', '2026-04-25 18:00:00', 'uploads/attendance/attendance-171717-1745571600000-101010101.jpg', 'normal', NULL, 'approved', 2),
-(27, '171717', 2, '2026-04-26', '2026-04-26 09:30:00', 'uploads/attendance/attendance-171717-1745654400000-111111222.jpg', 'late', '2026-04-26 17:00:00', 'uploads/attendance/attendance-171717-1745658000000-222222333.jpg', 'early', 'มีธุระด่วนที่บ้าน', 'pending', 2);
+(27, '171717', 2, '2026-04-26', '2026-04-26 09:30:00', 'uploads/attendance/attendance-171717-1745654400000-111111222.jpg', 'late', '2026-04-26 17:00:00', 'uploads/attendance/attendance-171717-1745658000000-222222333.jpg', 'early', 'มีธุระด่วนที่บ้าน', 'pending', 2),
+(30, '151515', 1, '2026-04-20', '2026-04-20 01:20:50', 'uploads\\attendance\\attendance-151515-1776648050621-941719389.jpg', 'late', '2026-04-20 01:22:11', 'uploads\\attendance\\attendance-151515-1776648131746-349908885.jpg', 'early', 'ไปหาหมอค่ะ', 'pending', 2),
+(31, '151515', 1, '2026-04-21', '2026-04-21 08:52:15', 'uploads/attendance/attendance-151515-1745211135000-111222333.jpg', 'on_time', NULL, NULL, NULL, NULL, 'approved', 2),
+(32, '202020', 2, '2026-04-20', '2026-04-20 09:12:45', 'uploads/attendance/attendance-202020-1745205165000-444555666.jpg', 'late', NULL, NULL, NULL, NULL, 'approved', 2);
 
 -- --------------------------------------------------------
 
@@ -320,6 +323,36 @@ INSERT INTO `Permission` (`id`, `category`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `permissions`
+--
+
+CREATE TABLE `permissions` (
+  `id_permission` int NOT NULL,
+  `permission_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `permissions`
+--
+
+INSERT INTO `permissions` (`id_permission`, `permission_name`) VALUES
+(1, 'view_dashboard'),
+(2, 'view_attendance_report'),
+(3, 'view_employee'),
+(4, 'create_employee'),
+(5, 'edit_employee'),
+(6, 'delete_employee'),
+(7, 'view_time_logs'),
+(8, 'approve_time_logs'),
+(9, 'edit_time_logs'),
+(10, 'export_data'),
+(11, 'manage_permissions'),
+(12, 'manage_gps'),
+(13, 'view_system_logs');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Roles`
 --
 
@@ -337,6 +370,40 @@ INSERT INTO `Roles` (`role_id`, `role`) VALUES
 (2, 'approver'),
 (3, 'admin'),
 (4, 'super admin');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `role_permissions`
+--
+
+CREATE TABLE `role_permissions` (
+  `id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `id_permission` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `role_permissions`
+--
+
+INSERT INTO `role_permissions` (`id`, `role_id`, `id_permission`) VALUES
+(32, 2, 2),
+(33, 2, 8),
+(50, 1, 3),
+(51, 1, 5),
+(64, 3, 3),
+(65, 3, 4),
+(66, 3, 5),
+(67, 3, 6),
+(68, 3, 9),
+(69, 3, 10),
+(70, 3, 12),
+(71, 1, 7),
+(72, 3, 7),
+(73, 3, 8),
+(74, 3, 1),
+(75, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -527,12 +594,26 @@ ALTER TABLE `Permission`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `permissions`
+--
+ALTER TABLE `permissions`
+  ADD PRIMARY KEY (`id_permission`);
+
+--
 -- Indexes for table `Roles`
 --
 ALTER TABLE `Roles`
   ADD PRIMARY KEY (`role_id`),
   ADD KEY `role_id` (`role_id`),
   ADD KEY `role_id_2` (`role_id`);
+
+--
+-- Indexes for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_role` (`role_id`),
+  ADD KEY `fk_permission` (`id_permission`);
 
 --
 -- Indexes for table `Shifts`
@@ -566,7 +647,7 @@ ALTER TABLE `User_shifts`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `branch`
@@ -621,6 +702,12 @@ ALTER TABLE `notifications`
 --
 ALTER TABLE `Permission`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `Users`
