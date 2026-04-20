@@ -98,16 +98,16 @@ export default function AccessControl() {
 
 
   return (
-     <div style={{
-            background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
-            position: 'fixed',
-            top: 0,
-            left: 260,             // กัน sidebar
-            right: 0,
-            bottom: 0,
-            overflowY: 'auto',
-            padding: '2rem'
-        }}>
+    <div style={{
+      background: 'linear-gradient(to bottom, #3C467B, #6E80E1)',
+      position: 'fixed',
+      top: 0,
+      left: 260,             // กัน sidebar
+      right: 0,
+      bottom: 0,
+      overflowY: 'auto',
+      padding: '2rem'
+    }}>
       {/* header */}
       <div className="py-4">
         <h1 className="fw-bold text-center m-4" style={{ color: '#FFFF' }}>
@@ -203,7 +203,7 @@ export default function AccessControl() {
               }}>
               Admin
             </Dropdown.Item>
-           
+
             <Dropdown.Item onClick={() => {
               setSelectedRole('approver')
               setRoleId(2)
@@ -253,7 +253,7 @@ export default function AccessControl() {
                             ? [...new Set([...prev, 1])]
                             //ตอนติ๊ก (เพิ่ม)
                             : prev.filter(id => id !== 1)
-                            //ตอนเอาติ๊กออก (ลบ)
+                          //ตอนเอาติ๊กออก (ลบ)
                         )
                       }
                     />
@@ -461,9 +461,12 @@ export default function AccessControl() {
               <Button
                 variant="success"
                 style={{ color: '#ffffff' }}
-                onClick={SaveRolePermissions}
+                onClick={async () => {
+                  await SaveRolePermissions();
+                  window.location.reload();
+                }}
               > Save </Button>
-              <Button variant="danger" style={{ color: '#FFF' }} onClick={() => setSelectedRole(null)}> Cancel</Button>
+              <Button variant="danger" style={{ color: '#FFF' }} onClick={() => setSelectedRole(null)} > Cancel</Button>
             </div>
 
           </div>

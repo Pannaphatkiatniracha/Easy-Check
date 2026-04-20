@@ -73,64 +73,82 @@ const ExportExcel = () => {
     earlyLeave: employees.filter(e => e.status === 'ออกก่อนเวลา').length,
   }
 
-  const handleExport = () => {
+  const handleExport = async () => {
     setIsExporting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({ date: selectedDate, format });
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment);
 
-    setTimeout(() => {
-      if (format === 'excel') {
-        exportToExcel();
-      } else {
-        exportToPDF();
-      }
-      setIsExporting(false);
+      const res = await fetch(`${API_BASE}/api/export?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Export failed');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `attendance_${selectedDate}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      link.click();
+      URL.revokeObjectURL(url);
+
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    }, 1500);
-  };
-  /*เป็นแค่การจำลอง ไม่มีlibraryเก็บ ไม่ได้ใช้excelจริงๆเพราะค่อนข้างหนัก อันนี้เลยเป็นแค่ตัวCSVจำลองที่เอาข้อมูลจากArrayที่ทำไว้จา */
-  const exportToExcel = () => {
-    const csvContent = [
-      ['รายงานการเข้างานพนักงาน'],
-      [`วันที่: ${selectedDate}`],
-      [`แผนก: ${selectedDepartment === 'all' ? 'ทั้งหมด' : selectedDepartment}`],
-      [''],
-      ['รหัสพนักงาน', 'ชื่อ-นามสกุล', 'แผนก', 'สถานะ', 'เวลาเข้างาน', 'เวลาออกงาน'],
-      ...filteredData.map(emp => [emp.id, emp.name, emp.department, emp.status, emp.checkIn, emp.checkOut])
-    ].map(row => row.join(',')).join('\n');
-    // ── เรียก backend ให้สร้างไฟล์แล้ว download เลย ──
-    const handleExport = async () => {
-      setIsExporting(true)
-      try {
-        const token = localStorage.getItem('token')
-        const params = new URLSearchParams({ date: selectedDate, format })
-        if (selectedDepartment !== 'all') params.append('department', selectedDepartment)
-
-        const res = await fetch(`${API_BASE}/api/export?${params}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-
-        if (!res.ok) throw new Error('Export failed')
-
-        const blob = await res.blob()
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `attendance_${selectedDate}.${format === 'excel' ? 'xlsx' : 'pdf'}`
-        link.click()
-        URL.revokeObjectURL(url)
-
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 3000)
-      } catch (err) {
-        console.error(err)
-        alert('เกิดข้อผิดพลาดในการส่งออกไฟล์')
-      } finally {
-        setIsExporting(false)
-      }
+    } catch (err) {
+      console.error(err);
+      alert('เกิดข้อผิดพลาดในการส่งออกไฟล์');
+    } finally {
+      setIsExporting(false);
     }
-  }
+  };
 
-return (
+  // ลบ exportToExcel / exportToPDF ออกได้เลย ถ้า backend จัดการทั้งหมด
+  /*เป็นแค่การจำลอง ไม่มีlibraryเก็บ ไม่ได้ใช้excelจริงๆเพราะค่อนข้างหนัก อันนี้เลยเป็นแค่ตัวCSVจำลองที่เอาข้อมูลจากArrayที่ทำไว้จา */
+  // const exportToExcel = () => {
+  //   const csvContent = [
+  //     ['รายงานการเข้างานพนักงาน'],
+  //     [`วันที่: ${selectedDate}`],
+  //     [`แผนก: ${selectedDepartment === 'all' ? 'ทั้งหมด' : selectedDepartment}`],
+  //     [''],
+  //     ['รหัสพนักงาน', 'ชื่อ-นามสกุล', 'แผนก', 'สถานะ', 'เวลาเข้างาน', 'เวลาออกงาน'],
+  //     ...filteredData.map(emp => [emp.id, emp.name, emp.department, emp.status, emp.checkIn, emp.checkOut])
+  //   ].map(row => row.join(',')).join('\n');
+  //   // ── เรียก backend ให้สร้างไฟล์แล้ว download เลย ──
+  //   const handleExport = async () => {
+  //     setIsExporting(true)
+  //     try {
+  //       const token = localStorage.getItem('token')
+  //       const params = new URLSearchParams({ date: selectedDate, format })
+  //       if (selectedDepartment !== 'all') params.append('department', selectedDepartment)
+
+  //       const res = await fetch(`${API_BASE}/api/export?${params}`, {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       })
+
+  //       if (!res.ok) throw new Error('Export failed')
+
+  //       const blob = await res.blob()
+  //       const url = URL.createObjectURL(blob)
+  //       const link = document.createElement('a')
+  //       link.href = url
+  //       link.download = `attendance_${selectedDate}.${format === 'excel' ? 'xlsx' : 'pdf'}`
+  //       link.click()
+  //       URL.revokeObjectURL(url)
+
+  //       setShowSuccess(true)
+  //       setTimeout(() => setShowSuccess(false), 3000)
+  //     } catch (err) {
+  //       console.error(err)
+  //       alert('เกิดข้อผิดพลาดในการส่งออกไฟล์')
+  //     } finally {
+  //       setIsExporting(false)
+  //     }
+  //   }
+  // }
+
+  return (
     <div className="min-h-screen" style={{ backgroundColor: '#3C467B' }}>
       {showSuccess && (
         <div className="fixed top-5 right-5 bg-gradient-to-r from-emerald-500 to-green-400 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50">
@@ -194,33 +212,17 @@ return (
                 </select>
               </div>
               <div>
+
                 <label className="block text-sm font-semibold text-gray-800 mb-2">รูปแบบไฟล์</label>
+
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => setFormat('excel')}
-                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${format === 'excel'
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                      : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
-                      }`}
-                  >
-                    Excel
-                  </button>
-                  <button
-                    onClick={() => setFormat('pdf')}
-                    className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${format === 'pdf'
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                      : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-500 hover:text-indigo-600'
-                      }`}
-                  >
-                    PDF
-                  </button>
                   {['excel', 'pdf'].map(f => (
                     <button
                       key={f}
                       onClick={() => setFormat(f)}
                       className={`flex-1 py-3 px-4 border-2 rounded-lg text-sm font-semibold transition-all ${format === f
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                        : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-300'
+                          ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
+                          : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-300'
                         }`}
                     >
                       {f === 'excel' ? 'Excel' : 'PDF'}
@@ -314,4 +316,4 @@ return (
 }
 
 
-export default ExportExcel ;
+export default ExportExcel;
