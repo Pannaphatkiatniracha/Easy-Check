@@ -1,9 +1,9 @@
 import db from "../config/db.js";
 
-// ── SSE: เก็บรายการเครื่องที่กำลังเชื่อมต่อรอรับแจ้งเตือน ─────────────────
+// ── SSE: เก็บรายการเครื่องที่กำลังเชื่อมต่อรอรับแจ้งเตือน 
 let connectedClients = [];
 
-// ── SSE Helper: สั่ง Push แจ้งเตือนให้ Frontend โหลดข้อมูลใหม่ ─────────────────
+// ── SSE Helper: สั่ง Push แจ้งเตือนให้ Frontend โหลดข้อมูลใหม่ 
 const notifyClient = (userId) => {
   // หา client ทั้งหมดของ user คนนี้ (เผื่อเขาเปิดหลายแท็บ/หลายเครื่อง)
   const userClients = connectedClients.filter(client => client.id === userId);
@@ -13,7 +13,7 @@ const notifyClient = (userId) => {
   });
 };
 
-// ── Helper: สร้าง notification ─────────────────
+//  Helper: สร้าง notification 
 export const createNotification = async ({ userId, type, title, message, refId = null }) => {
   await db.execute(
     `INSERT INTO notifications (id_employee, type, title, message, ref_id)
@@ -24,7 +24,7 @@ export const createNotification = async ({ userId, type, title, message, refId =
   notifyClient(userId);
 };
 
-// ── GET /notifications/stream ───────────────── (API ใหม่สำหรับเปิดท่อ SSE)
+// ── GET /notifications/stream (API ใหม่สำหรับเปิดท่อ SSE)
 export const streamNotifications = async (req, res) => {
   // ตั้งค่า Header สำหรับ Server-Sent Events
   res.setHeader("Content-Type", "text/event-stream");
@@ -47,7 +47,7 @@ export const streamNotifications = async (req, res) => {
   });
 };
 
-// ── GET /notifications ───────────────── (ใช้ดึง List ปกติ)
+// ── GET /notifications (ใช้ดึง List ปกติ)
 export const getMyNotifications = async (req, res) => {
   try {
     const userId = req.user.id; 
@@ -67,7 +67,7 @@ export const getMyNotifications = async (req, res) => {
   }
 };
 
-// ── GET /notifications/unread-count ───────────────── (เก็บไว้เผื่อใช้หน้าอื่น)
+// ── GET /notifications/unread-count (เก็บไว้เผื่อใช้หน้าอื่น)
 export const getUnreadCount = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -84,7 +84,7 @@ export const getUnreadCount = async (req, res) => {
   }
 };
 
-// ── PUT /notifications/:id/read ─────────────────
+// ── PUT /notifications/:id/read 
 export const markAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -105,7 +105,7 @@ export const markAsRead = async (req, res) => {
   }
 };
 
-// ── PUT /notifications/read-all ─────────────────
+//  PUT /notifications/read-all 
 export const markAllAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
