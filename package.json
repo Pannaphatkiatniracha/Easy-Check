@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "exceljs": "^4.4.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.4",
+    "pdfkit": "^0.18.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }

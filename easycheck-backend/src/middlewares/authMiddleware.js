@@ -10,7 +10,9 @@ export const branchFilter = (req, alias = 'u') => {
 export const verifyToken = (req, res, next) => {
     // Extract token from the authorization header
     const authHeader = req.headers.authorization
-    const token = authHeader && authHeader.split(' ')[1] // Split to get the token (skip 'Bearer')
+    
+    // เพิ่มการรองรับ Token จาก Query String (req.query.token) สำหรับ EventSource (SSE)
+    const token = (authHeader && authHeader.split(' ')[1]) || req.query.token 
 
     if (!token) {
         return res.status(401).json({
