@@ -40,6 +40,8 @@ app.use((req, res, next) => {
   next();
 });
 
+// ตัวแรก /uploads คือ ชื่อ URL ที่คนจะเรียก
+// express.static('uploads') คือ โฟลเดอร์จริงในเครื่อง server
 app.use("/uploads", express.static("uploads"));
 
 app.use("/auth", authRouter);

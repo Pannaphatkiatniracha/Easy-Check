@@ -149,6 +149,11 @@ export const uploadAvatar = async (req, res) => {
         const userId = req.user.id // ตรงนี้เอามาจาก vertifyToken
         
         // multer มันจะตั้งชื่อไฟล์รูปภาพให้เราใหม่โดยอัตโนมัติเพราะกันมัน replace กันก็ต้องเอามาเตรียมไว้ด้วย
+        // พอเก็บรูปลงเครื่อง multer จะสร้าง object 
+        // req.file = {
+        //   filename: "avatar-5-xxxx.png",
+        //    path: "uploads/avatars/avatar-5-xxxx.png",
+        //    mimetype: "image/png", }   แล้วก็จะเก็บใน req
         const fileName = req.file.filename
 
         // อัพเดตชื่อไฟล์ลง db คือเราเก็บแค่ชื่อไฟล์ แล้วอาไปต่อเป็น URL ในหน้าบ้าน
