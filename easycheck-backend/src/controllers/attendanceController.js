@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import pool from "../config/db.js";
 
-// ─── Multer Setup ─────────────────────────────────────────────────────────────
+//  Multer Setup 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "uploads/attendance/";
@@ -28,7 +28,7 @@ export const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 const calcTimeStatus = (currentTimeStr, shiftTimeStr, type) => {
   const [ch, cm] = currentTimeStr.split(":").map(Number);
   const [sh, sm] = shiftTimeStr.split(":").map(Number);
@@ -53,7 +53,7 @@ const getUserShift = async (primaryId) => {
   return rows[0] || null;
 };
 
-// ─── POST /attendance/check-in ────────────────────────────────────────────────
+//  POST /attendance/check-in 
 export const checkIn = async (req, res) => {
   try {
     const empId = req.user.id_employee;
@@ -98,7 +98,7 @@ export const checkIn = async (req, res) => {
   }
 };
 
-// ─── POST /attendance/check-out ───────────────────────────────────────────────
+//  POST /attendance/check-out 
 export const checkOut = async (req, res) => {
   try {
     const empId = req.user.id_employee;
@@ -145,7 +145,7 @@ export const checkOut = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/history ──────────────────────────────────────────────────
+//  GET /attendance/history 
 export const getHistory = async (req, res) => {
   try {
     const empId = req.user.id_employee;
@@ -176,7 +176,7 @@ export const getHistory = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/pending ──────────────────────────────────────────────────
+//  GET /attendance/pending 
 export const getPending = async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -212,7 +212,7 @@ export const getPending = async (req, res) => {
   }
 };
 
-// ─── PUT /attendance/:id/approve ──────────────────────────────────────────────
+//  PUT /attendance/:id/approve 
 export const approveAttendance = async (req, res) => {
   try {
     const { id } = req.params;
@@ -223,7 +223,7 @@ export const approveAttendance = async (req, res) => {
   }
 };
 
-// ─── PUT /attendance/:id/reject ───────────────────────────────────────────────
+// ─── PUT /attendance/:id/reject 
 export const rejectAttendance = async (req, res) => {
   try {
     const { id } = req.params;
@@ -236,7 +236,7 @@ export const rejectAttendance = async (req, res) => {
   }
 };
 
-// ─── GET /attendance/shift/me ─────────────────────────────────────────────────
+// ─── GET /attendance/shift/me 
 export const getMyShift = async (req, res) => {
   try {
     const primaryId = req.user.id; 

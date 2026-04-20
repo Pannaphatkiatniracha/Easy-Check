@@ -24,4 +24,4 @@ router.get("/pending", verifyToken, getPendingLeaves);
 router.put("/:id/approve", verifyToken, approveLeave);
 router.put("/:id/reject", verifyToken, rejectLeave);
 
-export default router;
+export default router; 
