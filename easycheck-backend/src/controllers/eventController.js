@@ -2,6 +2,7 @@ import db from '../config/db.js'
 
 
 // 🐷🐷 GET ALL-EVENT
+// API นี้ใช้ดึง event ทั้งหมด พร้อมจำนวนคนที่สมัครแล้ว
 export const getAllEvents = async (req, res) => {
     try {
 
@@ -28,12 +29,12 @@ export const getAllEvents = async (req, res) => {
 }
 
 
-// 🐷🐷 ลงทะเบียนเข้าร่วมกิจกรรม (Logic สำหรับหน้า ExRegister)
+// 🐷🐷 ลงทะเบียนเข้าร่วมกิจกรรม
 export const registerEvent = async (req, res) => {
-    const { eventId } = req.params 
+    const { eventId } = req.params // มาจาก URL
     const event_id = eventId
-    const { notes } = req.body
-    const id_employee = req.user.id_employee
+    const { notes } = req.body // มาจาก form
+    const id_employee = req.user.id_employee // มาจาก token
     const registration_date = new Date().toISOString().split('T')[0]
 
     try {
@@ -104,35 +105,5 @@ export const registerEvent = async (req, res) => {
     } catch (err) {
         console.error('Register Event Error:', err)
         res.status(500).json({ message: "Something went wrong. Please try again later", error: err.message })
-    }
-}
-
-
-// 🐷🐷 ดึงรายละเอียดกิจกรรมตาม id อันนี้คือทำเผื่อไว้ก่อน
-export const getEventById = async (req, res) => {
-    const { id } = req.params
-
-    try {
-        
-        const [rows] = await db.execute(
-            `SELECT events.*, 
-             COUNT(event_registrations.id) AS current_participants 
-             FROM events
-             LEFT JOIN event_registrations ON events.id = event_registrations.event_id 
-                AND event_registrations.status = 'registered'
-             WHERE events.id = ?
-             GROUP BY events.id`, 
-            [id]
-        )
-
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Event not found" })
-        }
-
-        res.status(200).json(rows[0])
-
-    } catch (err) {
-        console.error("Error fetching event:", err)
-        res.status(500).json({ message: "Server Error", error: err.message })
     }
 }

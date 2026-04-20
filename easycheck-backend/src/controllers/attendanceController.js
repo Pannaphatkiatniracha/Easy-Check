@@ -282,9 +282,10 @@ export const getAttendanceHistory = async (req, res) => {
       let current = new Date(start)
       const last = new Date(end)
 
+      // ทำไปเรื่อย ๆ จนกว่าวันจะเลยวันสุดท้ายที่ลา
       while (current <= last) {
-        dates.push(current.toISOString().split("T")[0])
-        current.setDate(current.getDate() + 1)
+        dates.push(current.toISOString().split("T")[0]) // อันนี้ตัด format เฉย ๆ
+        current.setDate(current.getDate() + 1) // อัพเดตค่าวันเพื่อเช็คกับเงื่อนไข
       }
 
       return dates
@@ -330,6 +331,7 @@ export const getWeeklyTimeline = async (req, res) => {
 
   try {
     // ไปดึงเวลาเข้างาน-ออกงาน แล้วก็วันที่ทำออกมา แต่เอาเฉพาะข้อมูล 7 วันล่าสุด
+    // AND work_date >= CURDATE() - INTERVAL 7 DAY มันคือเอาย้อนหลังแค่ 7 วัน
     const [rows] = await pool.query(
       `SELECT check_in_time,check_out_time,work_date,
           DAYNAME(work_date) as day
